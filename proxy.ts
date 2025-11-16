@@ -4,6 +4,10 @@ import { i18nSettings } from "@/i18n/settings";
 export function proxy(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
 
+  if (pathname.includes(".")) {
+    return NextResponse.next();
+  }
+
   if (i18nSettings.locales.some((loc) => pathname.startsWith(`/${loc}`))) {
     return NextResponse.next();
   }

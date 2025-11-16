@@ -1,18 +1,25 @@
-import type { Metadata } from "next";
-import type { ReactNode } from "react";
-
+/* **************************************************
+ * Imports
+ **************************************************/
+import Header from "@/components/organism/header";
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import { getDictionary } from "@/lib/i18n/utils";
+import "@/globals.css";
 
-type LayoutParams = { locale: string };
-
+/* **************************************************
+ * Types
+ **************************************************/
 interface RootLayoutProps {
-  params: LayoutParams;
-  children: ReactNode;
+  params: Promise<{ locale: string }>;
+  children: React.ReactNode;
 }
 
-export async function generateMetadata({ params }: RootLayoutProps): Promise<Metadata> {
-  const { locale } = params;
+/* **************************************************
+ * Metadata
+ **************************************************/
+export async function generateMetadata({ params }: RootLayoutProps) {
+  const { locale } = await params;
+
   const dict = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
   const meta = dict.meta;
 
@@ -27,10 +34,20 @@ export async function generateMetadata({ params }: RootLayoutProps): Promise<Met
   };
 }
 
-export default function RootLayout({ children, params }: RootLayoutProps) {
+/* **************************************************
+ * Layout
+ **************************************************/
+export default async function RootLayout({ children, params }: RootLayoutProps) {
+  const { locale } = await params;
+
+  const dict = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
+
   return (
-    <html lang={params.locale}>
-      <body>{children}</body>
+    <html lang={locale}>
+      <body>
+        <Header dict={dict}>Prova</Header>
+        {children}
+      </body>
     </html>
   );
 }

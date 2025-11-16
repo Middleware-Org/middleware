@@ -1,0 +1,89 @@
+@import "tailwindcss";
+
+button,
+input,
+textarea,
+select {
+  font-size: 1em !important;
+}
+
+svg,
+.icon {
+  font-size: 1em !important;
+}
+
+input[type="range"],
+input[type="checkbox"],
+input[type="radio"] {
+  font-size: 1em !important;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+@layer base {
+  :root {
+    --primary: #fff7f4;
+    --secondary: #000000;
+    --secondary-rgb: 0, 0, 0;
+    --tertiary: #c2081c;
+    /* Tailwind v4 color variables */
+    --color-primary: var(--primary);
+    --color-secondary: var(--secondary);
+    --color-tertiary: var(--tertiary);
+    --color-white: #fff7f4;
+    --color-black: #000000;
+  }
+  html[data-theme="dark"] {
+    --primary: #000000;
+    --secondary: #fff7f4;
+    --secondary-rgb: 255, 247, 244;
+    --tertiary: #c2081c;
+    /* Tailwind v4 color variables */
+    --color-primary: var(--primary);
+    --color-secondary: var(--secondary);
+    --color-tertiary: var(--tertiary);
+  }
+}
+
+@layer base {
+  body {
+    background-color: var(--primary);
+    color: var(--secondary);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p {
+    color: var(--secondary);
+  }
+}
+
+.hidden-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hidden-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 500ms;
+}
+
+svg > * {
+  fill: var(--color-primary) !important;
+}
+
+p {
+  margin-top: 0 !important;
+}
