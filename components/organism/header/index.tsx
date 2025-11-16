@@ -2,6 +2,7 @@
  * Imports
  **************************************************/
 import Logo from "@/components/organism/logo";
+import Hamburger from "@/components/organism/hamburger";
 import styles from "./styles";
 
 /* **************************************************
@@ -9,7 +10,15 @@ import styles from "./styles";
  **************************************************/
 interface HeaderProps {
   children: React.ReactNode;
-  dict: { title: string };
+  dict: {
+    title: string;
+    aria: {
+      hamburger: {
+        open: string;
+        close: string;
+      };
+    };
+  };
 }
 
 /* **************************************************
@@ -20,7 +29,7 @@ export default function Header({ children, dict }: HeaderProps) {
     <header className={styles.header}>
       <div className={styles.headerTopSub}>
         <Logo dict={dict} />
-        {/* <HeaderHamburger dict={dict} /> */}
+        <Hamburger dict={dict} />
       </div>
       <div className={styles.headerBottomSub}>
         <div className={styles.headerBottomSubContent}>

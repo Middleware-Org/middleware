@@ -1,5 +1,11 @@
 {
   "title": "Middleware",
+  "aria": {
+    "hamburger": {
+      "open": "Apri il menu",
+      "close": "Chiudi il menu"
+    }
+  },
   "meta": {
     "title": "Middleware",
     "description": "Magazine dell'Autonomia Modenese"
