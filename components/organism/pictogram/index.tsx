@@ -19,7 +19,7 @@ interface PictogramProps {
 export default function Pictogram({ className }: PictogramProps) {
   return (
     <Link href="/">
-      <span className={cn(styles.pictogram, className ? className : "")}>
+      <span className={cn(styles.pictogram, className ?? "")}>
         <Image src="/logo.svg" alt="" width={48} height={48} priority />
       </span>
     </Link>

@@ -1,16 +1,12 @@
 "use client";
 
+/* **************************************************
+ * Imports
+ **************************************************/
 import { cn } from "@/lib/utils/classes";
-/* **************************************************
- * Imports
- **************************************************/
-import styles from "./styles";
 import { useMenu } from "@/store/useMenu";
-
-/* **************************************************
- * Imports
- **************************************************/
 import type { CommonDictionary } from "@/lib/i18n/types";
+import styles from "./styles";
 
 /* **************************************************
  * Types
@@ -39,7 +35,7 @@ export default function Hamburger({ dict }: HamburgerProps) {
           isOpen ? styles.hamburgerLineOpen : styles.hamburgerLineClosed,
         )}
       ></span>
-      <div className="relative">
+      <div className={styles.hamburgerMiddleContainer}>
         <span
           className={cn(
             styles.hamburgerLineMiddle,

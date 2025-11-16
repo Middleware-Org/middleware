@@ -13,6 +13,7 @@ const styles = {
   ),
   hamburgerLineOpen: cn("opacity-0"),
   hamburgerLineClosed: cn("opacity-100"),
+  hamburgerMiddleContainer: cn("relative"),
   hamburgerLineMiddle: cn(
     "bg-secondary block transition-all duration-300 ease-out absolute top-0 right-0 h-0.5 w-[28px] rounded-sm",
   ),

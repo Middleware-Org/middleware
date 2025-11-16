@@ -1,5 +1,12 @@
+/* **************************************************
+ * Imports
+ **************************************************/
 import { cn } from "@/lib/utils/classes";
+import styles from "./styles";
 
+/* **************************************************
+ * Types
+ **************************************************/
 type Props = {
   children: React.ReactNode;
   className?: string;
@@ -12,6 +19,9 @@ type Props = {
   type?: "button" | "submit" | "reset";
 };
 
+/* **************************************************
+ * Button
+ **************************************************/
 export default function Button({
   children,
   className,
@@ -20,6 +30,13 @@ export default function Button({
   variants = "primary",
   ...props
 }: Props) {
+  const variantStyles = {
+    primary: styles.primary,
+    secondary: styles.secondary,
+    tertiary: styles.tertiary,
+    unstyled: styles.unstyled,
+  };
+
   return (
     <button
       type={type}
@@ -27,14 +44,7 @@ export default function Button({
       aria-pressed={props.ariaPressed}
       title={props.title}
       {...props}
-      className={cn(
-        className ? className : "",
-        "px-4 py-2 w-full cursor-pointer",
-        variants === "primary" ? "bg-primary text-secondary border-secondary border" : "",
-        variants === "secondary" ? "bg-secondary text-primary" : "",
-        variants === "tertiary" ? "bg-tertiary text-white border-secondary border" : "",
-        variants === "unstyled" ? "bg-transparent text-secondary" : "",
-      )}
+      className={cn(styles.base, variantStyles[variants], className ?? "")}
       style={style}
     >
       {children}
