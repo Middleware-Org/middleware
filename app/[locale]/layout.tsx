@@ -53,7 +53,7 @@ export default async function RootLayout({ children, params }: RootLayoutProps) 
           />
         </Header>
         <Menu dict={dict} />
-        {children}
+        <main className="w-full">{children}</main>
       </body>
     </html>
   );

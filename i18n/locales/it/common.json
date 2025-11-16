@@ -24,5 +24,9 @@
   "meta": {
     "title": "Middleware",
     "description": "Magazine dell'Autonomia Modenese"
+  },
+  "articleCard": {
+    "wordsBy": "Parole di",
+    "readMore": "Leggi di più"
   }
 }

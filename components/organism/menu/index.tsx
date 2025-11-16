@@ -58,9 +58,6 @@ export default function Menu({ dict }: MenuProps) {
     return `/${pathnameWithoutLang}`;
   }
 
-  /* **************************************************
-   * Render
-   **************************************************/
   return (
     <div
       className={cn(styles.container, isOpen ? styles.containerOpen : styles.containerClosed)}

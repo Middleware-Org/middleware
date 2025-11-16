@@ -95,9 +95,6 @@ export default function IssuesDropdown({ issues, className }: IssuesDropdownProp
     }
   };
 
-  /* **************************************************
-   * Render
-   **************************************************/
   if (!displayIssue) {
     return null;
   }
