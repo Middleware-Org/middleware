@@ -3,6 +3,7 @@
  **************************************************/
 
 import { Article } from "@/.velite";
+import Articles from "@/components/molecules/articles";
 import Cover from "@/components/organism/cover";
 import { getAllIssues, getArticlesByIssue } from "@/lib/content/queries";
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
@@ -50,7 +51,9 @@ export default async function RootPage({ params }: RootPageProps) {
             <div className="lg:sticky md:sticky lg:top-[115px] md:top-[115px] lg:self-start md:self-start lg:h-[calc(100dvh-180px)] md:h-[calc(100dvh-180px)] h-full">
               <Cover issue={issue} articleInEvidence={articleInEvidence} dict={dict} />
             </div>
-            <div className="flex flex-col lg:min-h-screen">ARTICLES</div>
+            <div className="flex flex-col lg:min-h-screen">
+              <Articles articles={otherArticles} dict={dict} issue={issue} />
+            </div>
           </div>
         );
       })}

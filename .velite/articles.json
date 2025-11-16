@@ -1,5 +1,16 @@
 [
   {
+    "slug": "hello-world-2",
+    "title": "Hello world",
+    "date": "2025-01-01T00:00:00.000Z",
+    "author": "infoaut",
+    "category": "organizzazione",
+    "issue": "l-enigma-dell-organizzazione",
+    "in_evidence": true,
+    "content": "<p>Questo è il mio primo articolo con Issue!</p>",
+    "excerpt": "Esempio di articolo"
+  },
+  {
     "slug": "hello-world",
     "title": "Hello world",
     "date": "2025-01-01T00:00:00.000Z",
