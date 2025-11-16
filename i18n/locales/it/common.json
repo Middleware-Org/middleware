@@ -13,6 +13,12 @@
       "categories": "Categorie",
       "authors": "Autori",
       "subscribe": "Abbonati"
+    },
+    "menu": {
+      "quote": "Non è la crisi che produce la lotta di classe, è la lotta di classe che produce la crisi.",
+      "footer_quote": "In memoria di Mario Tronti.",
+      "middleware": "Middleware",
+      "about": "About"
     }
   },
   "meta": {

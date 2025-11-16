@@ -6,6 +6,7 @@ import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import { getDictionary } from "@/lib/i18n/utils";
 import "@/globals.css";
 import IssuesDropdown from "@/components/organism/issuesDropDown";
+import Menu from "@/components/organism/menu";
 
 /* **************************************************
  * Types
@@ -51,6 +52,7 @@ export default async function RootLayout({ children, params }: RootLayoutProps) 
             issues={[{ id: "1", title: "Test", date: "2025-01-01", publishedAt: "2025-01-01" }]}
           />
         </Header>
+        <Menu dict={dict} />
         {children}
       </body>
     </html>

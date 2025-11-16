@@ -38,8 +38,12 @@ export function MonoTextBold({ children, className = "" }: TypographyProps) {
   return <p className={cn(gtAmericaMonoBold.className, className)}>{children}</p>;
 }
 
-export function MonoTextLight({ children, className = "" }: TypographyProps) {
-  return <p className={cn(gtAmericaMonoLight.className, className)}>{children}</p>;
+export function MonoTextLight({ children, className = "", onClick }: TypographyProps) {
+  return (
+    <p className={cn(gtAmericaMonoLight.className, className)} onClick={onClick}>
+      {children}
+    </p>
+  );
 }
 
 export function SerifText({ children, className = "" }: TypographyProps) {
