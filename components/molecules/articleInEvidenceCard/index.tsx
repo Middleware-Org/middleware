@@ -10,46 +10,41 @@ import { cn } from "@/lib/utils/classes";
 import { getTextColor } from "@/lib/utils/color";
 import { formatDateByLang } from "@/lib/utils/date";
 import styles from "./styles";
+import { Article, Issue } from "@/.velite";
+import { CommonDictionary } from "@/lib/i18n/types";
+import { getAuthorBySlug, getCategoryBySlug } from "@/lib/content/queries";
 
 /* **************************************************
  * Types
  **************************************************/
 type ArticleInEvidenceCardProps = {
-  article: {
-    id: string;
-    excerpt: string;
-    title: string;
-    date: string;
-    cover: string;
-    alt_cover: string;
-    color: string;
-    author: {
-      id: string;
-      name: string;
-    };
-    category: {
-      id: string;
-      name: string;
-    };
-  };
-  dict: {
-    articleCard: {
-      wordsBy: string;
-      readMore: string;
-    };
-  };
+  article: Article;
+  issue: Issue;
+  dict: Pick<CommonDictionary, "articleCard">;
 };
 
 /* **************************************************
  * ArticleInEvidenceCard
  **************************************************/
-export default function ArticleInEvidenceCard({ article, dict }: ArticleInEvidenceCardProps) {
+export default function ArticleInEvidenceCard({
+  article,
+  issue,
+  dict,
+}: ArticleInEvidenceCardProps) {
   const { lang = "it" } = useParams() as { lang: "it" };
+
   const isMobile = useIsMobile();
-  const { textColor, backgroundColor } = getTextColor(article.color);
+
+  const { textColor, backgroundColor } = getTextColor(issue.color);
+
+  const author = getAuthorBySlug(article.author);
+
+  const category = getCategoryBySlug(article.category);
+
+  if (!author || !category) return null;
 
   return (
-    <article className={styles.article} style={{ backgroundColor: article.color }}>
+    <article className={styles.article} style={{ backgroundColor: issue.color }}>
       <header className={styles.header}>
         <div className={styles.badgesMobile}>
           <div className={styles.badgeDate}>
@@ -61,7 +56,7 @@ export default function ArticleInEvidenceCard({ article, dict }: ArticleInEviden
             <MonoTextLight className={styles.badgeTextTitle}>{article.title}</MonoTextLight>
           </div>
         </div>
-        <Link href={`/articles/${article.id}`}>
+        <Link href={`/articles/${article.slug}`}>
           <H3 className={cn(styles.title, textColor)}>{article.title}</H3>
         </Link>
 
@@ -69,10 +64,8 @@ export default function ArticleInEvidenceCard({ article, dict }: ArticleInEviden
           <MonoTextLight className={cn(styles.authorLabel, textColor)}>
             {dict.articleCard.wordsBy}
           </MonoTextLight>
-          <Link href={`/authors#${article.author.id}`}>
-            <MonoTextBold className={cn(styles.authorLink, textColor)}>
-              {article.author.name}
-            </MonoTextBold>
+          <Link href={`/authors#${author.slug}`}>
+            <MonoTextBold className={cn(styles.authorLink, textColor)}>{author.name}</MonoTextBold>
           </Link>
         </div>
       </header>
@@ -80,7 +73,7 @@ export default function ArticleInEvidenceCard({ article, dict }: ArticleInEviden
       <section>
         <SerifText className={cn(styles.excerpt, textColor)}>{article.excerpt}</SerifText>
         <div className={styles.readMore}>
-          <Link href={`/articles/${article.id}`}>
+          <Link href={`/articles/${article.slug}`}>
             <MonoTextBold className={cn(styles.readMoreLink, textColor)}>
               {dict.articleCard.readMore} →
             </MonoTextBold>
@@ -89,10 +82,10 @@ export default function ArticleInEvidenceCard({ article, dict }: ArticleInEviden
       </section>
       <Separator className={cn(backgroundColor)} />
       <footer>
-        <Link href={`/categories#${article.category.id}`}>
+        <Link href={`/categories#${category.slug}`}>
           <div className={styles.category}>
             <MonoTextLight className={cn(styles.categoryLink, textColor)}>
-              {article.category.name}
+              {category.name}
             </MonoTextLight>
           </div>
         </Link>

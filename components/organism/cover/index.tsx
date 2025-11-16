@@ -11,36 +11,14 @@ import { formatDateByLang } from "@/lib/utils/date";
 import styles from "./styles";
 import ArticleInEvidenceCard from "@/components/molecules/articleInEvidenceCard";
 import { CommonDictionary } from "@/lib/i18n/types";
+import { Article, Issue } from "@/.velite";
 
 /* **************************************************
  * Types
  **************************************************/
 type CoverProps = {
-  issue: {
-    id: string;
-    title: string;
-    date: string;
-    cover: string;
-    alt_cover: string;
-    color: string;
-  };
-  articleInEvidence?: {
-    id: string;
-    title: string;
-    date: string;
-    cover: string;
-    alt_cover: string;
-    color: string;
-    excerpt: string;
-    author: {
-      id: string;
-      name: string;
-    };
-    category: {
-      id: string;
-      name: string;
-    };
-  };
+  issue: Issue;
+  articleInEvidence: Article;
   dict: Pick<CommonDictionary, "articleCard">;
 };
 
@@ -63,7 +41,7 @@ export default function Cover({ issue, articleInEvidence, dict }: CoverProps) {
         <div className={styles.imageWrapper} style={{ backgroundColor: issue.color }}>
           <Image
             src={issue.cover}
-            alt={issue.alt_cover}
+            alt={issue.title}
             width={IMAGE_WIDTH}
             height={IMAGE_HEIGHT}
             className={styles.image}
@@ -81,7 +59,9 @@ export default function Cover({ issue, articleInEvidence, dict }: CoverProps) {
           </div>
         </div>
         <div className={styles.footer} style={{ backgroundColor: issue.color }}>
-          {articleInEvidence && <ArticleInEvidenceCard article={articleInEvidence} dict={dict} />}
+          {articleInEvidence && (
+            <ArticleInEvidenceCard article={articleInEvidence} dict={dict} issue={issue} />
+          )}
         </div>
       </div>
     </div>
