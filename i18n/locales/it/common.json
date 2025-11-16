@@ -5,6 +5,9 @@
       "open": "Apri il menu",
       "close": "Chiudi il menu"
     },
+    "issuesDropdown": {
+      "title": "Seleziona un numero"
+    },
     "header": {
       "issues": "Archivio",
       "categories": "Categorie",

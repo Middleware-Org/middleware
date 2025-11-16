@@ -9,10 +9,7 @@ import { headerLinks } from "@/lib/data/links";
 import { useIsMobile } from "@/hooks/useMediaQuery";
 import { cn } from "@/lib/utils/classes";
 import Link from "next/link";
-
-/* **************************************************
- * Imports
- **************************************************/
+import styles from "./styles";
 import type { CommonDictionary } from "@/lib/i18n/types";
 
 /* **************************************************
@@ -31,21 +28,28 @@ export default function Nav({ dict }: NavProps) {
   const mobile = useIsMobile();
 
   return (
-    <nav className="flex items-center border-r border-secondary h-full">
+    <nav className={styles.nav}>
       {headerLinks.map((headerLink) => {
         const isActive = pathname?.includes(headerLink.href) || false;
         return (
           <div
             key={headerLink.label}
             className={cn(
-              mobile && !headerLink.in_evidence ? "lg:flex md:flex hidden" : "flex",
-              headerLink.in_evidence ? "bg-secondary text-primary" : "",
-              isActive ? "bg-tertiary text-white" : "",
-              " border-l border-secondary h-full items-center px-3 hover:bg-tertiary hover:text-white transition-all duration-150 cursor-pointer",
+              styles.linkContainer,
+              mobile && !headerLink.in_evidence
+                ? styles.linkContainerMobile
+                : styles.linkContainerVisible,
+              headerLink.in_evidence ? styles.linkContainerHighlighted : "",
+              isActive ? styles.linkContainerActive : "",
             )}
           >
             <Link href={headerLink.href}>
-              <MonoTextLight className="text-xs md:text-base">
+              <MonoTextLight
+                className={cn(
+                  styles.linkText,
+                  headerLink.in_evidence ? styles.linkTextHighlighted : "",
+                )}
+              >
                 {dict.aria.header[headerLink.label as keyof typeof dict.aria.header]}
               </MonoTextLight>
             </Link>
