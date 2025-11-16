@@ -25,12 +25,10 @@ const i18nInstanceCache = new Map<string, Promise<I18NextInstance>>();
 async function createI18n(locale: string) {
   const instance = createInstance();
 
-  await instance
-    .use(Backend)
-    .init({
-      ...sharedConfig,
-      lng: locale,
-    });
+  await instance.use(Backend).init({
+    ...sharedConfig,
+    lng: locale,
+  });
 
   return instance;
 }
@@ -43,7 +41,10 @@ async function getOrCreateInstance(locale: string) {
   return i18nInstanceCache.get(locale)!;
 }
 
-export async function initI18nServer(locale: string, namespaces?: TranslationNamespace | TranslationNamespace[]) {
+export async function initI18nServer(
+  locale: string,
+  namespaces?: TranslationNamespace | TranslationNamespace[],
+) {
   const normalizedNamespaces = normalizeNamespaces(namespaces);
   const i18nInstance = await getOrCreateInstance(locale);
 

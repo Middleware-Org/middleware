@@ -8,14 +8,10 @@ export function proxy(req: NextRequest) {
     return NextResponse.next();
   }
 
-  const locale = req.headers
-    .get("accept-language")
-    ?.split(",")[0]
-    .slice(0, 2);
+  const locale = req.headers.get("accept-language")?.split(",")[0].slice(0, 2);
 
-  const detected = locale && i18nSettings.locales.includes(locale)
-    ? locale
-    : i18nSettings.defaultLocale;
+  const detected =
+    locale && i18nSettings.locales.includes(locale) ? locale : i18nSettings.defaultLocale;
 
   return NextResponse.redirect(new URL(`/${detected}${pathname}`, req.url));
 }
