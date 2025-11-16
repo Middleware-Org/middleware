@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+@theme {
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-tertiary: var(--tertiary);
+  --color-white: #fff7f4;
+  --color-black: #000000;
+}
+
 button,
 input,
 textarea,
@@ -30,7 +38,7 @@ input[type="radio"] {
     --secondary: #000000;
     --secondary-rgb: 0, 0, 0;
     --tertiary: #c2081c;
-    /* Tailwind v4 color variables */
+    /* Tailwind v4 automatic color recognition */
     --color-primary: var(--primary);
     --color-secondary: var(--secondary);
     --color-tertiary: var(--tertiary);
@@ -42,7 +50,7 @@ input[type="radio"] {
     --secondary: #fff7f4;
     --secondary-rgb: 255, 247, 244;
     --tertiary: #c2081c;
-    /* Tailwind v4 color variables */
+    /* Tailwind v4 automatic color recognition */
     --color-primary: var(--primary);
     --color-secondary: var(--secondary);
     --color-tertiary: var(--tertiary);

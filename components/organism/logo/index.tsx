@@ -6,10 +6,15 @@ import Pictogram from "@/components/organism/pictogram";
 import { MonoTextBold } from "@/components/atoms/typography";
 
 /* **************************************************
+ * Imports
+ **************************************************/
+import type { CommonDictionary } from "@/lib/i18n/types";
+
+/* **************************************************
  * Types
  **************************************************/
 interface LogoProps {
-  dict: { title: string };
+  dict: Pick<CommonDictionary, "title">;
 }
 
 /* **************************************************

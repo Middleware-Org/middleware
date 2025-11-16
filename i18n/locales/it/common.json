@@ -4,6 +4,12 @@
     "hamburger": {
       "open": "Apri il menu",
       "close": "Chiudi il menu"
+    },
+    "header": {
+      "issues": "Archivio",
+      "categories": "Categorie",
+      "authors": "Autori",
+      "subscribe": "Abbonati"
     }
   },
   "meta": {

@@ -3,22 +3,16 @@
  **************************************************/
 import Logo from "@/components/organism/logo";
 import Hamburger from "@/components/organism/hamburger";
+import Nav from "@/components/organism/nav";
 import styles from "./styles";
+import type { CommonDictionary } from "@/lib/i18n/types";
 
 /* **************************************************
  * Types
  **************************************************/
 interface HeaderProps {
   children: React.ReactNode;
-  dict: {
-    title: string;
-    aria: {
-      hamburger: {
-        open: string;
-        close: string;
-      };
-    };
-  };
+  dict: CommonDictionary;
 }
 
 /* **************************************************
@@ -34,7 +28,7 @@ export default function Header({ children, dict }: HeaderProps) {
       <div className={styles.headerBottomSub}>
         <div className={styles.headerBottomSubContent}>
           {children}
-          {/* <HeaderNav dict={dict} /> */}
+          <Nav dict={dict} />
         </div>
       </div>
     </header>

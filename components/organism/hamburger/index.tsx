@@ -8,17 +8,15 @@ import styles from "./styles";
 import { useMenu } from "@/store/useMenu";
 
 /* **************************************************
+ * Imports
+ **************************************************/
+import type { CommonDictionary } from "@/lib/i18n/types";
+
+/* **************************************************
  * Types
  **************************************************/
 interface HamburgerProps {
-  dict: {
-    aria: {
-      hamburger: {
-        open: string;
-        close: string;
-      };
-    };
-  };
+  dict: Pick<CommonDictionary, "aria">;
 }
 
 /* **************************************************
@@ -45,13 +43,13 @@ export default function Hamburger({ dict }: HamburgerProps) {
         <span
           className={cn(
             styles.hamburgerLineMiddle,
-            isOpen ? styles.hamburgerLineMiddleOpen : styles.hamburgerLineMiddleClosed,
+            isOpen ? styles.hamburgerLineMiddleLeftOpen : styles.hamburgerLineMiddleClosed,
           )}
         ></span>
         <span
           className={cn(
             styles.hamburgerLineMiddle,
-            isOpen ? styles.hamburgerLineMiddleOpen : styles.hamburgerLineMiddleClosed,
+            isOpen ? styles.hamburgerLineMiddleRightOpen : styles.hamburgerLineMiddleClosed,
           )}
         ></span>
       </div>

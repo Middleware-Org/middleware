@@ -1,9 +1,18 @@
-import { DEFAULT_NAMESPACE } from "./consts";
-import { TranslationNamespace } from "./types";
+/* **************************************************
+ * Imports
+ **************************************************/
+import { DEFAULT_NAMESPACE } from "@/lib/i18n/consts";
+import type { DictionaryByNamespace, TranslationNamespace } from "@/lib/i18n/types";
 
-export async function getDictionary(locale: string, ns: TranslationNamespace) {
+/* **************************************************
+ * Functions
+ **************************************************/
+export async function getDictionary<T extends TranslationNamespace>(
+  locale: string,
+  ns: T,
+): Promise<DictionaryByNamespace<T>> {
   const file = await import(`@/i18n/locales/${locale}/${ns}.json`);
-  return file.default;
+  return file.default as DictionaryByNamespace<T>;
 }
 
 export function normalizeNamespaces(namespaces?: TranslationNamespace | TranslationNamespace[]) {
