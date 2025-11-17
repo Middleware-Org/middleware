@@ -5,7 +5,7 @@
 
 import { revalidatePath } from "next/cache";
 import { getUser } from "@/lib/auth/server";
-import { deleteMediaFile, uploadMediaFile, getAllMediaFiles } from "@/lib/github/media";
+import { deleteMediaFile, uploadMediaFile, getAllMediaFiles, type MediaFile } from "@/lib/github/media";
 
 /* **************************************************
  * Types
@@ -78,7 +78,7 @@ export async function deleteMediaAction(filename: string): Promise<ActionResult>
   }
 }
 
-export async function getAllMediaAction(): Promise<ActionResult> {
+export async function getAllMediaAction(): Promise<ActionResult<MediaFile[]>> {
   try {
     const user = await getUser();
     if (!user) {

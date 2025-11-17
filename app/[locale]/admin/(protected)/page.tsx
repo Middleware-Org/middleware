@@ -69,6 +69,9 @@ export default async function AdminProtectedPage() {
           <Link href="/admin/media" className={styles.navLink}>
             Gestisci Media →
           </Link>
+          <Link href="/admin/articles" className={styles.navLink}>
+            Gestisci Articoli →
+          </Link>
         </nav>
       </div>
 

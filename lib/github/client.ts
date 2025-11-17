@@ -111,8 +111,11 @@ export async function githubDelete(path: string, body: unknown) {
 export async function getFileSha(path: string): Promise<string | null> {
   try {
     const file = await githubFetch(`contents/${path}?ref=${branch}`);
-    return file.sha || null;
-  } catch {
+    const sha = file.sha || null;
+    console.log(`getFileSha: ${path} -> ${sha ? "found" : "not found"}`);
+    return sha;
+  } catch (error) {
+    console.log(`getFileSha: ${path} -> error (file likely doesn't exist)`);
     return null;
   }
 }
@@ -124,6 +127,8 @@ export async function createOrUpdateFile(
 ): Promise<void> {
   const sha = await getFileSha(path);
   const contentBase64 = Buffer.from(content, "utf-8").toString("base64");
+
+  console.log(`createOrUpdateFile: ${path}, sha: ${sha ? "exists" : "new file"}`);
 
   await githubPut(`contents/${path}`, {
     message,
