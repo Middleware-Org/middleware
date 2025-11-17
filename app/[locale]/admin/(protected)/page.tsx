@@ -60,6 +60,15 @@ export default async function AdminProtectedPage() {
           <Link href="/admin/categories" className={styles.navLink}>
             Gestisci Categorie →
           </Link>
+          <Link href="/admin/authors" className={styles.navLink}>
+            Gestisci Autori →
+          </Link>
+          <Link href="/admin/issues" className={styles.navLink}>
+            Gestisci Issues →
+          </Link>
+          <Link href="/admin/media" className={styles.navLink}>
+            Gestisci Media →
+          </Link>
         </nav>
       </div>
 

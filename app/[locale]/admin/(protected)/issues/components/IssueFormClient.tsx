@@ -11,6 +11,7 @@ import { createIssueAction, updateIssueAction, type ActionResult } from "../acti
 import { getGitHubImageUrl } from "@/lib/github/images";
 import styles from "../styles";
 import type { Issue } from "@/lib/github/types";
+import Image from "next/image";
 
 /* **************************************************
  * Types
@@ -111,7 +112,14 @@ function ImageUpload({
       <div onClick={handleClick} className={styles.imageUpload}>
         {preview ? (
           <div className={styles.imagePreview}>
-            <img src={preview} alt="Preview" className={styles.imagePreviewImg} />
+            <Image
+              src={preview}
+              alt="Preview"
+              className={styles.imagePreviewImg}
+              width={800}
+              height={500}
+              unoptimized
+            />
             <div className="mt-2 flex gap-2">
               <button
                 type="button"
