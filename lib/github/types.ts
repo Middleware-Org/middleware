@@ -34,6 +34,7 @@ export type Category = {
   slug: string;
   name: string;
   description: string;
+  order?: number;
 };
 
 export type Author = {

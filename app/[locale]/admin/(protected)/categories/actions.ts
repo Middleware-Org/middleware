@@ -5,7 +5,7 @@
 
 import { revalidatePath } from "next/cache";
 import { getUser } from "@/lib/auth/server";
-import { createCategory, updateCategory, deleteCategory } from "@/lib/github/categories";
+import { createCategory, updateCategory, deleteCategory, updateCategoriesOrder } from "@/lib/github/categories";
 import type { Category } from "@/lib/github/types";
 
 /* **************************************************
@@ -118,6 +118,30 @@ export async function deleteCategoryAction(slug: string): Promise<ActionResult> 
       success: false,
       error: errorMessage,
       errorType: isRelationError ? "warning" : "error",
+    };
+  }
+}
+
+export async function reorderCategoriesAction(slugs: string[]): Promise<ActionResult> {
+  try {
+    const user = await getUser();
+    if (!user) {
+      return { success: false, error: "Unauthorized", errorType: "error" };
+    }
+
+    if (!slugs || slugs.length === 0) {
+      return { success: false, error: "Slugs array is required", errorType: "error" };
+    }
+
+    await updateCategoriesOrder(slugs);
+    revalidatePath("/admin/categories");
+
+    return { success: true, message: "Categories reordered successfully" };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to reorder categories",
+      errorType: "error",
     };
   }
 }

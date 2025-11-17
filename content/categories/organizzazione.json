@@ -1,5 +1,6 @@
 {
   "slug": "organizzazione",
   "name": "Organizzazione",
-  "description": "Descrizione di esempio della categoria Organizzazione"
+  "description": "Descrizione di esempio della categoria Organizzazione",
+  "order": 0
 }

@@ -34,7 +34,17 @@ export async function getAllCategories(): Promise<Category[]> {
   );
 
   // Filtra i valori null (file non validi)
-  return categories.filter((cat): cat is Category => cat !== null);
+  const validCategories = categories.filter((cat): cat is Category => cat !== null);
+
+  // Ordina per order, poi per nome se order non è definito
+  return validCategories.sort((a, b) => {
+    const orderA = a.order ?? Infinity;
+    const orderB = b.order ?? Infinity;
+    if (orderA !== orderB) {
+      return orderA - orderB;
+    }
+    return a.name.localeCompare(b.name);
+  });
 }
 
 export async function getCategoryBySlug(slug: string): Promise<Category | undefined> {
@@ -57,19 +67,32 @@ export async function getCategoryBySlug(slug: string): Promise<Category | undefi
 
 export async function createCategory(category: Omit<Category, "slug"> & { slug?: string }) {
   const slug = category.slug || category.name.toLowerCase().replace(/\s+/g, "-");
+
+  // Se order non è specificato, assegna l'ultimo order + 1
+  let order = category.order;
+  if (order === undefined) {
+    const allCategories = await getAllCategories();
+    const maxOrder = allCategories.reduce((max, cat) => {
+      const catOrder = cat.order ?? 0;
+      return Math.max(max, catOrder);
+    }, -1);
+    order = maxOrder + 1;
+  }
+
   const filePath = `content/categories/${slug}.json`;
   const content = JSON.stringify(
     {
       slug,
       name: category.name,
       description: category.description,
+      order,
     },
     null,
     2,
   );
 
   await createOrUpdateFile(filePath, content, `Create category: ${category.name}`);
-  return { ...category, slug };
+  return { ...category, slug, order };
 }
 
 export async function updateCategory(slug: string, category: Partial<Omit<Category, "slug">>) {
@@ -82,6 +105,7 @@ export async function updateCategory(slug: string, category: Partial<Omit<Catego
     slug,
     name: category.name ?? existing.name,
     description: category.description ?? existing.description,
+    order: category.order !== undefined ? category.order : existing.order,
   };
 
   const filePath = `content/categories/${slug}.json`;
@@ -112,4 +136,25 @@ export async function deleteCategory(slug: string) {
   // Se non ci sono articoli che usano la categoria, procedi con l'eliminazione
   const filePath = `content/categories/${slug}.json`;
   await deleteFile(filePath, `Delete category: ${slug}`);
+}
+
+export async function updateCategoriesOrder(slugs: string[]): Promise<void> {
+  // Aggiorna l'order di tutte le categorie in base alla nuova posizione
+  const updatePromises = slugs.map(async (slug, index) => {
+    const category = await getCategoryBySlug(slug);
+    if (!category) {
+      throw new Error(`Category ${slug} not found`);
+    }
+
+    const updated: Category = {
+      ...category,
+      order: index,
+    };
+
+    const filePath = `content/categories/${slug}.json`;
+    const content = JSON.stringify(updated, null, 2);
+    await createOrUpdateFile(filePath, content, `Update category order: ${category.name}`);
+  });
+
+  await Promise.all(updatePromises);
 }
