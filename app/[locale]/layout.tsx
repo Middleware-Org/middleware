@@ -4,6 +4,7 @@
 import Header from "@/components/organism/header";
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import { getDictionary } from "@/lib/i18n/utils";
+import { prisma } from "@/lib/prisma";
 import "@/globals.css";
 import IssuesDropdown from "@/components/organism/issuesDropDown";
 import Menu from "@/components/organism/menu";
