@@ -50,6 +50,10 @@ const styles = {
     "disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150",
     "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-tertiary",
   ),
+  cancelButton: cn(
+    "px-4 py-2 border border-secondary hover:bg-tertiary hover:text-white",
+    "transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-tertiary",
+  ),
   // Text styles
   textSecondary: cn("text-sm text-secondary/80"),
   textSecondaryLight: cn("text-secondary/60"),
