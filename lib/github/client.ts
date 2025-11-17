@@ -86,6 +86,28 @@ export async function githubPut(path: string, body: unknown) {
   return res.json();
 }
 
+export async function githubDelete(path: string, body: unknown) {
+  const url = `${GITHUB_API_URL}/repos/${owner}/${repo}/${path}`;
+
+  const res = await fetch(url, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/vnd.github+json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error("GitHub DELETE error", url, errorText);
+    throw new Error(`GitHub API error: ${res.status} - ${errorText}`);
+  }
+
+  return res.json();
+}
+
 export async function getFileSha(path: string): Promise<string | null> {
   try {
     const file = await githubFetch(`contents/${path}?ref=${branch}`);
@@ -118,12 +140,9 @@ export async function deleteFile(path: string, message: string): Promise<void> {
     throw new Error(`File ${path} not found`);
   }
 
-  // Per eliminare un file su GitHub, devo passare sha, message, branch
-  // e content (anche se vuoto, è obbligatorio)
-  await githubPut(`contents/${path}`, {
+  await githubDelete(`contents/${path}`, {
     message,
     sha,
     branch,
-    content: "", // Campo obbligatorio anche per l'eliminazione
   });
 }
