@@ -10,7 +10,9 @@ import Image from "@tiptap/extension-image";
 import { useEffect, useCallback, useState } from "react";
 import { marked } from "marked";
 import TurndownService from "turndown";
+import { Link as LinkIcon, Image as ImageIcon } from "lucide-react";
 import MediaSelector from "./MediaSelector";
+import LinkModal from "./LinkModal";
 import { getGitHubImageUrl } from "@/lib/github/images";
 
 /* **************************************************
@@ -26,21 +28,19 @@ interface MarkdownEditorProps {
  * Markdown Editor Component
  **************************************************/
 export default function MarkdownEditor({ value, onChange, label }: MarkdownEditorProps) {
-  const [isMounted, setIsMounted] = useState(false);
+  const [isMounted] = useState(() => typeof window !== "undefined");
   const [isMediaSelectorOpen, setIsMediaSelectorOpen] = useState(false);
+  const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
 
-  // Convertitore Markdown -> HTML
   const markdownToHtml = useCallback((markdown: string): string => {
     if (!markdown) return "";
     try {
       return marked.parse(markdown, { breaks: true }) as string;
-    } catch (error) {
-      console.error("Error converting Markdown to HTML:", error);
+    } catch {
       return markdown;
     }
   }, []);
 
-  // Convertitore HTML -> Markdown
   const htmlToMarkdown = useCallback((html: string): string => {
     if (!html) return "";
     try {
@@ -50,8 +50,7 @@ export default function MarkdownEditor({ value, onChange, label }: MarkdownEdito
         bulletListMarker: "-",
       });
       return turndownService.turndown(html);
-    } catch (error) {
-      console.error("Error converting HTML to Markdown:", error);
+    } catch {
       return html;
     }
   }, []);
@@ -66,12 +65,12 @@ export default function MarkdownEditor({ value, onChange, label }: MarkdownEdito
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
-          class: "text-blue-600 hover:text-blue-800 underline",
+          class: "text-tertiary hover:text-tertiary/80 underline",
         },
       }),
       Image.configure({
         HTMLAttributes: {
-          class: "max-w-full h-auto rounded-lg",
+          class: "max-w-full h-auto",
         },
       }),
     ],
@@ -90,22 +89,14 @@ export default function MarkdownEditor({ value, onChange, label }: MarkdownEdito
     },
   });
 
-  // Assicura che il componente venga renderizzato solo lato client
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  // Aggiorna l'editor quando il valore cambia esternamente
   useEffect(() => {
     if (editor && value !== undefined) {
       const currentHtml = editor.getHTML();
       const currentMarkdown = htmlToMarkdown(currentHtml);
       const newHtml = markdownToHtml(value);
-      
-      // Evita loop infiniti: aggiorna solo se il contenuto Markdown è diverso
-      // Confronta i Markdown invece degli HTML per evitare differenze di formattazione
+
       if (currentMarkdown.trim() !== value.trim()) {
-        editor.commands.setContent(newHtml, false);
+        editor.commands.setContent(newHtml, { emitUpdate: false });
       }
     }
   }, [value, editor, markdownToHtml, htmlToMarkdown]);
@@ -113,11 +104,9 @@ export default function MarkdownEditor({ value, onChange, label }: MarkdownEdito
   if (!isMounted || !editor) {
     return (
       <div className="flex flex-col h-full">
-        {label && (
-          <label className="block mb-2 text-sm font-medium text-gray-700">{label}</label>
-        )}
-        <div className="flex-1 min-h-0 border border-gray-300 rounded-md p-4">
-          <div className="animate-pulse text-gray-400">Caricamento editor...</div>
+        {label && <label className="block mb-2 text-sm font-medium text-secondary">{label}</label>}
+        <div className="flex-1 min-h-0 border border-secondary p-4 bg-primary">
+          <div className="animate-pulse text-secondary/60">Caricamento editor...</div>
         </div>
       </div>
     );
@@ -125,18 +114,16 @@ export default function MarkdownEditor({ value, onChange, label }: MarkdownEdito
 
   return (
     <div className="flex flex-col h-full">
-      {label && (
-        <label className="block mb-2 text-sm font-medium text-gray-700">{label}</label>
-      )}
-      
+      {label && <label className="block mb-2 text-sm font-medium text-secondary">{label}</label>}
+
       {/* Toolbar */}
-      <div className="border-b border-gray-200 p-2 flex flex-wrap gap-2 bg-gray-50 rounded-t-md">
+      <div className="border-b border-secondary p-2 flex flex-wrap gap-2 bg-primary">
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleBold().run()}
           disabled={!editor.can().chain().focus().toggleBold().run()}
-          className={`px-3 py-1 text-sm rounded hover:bg-gray-200 ${
-            editor.isActive("bold") ? "bg-gray-300" : ""
+          className={`px-3 py-1 text-sm transition-all duration-150 hover:bg-tertiary hover:text-white ${
+            editor.isActive("bold") ? "bg-tertiary text-white" : "text-secondary"
           }`}
         >
           <strong>B</strong>
@@ -145,8 +132,8 @@ export default function MarkdownEditor({ value, onChange, label }: MarkdownEdito
           type="button"
           onClick={() => editor.chain().focus().toggleItalic().run()}
           disabled={!editor.can().chain().focus().toggleItalic().run()}
-          className={`px-3 py-1 text-sm rounded hover:bg-gray-200 ${
-            editor.isActive("italic") ? "bg-gray-300" : ""
+          className={`px-3 py-1 text-sm transition-all duration-150 hover:bg-tertiary hover:text-white ${
+            editor.isActive("italic") ? "bg-tertiary text-white" : "text-secondary"
           }`}
         >
           <em>I</em>
@@ -155,18 +142,18 @@ export default function MarkdownEditor({ value, onChange, label }: MarkdownEdito
           type="button"
           onClick={() => editor.chain().focus().toggleStrike().run()}
           disabled={!editor.can().chain().focus().toggleStrike().run()}
-          className={`px-3 py-1 text-sm rounded hover:bg-gray-200 ${
-            editor.isActive("strike") ? "bg-gray-300" : ""
+          className={`px-3 py-1 text-sm transition-all duration-150 hover:bg-tertiary hover:text-white ${
+            editor.isActive("strike") ? "bg-tertiary text-white" : "text-secondary"
           }`}
         >
           <s>S</s>
         </button>
-        <div className="w-px bg-gray-300 mx-1" />
+        <div className="w-px bg-secondary mx-1" />
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-          className={`px-3 py-1 text-sm rounded hover:bg-gray-200 ${
-            editor.isActive("heading", { level: 1 }) ? "bg-gray-300" : ""
+          className={`px-3 py-1 text-sm transition-all duration-150 hover:bg-tertiary hover:text-white ${
+            editor.isActive("heading", { level: 1 }) ? "bg-tertiary text-white" : "text-secondary"
           }`}
         >
           H1
@@ -174,8 +161,8 @@ export default function MarkdownEditor({ value, onChange, label }: MarkdownEdito
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-          className={`px-3 py-1 text-sm rounded hover:bg-gray-200 ${
-            editor.isActive("heading", { level: 2 }) ? "bg-gray-300" : ""
+          className={`px-3 py-1 text-sm transition-all duration-150 hover:bg-tertiary hover:text-white ${
+            editor.isActive("heading", { level: 2 }) ? "bg-tertiary text-white" : "text-secondary"
           }`}
         >
           H2
@@ -183,18 +170,18 @@ export default function MarkdownEditor({ value, onChange, label }: MarkdownEdito
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-          className={`px-3 py-1 text-sm rounded hover:bg-gray-200 ${
-            editor.isActive("heading", { level: 3 }) ? "bg-gray-300" : ""
+          className={`px-3 py-1 text-sm transition-all duration-150 hover:bg-tertiary hover:text-white ${
+            editor.isActive("heading", { level: 3 }) ? "bg-tertiary text-white" : "text-secondary"
           }`}
         >
           H3
         </button>
-        <div className="w-px bg-gray-300 mx-1" />
+        <div className="w-px bg-secondary mx-1" />
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={`px-3 py-1 text-sm rounded hover:bg-gray-200 ${
-            editor.isActive("bulletList") ? "bg-gray-300" : ""
+          className={`px-3 py-1 text-sm transition-all duration-150 hover:bg-tertiary hover:text-white ${
+            editor.isActive("bulletList") ? "bg-tertiary text-white" : "text-secondary"
           }`}
         >
           •
@@ -202,8 +189,8 @@ export default function MarkdownEditor({ value, onChange, label }: MarkdownEdito
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          className={`px-3 py-1 text-sm rounded hover:bg-gray-200 ${
-            editor.isActive("orderedList") ? "bg-gray-300" : ""
+          className={`px-3 py-1 text-sm transition-all duration-150 hover:bg-tertiary hover:text-white ${
+            editor.isActive("orderedList") ? "bg-tertiary text-white" : "text-secondary"
           }`}
         >
           1.
@@ -211,55 +198,48 @@ export default function MarkdownEditor({ value, onChange, label }: MarkdownEdito
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleBlockquote().run()}
-          className={`px-3 py-1 text-sm rounded hover:bg-gray-200 ${
-            editor.isActive("blockquote") ? "bg-gray-300" : ""
+          className={`px-3 py-1 text-sm transition-all duration-150 hover:bg-tertiary hover:text-white ${
+            editor.isActive("blockquote") ? "bg-tertiary text-white" : "text-secondary"
           }`}
         >
-          "
+          &quot;
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-          className={`px-3 py-1 text-sm rounded hover:bg-gray-200 ${
-            editor.isActive("codeBlock") ? "bg-gray-300" : ""
+          className={`px-3 py-1 text-sm transition-all duration-150 hover:bg-tertiary hover:text-white ${
+            editor.isActive("codeBlock") ? "bg-tertiary text-white" : "text-secondary"
           }`}
         >
           {"</>"}
         </button>
-        <div className="w-px bg-gray-300 mx-1" />
+        <div className="w-px bg-secondary mx-1" />
         <button
           type="button"
           onClick={() => {
-            const url = window.prompt("Inserisci l'URL del link:");
-            if (url) {
-              editor.chain().focus().setLink({ href: url }).run();
-            }
+            setIsLinkModalOpen(true);
           }}
-          className={`px-3 py-1 text-sm rounded hover:bg-gray-200 ${
-            editor.isActive("link") ? "bg-gray-300" : ""
+          className={`px-3 py-1 text-sm transition-all duration-150 hover:bg-tertiary hover:text-white flex items-center gap-1 ${
+            editor.isActive("link") ? "bg-tertiary text-white" : "text-secondary"
           }`}
+          title="Inserisci link"
         >
-          Link
+          <LinkIcon className="w-4 h-4" />
+          <span>Link</span>
         </button>
         <button
           type="button"
           onClick={() => setIsMediaSelectorOpen(true)}
-          className="px-3 py-1 text-sm rounded hover:bg-gray-200"
+          className="px-3 py-1 text-sm transition-all duration-150 hover:bg-tertiary hover:text-white text-secondary flex items-center gap-1"
+          title="Inserisci immagine"
         >
-          🖼️
-        </button>
-        <button
-          type="button"
-          onClick={() => editor.chain().focus().unsetLink().run()}
-          disabled={!editor.isActive("link")}
-          className="px-3 py-1 text-sm rounded hover:bg-gray-200 disabled:opacity-50"
-        >
-          Rimuovi Link
+          <ImageIcon className="w-4 h-4" />
+          <span>Immagine</span>
         </button>
       </div>
 
       {/* Editor */}
-      <div className="flex-1 min-h-0 border border-gray-300 rounded-b-md overflow-auto bg-white">
+      <div className="flex-1 min-h-0 border border-secondary overflow-auto bg-primary">
         <EditorContent editor={editor} />
       </div>
 
@@ -268,10 +248,28 @@ export default function MarkdownEditor({ value, onChange, label }: MarkdownEdito
         isOpen={isMediaSelectorOpen}
         onClose={() => setIsMediaSelectorOpen(false)}
         onSelect={(imageUrl) => {
-          // Converti il path relativo in URL GitHub
           const imageSrc = getGitHubImageUrl(imageUrl);
           editor.chain().focus().setImage({ src: imageSrc }).run();
         }}
+      />
+
+      {/* Link Modal */}
+      <LinkModal
+        isOpen={isLinkModalOpen}
+        onClose={() => setIsLinkModalOpen(false)}
+        onInsert={(url) => {
+          const { from, to } = editor.state.selection;
+          const selectedText = editor.state.doc.textBetween(from, to);
+
+          if (selectedText) {
+            // Se c'è testo selezionato, trasformalo in link
+            editor.chain().focus().setLink({ href: url }).run();
+          } else {
+            // Se non c'è testo selezionato, inserisci l'URL come link
+            editor.chain().focus().insertContent(`<a href="${url}">${url}</a>`).run();
+          }
+        }}
+        currentUrl={editor.getAttributes("link").href}
       />
     </div>
   );

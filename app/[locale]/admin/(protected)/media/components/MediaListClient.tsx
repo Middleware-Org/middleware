@@ -8,6 +8,7 @@ import { deleteMediaAction } from "../actions";
 import { getGitHubImageUrl } from "@/lib/github/images";
 import { useRouter } from "next/navigation";
 import styles from "../styles";
+import baseStyles from "../../styles";
 import type { MediaFile } from "@/lib/github/media";
 import Image from "next/image";
 
@@ -48,9 +49,9 @@ export default function MediaListClient({ mediaFiles }: MediaListClientProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className={baseStyles.container}>
       {error && (
-        <div className={error.type === "warning" ? styles.errorWarning : styles.error}>
+        <div className={error.type === "warning" ? baseStyles.errorWarning : baseStyles.error}>
           ⚠️ {error.message}
         </div>
       )}
@@ -58,7 +59,7 @@ export default function MediaListClient({ mediaFiles }: MediaListClientProps) {
       {mediaFiles.length === 0 ? (
         <div className={styles.empty}>
           <p>Nessuna immagine trovata.</p>
-          <p className="text-sm mt-2">Carica la tua prima immagine usando il form sopra.</p>
+          <p className={baseStyles.emptyStateText}>Carica la tua prima immagine usando il form sopra.</p>
         </div>
       ) : (
         <div className={styles.grid}>

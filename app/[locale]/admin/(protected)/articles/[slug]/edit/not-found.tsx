@@ -3,6 +3,7 @@
  **************************************************/
 import Link from "next/link";
 import styles from "../../../styles";
+import articleStyles from "../../styles";
 
 /* **************************************************
  * Not Found Page
@@ -18,12 +19,11 @@ export default function NotFound() {
       </div>
 
       <div className="text-center py-8">
-        <p className="text-gray-600 mb-4">L&apos;articolo che stai cercando non esiste.</p>
-        <Link href="/admin/articles" className={styles.submitButton}>
+        <p className="text-secondary/80 mb-4">L&apos;articolo che stai cercando non esiste.</p>
+        <Link href="/admin/articles" className={articleStyles.submitButton}>
           Torna alla lista articoli
         </Link>
       </div>
     </main>
   );
 }
-

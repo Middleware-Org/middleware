@@ -24,9 +24,10 @@ import {
 } from "@/components/table";
 import { SearchInput } from "@/components/search";
 import { Pagination } from "@/components/pagination";
-import { getGitHubImageUrl } from "@/lib/github/images";
 import styles from "../styles";
+import baseStyles from "../../styles";
 import type { Issue } from "@/lib/github/types";
+import Image from "next/image";
 
 /* **************************************************
  * Types
@@ -140,12 +141,6 @@ export default function IssueListClient({ issues }: IssueListClientProps) {
     const newIndex = localIssues.findIndex((iss) => String(iss.slug) === String(over.id));
 
     if (oldIndex === -1 || newIndex === -1) {
-      console.warn("Drag and drop: indices not found", {
-        active: active.id,
-        over: over.id,
-        oldIndex,
-        newIndex,
-      });
       return;
     }
 
@@ -177,13 +172,15 @@ export default function IssueListClient({ issues }: IssueListClientProps) {
         return (
           <TableCell>
             {issue.cover ? (
-              <img
-                src={getGitHubImageUrl(issue.cover)}
+              <Image
+                src={issue.cover}
+                width={64}
+                height={64}
                 alt={issue.title}
-                className="w-16 h-16 object-cover rounded border border-gray-300"
+                className="w-16 h-16 object-cover border border-secondary"
               />
             ) : (
-              <div className="w-16 h-16 bg-gray-200 rounded border border-gray-300 flex items-center justify-center text-xs text-gray-500">
+              <div className="w-16 h-16 bg-secondary/20 border border-secondary flex items-center justify-center text-xs text-secondary/60">
                 No image
               </div>
             )}
@@ -194,7 +191,7 @@ export default function IssueListClient({ issues }: IssueListClientProps) {
       case "slug":
         return (
           <TableCell>
-            <span className="text-xs text-gray-500 font-mono bg-gray-100 px-2 py-1 rounded">
+            <span className="text-xs text-secondary/60 font-mono bg-secondary/10 px-2 py-1">
               {issue.slug}
             </span>
           </TableCell>
@@ -204,23 +201,23 @@ export default function IssueListClient({ issues }: IssueListClientProps) {
       case "color":
         return (
           <TableCell>
-            <div className="flex items-center gap-2">
+            <div className={baseStyles.buttonGroup}>
               <div
-                className="w-6 h-6 rounded border border-gray-300"
+                className="w-6 h-6 border border-secondary"
                 style={{ backgroundColor: issue.color }}
               />
-              <span className="text-xs text-gray-600 font-mono">{issue.color}</span>
+              <span className="text-xs text-secondary/80 font-mono">{issue.color}</span>
             </div>
           </TableCell>
         );
       case "description":
         return (
-          <TableCell className="text-gray-600 max-w-md truncate">{issue.description}</TableCell>
+          <TableCell className="text-secondary/80 max-w-md truncate">{issue.description}</TableCell>
         );
       case "actions":
         return (
           <TableCell>
-            <div className="flex items-center gap-2">
+            <div className={baseStyles.buttonGroup}>
               <button
                 onClick={() => handleEdit(issue)}
                 className={styles.editButton}
@@ -244,17 +241,17 @@ export default function IssueListClient({ issues }: IssueListClientProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className={baseStyles.container}>
       {error && (
-        <div className={error.type === "warning" ? styles.errorWarning : styles.error}>
+        <div className={error.type === "warning" ? baseStyles.errorWarning : baseStyles.error}>
           ⚠️ {error.message}
         </div>
       )}
 
       {/* Search and Filters */}
-      <div className="bg-white p-4 rounded-lg border">
-        <div className="flex items-center gap-4">
-          <div className="flex-1">
+      <div className={baseStyles.searchContainer}>
+        <div className={baseStyles.searchRow}>
+          <div className={baseStyles.searchInputWrapper}>
             <SearchInput
               value={search}
               onChange={setSearch}
@@ -266,20 +263,17 @@ export default function IssueListClient({ issues }: IssueListClientProps) {
             visibleColumns={visibleColumns}
             onColumnsChange={setVisibleColumns}
           />
-          <Link
-            href="/admin/issues/new"
-            className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
-          >
+          <Link href="/admin/issues/new" className={baseStyles.newButton}>
             + Nuova Issue
           </Link>
-          <div className="text-sm text-gray-600">
+          <div className={baseStyles.textSecondary}>
             {totalItems} {totalItems === 1 ? "issue" : "issues"}
           </div>
         </div>
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-lg border overflow-hidden">
+      <div className={baseStyles.tableContainer}>
         <DndTableWrapper
           items={tableData.map((iss) => iss.slug)}
           onDragEnd={handleDragEnd}
@@ -288,16 +282,11 @@ export default function IssueListClient({ issues }: IssueListClientProps) {
           <Table>
             <TableHeader>
               <TableRow>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-8">
-                  {/* Drag handle column */}
-                </th>
+                <th className={`${baseStyles.tableHeaderCell} w-8`}>{/* Drag handle column */}</th>
                 {visibleColumnConfigs.map((column) => {
                   if (column.key === "actions") {
                     return (
-                      <th
-                        key={column.key}
-                        className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
+                      <th key={column.key} className={baseStyles.tableHeaderCell}>
                         {column.label}
                       </th>
                     );
@@ -320,7 +309,7 @@ export default function IssueListClient({ issues }: IssueListClientProps) {
                 <TableRow>
                   <TableCell
                     colSpan={visibleColumnConfigs.length + 1}
-                    className="text-center py-8 text-gray-500"
+                    className={baseStyles.tableEmptyCell}
                   >
                     Nessuna issue trovata
                   </TableCell>
@@ -346,4 +335,3 @@ export default function IssueListClient({ issues }: IssueListClientProps) {
     </div>
   );
 }
-

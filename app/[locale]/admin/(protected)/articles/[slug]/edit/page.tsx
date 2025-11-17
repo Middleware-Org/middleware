@@ -31,9 +31,6 @@ export default async function EditArticlePage({ params }: EditArticlePageProps) 
 
   const { slug } = await params;
 
-  // Log per debug
-  console.log("EditArticlePage - slug:", slug);
-
   const [article, categories, authors, issues] = await Promise.all([
     getArticleBySlug(slug),
     getAllCategories(),
@@ -41,10 +38,7 @@ export default async function EditArticlePage({ params }: EditArticlePageProps) 
     getAllIssues(),
   ]);
 
-  console.log("EditArticlePage - article found:", !!article);
-
   if (!article) {
-    console.error(`Article not found for slug: ${slug}`);
     notFound();
   }
 

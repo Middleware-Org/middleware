@@ -9,5 +9,3 @@ import ArticleEditSkeleton from "../../components/ArticleEditSkeleton";
 export default function Loading() {
   return <ArticleEditSkeleton />;
 }
-
-

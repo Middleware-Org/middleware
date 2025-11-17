@@ -26,8 +26,6 @@ export async function generateMetadata({ params }: RootLayoutProps) {
     return null;
   }
 
-  console.log("locale", locale);
-
   const dict = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
   const meta = dict.meta;
 

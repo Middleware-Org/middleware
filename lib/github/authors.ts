@@ -17,26 +17,21 @@ export async function getAllAuthors(): Promise<Author[]> {
       try {
         const content = await getFileContent(file.path);
 
-        // Valida che il contenuto non sia vuoto
         if (!content || content.trim().length === 0) {
-          console.warn(`File ${file.path} is empty, skipping`);
           return null;
         }
 
         const author = JSON.parse(content) as Author;
         author.slug = file.name.replace(".json", "");
         return author;
-      } catch (error) {
-        console.error(`Error parsing author file ${file.path}:`, error);
+      } catch {
         return null;
       }
     }),
   );
 
-  // Filtra i valori null (file non validi)
   const validAuthors = authors.filter((author): author is Author => author !== null);
 
-  // Ordina per order, poi per nome se order non è definito
   return validAuthors.sort((a, b) => {
     const orderA = a.order ?? Infinity;
     const orderB = b.order ?? Infinity;
@@ -59,8 +54,7 @@ export async function getAuthorBySlug(slug: string): Promise<Author | undefined>
     const author = JSON.parse(content) as Author;
     author.slug = slug;
     return author;
-  } catch (error) {
-    console.error(`Error getting author ${slug}:`, error);
+  } catch {
     return undefined;
   }
 }

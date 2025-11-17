@@ -16,6 +16,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils/classes";
 import { authClient } from "@/lib/auth/client";
+import { i18nSettings } from "@/lib/i18n/settings";
+import styles from "./styles";
 
 /* **************************************************
  * Sidebar Component
@@ -29,6 +31,18 @@ export default function Sidebar() {
     router.push("/admin/login");
     router.refresh();
   }
+
+  // Rimuove il locale dal pathname (es. /it/admin -> /admin)
+  function getPathnameWithoutLocale(path: string): string {
+    const segments = path.split("/").filter(Boolean);
+    // Se il primo segmento è un locale supportato, rimuovilo
+    if (segments.length > 0 && i18nSettings.locales.includes(segments[0])) {
+      return "/" + segments.slice(1).join("/");
+    }
+    return path;
+  }
+
+  const pathnameWithoutLocale = getPathnameWithoutLocale(pathname);
 
   const navItems = [
     {
@@ -64,30 +78,33 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="w-64 bg-gray-900 text-white min-h-screen flex flex-col">
-      {/* Header */}
-      <div className="p-6 border-b border-gray-800">
-        <h1 className="text-xl font-bold">Admin Panel</h1>
+    <aside className={styles.sidebar}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>Admin Panel</h1>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 p-4">
-        <ul className="space-y-2">
+      <nav className={styles.nav}>
+        <ul className={styles.navList}>
           {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+            // Per "/admin", deve essere attivo solo se il pathname è esattamente "/admin" o "/admin/"
+            // Per gli altri link, devono essere attivi se il pathname inizia con il loro href
+            const isActive =
+              item.href === "/admin"
+                ? pathnameWithoutLocale === "/admin" || pathnameWithoutLocale === "/admin/"
+                : pathnameWithoutLocale === item.href ||
+                  pathnameWithoutLocale.startsWith(`${item.href}/`);
 
             return (
               <li key={item.href}>
                 <Link
                   href={item.href}
                   className={cn(
-                    "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
-                    "hover:bg-gray-800",
-                    isActive ? "bg-gray-800 text-white" : "text-gray-300",
+                    styles.navItem,
+                    isActive ? styles.navItemActive : styles.navItemInactive,
                   )}
                 >
-                  <Icon className="w-5 h-5" />
+                  <Icon className={styles.navIcon} />
                   <span>{item.label}</span>
                 </Link>
               </li>
@@ -96,14 +113,9 @@ export default function Sidebar() {
         </ul>
       </nav>
 
-      {/* Footer */}
-      <div className="p-4 border-t border-gray-800">
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors hover:bg-gray-800 text-gray-400 hover:text-white"
-        >
-          <LogOut className="w-5 h-5" />
+      <div className={styles.footer}>
+        <button type="button" onClick={handleLogout} className={styles.logoutButton}>
+          <LogOut className={styles.navIcon} />
           <span>Logout</span>
         </button>
       </div>

@@ -5,6 +5,7 @@
 
 import { cn } from "@/lib/utils/classes";
 import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import styles from "./styles";
 
 /* **************************************************
  * Types
@@ -37,14 +38,7 @@ export function SortableHeader({
   }
 
   return (
-    <th
-      className={cn(
-        "px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider",
-        "cursor-pointer select-none hover:bg-gray-100 transition-colors",
-        className,
-      )}
-      onClick={handleClick}
-    >
+    <th className={cn(styles.sortableHeader, className)} onClick={handleClick}>
       <div className="flex items-center gap-2">
         <span>{children}</span>
         <span className="flex-shrink-0">
@@ -53,7 +47,7 @@ export function SortableHeader({
           ) : direction === "desc" ? (
             <ArrowDown className="h-4 w-4" />
           ) : (
-            <ArrowUpDown className="h-4 w-4 text-gray-400" />
+            <ArrowUpDown className="h-4 w-4 text-secondary/40" />
           )}
         </span>
       </div>

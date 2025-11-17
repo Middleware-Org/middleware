@@ -9,6 +9,7 @@ import { useFormStatus } from "react-dom";
 import { useRouter } from "next/navigation";
 import { createAuthorAction, updateAuthorAction, type ActionResult } from "../actions";
 import styles from "../styles";
+import baseStyles from "../../styles";
 import type { Author } from "@/lib/github/types";
 
 /* **************************************************
@@ -61,9 +62,7 @@ export default function AuthorFormClient({ author }: AuthorFormClientProps) {
       )}
 
       {state?.success && state.message && (
-        <div className="mb-4 p-4 bg-green-50 border border-green-200 text-green-700 rounded-md">
-          {state.message}
-        </div>
+        <div className={baseStyles.successMessageGreen}>{state.message}</div>
       )}
 
       <form ref={formRef} action={formAction} className={styles.form}>

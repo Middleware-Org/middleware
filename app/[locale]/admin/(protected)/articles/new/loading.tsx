@@ -9,4 +9,3 @@ import ArticleFormSkeleton from "../components/ArticleFormSkeleton";
 export default function Loading() {
   return <ArticleFormSkeleton />;
 }
-

@@ -17,26 +17,21 @@ export async function getAllIssues(): Promise<Issue[]> {
       try {
         const content = await getFileContent(file.path);
 
-        // Valida che il contenuto non sia vuoto
         if (!content || content.trim().length === 0) {
-          console.warn(`File ${file.path} is empty, skipping`);
           return null;
         }
 
         const issue = JSON.parse(content) as Issue;
         issue.slug = file.name.replace(".json", "");
         return issue;
-      } catch (error) {
-        console.error(`Error parsing issue file ${file.path}:`, error);
+      } catch {
         return null;
       }
     }),
   );
 
-  // Filtra i valori null (file non validi)
   const validIssues = issues.filter((issue): issue is Issue => issue !== null);
 
-  // Ordina per order, poi per data se order non è definito
   return validIssues.sort((a, b) => {
     const orderA = a.order ?? Infinity;
     const orderB = b.order ?? Infinity;
@@ -59,8 +54,7 @@ export async function getIssueBySlug(slug: string): Promise<Issue | undefined> {
     const issue = JSON.parse(content) as Issue;
     issue.slug = slug;
     return issue;
-  } catch (error) {
-    console.error(`Error getting issue ${slug}:`, error);
+  } catch {
     return undefined;
   }
 }

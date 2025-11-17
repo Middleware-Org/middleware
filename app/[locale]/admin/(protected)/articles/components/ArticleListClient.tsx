@@ -21,6 +21,7 @@ import {
 import { SearchInput } from "@/components/search";
 import { Pagination } from "@/components/pagination";
 import styles from "../styles";
+import baseStyles from "../../styles";
 import type { Article } from "@/lib/github/types";
 
 /* **************************************************
@@ -111,7 +112,7 @@ export default function ArticleListClient({ articles }: ArticleListClientProps) 
       case "slug":
         return (
           <TableCell>
-            <span className="text-xs text-gray-500 font-mono bg-gray-100 px-2 py-1 rounded">
+            <span className="text-xs text-secondary/60 font-mono bg-secondary/10 px-2 py-1">
               {article.slug}
             </span>
           </TableCell>
@@ -128,16 +129,16 @@ export default function ArticleListClient({ articles }: ArticleListClientProps) 
         return (
           <TableCell>
             {article.in_evidence ? (
-              <span className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded">Sì</span>
+              <span className="px-2 py-1 text-xs bg-green-100 text-green-700">Sì</span>
             ) : (
-              <span className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded">No</span>
+              <span className="px-2 py-1 text-xs bg-secondary/10 text-secondary/60">No</span>
             )}
           </TableCell>
         );
       case "actions":
         return (
           <TableCell>
-            <div className="flex items-center gap-2">
+            <div className={baseStyles.buttonGroup}>
               <button
                 onClick={() => handleEdit(article)}
                 className={styles.submitButton}
@@ -161,17 +162,17 @@ export default function ArticleListClient({ articles }: ArticleListClientProps) 
   }
 
   return (
-    <div className="space-y-4">
+    <div className={baseStyles.container}>
       {error && (
-        <div className={error.type === "warning" ? styles.errorWarning : styles.error}>
+        <div className={error.type === "warning" ? baseStyles.errorWarning : baseStyles.error}>
           ⚠️ {error.message}
         </div>
       )}
 
       {/* Search and Filters */}
-      <div className="bg-white p-4 rounded-lg border">
-        <div className="flex items-center gap-4">
-          <div className="flex-1">
+      <div className={baseStyles.searchContainer}>
+        <div className={baseStyles.searchRow}>
+          <div className={baseStyles.searchInputWrapper}>
             <SearchInput
               value={search}
               onChange={setSearch}
@@ -183,30 +184,24 @@ export default function ArticleListClient({ articles }: ArticleListClientProps) 
             visibleColumns={visibleColumns}
             onColumnsChange={setVisibleColumns}
           />
-          <Link
-            href="/admin/articles/new"
-            className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
-          >
+          <Link href="/admin/articles/new" className={baseStyles.newButton}>
             + Nuovo Articolo
           </Link>
-          <div className="text-sm text-gray-600">
+          <div className={baseStyles.textSecondary}>
             {totalItems} {totalItems === 1 ? "articolo" : "articoli"}
           </div>
         </div>
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-lg border overflow-hidden">
+      <div className={baseStyles.tableContainer}>
         <Table>
           <TableHeader>
             <TableRow>
               {visibleColumnConfigs.map((column) => {
                 if (column.key === "actions") {
                   return (
-                    <th
-                      key={column.key}
-                      className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
+                    <th key={column.key} className={baseStyles.tableHeaderCell}>
                       {column.label}
                     </th>
                   );
@@ -229,7 +224,7 @@ export default function ArticleListClient({ articles }: ArticleListClientProps) 
               <TableRow>
                 <TableCell
                   colSpan={visibleColumnConfigs.length}
-                  className="text-center py-8 text-gray-500"
+                  className={baseStyles.tableEmptyCell}
                 >
                   Nessun articolo trovato
                 </TableCell>
@@ -254,4 +249,3 @@ export default function ArticleListClient({ articles }: ArticleListClientProps) 
     </div>
   );
 }
-

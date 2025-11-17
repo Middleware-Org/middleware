@@ -116,7 +116,7 @@ export default function MediaUploadClient() {
       )}
 
       {state?.success && state.message && (
-        <div className="mb-4 p-4 bg-green-50 border border-green-200 text-green-700 rounded-md">
+        <div className="mb-4 p-4 bg-green-50 border border-green-200 text-green-700">
           {state.message}
         </div>
       )}
@@ -150,7 +150,7 @@ export default function MediaUploadClient() {
                       e.stopPropagation();
                       handleClick();
                     }}
-                    className="px-3 py-1 text-sm bg-gray-100 rounded hover:bg-gray-200"
+                    className="px-3 py-1 text-sm bg-secondary/10 hover:bg-secondary/20"
                   >
                     Cambia immagine
                   </button>
@@ -160,7 +160,7 @@ export default function MediaUploadClient() {
                       e.stopPropagation();
                       handleRemove();
                     }}
-                    className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200"
+                    className="px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200"
                   >
                     Rimuovi
                   </button>
@@ -168,8 +168,8 @@ export default function MediaUploadClient() {
               </div>
             ) : (
               <div className="text-center py-8">
-                <p className="text-gray-600 mb-2">Clicca per selezionare un&apos;immagine</p>
-                <p className="text-sm text-gray-500">JPG, PNG, GIF o WEBP (max 5MB)</p>
+                <p className="text-secondary/80 mb-2">Clicca per selezionare un&apos;immagine</p>
+                <p className="text-sm text-secondary/60">JPG, PNG, GIF o WEBP (max 5MB)</p>
               </div>
             )}
           </div>
@@ -189,7 +189,7 @@ export default function MediaUploadClient() {
               className={styles.input}
               placeholder="auto-generato se vuoto"
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-secondary/60 mt-1">
               Se lasciato vuoto, verrà generato un nome univoco automaticamente
             </p>
           </div>

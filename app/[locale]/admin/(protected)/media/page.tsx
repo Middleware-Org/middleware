@@ -1,7 +1,6 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getUser } from "@/lib/auth/server";
@@ -30,15 +29,11 @@ export default async function MediaPage() {
         </Link>
       </div>
 
-      <Suspense fallback={<div className={styles.loading}>Caricamento...</div>}>
-        <MediaUploadClient />
-      </Suspense>
+      <MediaUploadClient />
 
       <div className="mt-8">
         <h2 className="text-xl font-semibold mb-4">Immagini Caricate</h2>
-        <Suspense fallback={<div className={styles.loading}>Caricamento immagini...</div>}>
-          <MediaListClient mediaFiles={mediaFiles} />
-        </Suspense>
+        <MediaListClient mediaFiles={mediaFiles} />
       </div>
     </main>
   );

@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { deleteArticleAction } from "../actions";
 import styles from "../styles";
+import baseStyles from "../../styles";
 import type { Article } from "@/lib/github/types";
 import type { Category } from "@/lib/github/types";
 import type { Author } from "@/lib/github/types";
@@ -31,7 +32,7 @@ interface ArticleMetaPanelProps {
   };
   onFormDataChange: (field: string, value: string | boolean) => void;
   editing: boolean;
-  formRef: React.RefObject<HTMLFormElement>;
+  formRef: React.RefObject<HTMLFormElement | null>;
 }
 
 /* **************************************************
@@ -54,7 +55,7 @@ export default function ArticleMetaPanel({
   async function handleDelete() {
     if (!article) return;
 
-    if (!confirm(`Sei sicuro di voler eliminare l'articolo "${article.title}"?`)) {
+    if (!confirm(`Sei sicuro di voler eliminare l&apos;articolo "${article.title}"?`)) {
       return;
     }
 
@@ -77,7 +78,6 @@ export default function ArticleMetaPanel({
 
   return (
     <div className={styles.metaPanel}>
-      {/* Meta Fields */}
       <div className={styles.metaCard}>
         <h3 className={styles.metaCardTitle}>Metadati</h3>
 
@@ -160,7 +160,7 @@ export default function ArticleMetaPanel({
             required
             className={styles.select}
           >
-            <option value="">Seleziona un'issue</option>
+            <option value="">Seleziona un&apos;issue</option>
             {issues.map((issue) => (
               <option key={issue.slug} value={issue.slug}>
                 {issue.title}
@@ -183,7 +183,7 @@ export default function ArticleMetaPanel({
         </div>
 
         <div className={styles.field}>
-          <label className="flex items-center gap-2 cursor-pointer">
+          <label className={`${baseStyles.buttonGroup} cursor-pointer`}>
             <input
               type="checkbox"
               checked={formData.in_evidence}
@@ -195,7 +195,6 @@ export default function ArticleMetaPanel({
         </div>
       </div>
 
-      {/* Actions */}
       <div className={styles.metaCard}>
         <h3 className={styles.metaCardTitle}>Azioni</h3>
         <div className={styles.formActions}>
@@ -222,17 +221,15 @@ export default function ArticleMetaPanel({
         {editing && article && (
           <>
             {error && (
-              <div className={`mt-4 ${error.type === "warning" ? styles.errorWarning : styles.error}`}>
+              <div
+                className={`mt-4 ${error.type === "warning" ? styles.errorWarning : styles.error}`}
+              >
                 ⚠️ {error.message}
               </div>
             )}
-            <div className="mt-4 pt-4 border-t">
-              <h4 className="text-sm font-semibold mb-2 text-red-700">Zona Pericolosa</h4>
-              <button
-                onClick={handleDelete}
-                className={styles.deleteButton}
-                disabled={isPending}
-              >
+            <div className="mt-4 pt-4 border-t border-secondary">
+              <h4 className="text-sm font-semibold mb-2 text-tertiary">Zona Pericolosa</h4>
+              <button onClick={handleDelete} className={styles.deleteButton} disabled={isPending}>
                 {isPending ? "Eliminazione..." : "Elimina Articolo"}
               </button>
             </div>
@@ -242,4 +239,3 @@ export default function ArticleMetaPanel({
     </div>
   );
 }
-

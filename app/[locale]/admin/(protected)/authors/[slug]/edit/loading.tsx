@@ -9,4 +9,3 @@ import AuthorEditSkeleton from "../../components/AuthorEditSkeleton";
 export default function Loading() {
   return <AuthorEditSkeleton />;
 }
-

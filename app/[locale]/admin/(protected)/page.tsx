@@ -30,7 +30,6 @@ export default async function AdminProtectedPage() {
     getAllAuthors(),
   ]);
 
-  // Risolvi tutte le relazioni degli articoli in parallelo
   const articlesWithRelations = await Promise.all(
     articles.map(async (article) => {
       const [author, category, issue] = await Promise.all([

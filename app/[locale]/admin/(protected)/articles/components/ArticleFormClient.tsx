@@ -9,23 +9,24 @@ import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { createArticleAction, updateArticleAction, type ActionResult } from "../actions";
 import ArticleMetaPanel from "./ArticleMetaPanel";
+import styles from "../styles";
+import baseStyles from "../../styles";
+import type { Article } from "@/lib/github/types";
+import type { Category } from "@/lib/github/types";
+import type { Author } from "@/lib/github/types";
+import type { Issue } from "@/lib/github/types";
 
 // Import dinamico per evitare problemi SSR con Tiptap
 const MarkdownEditor = dynamic(() => import("./MarkdownEditor"), {
   ssr: false,
   loading: () => (
     <div className="flex flex-col h-full">
-      <div className="flex-1 min-h-0 border border-gray-300 rounded-md p-4">
-        <div className="animate-pulse text-gray-400">Caricamento editor...</div>
+      <div className="flex-1 min-h-0 border border-secondary p-4 bg-primary">
+        <div className="animate-pulse text-secondary/60">Caricamento editor...</div>
       </div>
     </div>
   ),
 });
-import styles from "../styles";
-import type { Article } from "@/lib/github/types";
-import type { Category } from "@/lib/github/types";
-import type { Author } from "@/lib/github/types";
-import type { Issue } from "@/lib/github/types";
 
 /* **************************************************
  * Types
@@ -81,7 +82,7 @@ export default function ArticleFormClient({
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formDataObj = new FormData(event.currentTarget);
-    
+
     // Add all form data
     formDataObj.set("title", formData.title);
     formDataObj.set("date", formData.date);
@@ -100,17 +101,17 @@ export default function ArticleFormClient({
   }
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} className="h-full flex flex-col">
+    <form ref={formRef} onSubmit={handleSubmit} className={baseStyles.formContainer}>
       {state && !state.success && (
-        <div className={`mb-4 ${state.errorType === "warning" ? styles.errorWarning : styles.error}`}>
+        <div
+          className={`mb-4 ${state.errorType === "warning" ? baseStyles.errorWarning : baseStyles.error}`}
+        >
           {state.error}
         </div>
       )}
 
       {state?.success && state.message && (
-        <div className="mb-4 p-4 bg-green-50 border border-green-200 text-green-700 rounded-md">
-          {state.message}
-        </div>
+        <div className={baseStyles.successMessage}>{state.message}</div>
       )}
 
       <div className={styles.editorContainer}>
@@ -138,4 +139,3 @@ export default function ArticleFormClient({
     </form>
   );
 }
-

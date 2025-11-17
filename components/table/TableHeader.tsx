@@ -3,6 +3,7 @@
  **************************************************/
 import { cn } from "@/lib/utils/classes";
 import type { ReactNode } from "react";
+import styles from "./styles";
 
 /* **************************************************
  * Types
@@ -17,7 +18,7 @@ interface TableHeaderProps {
  **************************************************/
 export function TableHeader({ children, className }: TableHeaderProps) {
   return (
-    <thead className={cn("bg-gray-50 border-b border-gray-200", className)}>
+    <thead className={cn(styles.header, className)}>
       {children}
     </thead>
   );

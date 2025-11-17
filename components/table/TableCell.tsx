@@ -3,6 +3,7 @@
  **************************************************/
 import { cn } from "@/lib/utils/classes";
 import type { ReactNode } from "react";
+import styles from "./styles";
 
 /* **************************************************
  * Types
@@ -18,7 +19,7 @@ interface TableCellProps {
  **************************************************/
 export function TableCell({ children, className, colSpan }: TableCellProps) {
   return (
-    <td className={cn("px-4 py-3 text-sm", className)} colSpan={colSpan}>
+    <td className={cn(styles.cell, "text-sm", className)} colSpan={colSpan}>
       {children}
     </td>
   );

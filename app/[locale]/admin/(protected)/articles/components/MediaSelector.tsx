@@ -3,11 +3,13 @@
  **************************************************/
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { getGitHubImageUrl } from "@/lib/github/images";
-import { getAllMediaAction } from "../../media/actions";
+import { getAllMediaAction, uploadMediaAction } from "../../media/actions";
 import type { MediaFile } from "@/lib/github/media";
+import baseStyles from "../../styles";
+import styles from "../../media/styles";
 
 /* **************************************************
  * Types
@@ -25,12 +27,19 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [filename, setFilename] = useState<string>("");
 
   useEffect(() => {
     if (isOpen) {
       loadMediaFiles();
     }
   }, [isOpen]);
+
 
   async function loadMediaFiles() {
     setLoading(true);
@@ -54,74 +63,219 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
     onClose();
   }
 
+  function handleFileSelect(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      alert("Seleziona un file immagine");
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert("La dimensione dell'immagine deve essere inferiore a 5MB");
+      return;
+    }
+
+    // Set filename from file name (without extension)
+    const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
+    setFilename(nameWithoutExt);
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64 = reader.result as string;
+      setPreview(base64);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function handleClick() {
+    fileInputRef.current?.click();
+  }
+
+  function handleRemove() {
+    setPreview(null);
+    setFilename("");
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  }
+
+  async function handleUpload() {
+    if (!preview) {
+      setUploadError("Seleziona un'immagine prima di caricare");
+      return;
+    }
+
+    setUploading(true);
+    setUploadError(null);
+    setUploadSuccess(null);
+
+    try {
+      const formData = new FormData();
+      formData.set("image", preview);
+      if (filename) {
+        formData.set("filename", filename);
+      }
+
+      const result = await uploadMediaAction(null, formData);
+      
+      if (result.success && result.data) {
+        setUploadSuccess(result.message || "Immagine caricata con successo");
+        // Ricarica la lista dei media
+        await loadMediaFiles();
+        // Seleziona automaticamente il file appena caricato
+        handleSelect(result.data);
+        // Reset form
+        setPreview(null);
+        setFilename("");
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+      } else {
+        setUploadError(result.error || "Errore durante il caricamento");
+      }
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : "Errore durante il caricamento");
+    } finally {
+      setUploading(false);
+    }
+  }
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[80vh] flex flex-col">
+    <div className={baseStyles.modalOverlay}>
+      <div className={baseStyles.modalContainer}>
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b">
-          <h2 className="text-xl font-semibold">Seleziona Immagine</h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 text-2xl leading-none"
-          >
+        <div className={baseStyles.modalHeader}>
+          <h2 className={baseStyles.modalTitle}>Seleziona Immagine</h2>
+          <button type="button" onClick={onClose} className={baseStyles.modalCloseButton}>
             ×
           </button>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-auto p-4">
-          {loading && <div className="text-center py-8 text-gray-500">Caricamento immagini...</div>}
+        <div className={baseStyles.modalContent}>
+          {/* Upload Section */}
+          <div className="mb-6 p-4 border-b border-secondary">
+            <h3 className="text-sm font-semibold text-secondary mb-3">Carica Nuova Immagine</h3>
+            <div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileSelect}
+                className="hidden"
+              />
 
-          {error && (
-            <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">
-              {error}
-            </div>
-          )}
-
-          {!loading && !error && mediaFiles.length === 0 && (
-            <div className="text-center py-8 text-gray-500">
-              Nessuna immagine disponibile. Vai alla sezione Media per caricarne una.
-            </div>
-          )}
-
-          {!loading && !error && mediaFiles.length > 0 && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-              {mediaFiles.map((file) => (
-                <button
-                  key={file.name}
-                  type="button"
-                  onClick={() => handleSelect(file.url)}
-                  className="relative group border border-gray-300 rounded-lg overflow-hidden hover:border-primary hover:shadow-md transition-all"
-                >
-                  <div className="aspect-square relative">
+              {preview ? (
+                <div className="relative">
+                  <div className={styles.imagePreview}>
                     <Image
-                      src={getGitHubImageUrl(file.url)}
-                      alt={file.name}
-                      fill
-                      className="object-cover"
+                      src={preview}
+                      alt="Preview"
+                      className={styles.imagePreviewImg}
+                      width={800}
+                      height={500}
                       unoptimized
                     />
                   </div>
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
-                  <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs p-2 truncate">
-                    {file.name}
+                  <div className={`mt-2 ${baseStyles.buttonGroup}`}>
+                    <input
+                      type="text"
+                      value={filename}
+                      onChange={(e) => setFilename(e.target.value)}
+                      placeholder="Nome file (opzionale)"
+                      className={styles.input}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleUpload}
+                      disabled={uploading}
+                      className={styles.submitButton}
+                    >
+                      {uploading ? "Caricamento..." : "Carica"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleRemove}
+                      className={styles.cancelButton}
+                      disabled={uploading}
+                    >
+                      Annulla
+                    </button>
                   </div>
-                </button>
-              ))}
+                </div>
+              ) : (
+                <div
+                  onClick={handleClick}
+                  className={styles.imageUpload}
+                >
+                  <div className="text-center py-8">
+                    <p className={baseStyles.textSecondary}>Clicca per selezionare un&apos;immagine</p>
+                    <p className="text-sm text-secondary/60 mt-2">JPG, PNG, GIF o WEBP (max 5MB)</p>
+                  </div>
+                </div>
+              )}
+
+              {uploadError && (
+                <div className={`mt-2 ${baseStyles.error}`}>
+                  {uploadError}
+                </div>
+              )}
+
+              {uploadSuccess && (
+                <div className={`mt-2 ${baseStyles.successMessageGreen}`}>{uploadSuccess}</div>
+              )}
             </div>
-          )}
+          </div>
+
+          {/* Media List */}
+          <div>
+            <h3 className="text-sm font-semibold text-secondary mb-3">Immagini Disponibili</h3>
+            {loading && <div className={baseStyles.loadingText}>Caricamento immagini...</div>}
+
+            {error && <div className={baseStyles.error}>{error}</div>}
+
+            {!loading && !error && mediaFiles.length === 0 && (
+              <div className={baseStyles.emptyState}>
+                Nessuna immagine disponibile. Carica la prima immagine usando il form sopra.
+              </div>
+            )}
+
+            {!loading && !error && mediaFiles.length > 0 && (
+              <div className={baseStyles.mediaGrid}>
+                {mediaFiles.map((file) => (
+                  <button
+                    key={file.name}
+                    type="button"
+                    onClick={() => handleSelect(file.url)}
+                    className={baseStyles.mediaCard}
+                  >
+                    <div className={baseStyles.mediaCardImage}>
+                      <Image
+                        src={getGitHubImageUrl(file.url)}
+                        alt={file.name}
+                        fill
+                        className="object-cover"
+                        unoptimized
+                      />
+                    </div>
+                    <div className={baseStyles.mediaCardOverlay} />
+                    <div className={baseStyles.mediaCardName}>{file.name}</div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t flex justify-end">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 border rounded-md hover:bg-gray-50"
-          >
+        <div className={baseStyles.modalFooter}>
+          <button type="button" onClick={onClose} className={baseStyles.cancelButton}>
             Annulla
           </button>
         </div>

@@ -50,7 +50,6 @@ export async function getFileContent(path: string): Promise<string> {
     throw new Error(`Unsupported encoding: ${file.encoding}`);
   }
 
-  // Gestisci il caso di contenuto vuoto o null
   if (!file.content || file.content.trim().length === 0) {
     return "";
   }
@@ -111,11 +110,8 @@ export async function githubDelete(path: string, body: unknown) {
 export async function getFileSha(path: string): Promise<string | null> {
   try {
     const file = await githubFetch(`contents/${path}?ref=${branch}`);
-    const sha = file.sha || null;
-    console.log(`getFileSha: ${path} -> ${sha ? "found" : "not found"}`);
-    return sha;
-  } catch (error) {
-    console.log(`getFileSha: ${path} -> error (file likely doesn't exist)`);
+    return (file.sha as string) || null;
+  } catch {
     return null;
   }
 }
@@ -128,13 +124,11 @@ export async function createOrUpdateFile(
   const sha = await getFileSha(path);
   const contentBase64 = Buffer.from(content, "utf-8").toString("base64");
 
-  console.log(`createOrUpdateFile: ${path}, sha: ${sha ? "exists" : "new file"}`);
-
   await githubPut(`contents/${path}`, {
     message,
     content: contentBase64,
     branch,
-    ...(sha && { sha }), // Include sha se il file esiste (update)
+    ...(sha && { sha }),
   });
 }
 
@@ -152,41 +146,28 @@ export async function deleteFile(path: string, message: string): Promise<void> {
   });
 }
 
-/**
- * Upload an image file to GitHub repository
- * @param imageBase64 - Base64 encoded image (with or without data URL prefix)
- * @param filename - Optional filename. If not provided, generates a unique name
- * @returns The relative path to the uploaded image (e.g., "/assets/filename.jpg")
- */
 export async function uploadImage(imageBase64: string, filename?: string): Promise<string> {
-  // Remove data URL prefix if present (e.g., "data:image/jpeg;base64,")
   const base64Data = imageBase64.includes(",") ? imageBase64.split(",")[1] : imageBase64;
 
-  // Generate filename if not provided
   if (!filename) {
     const timestamp = Date.now();
     const random = Math.random().toString(36).substring(2, 9);
-    filename = `image-${timestamp}-${random}.jpg`; // Default to jpg
+    filename = `image-${timestamp}-${random}.jpg`;
   }
 
-  // Ensure filename has an extension
   if (!filename.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
     filename = `${filename}.jpg`;
   }
 
   const imagePath = `public/assets/${filename}`;
-
-  // Get SHA if file exists (for update)
   const sha = await getFileSha(imagePath);
 
-  // Upload the image directly with base64 (no double encoding)
   await githubPut(`contents/${imagePath}`, {
     message: `Upload image: ${filename}`,
-    content: base64Data, // Already base64, don't encode again
+    content: base64Data,
     branch,
-    ...(sha && { sha }), // Include sha se il file esiste (update)
+    ...(sha && { sha }),
   });
 
-  // Return the relative path (without public prefix, as it's served from root)
   return `/assets/${filename}`;
 }

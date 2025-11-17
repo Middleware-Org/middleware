@@ -17,26 +17,21 @@ export async function getAllCategories(): Promise<Category[]> {
       try {
         const content = await getFileContent(file.path);
 
-        // Valida che il contenuto non sia vuoto
         if (!content || content.trim().length === 0) {
-          console.warn(`File ${file.path} is empty, skipping`);
           return null;
         }
 
         const category = JSON.parse(content) as Category;
         category.slug = file.name.replace(".json", "");
         return category;
-      } catch (error) {
-        console.error(`Error parsing category file ${file.path}:`, error);
+      } catch {
         return null;
       }
     }),
   );
 
-  // Filtra i valori null (file non validi)
   const validCategories = categories.filter((cat): cat is Category => cat !== null);
 
-  // Ordina per order, poi per nome se order non è definito
   return validCategories.sort((a, b) => {
     const orderA = a.order ?? Infinity;
     const orderB = b.order ?? Infinity;
@@ -59,8 +54,7 @@ export async function getCategoryBySlug(slug: string): Promise<Category | undefi
     const category = JSON.parse(content) as Category;
     category.slug = slug;
     return category;
-  } catch (error) {
-    console.error(`Error getting category ${slug}:`, error);
+  } catch {
     return undefined;
   }
 }

@@ -4,6 +4,7 @@
 import { forwardRef } from "react";
 import { cn } from "@/lib/utils/classes";
 import type { ReactNode } from "react";
+import styles from "./styles";
 
 /* **************************************************
  * Types
@@ -24,11 +25,7 @@ export const TableRow = forwardRef<HTMLTableRowElement, TableRowProps>(
       <tr
         ref={ref}
         style={style}
-        className={cn(
-          "hover:bg-gray-50 transition-colors",
-          onClick && "cursor-pointer",
-          className,
-        )}
+        className={cn(styles.row, onClick && styles.rowClickable, className)}
         onClick={onClick}
       >
         {children}

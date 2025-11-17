@@ -3,6 +3,7 @@
  **************************************************/
 import { cn } from "@/lib/utils/classes";
 import type { ReactNode } from "react";
+import styles from "./styles";
 
 /* **************************************************
  * Types
@@ -17,8 +18,8 @@ interface TableProps {
  **************************************************/
 export function Table({ children, className }: TableProps) {
   return (
-    <div className="overflow-x-auto">
-      <table className={cn("w-full border-collapse", className)}>{children}</table>
+    <div className={styles.tableWrapper}>
+      <table className={cn(styles.table, className)}>{children}</table>
     </div>
   );
 }

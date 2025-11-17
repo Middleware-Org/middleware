@@ -9,6 +9,7 @@ import { useFormStatus } from "react-dom";
 import { useRouter } from "next/navigation";
 import { createCategoryAction, updateCategoryAction, type ActionResult } from "../actions";
 import styles from "../styles";
+import baseStyles from "../../styles";
 import type { Category } from "@/lib/github/types";
 
 /* **************************************************
@@ -61,7 +62,7 @@ export default function CategoryFormClient({ category }: CategoryFormClientProps
       )}
 
       {state?.success && state.message && (
-        <div className="mb-4 p-4 bg-green-50 border border-green-200 text-green-700 rounded-md">
+        <div className={baseStyles.successMessageGreen}>
           {state.message}
         </div>
       )}

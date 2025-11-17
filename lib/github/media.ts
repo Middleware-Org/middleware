@@ -3,7 +3,6 @@
  **************************************************/
 import { deleteFile, listDirectoryFiles, uploadImage } from "./client";
 import { getAllIssues } from "./issues";
-import type { GitHubFile } from "./types";
 
 /* **************************************************
  * Types
@@ -47,15 +46,13 @@ export async function deleteMediaFile(filename: string): Promise<void> {
     // Extract filename from cover path (could be "/assets/filename.jpg" or "public/assets/filename.jpg")
     const coverPath = issue.cover;
     if (!coverPath) return false;
-    
+
     // Normalize path: remove leading slash, ensure it starts with "public/assets/"
-    const normalizedPath = coverPath.startsWith("/")
-      ? coverPath.slice(1)
-      : coverPath;
+    const normalizedPath = coverPath.startsWith("/") ? coverPath.slice(1) : coverPath;
     const fullPath = normalizedPath.startsWith("public/")
       ? normalizedPath
       : `public/${normalizedPath}`;
-    
+
     // Check if this issue uses the image we're trying to delete
     return fullPath === `public/assets/${filename}`;
   });
@@ -72,10 +69,6 @@ export async function deleteMediaFile(filename: string): Promise<void> {
   await deleteFile(filePath, `Delete media file: ${filename}`);
 }
 
-export async function uploadMediaFile(
-  imageBase64: string,
-  filename?: string,
-): Promise<string> {
+export async function uploadMediaFile(imageBase64: string, filename?: string): Promise<string> {
   return uploadImage(imageBase64, filename);
 }
-
