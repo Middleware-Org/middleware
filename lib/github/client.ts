@@ -58,4 +58,3 @@ export async function listDirectoryFiles(dir: string): Promise<GitHubFile[]> {
   const files = await githubFetch(`contents/${dir}?ref=${branch}`);
   return Array.isArray(files) ? files : [];
 }
-

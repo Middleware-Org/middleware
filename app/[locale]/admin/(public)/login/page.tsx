@@ -5,7 +5,7 @@
  **************************************************/
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { authClient } from "@/lib/auth";
+import { authClient } from "@/lib/auth/client";
 import styles from "./styles";
 
 /* **************************************************
