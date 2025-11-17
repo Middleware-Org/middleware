@@ -41,5 +41,6 @@ export type Author = {
   slug: string;
   name: string;
   description: string;
+  order?: number;
 };
 

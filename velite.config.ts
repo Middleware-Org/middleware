@@ -14,6 +14,7 @@ export default defineConfig({
         in_evidence: s.boolean().default(false),
         content: s.markdown(),
         excerpt: s.string().max(200),
+        order: s.number().optional(),
       }),
     },
     authors: {
@@ -23,6 +24,7 @@ export default defineConfig({
         slug: s.slug("authors"),
         name: s.string(),
         description: s.string(),
+        order: s.number().optional(),
       }),
     },
     categories: {
@@ -32,6 +34,7 @@ export default defineConfig({
         slug: s.slug("categories"),
         name: s.string(),
         description: s.string(),
+        order: s.number().optional(),
       }),
     },
     issues: {
@@ -44,6 +47,7 @@ export default defineConfig({
         description: s.string(),
         cover: s.string(),
         color: s.string(),
+        order: s.number().optional(),
       }),
     },
   },
