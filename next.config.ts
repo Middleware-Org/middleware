@@ -2,11 +2,14 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ["via.placeholder.com"],
     remotePatterns: [
       {
         protocol: "https",
         hostname: "raw.githubusercontent.com",
+      },
+      {
+        protocol: "https",
+        hostname: "via.placeholder.com",
       },
     ],
     // Allow local API routes with query strings
