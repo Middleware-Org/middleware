@@ -1,24 +1,24 @@
 [
   {
-    "slug": "hello-world-2",
+    "slug": "organizzazione",
     "title": "Hello world",
     "date": "2025-01-01T00:00:00.000Z",
     "author": "infoaut",
     "category": "organizzazione",
     "issue": "l-enigma-dell-organizzazione",
     "in_evidence": true,
-    "content": "<p>Questo è il mio primo articolo con Issue!</p>",
+    "content": "<p><img src=\"/api/github/image?path=public%2Fassets%2Fimage-1763414275801-m44htkz.jpg\" alt=\"\"></p>\n<p>Questo è il mio primo articolo con Issue!</p>",
     "excerpt": "Esempio di articolo"
   },
   {
-    "slug": "hello-world",
-    "title": "Hello world",
-    "date": "2025-01-01T00:00:00.000Z",
+    "slug": "ueueue",
+    "title": "ueueue",
+    "date": "2025-11-17T00:00:00.000Z",
     "author": "infoaut",
     "category": "organizzazione",
     "issue": "l-enigma-dell-organizzazione",
     "in_evidence": true,
-    "content": "<p>Questo è il mio primo articolo con Issue!</p>",
-    "excerpt": "Esempio di articolo"
+    "content": "<p>Ueue</p>",
+    "excerpt": "Ueueue"
   }
 ]
