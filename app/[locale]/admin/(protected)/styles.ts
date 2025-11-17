@@ -8,8 +8,14 @@ import { cn } from "@/lib/utils/classes";
  ************************************************** */
 const styles = {
   main: cn("p-6 max-w-7xl mx-auto"),
+  header: cn("mb-6"),
   title: cn("mb-2 text-2xl font-bold"),
-  welcome: cn("mb-6 text-sm text-gray-500"),
+  welcome: cn("mb-4 text-sm text-gray-500"),
+  nav: cn("mt-4"),
+  navLink: cn(
+    "inline-block px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90",
+    "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary",
+  ),
   grid: cn("grid grid-cols-1 md:grid-cols-2 gap-6"),
   section: cn("bg-white rounded-lg border p-4"),
   sectionTitle: cn("mb-4 text-lg font-semibold text-gray-800"),

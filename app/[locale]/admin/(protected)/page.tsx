@@ -1,6 +1,7 @@
 /* **************************************************
  * Imports
  **************************************************/
+import Link from "next/link";
 import { getUser } from "@/lib/auth/server";
 import {
   getAllIssues,
@@ -50,10 +51,17 @@ export default async function AdminProtectedPage() {
 
   return (
     <main className={styles.main}>
-      <h1 className={styles.title}>Dashboard admin</h1>
-      <p className={styles.welcome}>
-        Ciao {user.name ?? user.email}, benvenutə nell&apos;area riservata.
-      </p>
+      <div className={styles.header}>
+        <h1 className={styles.title}>Dashboard admin</h1>
+        <p className={styles.welcome}>
+          Ciao {user.name ?? user.email}, benvenutə nell&apos;area riservata.
+        </p>
+        <nav className={styles.nav}>
+          <Link href="/admin/categories" className={styles.navLink}>
+            Gestisci Categorie →
+          </Link>
+        </nav>
+      </div>
 
       <div className={styles.grid}>
         {/* Issues */}

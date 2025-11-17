@@ -50,6 +50,11 @@ export async function getFileContent(path: string): Promise<string> {
     throw new Error(`Unsupported encoding: ${file.encoding}`);
   }
 
+  // Gestisci il caso di contenuto vuoto o null
+  if (!file.content || file.content.trim().length === 0) {
+    return "";
+  }
+
   const buff = Buffer.from(file.content, "base64");
   return buff.toString("utf-8");
 }
@@ -57,4 +62,68 @@ export async function getFileContent(path: string): Promise<string> {
 export async function listDirectoryFiles(dir: string): Promise<GitHubFile[]> {
   const files = await githubFetch(`contents/${dir}?ref=${branch}`);
   return Array.isArray(files) ? files : [];
+}
+
+export async function githubPut(path: string, body: unknown) {
+  const url = `${GITHUB_API_URL}/repos/${owner}/${repo}/${path}`;
+
+  const res = await fetch(url, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/vnd.github+json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error("GitHub PUT error", url, errorText);
+    throw new Error(`GitHub API error: ${res.status} - ${errorText}`);
+  }
+
+  return res.json();
+}
+
+export async function getFileSha(path: string): Promise<string | null> {
+  try {
+    const file = await githubFetch(`contents/${path}?ref=${branch}`);
+    return file.sha || null;
+  } catch {
+    return null;
+  }
+}
+
+export async function createOrUpdateFile(
+  path: string,
+  content: string,
+  message: string,
+): Promise<void> {
+  const sha = await getFileSha(path);
+  const contentBase64 = Buffer.from(content, "utf-8").toString("base64");
+
+  await githubPut(`contents/${path}`, {
+    message,
+    content: contentBase64,
+    branch,
+    ...(sha && { sha }), // Include sha se il file esiste (update)
+  });
+}
+
+export async function deleteFile(path: string, message: string): Promise<void> {
+  const sha = await getFileSha(path);
+
+  if (!sha) {
+    throw new Error(`File ${path} not found`);
+  }
+
+  // Per eliminare un file su GitHub, devo passare sha, message, branch
+  // e content (anche se vuoto, è obbligatorio)
+  await githubPut(`contents/${path}`, {
+    message,
+    sha,
+    branch,
+    content: "", // Campo obbligatorio anche per l'eliminazione
+  });
 }
