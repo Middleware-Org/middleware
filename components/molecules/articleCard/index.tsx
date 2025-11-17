@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Article } from "@/.velite";
 import Separator from "@/components/atoms/separetor";
 import { H3, MonoTextBold, MonoTextLight, SerifText } from "@/components/atoms/typography";
-import { getAuthorBySlug, getCategoryBySlug } from "@/lib/content/queries";
+import { getAuthorBySlug, getCategoryBySlug } from "@/lib/content";
 import { CommonDictionary } from "@/lib/i18n/types";
 import styles from "./styles";
 

@@ -12,7 +12,7 @@ import { formatDateByLang } from "@/lib/utils/date";
 import styles from "./styles";
 import { Article, Issue } from "@/.velite";
 import { CommonDictionary } from "@/lib/i18n/types";
-import { getAuthorBySlug, getCategoryBySlug } from "@/lib/content/queries";
+import { getAuthorBySlug, getCategoryBySlug } from "@/lib/content";
 
 /* **************************************************
  * Types

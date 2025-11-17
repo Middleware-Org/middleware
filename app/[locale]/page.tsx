@@ -5,7 +5,7 @@
 import { Article } from "@/.velite";
 import Articles from "@/components/molecules/articles";
 import Cover from "@/components/organism/cover";
-import { getAllIssues, getArticlesByIssue } from "@/lib/content/queries";
+import { getAllIssues, getArticlesByIssue } from "@/lib/content";
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import { getDictionary } from "@/lib/i18n/utils";
 
