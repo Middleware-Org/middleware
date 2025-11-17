@@ -15,11 +15,10 @@ export const auth = betterAuth({
     provider: "postgresql",
   }),
 
-  socialProviders: {
-    github: {
-      clientId: process.env.GITHUB_CLIENT_ID!,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
-    },
+  emailAndPassword: {
+    enabled: true,
+    requireEmailVerification: false,
+    minPasswordLength: 8,
   },
 
   plugins: [nextCookies()],
