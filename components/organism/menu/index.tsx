@@ -8,7 +8,7 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { CommonDictionary } from "@/lib/i18n/types";
 import { cn } from "@/lib/utils/classes";
-import { useMenu } from "@/store/useMenu";
+import { useMenu } from "@/lib/store";
 import { menuItems } from "@/lib/data/links";
 import { MonoTextBold, MonoTextLight } from "@/components/atoms/typography";
 import Separator from "@/components/atoms/separetor";

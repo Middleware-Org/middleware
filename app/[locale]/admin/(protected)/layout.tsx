@@ -3,12 +3,13 @@
  **************************************************/
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
+import type { ReactNode } from "react";
 
 /* **************************************************
  * Types
  ************************************************** */
 interface AdminProtectedLayoutProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 /* **************************************************

@@ -4,7 +4,7 @@
  * Imports
  **************************************************/
 import { cn } from "@/lib/utils/classes";
-import { useMenu } from "@/store/useMenu";
+import { useMenu } from "@/lib/store";
 import type { CommonDictionary } from "@/lib/i18n/types";
 import styles from "./styles";
 

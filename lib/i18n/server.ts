@@ -1,4 +1,4 @@
-import { initI18nServer } from "@/i18n/config";
+import { initI18nServer } from "./config";
 import { normalizeNamespaces } from "./utils";
 import { TranslationNamespace } from "./types";
 

@@ -1,7 +1,13 @@
+/* **************************************************
+ * Imports
+ **************************************************/
 import { NextRequest, NextResponse } from "next/server";
-import { i18nSettings } from "@/i18n/settings";
+import { i18nSettings } from "@/lib/i18n/settings";
 
-export function proxy(req: NextRequest) {
+/* **************************************************
+ * Middleware
+ **************************************************/
+export function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
 
   if (pathname.includes(".")) {
@@ -23,3 +29,4 @@ export function proxy(req: NextRequest) {
 export const config = {
   matcher: ["/((?!_next|api|favicon.ico|sw.js|.*\\.).*)"],
 };
+

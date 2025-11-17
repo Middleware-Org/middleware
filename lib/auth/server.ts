@@ -5,7 +5,7 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 import { headers } from "next/headers";
-import { prisma } from "./prisma";
+import { prisma } from "../prisma";
 
 /* ****************************************************************
  * Auth Configuration
@@ -37,3 +37,4 @@ export async function getUser() {
   const session = await getSession();
   return session?.user;
 }
+
