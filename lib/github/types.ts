@@ -28,6 +28,7 @@ export type Issue = {
   cover: string;
   color: string;
   date: string;
+  order?: number;
 };
 
 export type Category = {

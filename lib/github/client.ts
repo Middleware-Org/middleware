@@ -146,3 +146,42 @@ export async function deleteFile(path: string, message: string): Promise<void> {
     branch,
   });
 }
+
+/**
+ * Upload an image file to GitHub repository
+ * @param imageBase64 - Base64 encoded image (with or without data URL prefix)
+ * @param filename - Optional filename. If not provided, generates a unique name
+ * @returns The relative path to the uploaded image (e.g., "/assets/filename.jpg")
+ */
+export async function uploadImage(imageBase64: string, filename?: string): Promise<string> {
+  // Remove data URL prefix if present (e.g., "data:image/jpeg;base64,")
+  const base64Data = imageBase64.includes(",") ? imageBase64.split(",")[1] : imageBase64;
+
+  // Generate filename if not provided
+  if (!filename) {
+    const timestamp = Date.now();
+    const random = Math.random().toString(36).substring(2, 9);
+    filename = `image-${timestamp}-${random}.jpg`; // Default to jpg
+  }
+
+  // Ensure filename has an extension
+  if (!filename.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+    filename = `${filename}.jpg`;
+  }
+
+  const imagePath = `public/assets/${filename}`;
+
+  // Get SHA if file exists (for update)
+  const sha = await getFileSha(imagePath);
+
+  // Upload the image directly with base64 (no double encoding)
+  await githubPut(`contents/${imagePath}`, {
+    message: `Upload image: ${filename}`,
+    content: base64Data, // Already base64, don't encode again
+    branch,
+    ...(sha && { sha }), // Include sha se il file esiste (update)
+  });
+
+  // Return the relative path (without public prefix, as it's served from root)
+  return `/assets/${filename}`;
+}
