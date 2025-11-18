@@ -147,23 +147,47 @@ export async function deleteFile(path: string, message: string): Promise<void> {
 }
 
 export async function uploadImage(imageBase64: string, filename?: string): Promise<string> {
-  const base64Data = imageBase64.includes(",") ? imageBase64.split(",")[1] : imageBase64;
+  return uploadFile(imageBase64, filename, "image");
+}
+
+export async function uploadFile(
+  fileBase64: string,
+  filename?: string,
+  fileType: "image" | "audio" | "json" = "image",
+): Promise<string> {
+  const base64Data = fileBase64.includes(",") ? fileBase64.split(",")[1] : fileBase64;
 
   if (!filename) {
     const timestamp = Date.now();
     const random = Math.random().toString(36).substring(2, 9);
-    filename = `image-${timestamp}-${random}.jpg`;
+    const extensions = {
+      image: "jpg",
+      audio: "mp3",
+      json: "json",
+    };
+    filename = `file-${timestamp}-${random}.${extensions[fileType]}`;
+  } else {
+    // Ensure filename has correct extension based on file type
+    const extensions = {
+      image: /\.(jpg|jpeg|png|gif|webp)$/i,
+      audio: /\.(mp3|wav)$/i,
+      json: /\.json$/i,
+    };
+    if (!filename.match(extensions[fileType])) {
+      const defaultExt = {
+        image: "jpg",
+        audio: "mp3",
+        json: "json",
+      };
+      filename = `${filename}.${defaultExt[fileType]}`;
+    }
   }
 
-  if (!filename.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
-    filename = `${filename}.jpg`;
-  }
+  const filePath = `public/assets/${filename}`;
+  const sha = await getFileSha(filePath);
 
-  const imagePath = `public/assets/${filename}`;
-  const sha = await getFileSha(imagePath);
-
-  await githubPut(`contents/${imagePath}`, {
-    message: `Upload image: ${filename}`,
+  await githubPut(`contents/${filePath}`, {
+    message: `Upload ${fileType}: ${filename}`,
     content: base64Data,
     branch,
     ...(sha && { sha }),

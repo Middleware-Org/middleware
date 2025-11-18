@@ -27,25 +27,30 @@ export async function uploadMediaAction(
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
 
-    const imageBase64 = formData.get("image") as string;
+    const fileBase64 = formData.get("file") as string;
     const filename = formData.get("filename") as string | null;
+    const fileType = (formData.get("fileType") as "image" | "audio" | "json") || "image";
 
-    if (!imageBase64) {
+    if (!fileBase64) {
       return {
         success: false,
-        error: "Image is required",
+        error: "File is required",
         errorType: "error",
       };
     }
 
-    const imagePath = await uploadMediaFile(imageBase64, filename?.trim() || undefined);
+    const filePath = await uploadMediaFile(
+      fileBase64,
+      filename?.trim() || undefined,
+      fileType,
+    );
 
     revalidatePath("/admin/media");
-    return { success: true, data: imagePath, message: "Image uploaded successfully" };
+    return { success: true, data: filePath, message: "File uploaded successfully" };
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to upload image",
+      error: error instanceof Error ? error.message : "Failed to upload file",
       errorType: "error",
     };
   }
@@ -65,7 +70,7 @@ export async function deleteMediaAction(filename: string): Promise<ActionResult>
     await deleteMediaFile(filename);
     revalidatePath("/admin/media");
 
-    return { success: true, message: "Image deleted successfully" };
+    return { success: true, message: "File deleted successfully" };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Failed to delete image";
     const isRelationError = errorMessage.includes("used by");

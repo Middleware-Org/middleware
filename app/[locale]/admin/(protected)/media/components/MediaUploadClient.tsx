@@ -3,52 +3,54 @@
  **************************************************/
 "use client";
 
-import { useRef, useState, useEffect } from "react";
-import { useActionState } from "react";
-import { useFormStatus } from "react-dom";
-import { uploadMediaAction, type ActionResult } from "../actions";
+import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import type { ActionResult } from "../actions";
 import styles from "../styles";
 import Image from "next/image";
-
-/* **************************************************
- * Submit Button Component
- **************************************************/
-function SubmitButton() {
-  const { pending } = useFormStatus();
-
-  return (
-    <button type="submit" disabled={pending} className={styles.submitButton}>
-      {pending ? "Caricamento..." : "Carica Immagine"}
-    </button>
-  );
-}
 
 /* **************************************************
  * Media Upload Client Component
  **************************************************/
 export default function MediaUploadClient() {
+  const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [filename, setFilename] = useState<string>("");
-  const [state, formAction] = useActionState<ActionResult<string> | null, FormData>(
-    uploadMediaAction,
-    null,
-  );
+  const [fileType, setFileType] = useState<"image" | "audio" | "json">("image");
+  const [state, setState] = useState<ActionResult<string> | null>(null);
+  const [isPending, setIsPending] = useState(false);
 
   function handleFileSelect(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
-    if (!file.type.startsWith("image/")) {
-      alert("Seleziona un file immagine");
+    // Determine file type
+    let detectedType: "image" | "audio" | "json" = "image";
+    if (file.type.startsWith("image/")) {
+      detectedType = "image";
+    } else if (
+      file.type.startsWith("audio/") ||
+      file.name.endsWith(".mp3") ||
+      file.name.endsWith(".wav")
+    ) {
+      detectedType = "audio";
+    } else if (file.type === "application/json" || file.name.endsWith(".json")) {
+      detectedType = "json";
+    } else {
+      alert(
+        "Formato file non supportato. Usa immagini (JPG, PNG, GIF, WEBP), audio (MP3, WAV) o JSON.",
+      );
       return;
     }
 
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      alert("La dimensione dell'immagine deve essere inferiore a 5MB");
+    setFileType(detectedType);
+
+    // Validate file size (max 50MB for audio, 10MB for others)
+    const maxSize = detectedType === "audio" ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
+    if (file.size > maxSize) {
+      alert(`La dimensione del file deve essere inferiore a ${maxSize / 1024 / 1024}MB`);
       return;
     }
 
@@ -79,35 +81,115 @@ export default function MediaUploadClient() {
     }
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!preview) {
-      alert("Seleziona un'immagine prima di caricare");
+      alert("Seleziona un file prima di caricare");
       return;
     }
 
-    const formData = new FormData(event.currentTarget);
-    formData.set("image", preview);
-    if (filename) {
-      formData.set("filename", filename);
-    }
+    setIsPending(true);
+    setState(null);
 
-    formAction(formData);
+    try {
+      const formData = new FormData();
+      formData.set("file", preview);
+      formData.set("fileType", fileType);
+      if (filename) {
+        formData.set("filename", filename);
+      }
+
+      const response = await fetch("/api/media/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setState(result);
+        setTimeout(() => {
+          handleRemove();
+          formRef.current?.reset();
+          router.refresh();
+        }, 100);
+      } else {
+        setState({
+          success: false,
+          error: result.error || "Failed to upload file",
+          errorType: "error",
+        });
+      }
+    } catch (error) {
+      setState({
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to upload file",
+        errorType: "error",
+      });
+    } finally {
+      setIsPending(false);
+    }
   }
 
-  // Reset form on success
-  useEffect(() => {
-    if (state?.success) {
-      setTimeout(() => {
-        handleRemove();
-        formRef.current?.reset();
-      }, 100);
+  function renderPreview() {
+    if (!preview) return null;
+
+    if (fileType === "image") {
+      return (
+        <div className={styles.imagePreview}>
+          <Image
+            src={preview}
+            alt="Preview"
+            className={styles.imagePreviewImg}
+            width={800}
+            height={500}
+            unoptimized
+          />
+        </div>
+      );
+    } else if (fileType === "audio") {
+      return (
+        <div className="p-4 border border-secondary bg-primary">
+          <audio controls src={preview} className="w-full">
+            Il tuo browser non supporta l&apos;elemento audio.
+          </audio>
+        </div>
+      );
+    } else if (fileType === "json") {
+      try {
+        // Decode base64 and handle UTF-8 encoding correctly
+        const base64Data = preview.includes(",") ? preview.split(",")[1] : preview;
+        const binaryString = atob(base64Data);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        const jsonContent = new TextDecoder("utf-8").decode(bytes);
+        const parsed = JSON.parse(jsonContent);
+        return (
+          <div className="p-4 border border-secondary bg-primary max-h-64 overflow-auto">
+            <pre className="text-xs text-secondary whitespace-pre-wrap font-mono">
+              {JSON.stringify(parsed, null, 2)}
+            </pre>
+          </div>
+        );
+      } catch (err) {
+        return (
+          <div className="p-4 border border-secondary bg-primary">
+            <p className="text-sm text-secondary">File JSON selezionato</p>
+            <p className="text-xs text-secondary/60 mt-1">
+              {err instanceof Error ? err.message : "Errore nel parsing"}
+            </p>
+          </div>
+        );
+      }
     }
-  }, [state?.success]);
+    return null;
+  }
 
   return (
     <div className={styles.form}>
-      <h2 className={styles.formTitle}>Carica Nuova Immagine</h2>
+      <h2 className={styles.formTitle}>Carica Nuovo File</h2>
 
       {state && !state.success && (
         <div className={state.errorType === "warning" ? styles.errorWarning : styles.error}>
@@ -123,26 +205,19 @@ export default function MediaUploadClient() {
 
       <form ref={formRef} onSubmit={handleSubmit}>
         <div className={styles.field}>
-          <label className={styles.label}>Immagine *</label>
+          <label className={styles.label}>File *</label>
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/*"
+            accept="image/*,audio/mp3,audio/wav,audio/mpeg,.json,application/json"
             onChange={handleFileSelect}
             className="hidden"
             required
           />
           <div onClick={handleClick} className={styles.imageUpload}>
             {preview ? (
-              <div className={styles.imagePreview}>
-                <Image
-                  src={preview}
-                  alt="Preview"
-                  className={styles.imagePreviewImg}
-                  width={800}
-                  height={500}
-                  unoptimized
-                />
+              <div>
+                {renderPreview()}
                 <div className="mt-2 flex gap-2">
                   <button
                     type="button"
@@ -152,7 +227,7 @@ export default function MediaUploadClient() {
                     }}
                     className="px-3 py-1 text-sm bg-secondary/10 hover:bg-secondary/20"
                   >
-                    Cambia immagine
+                    Cambia file
                   </button>
                   <button
                     type="button"
@@ -168,8 +243,10 @@ export default function MediaUploadClient() {
               </div>
             ) : (
               <div className="text-center py-8">
-                <p className="text-secondary/80 mb-2">Clicca per selezionare un&apos;immagine</p>
-                <p className="text-sm text-secondary/60">JPG, PNG, GIF o WEBP (max 5MB)</p>
+                <p className="text-secondary/80 mb-2">Clicca per selezionare un file</p>
+                <p className="text-sm text-secondary/60">
+                  Immagini (JPG, PNG, GIF, WEBP), Audio (MP3, WAV) o JSON (max 10MB, audio max 50MB)
+                </p>
               </div>
             )}
           </div>
@@ -197,7 +274,9 @@ export default function MediaUploadClient() {
 
         {preview && (
           <div className="mt-4">
-            <SubmitButton />
+            <button type="submit" disabled={isPending} className={styles.submitButton}>
+              {isPending ? "Caricamento..." : "Carica File"}
+            </button>
           </div>
         )}
       </form>

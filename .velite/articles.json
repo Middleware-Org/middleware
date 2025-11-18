@@ -11,6 +11,17 @@
     "excerpt": "Esempio di articolo"
   },
   {
+    "slug": "titolo",
+    "title": "titolo",
+    "date": "2025-11-17T00:00:00.000Z",
+    "author": "infoaut",
+    "category": "organizzazione",
+    "issue": "l-enigma-dell-organizzazione",
+    "in_evidence": false,
+    "content": "<h1><strong>Articolo di prova</strong></h1>",
+    "excerpt": "Prova"
+  },
+  {
     "slug": "ueueue",
     "title": "ueueue",
     "date": "2025-11-17T00:00:00.000Z",

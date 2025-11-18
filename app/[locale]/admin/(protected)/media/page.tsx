@@ -32,7 +32,7 @@ export default async function MediaPage() {
       <MediaUploadClient />
 
       <div className="mt-8">
-        <h2 className="text-xl font-semibold mb-4">Immagini Caricate</h2>
+        <h2 className="text-xl font-semibold mb-4">File Caricati</h2>
         <MediaListClient mediaFiles={mediaFiles} />
       </div>
     </main>

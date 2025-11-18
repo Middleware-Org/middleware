@@ -7,6 +7,7 @@ import { useState, useTransition } from "react";
 import { deleteMediaAction } from "../actions";
 import { getGitHubImageUrl } from "@/lib/github/images";
 import { useRouter } from "next/navigation";
+import { Music, FileJson } from "lucide-react";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { MediaFile } from "@/lib/github/media";
@@ -28,7 +29,7 @@ export default function MediaListClient({ mediaFiles }: MediaListClientProps) {
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
 
   async function handleDelete(filename: string) {
-    if (!confirm(`Sei sicuro di voler eliminare l'immagine "${filename}"?`)) {
+    if (!confirm(`Sei sicuro di voler eliminare il file "${filename}"?`)) {
       return;
     }
 
@@ -58,21 +59,31 @@ export default function MediaListClient({ mediaFiles }: MediaListClientProps) {
 
       {mediaFiles.length === 0 ? (
         <div className={styles.empty}>
-          <p>Nessuna immagine trovata.</p>
-          <p className={baseStyles.emptyStateText}>Carica la tua prima immagine usando il form sopra.</p>
+          <p>Nessun file trovato.</p>
+          <p className={baseStyles.emptyStateText}>Carica il tuo primo file usando il form sopra.</p>
         </div>
       ) : (
         <div className={styles.grid}>
           {mediaFiles.map((file) => (
             <div key={file.name} className={styles.imageCard}>
-              <Image
-                width={400}
-                height={300}
-                src={getGitHubImageUrl(file.url)}
-                alt={file.name}
-                className={styles.imageCardImg}
-                unoptimized
-              />
+              {file.type === "image" ? (
+                <Image
+                  width={400}
+                  height={300}
+                  src={getGitHubImageUrl(file.url)}
+                  alt={file.name}
+                  className={styles.imageCardImg}
+                  unoptimized
+                />
+              ) : file.type === "audio" ? (
+                <div className="w-full h-48 bg-secondary/10 flex items-center justify-center">
+                  <Music className="w-16 h-16 text-secondary/60" />
+                </div>
+              ) : (
+                <div className="w-full h-48 bg-secondary/10 flex items-center justify-center">
+                  <FileJson className="w-16 h-16 text-secondary/60" />
+                </div>
+              )}
               <div className={styles.imageCardName}>{file.name}</div>
               <div className={styles.imageCardOverlay}>
                 <button

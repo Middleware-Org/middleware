@@ -1,7 +1,7 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { deleteFile, listDirectoryFiles, uploadImage } from "./client";
+import { deleteFile, listDirectoryFiles } from "./client";
 import { getAllIssues } from "./issues";
 
 /* **************************************************
@@ -12,7 +12,7 @@ export type MediaFile = {
   path: string;
   url: string; // Relative path like "/assets/filename.jpg"
   size?: number;
-  type?: string;
+  type: "image" | "audio" | "json";
 };
 
 /* **************************************************
@@ -20,23 +20,35 @@ export type MediaFile = {
  **************************************************/
 export async function getAllMediaFiles(): Promise<MediaFile[]> {
   const files = await listDirectoryFiles("public/assets");
-  const imageFiles = files.filter(
+  const mediaFiles = files.filter(
     (f) =>
       f.type === "file" &&
       (f.name.endsWith(".jpg") ||
         f.name.endsWith(".jpeg") ||
         f.name.endsWith(".png") ||
         f.name.endsWith(".gif") ||
-        f.name.endsWith(".webp")),
+        f.name.endsWith(".webp") ||
+        f.name.endsWith(".mp3") ||
+        f.name.endsWith(".wav") ||
+        f.name.endsWith(".json")),
   );
 
-  return imageFiles.map((file) => ({
-    name: file.name,
-    path: file.path,
-    url: `/assets/${file.name}`,
-    size: 0, // GitHub API doesn't provide size directly
-    type: "image",
-  }));
+  return mediaFiles.map((file) => {
+    let fileType: "image" | "audio" | "json" = "image";
+    if (file.name.endsWith(".mp3") || file.name.endsWith(".wav")) {
+      fileType = "audio";
+    } else if (file.name.endsWith(".json")) {
+      fileType = "json";
+    }
+
+    return {
+      name: file.name,
+      path: file.path,
+      url: `/assets/${file.name}`,
+      size: 0, // GitHub API doesn't provide size directly
+      type: fileType,
+    };
+  });
 }
 
 export async function deleteMediaFile(filename: string): Promise<void> {
@@ -69,6 +81,11 @@ export async function deleteMediaFile(filename: string): Promise<void> {
   await deleteFile(filePath, `Delete media file: ${filename}`);
 }
 
-export async function uploadMediaFile(imageBase64: string, filename?: string): Promise<string> {
-  return uploadImage(imageBase64, filename);
+export async function uploadMediaFile(
+  fileBase64: string,
+  filename?: string,
+  fileType: "image" | "audio" | "json" = "image",
+): Promise<string> {
+  const { uploadFile } = await import("./client");
+  return uploadFile(fileBase64, filename, fileType);
 }

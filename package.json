@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "npx prisma generate --no-engine && npx velite && next dev",
     "build": "prisma generate --no-engine && npx velite && next build",
     "postinstall": "prisma generate --no-engine",
     "start": "next start",

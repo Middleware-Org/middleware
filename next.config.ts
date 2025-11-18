@@ -15,6 +15,11 @@ const nextConfig: NextConfig = {
     // Allow local API routes with query strings
     unoptimized: false,
   },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "50mb",
+    },
+  },
 };
 
 export default nextConfig;
