@@ -6,9 +6,9 @@ excerpt: >-
   tecnici e strumenti di analisi senza cookie (cookieless), nel pieno rispetto
   della normativa vigente.
 ---
-**Ultimo aggiornamento:** 4 agosto 2025
+# **Ultimo aggiornamento:** 4 agosto 2025
 
-Questo sito web ([https://www.middleware.blog](https://www.middleware.blog)) utilizza **esclusivamente cookie tecnici** e strumenti di analisi **senza cookie** (cookieless), nel pieno rispetto della normativa vigente.
+## Questo sito web ([https://www.middleware.blog](https://www.middleware.blog)) utilizza **esclusivamente cookie tecnici** e strumenti di analisi **senza cookie** (cookieless), nel pieno rispetto della normativa vigente.
 
 ## **Cosa sono i cookie?**
 
@@ -32,8 +32,8 @@ Utilizziamo **solo cookie tecnici**, che:
     
 -   **Non** sono condivisi con terze parti.
     
-
-Un esempio è il cookie utilizzato per ricordare la chiusura del banner informativo.
+-   Un esempio è il cookie utilizzato per ricordare la chiusura del banner informativo.
+    
 
 * * *
 
