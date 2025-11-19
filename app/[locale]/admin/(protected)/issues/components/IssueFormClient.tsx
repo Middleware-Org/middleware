@@ -14,6 +14,7 @@ import type { Issue } from "@/lib/github/types";
 import Image from "next/image";
 import { useIssue } from "@/hooks/swr";
 import MediaSelector from "../../articles/components/MediaSelector";
+import { mutate } from "swr";
 
 /* **************************************************
  * Types
@@ -163,11 +164,16 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
   useEffect(() => {
     if (state?.success) {
       formRef.current?.reset();
+      // Invalida la cache SWR per forzare il refetch della lista
+      mutate("/api/issues");
+      if (editing && issueSlug) {
+        mutate(`/api/issues/${issueSlug}`);
+      }
       router.push("/admin/issues");
       // Reset coverImage after navigation
       setTimeout(() => setCoverImage(""), 0);
     }
-  }, [state, router]);
+  }, [state, router, editing, issueSlug]);
 
   // Update hidden input when coverImage changes
   useEffect(() => {

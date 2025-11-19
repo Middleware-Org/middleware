@@ -12,6 +12,7 @@ import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Category } from "@/lib/github/types";
 import { useCategory } from "@/hooks/swr";
+import { mutate } from "swr";
 
 /* **************************************************
  * Types
@@ -53,9 +54,14 @@ export default function CategoryFormClient({ categorySlug }: CategoryFormClientP
   useEffect(() => {
     if (state?.success) {
       formRef.current?.reset();
+      // Invalida la cache SWR per forzare il refetch della lista
+      mutate("/api/categories");
+      if (editing && categorySlug) {
+        mutate(`/api/categories/${categorySlug}`);
+      }
       router.push("/admin/categories");
     }
-  }, [state, router]);
+  }, [state, router, editing, categorySlug]);
 
   return (
     <>

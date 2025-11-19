@@ -13,6 +13,7 @@ import type { Category } from "@/lib/github/types";
 import type { Author } from "@/lib/github/types";
 import type { Issue } from "@/lib/github/types";
 import AudioJsonMediaSelector from "./AudioJsonMediaSelector";
+import { mutate } from "swr";
 
 /* **************************************************
  * Types
@@ -75,6 +76,9 @@ export default function ArticleMetaPanel({
           type: result.errorType || "error",
         });
       } else {
+        // Invalida la cache SWR per forzare il refetch della lista
+        mutate("/api/articles");
+        mutate(`/api/articles/${article.slug}`);
         router.push("/admin/articles");
       }
     });

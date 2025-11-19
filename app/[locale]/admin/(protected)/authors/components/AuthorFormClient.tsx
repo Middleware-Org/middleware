@@ -12,6 +12,7 @@ import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Author } from "@/lib/github/types";
 import { useAuthor } from "@/hooks/swr";
+import { mutate } from "swr";
 
 /* **************************************************
  * Types
@@ -53,9 +54,14 @@ export default function AuthorFormClient({ authorSlug }: AuthorFormClientProps) 
   useEffect(() => {
     if (state?.success) {
       formRef.current?.reset();
+      // Invalida la cache SWR per forzare il refetch della lista
+      mutate("/api/authors");
+      if (editing && authorSlug) {
+        mutate(`/api/authors/${authorSlug}`);
+      }
       router.push("/admin/authors");
     }
-  }, [state, router]);
+  }, [state, router, editing, authorSlug]);
 
   return (
     <>
