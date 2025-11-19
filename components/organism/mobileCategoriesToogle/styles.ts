@@ -7,11 +7,11 @@ import { cn } from "@/lib/utils/classes";
  * Styles
  **************************************************/
 const styles = {
-  buttonText: cn("text-sm"),
+  buttonTextOpen: cn("text-sm"),
+  buttonTextClosed: cn("text-white text-sm"),
 };
 
 /* **************************************************
  * Export
  **************************************************/
 export default styles;
-

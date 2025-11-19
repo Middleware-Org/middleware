@@ -27,7 +27,9 @@ export default function MobileCategoriesToggle({ dict }: MobileCategoriesToggleP
 
   return (
     <Button onClick={toggleOpen} variants={buttonVariant}>
-      <MonoTextLight className={styles.buttonText}>{buttonText}</MonoTextLight>
+      <MonoTextLight className={isOpen ? styles.buttonTextClosed : styles.buttonTextOpen}>
+        {buttonText}
+      </MonoTextLight>
     </Button>
   );
 }
