@@ -1,5 +1,14 @@
 [
   {
+    "slug": "issue-19",
+    "date": "2025-11-19T00:00:00.000Z",
+    "title": "Issue 19",
+    "description": "Commuter trains often stop at the edge of cities. Short tunnels can link them up, creating metro networks for a fraction of the cost of building them from scratch.",
+    "cover": "/assets/image-1763414275801-m44htkz.jpg",
+    "color": "#e20a39",
+    "order": 1
+  },
+  {
     "slug": "l-enigma-dell-organizzazione",
     "date": "2025-01-01T00:00:00.000Z",
     "title": "L'enigma dell'organizzazione",

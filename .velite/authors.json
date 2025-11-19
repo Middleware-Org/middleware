@@ -1,7 +1,13 @@
 [
   {
+    "slug": "daniele-benedetto",
+    "name": "Daniele benedettovcfds",
+    "description": "bgvfdsa",
+    "order": 1
+  },
+  {
     "slug": "infoaut",
-    "name": "Infoaut",
+    "name": "Infoaut er",
     "description": "Infoaut è un autore di articoli"
   }
 ]
