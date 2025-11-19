@@ -50,7 +50,7 @@ export default async function CategoriesLayout({ children, params }: CategoriesL
   const dictCategories = await getDictionary(locale, TRANSLATION_NAMESPACES.CATEGORIES);
 
   return (
-    <body>
+    <>
       <Header dict={dict}>
         <MonoTextLight className="text-xs! md:text-base!">
           {dictCategories.page.title}
@@ -58,6 +58,6 @@ export default async function CategoriesLayout({ children, params }: CategoriesL
       </Header>
       <Menu dict={dict} />
       <main className="w-full">{children}</main>
-    </body>
+    </>
   );
 }

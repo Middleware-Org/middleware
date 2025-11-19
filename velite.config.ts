@@ -52,5 +52,13 @@ export default defineConfig({
         order: s.number().optional(),
       }),
     },
+    pages: {
+      name: "Page",
+      pattern: "pages/**/*.md",
+      schema: s.object({
+        slug: s.slug("pages"),
+        content: s.markdown(),
+      }),
+    },
   },
 });

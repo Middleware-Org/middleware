@@ -52,12 +52,12 @@ export default async function HomeLayout({ children, params }: HomeLayoutProps) 
   const issues = getAllIssues();
 
   return (
-    <body>
+    <>
       <Header dict={dict}>
         <IssuesDropdown issues={issues} />
       </Header>
       <Menu dict={dict} />
       <main className="w-full">{children}</main>
-    </body>
+    </>
   );
 }

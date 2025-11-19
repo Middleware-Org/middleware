@@ -12,6 +12,7 @@ import {
   BookOpen,
   Image as ImageIcon,
   FileText,
+  FileCode,
   LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils/classes";
@@ -73,6 +74,11 @@ export default function Sidebar() {
       href: "/admin/articles",
       label: "Articoli",
       icon: FileText,
+    },
+    {
+      href: "/admin/pages",
+      label: "Pagine",
+      icon: FileCode,
     },
   ];
 

@@ -47,3 +47,7 @@ export type Author = {
   order?: number;
 };
 
+export type Page = {
+  slug: string;
+  content: string;
+};

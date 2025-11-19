@@ -50,7 +50,7 @@ export default async function AuthorsLayout({ children, params }: AuthorsLayoutP
   const dictAuthors = await getDictionary(locale, TRANSLATION_NAMESPACES.AUTHORS);
 
   return (
-    <body>
+    <>
       <Header dict={dict}>
         <MonoTextLight className="text-xs! md:text-base!">
           {dictAuthors.page.title}
@@ -58,7 +58,7 @@ export default async function AuthorsLayout({ children, params }: AuthorsLayoutP
       </Header>
       <Menu dict={dict} />
       <main className="w-full">{children}</main>
-    </body>
+    </>
   );
 }
 

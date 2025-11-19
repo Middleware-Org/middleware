@@ -43,5 +43,9 @@ export async function generateMetadata({ params }: RootLayoutProps) {
 export default async function RootLayout({ children, params }: RootLayoutProps) {
   const { locale } = await params;
 
-  return <html lang={locale}>{children}</html>;
+  return (
+    <html lang={locale}>
+      <body>{children}</body>
+    </html>
+  );
 }
