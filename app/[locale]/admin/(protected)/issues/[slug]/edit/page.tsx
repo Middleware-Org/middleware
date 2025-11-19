@@ -10,6 +10,7 @@ import IssueFormClient from "../../components/IssueFormClient";
 import IssueDeleteButton from "../../components/IssueDeleteButton";
 import IssueEditSkeleton from "../../components/IssueEditSkeleton";
 import styles from "../../styles";
+import SWRPageProvider from "@/components/providers/SWRPageProvider";
 
 /* **************************************************
  * Types
@@ -34,22 +35,28 @@ export default async function EditIssuePage({ params }: EditIssuePageProps) {
     notFound();
   }
 
-  return (
-    <main className={styles.main}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>Modifica Issue: {issue.title}</h1>
-        <Link href="/admin/issues" className={styles.backButton}>
-          ← Indietro
-        </Link>
-      </div>
+  // Pre-popolazione cache SWR con dati SSR
+  const swrFallback = {
+    [`/api/issues/${slug}`]: issue,
+  };
 
-      <Suspense fallback={<IssueEditSkeleton />}>
-        <IssueFormClient issue={issue} />
-        <div className="mt-6">
-          <IssueDeleteButton issue={issue} />
+  return (
+    <SWRPageProvider fallback={swrFallback}>
+      <main className={styles.main}>
+        <div className={styles.header}>
+          <h1 className={styles.title}>Modifica Issue: {issue.title}</h1>
+          <Link href="/admin/issues" className={styles.backButton}>
+            ← Indietro
+          </Link>
         </div>
-      </Suspense>
-    </main>
+
+        <Suspense fallback={<IssueEditSkeleton />}>
+          <IssueFormClient issueSlug={slug} />
+          <div className="mt-6">
+            <IssueDeleteButton issueSlug={slug} />
+          </div>
+        </Suspense>
+      </main>
+    </SWRPageProvider>
   );
 }
-

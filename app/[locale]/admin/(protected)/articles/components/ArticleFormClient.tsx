@@ -12,9 +12,7 @@ import ArticleMetaPanel from "./ArticleMetaPanel";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Article } from "@/lib/github/types";
-import type { Category } from "@/lib/github/types";
-import type { Author } from "@/lib/github/types";
-import type { Issue } from "@/lib/github/types";
+import { useArticle, useAuthors, useCategories, useIssues } from "@/hooks/swr";
 
 // Import dinamico per evitare problemi SSR con Tiptap
 const MarkdownEditor = dynamic(() => import("./MarkdownEditor"), {
@@ -32,36 +30,54 @@ const MarkdownEditor = dynamic(() => import("./MarkdownEditor"), {
  * Types
  **************************************************/
 interface ArticleFormClientProps {
-  article?: Article | null;
-  categories: Category[];
-  authors: Author[];
-  issues: Issue[];
+  articleSlug?: string; // Slug per edit mode
 }
 
 /* **************************************************
  * Article Form Client Component
  **************************************************/
-export default function ArticleFormClient({
-  article,
-  categories,
-  authors,
-  issues,
-}: ArticleFormClientProps) {
+export default function ArticleFormClient({ articleSlug }: ArticleFormClientProps) {
   const router = useRouter();
-  const editing = !!article;
+  const editing = !!articleSlug;
+
+  // Usa SWR per ottenere i dati (cache pre-popolata dal server)
+  const { article } = useArticle(articleSlug || null);
+  const { authors = [] } = useAuthors();
+  const { categories = [] } = useCategories();
+  const { issues = [] } = useIssues();
+
   const formRef = useRef<HTMLFormElement>(null);
-  const [content, setContent] = useState<string>(article?.content || "");
-  const [formData, setFormData] = useState({
-    title: article?.title || "",
-    date: article?.date || new Date().toISOString().split("T")[0],
-    author: article?.author || "",
-    category: article?.category || "",
-    issue: article?.issue || "",
-    in_evidence: article?.in_evidence || false,
-    excerpt: article?.excerpt || "",
-    audio: article?.audio || "",
-    audio_chunks: article?.audio_chunks || "",
-  });
+
+  // Usa i valori dall'articolo quando disponibili, altrimenti valori di default
+  const defaultFormData = {
+    title: "",
+    date: new Date().toISOString().split("T")[0],
+    author: "",
+    category: "",
+    issue: "",
+    in_evidence: false,
+    excerpt: "",
+    audio: "",
+    audio_chunks: "",
+  };
+
+  // Inizializza lo stato con i valori dell'articolo se disponibile
+  const [content, setContent] = useState<string>(() => article?.content || "");
+  const [formData, setFormData] = useState(() =>
+    article
+      ? {
+          title: article.title || "",
+          date: article.date || new Date().toISOString().split("T")[0],
+          author: article.author || "",
+          category: article.category || "",
+          issue: article.issue || "",
+          in_evidence: article.in_evidence || false,
+          excerpt: article.excerpt || "",
+          audio: article.audio || "",
+          audio_chunks: article.audio_chunks || "",
+        }
+      : defaultFormData,
+  );
 
   const [state, formAction] = useActionState<ActionResult<Article> | null, FormData>(
     editing ? updateArticleAction : createArticleAction,
@@ -91,7 +107,7 @@ export default function ArticleFormClient({
     preparedFormData.set("in_evidence", formData.in_evidence.toString());
     preparedFormData.set("excerpt", formData.excerpt);
     preparedFormData.set("content", content);
-    
+
     if (formData.audio) {
       preparedFormData.set("audio", formData.audio);
     }
@@ -99,8 +115,8 @@ export default function ArticleFormClient({
       preparedFormData.set("audio_chunks", formData.audio_chunks);
     }
 
-    if (editing && article) {
-      preparedFormData.set("slug", article.slug);
+    if (editing && articleSlug) {
+      preparedFormData.set("slug", articleSlug);
     }
 
     return formAction(preparedFormData);
@@ -131,16 +147,18 @@ export default function ArticleFormClient({
         </div>
 
         {/* Meta Panel - 1/4 width */}
-        <ArticleMetaPanel
-          article={article}
-          categories={categories}
-          authors={authors}
-          issues={issues}
-          formData={formData}
-          onFormDataChange={handleFormDataChange}
-          editing={editing}
-          formRef={formRef}
-        />
+        {authors.length > 0 && categories.length > 0 && issues.length > 0 && (
+          <ArticleMetaPanel
+            article={article || null}
+            categories={categories}
+            authors={authors}
+            issues={issues}
+            formData={formData}
+            onFormDataChange={handleFormDataChange}
+            editing={editing}
+            formRef={formRef}
+          />
+        )}
       </div>
     </form>
   );

@@ -9,6 +9,7 @@ import { getAllCategories } from "@/lib/github/categories";
 import CategoryListClient from "./components/CategoryListClient";
 import CategoryListSkeleton from "./components/CategoryListSkeleton";
 import styles from "./styles";
+import SWRPageProvider from "@/components/providers/SWRPageProvider";
 
 /* **************************************************
  * Categories List Page (Server Component)
@@ -21,23 +22,30 @@ export default async function CategoriesPage() {
 
   const categories = await getAllCategories();
 
-  return (
-    <main className={styles.main}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>Gestione Categorie</h1>
-        <div className="flex gap-2">
-          <Link href="/admin/categories/new" className={styles.submitButton}>
-            + Nuova Categoria
-          </Link>
-          <Link href="/admin" className={styles.backButton}>
-            ← Indietro
-          </Link>
-        </div>
-      </div>
+  // Pre-popolazione cache SWR con dati SSR
+  const swrFallback = {
+    "/api/categories": categories,
+  };
 
-      <Suspense fallback={<CategoryListSkeleton />}>
-        <CategoryListClient categories={categories} />
-      </Suspense>
-    </main>
+  return (
+    <SWRPageProvider fallback={swrFallback}>
+      <main className={styles.main}>
+        <div className={styles.header}>
+          <h1 className={styles.title}>Gestione Categorie</h1>
+          <div className="flex gap-2">
+            <Link href="/admin/categories/new" className={styles.submitButton}>
+              + Nuova Categoria
+            </Link>
+            <Link href="/admin" className={styles.backButton}>
+              ← Indietro
+            </Link>
+          </div>
+        </div>
+
+        <Suspense fallback={<CategoryListSkeleton />}>
+          <CategoryListClient />
+        </Suspense>
+      </main>
+    </SWRPageProvider>
   );
 }

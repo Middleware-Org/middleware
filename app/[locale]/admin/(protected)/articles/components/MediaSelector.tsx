@@ -3,13 +3,14 @@
  **************************************************/
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef } from "react";
 import Image from "next/image";
 import { getGitHubImageUrl } from "@/lib/github/images";
-import { getAllMediaAction, uploadMediaAction } from "../../media/actions";
-import type { MediaFile } from "@/lib/github/media";
+import { uploadMediaAction } from "../../media/actions";
 import baseStyles from "../../styles";
 import styles from "../../media/styles";
+import { useMedia } from "@/hooks/swr";
+import { mutate } from "swr";
 
 /* **************************************************
  * Types
@@ -24,9 +25,6 @@ interface MediaSelectorProps {
  * Media Selector Component
  **************************************************/
 export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelectorProps) {
-  const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
@@ -34,29 +32,10 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
   const [preview, setPreview] = useState<string | null>(null);
   const [filename, setFilename] = useState<string>("");
 
-  useEffect(() => {
-    if (isOpen) {
-      loadMediaFiles();
-    }
-  }, [isOpen]);
-
-
-  async function loadMediaFiles() {
-    setLoading(true);
-    setError(null);
-    try {
-      const result = await getAllMediaAction();
-      if (result.success && result.data) {
-        setMediaFiles(result.data as MediaFile[]);
-      } else {
-        setError(result.success === false ? result.error : "Failed to load media files");
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load media files");
-    } finally {
-      setLoading(false);
-    }
-  }
+  // Usa SWR per caricare i media files con cache, filtra solo immagini
+  const { mediaFiles: allMediaFiles = [], isLoading: loading, isError } = useMedia();
+  const mediaFiles = allMediaFiles.filter((file) => file.type === "image");
+  const error = isError ? "Failed to load media files" : null;
 
   function handleSelect(imageUrl: string) {
     onSelect(imageUrl);
@@ -121,11 +100,11 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
       }
 
       const result = await uploadMediaAction(null, formData);
-      
+
       if (result.success && result.data) {
         setUploadSuccess(result.message || "Immagine caricata con successo");
-        // Ricarica la lista dei media
-        await loadMediaFiles();
+        // Invalida la cache SWR per forzare il refetch
+        mutate("/api/media");
         // Seleziona automaticamente il file appena caricato
         handleSelect(result.data);
         // Reset form
@@ -210,22 +189,17 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
                   </div>
                 </div>
               ) : (
-                <div
-                  onClick={handleClick}
-                  className={styles.imageUpload}
-                >
+                <div onClick={handleClick} className={styles.imageUpload}>
                   <div className="text-center py-8">
-                    <p className={baseStyles.textSecondary}>Clicca per selezionare un&apos;immagine</p>
+                    <p className={baseStyles.textSecondary}>
+                      Clicca per selezionare un&apos;immagine
+                    </p>
                     <p className="text-sm text-secondary/60 mt-2">JPG, PNG, GIF o WEBP (max 5MB)</p>
                   </div>
                 </div>
               )}
 
-              {uploadError && (
-                <div className={`mt-2 ${baseStyles.error}`}>
-                  {uploadError}
-                </div>
-              )}
+              {uploadError && <div className={`mt-2 ${baseStyles.error}`}>{uploadError}</div>}
 
               {uploadSuccess && (
                 <div className={`mt-2 ${baseStyles.successMessageGreen}`}>{uploadSuccess}</div>

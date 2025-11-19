@@ -3,10 +3,10 @@
  **************************************************/
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/auth/server";
-import { getAllCategories } from "@/lib/github/categories";
+import { getAllAuthors } from "@/lib/github/authors";
 
 /* **************************************************
- * GET /api/categories
+ * GET /api/authors
  **************************************************/
 export async function GET() {
   try {
@@ -16,23 +16,24 @@ export async function GET() {
     }
 
     // Log per verificare se la richiesta viene fatta (non cache)
-    console.log("[API] GET /api/categories - Richiesta REST effettuata", {
+    console.log("[API] GET /api/authors - Richiesta REST effettuata", {
       timestamp: new Date().toISOString(),
       user: user.email,
     });
 
-    const categories = await getAllCategories();
+    const authors = await getAllAuthors();
     
-    const response = NextResponse.json(categories);
+    const response = NextResponse.json(authors);
     response.headers.set("X-Data-Source", "rest-api");
     response.headers.set("X-Timestamp", new Date().toISOString());
     
     return response;
   } catch (error) {
-    console.error("Error fetching categories:", error);
+    console.error("Error fetching authors:", error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to fetch categories" },
+      { error: error instanceof Error ? error.message : "Failed to fetch authors" },
       { status: 500 },
     );
   }
 }
+

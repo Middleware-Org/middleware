@@ -9,6 +9,7 @@ import { getAllIssues } from "@/lib/github/issues";
 import IssueListClient from "./components/IssueListClient";
 import IssueListSkeleton from "./components/IssueListSkeleton";
 import styles from "./styles";
+import SWRPageProvider from "@/components/providers/SWRPageProvider";
 
 /* **************************************************
  * Issues List Page (Server Component)
@@ -21,24 +22,31 @@ export default async function IssuesPage() {
 
   const issues = await getAllIssues();
 
-  return (
-    <main className={styles.main}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>Gestione Issues</h1>
-        <div className="flex gap-2">
-          <Link href="/admin/issues/new" className={styles.submitButton}>
-            + Nuova Issue
-          </Link>
-          <Link href="/admin" className={styles.backButton}>
-            ← Indietro
-          </Link>
-        </div>
-      </div>
+  // Pre-popolazione cache SWR con dati SSR
+  const swrFallback = {
+    "/api/issues": issues,
+  };
 
-      <Suspense fallback={<IssueListSkeleton />}>
-        <IssueListClient issues={issues} />
-      </Suspense>
-    </main>
+  return (
+    <SWRPageProvider fallback={swrFallback}>
+      <main className={styles.main}>
+        <div className={styles.header}>
+          <h1 className={styles.title}>Gestione Issues</h1>
+          <div className="flex gap-2">
+            <Link href="/admin/issues/new" className={styles.submitButton}>
+              + Nuova Issue
+            </Link>
+            <Link href="/admin" className={styles.backButton}>
+              ← Indietro
+            </Link>
+          </div>
+        </div>
+
+        <Suspense fallback={<IssueListSkeleton />}>
+          <IssueListClient />
+        </Suspense>
+      </main>
+    </SWRPageProvider>
   );
 }
 

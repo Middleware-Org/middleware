@@ -7,26 +7,32 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { deleteCategoryAction } from "../actions";
 import styles from "../styles";
-import type { Category } from "@/lib/github/types";
+import { useCategory } from "@/hooks/swr";
+import { mutate } from "swr";
 
 /* **************************************************
  * Types
  **************************************************/
 interface CategoryDeleteButtonProps {
-  category: Category;
+  categorySlug: string;
 }
 
 /* **************************************************
  * Category Delete Button Component
  **************************************************/
-export default function CategoryDeleteButton({ category }: CategoryDeleteButtonProps) {
+export default function CategoryDeleteButton({ categorySlug }: CategoryDeleteButtonProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(
     null,
   );
+  
+  // Usa SWR per ottenere la categoria (cache pre-popolata dal server)
+  const { category } = useCategory(categorySlug);
 
   async function handleDelete() {
+    if (!category) return;
+    
     if (!confirm(`Sei sicuro di voler eliminare la categoria "${category.name}"?`)) {
       return;
     }
@@ -34,7 +40,7 @@ export default function CategoryDeleteButton({ category }: CategoryDeleteButtonP
     setError(null);
 
     startTransition(async () => {
-      const result = await deleteCategoryAction(category.slug);
+      const result = await deleteCategoryAction(categorySlug);
 
       if (!result.success) {
         setError({
@@ -42,6 +48,9 @@ export default function CategoryDeleteButton({ category }: CategoryDeleteButtonP
           type: result.errorType || "error",
         });
       } else {
+        // Invalida la cache SWR per forzare il refetch
+        mutate("/api/categories");
+        mutate(`/api/categories/${categorySlug}`);
         router.push("/admin/categories");
         router.refresh();
       }

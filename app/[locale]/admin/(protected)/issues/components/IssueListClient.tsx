@@ -28,13 +28,13 @@ import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Issue } from "@/lib/github/types";
 import Image from "next/image";
+import { useIssues } from "@/hooks/swr";
+import { mutate } from "swr";
 
 /* **************************************************
  * Types
  **************************************************/
-interface IssueListClientProps {
-  issues: Issue[];
-}
+// Non più necessario - i dati vengono da SWR
 
 /* **************************************************
  * Column Configuration
@@ -52,10 +52,13 @@ const columnConfig: ColumnConfig[] = [
 /* **************************************************
  * Issue List Client Component
  **************************************************/
-export default function IssueListClient({ issues }: IssueListClientProps) {
+export default function IssueListClient() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
+
+  // Usa SWR per ottenere le issues (cache pre-popolata dal server)
+  const { issues = [], isLoading } = useIssues();
   const [localIssues, setLocalIssues] = useState<Issue[]>(issues);
 
   // Sensors for drag and drop
@@ -95,7 +98,7 @@ export default function IssueListClient({ issues }: IssueListClientProps) {
     return columnConfig.filter((col) => visibleColumns.includes(col.key));
   }, [visibleColumns]);
 
-  // Sync local issues with props when they change
+  // Sync local issues with SWR data when they change
   useEffect(() => {
     setLocalIssues(issues);
   }, [issues]);
@@ -120,6 +123,8 @@ export default function IssueListClient({ issues }: IssueListClientProps) {
           type: result.errorType || "error",
         });
       } else {
+        // Invalida la cache SWR per forzare il refetch
+        mutate("/api/issues");
         router.refresh();
       }
     });
@@ -161,6 +166,8 @@ export default function IssueListClient({ issues }: IssueListClientProps) {
         // Revert on error
         setLocalIssues(issues);
       } else {
+        // Invalida la cache SWR per forzare il refetch
+        mutate("/api/issues");
         router.refresh();
       }
     });
@@ -238,6 +245,15 @@ export default function IssueListClient({ issues }: IssueListClientProps) {
       default:
         return null;
     }
+  }
+
+  // Mostra loading solo se non ci sono dati (prima richiesta)
+  if (isLoading && issues.length === 0) {
+    return (
+      <div className={baseStyles.container}>
+        <div className={baseStyles.loadingText}>Caricamento issues...</div>
+      </div>
+    );
   }
 
   return (

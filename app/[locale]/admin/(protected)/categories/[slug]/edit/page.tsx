@@ -10,6 +10,7 @@ import CategoryFormClient from "../../components/CategoryFormClient";
 import CategoryDeleteButton from "../../components/CategoryDeleteButton";
 import CategoryEditSkeleton from "../../components/CategoryEditSkeleton";
 import styles from "../../styles";
+import SWRPageProvider from "@/components/providers/SWRPageProvider";
 
 /* **************************************************
  * Types
@@ -34,21 +35,28 @@ export default async function EditCategoryPage({ params }: EditCategoryPageProps
     notFound();
   }
 
-  return (
-    <main className={styles.main}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>Modifica Categoria: {category.name}</h1>
-        <Link href="/admin/categories" className={styles.backButton}>
-          ← Indietro
-        </Link>
-      </div>
+  // Pre-popolazione cache SWR con dati SSR
+  const swrFallback = {
+    [`/api/categories/${slug}`]: category,
+  };
 
-      <Suspense fallback={<CategoryEditSkeleton />}>
-        <CategoryFormClient category={category} />
-        <div className="mt-6">
-          <CategoryDeleteButton category={category} />
+  return (
+    <SWRPageProvider fallback={swrFallback}>
+      <main className={styles.main}>
+        <div className={styles.header}>
+          <h1 className={styles.title}>Modifica Categoria: {category.name}</h1>
+          <Link href="/admin/categories" className={styles.backButton}>
+            ← Indietro
+          </Link>
         </div>
-      </Suspense>
-    </main>
+
+        <Suspense fallback={<CategoryEditSkeleton />}>
+          <CategoryFormClient categorySlug={slug} />
+          <div className="mt-6">
+            <CategoryDeleteButton categorySlug={slug} />
+          </div>
+        </Suspense>
+      </main>
+    </SWRPageProvider>
   );
 }

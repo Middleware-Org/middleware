@@ -12,6 +12,7 @@ import { getAllIssues } from "@/lib/github/issues";
 import ArticleFormClient from "../../components/ArticleFormClient";
 import ArticleEditSkeleton from "../../components/ArticleEditSkeleton";
 import styles from "../../styles";
+import SWRPageProvider from "@/components/providers/SWRPageProvider";
 
 /* **************************************************
  * Types
@@ -42,23 +43,28 @@ export default async function EditArticlePage({ params }: EditArticlePageProps) 
     notFound();
   }
 
-  return (
-    <main className={styles.main}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>Modifica Articolo: {article.title}</h1>
-        <Link href="/admin/articles" className={styles.backButton}>
-          ← Indietro
-        </Link>
-      </div>
+  // Pre-popolazione cache SWR con dati SSR
+  const swrFallback = {
+    [`/api/articles/${slug}`]: article,
+    "/api/categories": categories,
+    "/api/authors": authors,
+    "/api/issues": issues,
+  };
 
-      <Suspense fallback={<ArticleEditSkeleton />}>
-        <ArticleFormClient
-          article={article}
-          categories={categories}
-          authors={authors}
-          issues={issues}
-        />
-      </Suspense>
-    </main>
+  return (
+    <SWRPageProvider fallback={swrFallback}>
+      <main className={styles.main}>
+        <div className={styles.header}>
+          <h1 className={styles.title}>Modifica Articolo: {article.title}</h1>
+          <Link href="/admin/articles" className={styles.backButton}>
+            ← Indietro
+          </Link>
+        </div>
+
+        <Suspense fallback={<ArticleEditSkeleton />}>
+          <ArticleFormClient articleSlug={slug} />
+        </Suspense>
+      </main>
+    </SWRPageProvider>
   );
 }

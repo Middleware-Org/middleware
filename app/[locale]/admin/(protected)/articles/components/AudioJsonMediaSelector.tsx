@@ -4,10 +4,12 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { getAllMediaAction, uploadMediaAction } from "../../media/actions";
+import { uploadMediaAction } from "../../media/actions";
 import type { MediaFile } from "@/lib/github/media";
 import baseStyles from "../../styles";
 import styles from "../../media/styles";
+import { useMedia } from "@/hooks/swr";
+import { mutate } from "swr";
 
 /* **************************************************
  * Types
@@ -30,9 +32,6 @@ export default function AudioJsonMediaSelector({
   fileType,
   title,
 }: AudioJsonMediaSelectorProps) {
-  const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
@@ -40,32 +39,12 @@ export default function AudioJsonMediaSelector({
   const [preview, setPreview] = useState<string | null>(null);
   const [filename, setFilename] = useState<string>("");
 
-  useEffect(() => {
-    if (isOpen) {
-      loadMediaFiles();
-    }
-  }, [isOpen]);
-
-  async function loadMediaFiles() {
-    setLoading(true);
-    setError(null);
-    try {
-      const result = await getAllMediaAction();
-      if (result.success && result.data) {
-        // Filtra solo i file del tipo richiesto
-        const filteredFiles = (result.data as MediaFile[]).filter(
-          (file) => file.type === fileType,
-        );
-        setMediaFiles(filteredFiles);
-      } else {
-        setError(result.success === false ? result.error : "Failed to load media files");
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load media files");
-    } finally {
-      setLoading(false);
-    }
-  }
+  // Usa SWR per caricare i media files con cache
+  const { mediaFiles: allMediaFiles = [], isLoading: loading, isError } = useMedia();
+  
+  // Filtra i file per tipo
+  const mediaFiles = allMediaFiles.filter((file) => file.type === fileType);
+  const error = isError ? "Failed to load media files" : null;
 
   function handleSelect(fileUrl: string) {
     onSelect(fileUrl);
@@ -144,8 +123,8 @@ export default function AudioJsonMediaSelector({
 
       if (result.success && result.data) {
         setUploadSuccess(result.message || "File caricato con successo");
-        // Ricarica la lista dei media
-        await loadMediaFiles();
+        // Invalida la cache SWR per forzare il refetch
+        mutate("/api/media");
         // Seleziona automaticamente il file appena caricato
         handleSelect(result.data);
         // Reset form

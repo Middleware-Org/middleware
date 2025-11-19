@@ -12,21 +12,26 @@ import styles from "../styles";
 import baseStyles from "../../styles";
 import type { MediaFile } from "@/lib/github/media";
 import Image from "next/image";
+import { useMedia } from "@/hooks/swr";
+import { mutate } from "swr";
 
 /* **************************************************
  * Types
  **************************************************/
 interface MediaListClientProps {
-  mediaFiles: MediaFile[];
+  mediaFiles: MediaFile[]; // Dati iniziali dal SSR
 }
 
 /* **************************************************
  * Media List Client Component
  **************************************************/
-export default function MediaListClient({ mediaFiles }: MediaListClientProps) {
+export default function MediaListClient({ mediaFiles: initialMediaFiles }: MediaListClientProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
+
+  // Usa SWR per cache e revalidazione, con fallback ai dati iniziali SSR
+  const { mediaFiles = initialMediaFiles } = useMedia();
 
   async function handleDelete(filename: string) {
     if (!confirm(`Sei sicuro di voler eliminare il file "${filename}"?`)) {
@@ -44,6 +49,8 @@ export default function MediaListClient({ mediaFiles }: MediaListClientProps) {
           type: result.errorType || "error",
         });
       } else {
+        // Invalida la cache SWR per forzare il refetch
+        mutate("/api/media");
         router.refresh();
       }
     });
@@ -60,7 +67,9 @@ export default function MediaListClient({ mediaFiles }: MediaListClientProps) {
       {mediaFiles.length === 0 ? (
         <div className={styles.empty}>
           <p>Nessun file trovato.</p>
-          <p className={baseStyles.emptyStateText}>Carica il tuo primo file usando il form sopra.</p>
+          <p className={baseStyles.emptyStateText}>
+            Carica il tuo primo file usando il form sopra.
+          </p>
         </div>
       ) : (
         <div className={styles.grid}>

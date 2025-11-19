@@ -11,12 +11,13 @@ import { createAuthorAction, updateAuthorAction, type ActionResult } from "../ac
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Author } from "@/lib/github/types";
+import { useAuthor } from "@/hooks/swr";
 
 /* **************************************************
  * Types
  **************************************************/
 interface AuthorFormClientProps {
-  author?: Author | null;
+  authorSlug?: string; // Slug per edit mode
 }
 
 /* **************************************************
@@ -35,9 +36,13 @@ function SubmitButton({ editing }: { editing: boolean }) {
 /* **************************************************
  * Author Form Client Component
  **************************************************/
-export default function AuthorFormClient({ author }: AuthorFormClientProps) {
+export default function AuthorFormClient({ authorSlug }: AuthorFormClientProps) {
   const router = useRouter();
-  const editing = !!author;
+  const editing = !!authorSlug;
+  
+  // Usa SWR per ottenere l'autore (cache pre-popolata dal server)
+  const { author } = useAuthor(authorSlug || null);
+  
   const formRef = useRef<HTMLFormElement>(null);
   const [state, formAction] = useActionState<ActionResult<Author> | null, FormData>(
     editing ? updateAuthorAction : createAuthorAction,
@@ -68,7 +73,7 @@ export default function AuthorFormClient({ author }: AuthorFormClientProps) {
       <form ref={formRef} action={formAction} className={styles.form}>
         <h2 className={styles.formTitle}>{editing ? "Modifica Autore" : "Nuovo Autore"}</h2>
 
-        {editing && <input type="hidden" name="slug" value={author.slug} />}
+        {editing && authorSlug && <input type="hidden" name="slug" value={authorSlug} />}
 
         <div className={styles.field}>
           <label htmlFor="name" className={styles.label}>

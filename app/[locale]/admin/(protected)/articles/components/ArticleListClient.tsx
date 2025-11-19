@@ -23,13 +23,13 @@ import { Pagination } from "@/components/pagination";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Article } from "@/lib/github/types";
+import { useArticles } from "@/hooks/swr";
+import { mutate } from "swr";
 
 /* **************************************************
  * Types
  **************************************************/
-interface ArticleListClientProps {
-  articles: Article[];
-}
+// Non più necessario - i dati vengono da SWR
 
 /* **************************************************
  * Column Configuration
@@ -48,10 +48,13 @@ const columnConfig: ColumnConfig[] = [
 /* **************************************************
  * Article List Client Component
  **************************************************/
-export default function ArticleListClient({ articles }: ArticleListClientProps) {
+export default function ArticleListClient() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
+
+  // Usa SWR per ottenere gli articoli (cache pre-popolata dal server)
+  const { articles = [], isLoading } = useArticles();
 
   // Initialize visible columns from defaultVisible
   const [visibleColumns, setVisibleColumns] = useState<string[]>(() =>
@@ -100,6 +103,8 @@ export default function ArticleListClient({ articles }: ArticleListClientProps) 
           type: result.errorType || "error",
         });
       } else {
+        // Invalida la cache SWR per forzare il refetch
+        mutate("/api/articles");
         router.refresh();
       }
     });
@@ -159,6 +164,15 @@ export default function ArticleListClient({ articles }: ArticleListClientProps) 
       default:
         return null;
     }
+  }
+
+  // Mostra loading solo se non ci sono dati (prima richiesta)
+  if (isLoading && articles.length === 0) {
+    return (
+      <div className={baseStyles.container}>
+        <div className={baseStyles.loadingText}>Caricamento articoli...</div>
+      </div>
+    );
   }
 
   return (

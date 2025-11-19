@@ -27,13 +27,13 @@ import { Pagination } from "@/components/pagination";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Author } from "@/lib/github/types";
+import { useAuthors } from "@/hooks/swr";
+import { mutate } from "swr";
 
 /* **************************************************
  * Types
  **************************************************/
-interface AuthorListClientProps {
-  authors: Author[];
-}
+// Non più necessario - i dati vengono da SWR
 
 /* **************************************************
  * Column Configuration
@@ -48,10 +48,13 @@ const columnConfig: ColumnConfig[] = [
 /* **************************************************
  * Author List Client Component
  **************************************************/
-export default function AuthorListClient({ authors }: AuthorListClientProps) {
+export default function AuthorListClient() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
+  
+  // Usa SWR per ottenere gli autori (cache pre-popolata dal server)
+  const { authors = [], isLoading } = useAuthors();
   const [localAuthors, setLocalAuthors] = useState<Author[]>(authors);
 
   // Sensors for drag and drop
@@ -91,7 +94,7 @@ export default function AuthorListClient({ authors }: AuthorListClientProps) {
     return columnConfig.filter((col) => visibleColumns.includes(col.key));
   }, [visibleColumns]);
 
-  // Sync local authors with props when they change
+  // Sync local authors with SWR data when they change
   useEffect(() => {
     setLocalAuthors(authors);
   }, [authors]);
@@ -116,6 +119,8 @@ export default function AuthorListClient({ authors }: AuthorListClientProps) {
           type: result.errorType || "error",
         });
       } else {
+        // Invalida la cache SWR per forzare il refetch
+        mutate("/api/authors");
         router.refresh();
       }
     });
@@ -157,6 +162,8 @@ export default function AuthorListClient({ authors }: AuthorListClientProps) {
         // Revert on error
         setLocalAuthors(authors);
       } else {
+        // Invalida la cache SWR per forzare il refetch
+        mutate("/api/authors");
         router.refresh();
       }
     });
@@ -200,6 +207,15 @@ export default function AuthorListClient({ authors }: AuthorListClientProps) {
       default:
         return null;
     }
+  }
+
+  // Mostra loading solo se non ci sono dati (prima richiesta)
+  if (isLoading && authors.length === 0) {
+    return (
+      <div className={baseStyles.container}>
+        <div className={baseStyles.loadingText}>Caricamento autori...</div>
+      </div>
+    );
   }
 
   return (

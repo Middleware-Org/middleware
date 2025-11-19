@@ -11,6 +11,7 @@ import { getAllIssues } from "@/lib/github/issues";
 import ArticleFormClient from "../components/ArticleFormClient";
 import ArticleFormSkeleton from "../components/ArticleFormSkeleton";
 import styles from "../styles";
+import SWRPageProvider from "@/components/providers/SWRPageProvider";
 
 /* **************************************************
  * New Article Page (Server Component)
@@ -27,18 +28,27 @@ export default async function NewArticlePage() {
     getAllIssues(),
   ]);
 
-  return (
-    <main className={styles.main}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>Nuovo Articolo</h1>
-        <Link href="/admin/articles" className={styles.backButton}>
-          ← Indietro
-        </Link>
-      </div>
+  // Pre-popolazione cache SWR con dati SSR
+  const swrFallback = {
+    "/api/categories": categories,
+    "/api/authors": authors,
+    "/api/issues": issues,
+  };
 
-      <Suspense fallback={<ArticleFormSkeleton />}>
-        <ArticleFormClient categories={categories} authors={authors} issues={issues} />
-      </Suspense>
-    </main>
+  return (
+    <SWRPageProvider fallback={swrFallback}>
+      <main className={styles.main}>
+        <div className={styles.header}>
+          <h1 className={styles.title}>Nuovo Articolo</h1>
+          <Link href="/admin/articles" className={styles.backButton}>
+            ← Indietro
+          </Link>
+        </div>
+
+        <Suspense fallback={<ArticleFormSkeleton />}>
+          <ArticleFormClient />
+        </Suspense>
+      </main>
+    </SWRPageProvider>
   );
 }

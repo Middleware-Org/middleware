@@ -12,12 +12,13 @@ import { getGitHubImageUrl } from "@/lib/github/images";
 import styles from "../styles";
 import type { Issue } from "@/lib/github/types";
 import Image from "next/image";
+import { useIssue } from "@/hooks/swr";
 
 /* **************************************************
  * Types
  **************************************************/
 interface IssueFormClientProps {
-  issue?: Issue | null;
+  issueSlug?: string; // Slug per edit mode
 }
 
 /* **************************************************
@@ -157,16 +158,27 @@ function ImageUpload({
 /* **************************************************
  * Issue Form Client Component
  **************************************************/
-export default function IssueFormClient({ issue }: IssueFormClientProps) {
+export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
   const router = useRouter();
-  const editing = !!issue;
+  const editing = !!issueSlug;
+  
+  // Usa SWR per ottenere l'issue (cache pre-popolata dal server)
+  const { issue } = useIssue(issueSlug || null);
+  
   const formRef = useRef<HTMLFormElement>(null);
   // Initialize with existing cover if editing, or empty if creating
-  const [coverImage, setCoverImage] = useState<string>(issue?.cover || "");
+  const [coverImage, setCoverImage] = useState<string>(() => issue?.cover || "");
   const [state, formAction] = useActionState<ActionResult<Issue> | null, FormData>(
     editing ? updateIssueAction : createIssueAction,
     null,
   );
+
+  // Aggiorna coverImage quando l'issue viene caricato
+  useEffect(() => {
+    if (issue?.cover) {
+      setCoverImage(issue.cover);
+    }
+  }, [issue?.cover]);
 
   // Reset form and navigate on success
   useEffect(() => {
@@ -204,7 +216,7 @@ export default function IssueFormClient({ issue }: IssueFormClientProps) {
       <form ref={formRef} action={formAction} className={styles.form}>
         <h2 className={styles.formTitle}>{editing ? "Modifica Issue" : "Nuova Issue"}</h2>
 
-        {editing && <input type="hidden" name="slug" value={issue.slug} />}
+        {editing && issueSlug && <input type="hidden" name="slug" value={issueSlug} />}
         <input type="hidden" name="cover" value={coverImage} />
 
         <div className={styles.field}>

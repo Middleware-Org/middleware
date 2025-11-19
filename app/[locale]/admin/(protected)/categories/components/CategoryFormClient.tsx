@@ -11,12 +11,13 @@ import { createCategoryAction, updateCategoryAction, type ActionResult } from ".
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Category } from "@/lib/github/types";
+import { useCategory } from "@/hooks/swr";
 
 /* **************************************************
  * Types
  **************************************************/
 interface CategoryFormClientProps {
-  category?: Category | null;
+  categorySlug?: string; // Slug per edit mode
 }
 
 /* **************************************************
@@ -35,9 +36,13 @@ function SubmitButton({ editing }: { editing: boolean }) {
 /* **************************************************
  * Category Form Client Component
  **************************************************/
-export default function CategoryFormClient({ category }: CategoryFormClientProps) {
+export default function CategoryFormClient({ categorySlug }: CategoryFormClientProps) {
   const router = useRouter();
-  const editing = !!category;
+  const editing = !!categorySlug;
+  
+  // Usa SWR per ottenere la categoria (cache pre-popolata dal server)
+  const { category } = useCategory(categorySlug || null);
+  
   const formRef = useRef<HTMLFormElement>(null);
   const [state, formAction] = useActionState<ActionResult<Category> | null, FormData>(
     editing ? updateCategoryAction : createCategoryAction,
@@ -70,7 +75,7 @@ export default function CategoryFormClient({ category }: CategoryFormClientProps
       <form ref={formRef} action={formAction} className={styles.form}>
         <h2 className={styles.formTitle}>{editing ? "Modifica Categoria" : "Nuova Categoria"}</h2>
 
-        {editing && <input type="hidden" name="slug" value={category.slug} />}
+        {editing && categorySlug && <input type="hidden" name="slug" value={categorySlug} />}
 
         <div className={styles.field}>
           <label htmlFor="name" className={styles.label}>

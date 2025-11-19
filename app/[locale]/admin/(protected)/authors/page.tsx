@@ -9,6 +9,7 @@ import { getAllAuthors } from "@/lib/github/authors";
 import AuthorListClient from "./components/AuthorListClient";
 import AuthorListSkeleton from "./components/AuthorListSkeleton";
 import styles from "./styles";
+import SWRPageProvider from "@/components/providers/SWRPageProvider";
 
 /* **************************************************
  * Authors List Page (Server Component)
@@ -21,24 +22,31 @@ export default async function AuthorsPage() {
 
   const authors = await getAllAuthors();
 
-  return (
-    <main className={styles.main}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>Gestione Autori</h1>
-        <div className="flex gap-2">
-          <Link href="/admin/authors/new" className={styles.submitButton}>
-            + Nuovo Autore
-          </Link>
-          <Link href="/admin" className={styles.backButton}>
-            ← Indietro
-          </Link>
-        </div>
-      </div>
+  // Pre-popolazione cache SWR con dati SSR
+  const swrFallback = {
+    "/api/authors": authors,
+  };
 
-      <Suspense fallback={<AuthorListSkeleton />}>
-        <AuthorListClient authors={authors} />
-      </Suspense>
-    </main>
+  return (
+    <SWRPageProvider fallback={swrFallback}>
+      <main className={styles.main}>
+        <div className={styles.header}>
+          <h1 className={styles.title}>Gestione Autori</h1>
+          <div className="flex gap-2">
+            <Link href="/admin/authors/new" className={styles.submitButton}>
+              + Nuovo Autore
+            </Link>
+            <Link href="/admin" className={styles.backButton}>
+              ← Indietro
+            </Link>
+          </div>
+        </div>
+
+        <Suspense fallback={<AuthorListSkeleton />}>
+          <AuthorListClient />
+        </Suspense>
+      </main>
+    </SWRPageProvider>
   );
 }
 

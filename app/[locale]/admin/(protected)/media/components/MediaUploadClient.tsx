@@ -108,6 +108,9 @@ export default function MediaUploadClient() {
 
       if (result.success) {
         setState(result);
+        // Invalida la cache SWR per forzare il refetch
+        const { mutate } = await import("swr");
+        mutate("/api/media");
         setTimeout(() => {
           handleRemove();
           formRef.current?.reset();

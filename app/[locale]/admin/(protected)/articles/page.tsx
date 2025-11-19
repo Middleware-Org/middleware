@@ -9,6 +9,7 @@ import { getAllArticles } from "@/lib/github/articles";
 import ArticleListClient from "./components/ArticleListClient";
 import ArticleListSkeleton from "./components/ArticleListSkeleton";
 import styles from "./styles";
+import SWRPageProvider from "@/components/providers/SWRPageProvider";
 
 /* **************************************************
  * Articles List Page (Server Component)
@@ -21,23 +22,30 @@ export default async function ArticlesPage() {
 
   const articles = await getAllArticles();
 
-  return (
-    <main className={styles.main}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>Gestione Articoli</h1>
-        <div className="flex gap-2">
-          <Link href="/admin/articles/new" className={styles.submitButton}>
-            + Nuovo Articolo
-          </Link>
-          <Link href="/admin" className={styles.backButton}>
-            ← Indietro
-          </Link>
-        </div>
-      </div>
+  // Pre-popolazione cache SWR con dati SSR
+  const swrFallback = {
+    "/api/articles": articles,
+  };
 
-      <Suspense fallback={<ArticleListSkeleton />}>
-        <ArticleListClient articles={articles} />
-      </Suspense>
-    </main>
+  return (
+    <SWRPageProvider fallback={swrFallback}>
+      <main className={styles.main}>
+        <div className={styles.header}>
+          <h1 className={styles.title}>Gestione Articoli</h1>
+          <div className="flex gap-2">
+            <Link href="/admin/articles/new" className={styles.submitButton}>
+              + Nuovo Articolo
+            </Link>
+            <Link href="/admin" className={styles.backButton}>
+              ← Indietro
+            </Link>
+          </div>
+        </div>
+
+        <Suspense fallback={<ArticleListSkeleton />}>
+          <ArticleListClient />
+        </Suspense>
+      </main>
+    </SWRPageProvider>
   );
 }

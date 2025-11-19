@@ -27,13 +27,13 @@ import { Pagination } from "@/components/pagination";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Category } from "@/lib/github/types";
+import { useCategories } from "@/hooks/swr";
+import { mutate } from "swr";
 
 /* **************************************************
  * Types
  **************************************************/
-interface CategoryListClientProps {
-  categories: Category[];
-}
+// Non più necessario - i dati vengono da SWR
 
 /* **************************************************
  * Column Configuration
@@ -48,10 +48,13 @@ const columnConfig: ColumnConfig[] = [
 /* **************************************************
  * Category List Client Component
  **************************************************/
-export default function CategoryListClient({ categories }: CategoryListClientProps) {
+export default function CategoryListClient() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
+  
+  // Usa SWR per ottenere le categorie (cache pre-popolata dal server)
+  const { categories = [], isLoading } = useCategories();
   const [localCategories, setLocalCategories] = useState<Category[]>(categories);
 
   // Sensors for drag and drop
@@ -90,7 +93,7 @@ export default function CategoryListClient({ categories }: CategoryListClientPro
     return columnConfig.filter((col) => visibleColumns.includes(col.key));
   }, [visibleColumns]);
 
-  // Sync local categories with props when they change
+  // Sync local categories with SWR data when they change
   useEffect(() => {
     setLocalCategories(categories);
   }, [categories]);
@@ -115,6 +118,8 @@ export default function CategoryListClient({ categories }: CategoryListClientPro
           type: result.errorType || "error",
         });
       } else {
+        // Invalida la cache SWR per forzare il refetch
+        mutate("/api/categories");
         router.refresh();
       }
     });
@@ -156,6 +161,8 @@ export default function CategoryListClient({ categories }: CategoryListClientPro
         // Revert on error
         setLocalCategories(categories);
       } else {
+        // Invalida la cache SWR per forzare il refetch
+        mutate("/api/categories");
         router.refresh();
       }
     });
@@ -199,6 +206,15 @@ export default function CategoryListClient({ categories }: CategoryListClientPro
       default:
         return null;
     }
+  }
+
+  // Mostra loading solo se non ci sono dati (prima richiesta)
+  if (isLoading && categories.length === 0) {
+    return (
+      <div className={baseStyles.container}>
+        <div className={baseStyles.loadingText}>Caricamento categorie...</div>
+      </div>
+    );
   }
 
   return (

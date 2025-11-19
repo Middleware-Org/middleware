@@ -10,6 +10,7 @@ import AuthorFormClient from "../../components/AuthorFormClient";
 import AuthorDeleteButton from "../../components/AuthorDeleteButton";
 import AuthorEditSkeleton from "../../components/AuthorEditSkeleton";
 import styles from "../../styles";
+import SWRPageProvider from "@/components/providers/SWRPageProvider";
 
 /* **************************************************
  * Types
@@ -34,21 +35,28 @@ export default async function EditAuthorPage({ params }: EditAuthorPageProps) {
     notFound();
   }
 
-  return (
-    <main className={styles.main}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>Modifica Autore: {author.name}</h1>
-        <Link href="/admin/authors" className={styles.backButton}>
-          ← Indietro
-        </Link>
-      </div>
+  // Pre-popolazione cache SWR con dati SSR
+  const swrFallback = {
+    [`/api/authors/${slug}`]: author,
+  };
 
-      <Suspense fallback={<AuthorEditSkeleton />}>
-        <AuthorFormClient author={author} />
-        <div className="mt-6">
-          <AuthorDeleteButton author={author} />
+  return (
+    <SWRPageProvider fallback={swrFallback}>
+      <main className={styles.main}>
+        <div className={styles.header}>
+          <h1 className={styles.title}>Modifica Autore: {author.name}</h1>
+          <Link href="/admin/authors" className={styles.backButton}>
+            ← Indietro
+          </Link>
         </div>
-      </Suspense>
-    </main>
+
+        <Suspense fallback={<AuthorEditSkeleton />}>
+          <AuthorFormClient authorSlug={slug} />
+          <div className="mt-6">
+            <AuthorDeleteButton authorSlug={slug} />
+          </div>
+        </Suspense>
+      </main>
+    </SWRPageProvider>
   );
 }
