@@ -4,7 +4,7 @@
 import { MonoTextLight } from "@/components/atoms/typography";
 import Separator from "@/components/atoms/separetor";
 import { SerifTextBold } from "@/components/atoms/typography";
-import { Author } from "@/.velite";
+import type { Author } from "@/.velite";
 import { AuthorsDictionary, CommonDictionary } from "@/lib/i18n/types";
 import { getArticlesByAuthorSlug } from "@/lib/content";
 import AuthorArticles from "../authorArticles";
@@ -53,4 +53,3 @@ export default async function Author({ author, dictCommon, dictAuthors }: Author
     </section>
   );
 }
-

@@ -4,7 +4,7 @@
 import { MonoTextLight } from "@/components/atoms/typography";
 import Separator from "@/components/atoms/separetor";
 import { SerifTextBold } from "@/components/atoms/typography";
-import { Category } from "@/.velite";
+import type { Category } from "@/.velite";
 import { CategoriesDictionary, CommonDictionary } from "@/lib/i18n/types";
 import { getArticlesByCategorySlug } from "@/lib/content";
 import CategoryArticles from "../categoryArticles";
