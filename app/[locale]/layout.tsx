@@ -7,6 +7,7 @@ import { getDictionary } from "@/lib/i18n/utils";
 import "@/globals.css";
 import IssuesDropdown from "@/components/organism/issuesDropDown";
 import Menu from "@/components/organism/menu";
+import { getAllIssues } from "@/lib/content";
 
 /* **************************************************
  * Types
@@ -48,13 +49,13 @@ export default async function RootLayout({ children, params }: RootLayoutProps) 
 
   const dict = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
 
+  const issues = getAllIssues();
+
   return (
     <html lang={locale}>
       <body>
         <Header dict={dict}>
-          <IssuesDropdown
-            issues={[{ id: "1", title: "Test", date: "2025-01-01", publishedAt: "2025-01-01" }]}
-          />
+          <IssuesDropdown issues={issues} />
         </Header>
         <Menu dict={dict} />
         <main className="w-full">{children}</main>

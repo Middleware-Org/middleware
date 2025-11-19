@@ -1,16 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Issue } from "@/.velite";
 
-interface IssueNode {
-  id: string;
-  title: string;
-  date: string;
-  publishedAt: string;
-}
-
-export function useActiveIssue(issues: IssueNode[]) {
-  const [activeIssue, setActiveIssue] = useState<IssueNode | null>(
+export function useActiveIssue(issues: Issue[]) {
+  const [activeIssue, setActiveIssue] = useState<Issue | null>(
     issues.length > 0 ? issues[0] : null,
   );
 
@@ -25,7 +19,7 @@ export function useActiveIssue(issues: IssueNode[]) {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           const issueId = entry.target.id;
-          const foundIssue = issues.find((issue) => issue.id === issueId);
+          const foundIssue = issues.find((issue) => issue.slug === issueId);
 
           if (foundIssue) {
             setActiveIssue(foundIssue);
@@ -36,7 +30,7 @@ export function useActiveIssue(issues: IssueNode[]) {
 
     // Osserva tutti gli elementi delle issue
     issues.forEach((issue) => {
-      const element = document.getElementById(`issue-${issue.id}`);
+      const element = document.getElementById(`issue-${issue.slug}`);
       if (element) {
         observer.observe(element);
       }

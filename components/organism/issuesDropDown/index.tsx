@@ -13,27 +13,15 @@ import { cn } from "@/lib/utils/classes";
 import { formatDateByLang } from "@/lib/utils/date";
 import Button from "@/components/atoms/button";
 import styles from "./styles";
+import { Issue } from "@/.velite";
 
 /* **************************************************
  * Types
  **************************************************/
-interface IssueNode {
-  id: string;
-  title: string;
-  date: string;
-  publishedAt: string;
-}
-
 interface IssuesDropdownProps {
-  issues: IssueNode[];
+  issues: Issue[];
   className?: string;
 }
-
-/* **************************************************
- * Constants
- **************************************************/
-const HEADER_HEIGHT = 115;
-const ISSUE_ELEMENT_PREFIX = "issue-";
 
 /* **************************************************
  * IssuesDropdown
@@ -47,7 +35,7 @@ export default function IssuesDropdown({ issues, className }: IssuesDropdownProp
 
   const activeIssue = useActiveIssue(issues);
   const [userHasSelected, setUserHasSelected] = useState(false);
-  const [selectedIssue, setSelectedIssue] = useState<IssueNode | null>(() => {
+  const [selectedIssue, setSelectedIssue] = useState<Issue | null>(() => {
     return activeIssue || (issues.length > 0 ? issues[0] : null);
   });
 
@@ -77,17 +65,18 @@ export default function IssuesDropdown({ issues, className }: IssuesDropdownProp
     setIsOpen(!isOpen);
   };
 
-  const handleIssueSelect = (issue: IssueNode) => {
+  const handleIssueSelect = (issue: Issue) => {
     if (typeof window === "undefined") return;
 
     setUserHasSelected(true);
     setSelectedIssue(issue);
     setIsOpen(false);
 
-    const issueElement = document.getElementById(`${ISSUE_ELEMENT_PREFIX}${issue.id}`);
+    const issueElement = document.getElementById(`issue-${issue.slug}`);
+    console.log(issueElement);
     if (issueElement) {
-      const elementPosition = issueElement.offsetTop - HEADER_HEIGHT;
-
+      const elementPosition = issueElement.offsetTop - 115;
+      console.log(elementPosition);
       window.scrollTo({
         top: elementPosition,
         behavior: "smooth",
@@ -122,7 +111,7 @@ export default function IssuesDropdown({ issues, className }: IssuesDropdownProp
       {isOpen && (
         <ul id="issues-dropdown-list" role="listbox" className={styles.dropdown}>
           {issues.map((issue) => (
-            <li key={issue.id} role="option" aria-selected={displayIssue.id === issue.id}>
+            <li key={issue.slug} role="option" aria-selected={displayIssue.slug === issue.slug}>
               <Button
                 onClick={() => handleIssueSelect(issue)}
                 className={styles.buttonIssue}

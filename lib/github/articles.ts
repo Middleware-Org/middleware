@@ -3,6 +3,7 @@
  **************************************************/
 import matter from "gray-matter";
 import { createOrUpdateFile, deleteFile, getFileContent, listDirectoryFiles } from "./client";
+import { generateSlug, generateUniqueSlug } from "./utils";
 import type { Article } from "./types";
 
 /* **************************************************
@@ -32,8 +33,10 @@ export async function getAllArticles(): Promise<Article[]> {
           issue: data.issue,
           in_evidence: data.in_evidence ?? false,
           excerpt: data.excerpt || "",
-        content: markdownContent,
-      } as Article;
+          content: markdownContent,
+          audio: data.audio,
+          audio_chunks: data.audio_chunks,
+        } as Article;
       } catch {
         return null;
       }
@@ -92,6 +95,8 @@ export async function getArticleBySlug(slug: string): Promise<Article | undefine
         in_evidence: (data.in_evidence as boolean) ?? false,
         excerpt: (data.excerpt as string) || "",
         content: markdownContent || "",
+        audio: (data.audio as string) || undefined,
+        audio_chunks: (data.audio_chunks as string) || undefined,
       } as Article;
     } catch {
       return undefined;
@@ -107,10 +112,14 @@ export async function getArticlesByIssue(issueSlug: string): Promise<Article[]> 
 }
 
 export async function createArticle(article: Omit<Article, "slug"> & { slug?: string }) {
-  const slug = article.slug || article.title.toLowerCase().replace(/\s+/g, "-");
+  // Generate slug from title if not provided
+  const baseSlug = article.slug || generateSlug(article.title);
+  
+  // Ensure slug is unique
+  const slug = await generateUniqueSlug("content/articles", baseSlug, ".md");
 
   // Crea il frontmatter
-  const frontmatter = {
+  const frontmatter: Record<string, any> = {
     slug,
     title: article.title,
     date: article.date,
@@ -120,6 +129,13 @@ export async function createArticle(article: Omit<Article, "slug"> & { slug?: st
     in_evidence: article.in_evidence ?? false,
     excerpt: article.excerpt || "",
   };
+
+  if (article.audio) {
+    frontmatter.audio = article.audio;
+  }
+  if (article.audio_chunks) {
+    frontmatter.audio_chunks = article.audio_chunks;
+  }
 
   // Combina frontmatter e contenuto
   const fileContent = matter.stringify(article.content, frontmatter);
@@ -177,9 +193,11 @@ export async function updateArticle(slug: string, article: Partial<Omit<Article,
     in_evidence: article.in_evidence !== undefined ? article.in_evidence : existing.in_evidence,
     excerpt: article.excerpt ?? existing.excerpt,
     content: article.content ?? existing.content,
+    audio: article.audio !== undefined ? article.audio : existing.audio,
+    audio_chunks: article.audio_chunks !== undefined ? article.audio_chunks : existing.audio_chunks,
   };
 
-  const frontmatter = {
+  const frontmatter: Record<string, any> = {
     slug: fileSlug,
     title: updated.title,
     date: updated.date,
@@ -189,6 +207,13 @@ export async function updateArticle(slug: string, article: Partial<Omit<Article,
     in_evidence: updated.in_evidence,
     excerpt: updated.excerpt,
   };
+
+  if (updated.audio) {
+    frontmatter.audio = updated.audio;
+  }
+  if (updated.audio_chunks) {
+    frontmatter.audio_chunks = updated.audio_chunks;
+  }
 
   const fileContent = matter.stringify(updated.content, frontmatter);
   const filePath = `content/articles/${fileSlug}.md`;

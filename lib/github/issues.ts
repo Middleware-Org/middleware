@@ -3,6 +3,7 @@
  **************************************************/
 import { createOrUpdateFile, deleteFile, getFileContent, listDirectoryFiles } from "./client";
 import { getAllArticles } from "./articles";
+import { generateSlug, generateUniqueSlug } from "./utils";
 import type { Issue } from "./types";
 
 /* **************************************************
@@ -60,7 +61,11 @@ export async function getIssueBySlug(slug: string): Promise<Issue | undefined> {
 }
 
 export async function createIssue(issue: Omit<Issue, "slug"> & { slug?: string }) {
-  const slug = issue.slug || issue.title.toLowerCase().replace(/\s+/g, "-");
+  // Generate slug from title if not provided
+  const baseSlug = issue.slug || generateSlug(issue.title);
+
+  // Ensure slug is unique
+  const slug = await generateUniqueSlug("content/issues", baseSlug, ".json");
 
   // Se order non è specificato, assegna l'ultimo order + 1
   let order = issue.order;

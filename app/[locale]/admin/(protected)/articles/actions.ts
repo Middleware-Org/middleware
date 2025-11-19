@@ -36,6 +36,8 @@ export async function createArticleAction(
     const in_evidence = formData.get("in_evidence") === "true";
     const excerpt = formData.get("excerpt") as string;
     const content = formData.get("content") as string;
+    const audio = formData.get("audio") as string | null;
+    const audio_chunks = formData.get("audio_chunks") as string | null;
     const slug = formData.get("slug") as string | null;
 
     if (!title || !date || !author || !category || !issue || !content) {
@@ -55,6 +57,8 @@ export async function createArticleAction(
       in_evidence,
       excerpt: excerpt?.trim() || "",
       content: content.trim(),
+      audio: audio?.trim() || undefined,
+      audio_chunks: audio_chunks?.trim() || undefined,
       slug: slug?.trim() || undefined,
     });
 
@@ -88,6 +92,8 @@ export async function updateArticleAction(
     const in_evidence = formData.get("in_evidence") === "true";
     const excerpt = formData.get("excerpt") as string;
     const content = formData.get("content") as string;
+    const audio = formData.get("audio") as string | null;
+    const audio_chunks = formData.get("audio_chunks") as string | null;
 
     if (!slug || !title || !date || !author || !category || !issue || !content) {
       return {
@@ -106,6 +112,8 @@ export async function updateArticleAction(
       in_evidence,
       excerpt: excerpt?.trim() || "",
       content: content.trim(),
+      audio: audio?.trim() || undefined,
+      audio_chunks: audio_chunks?.trim() || undefined,
     });
 
     revalidatePath("/admin/articles");

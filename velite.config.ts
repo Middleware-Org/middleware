@@ -15,6 +15,8 @@ export default defineConfig({
         content: s.markdown(),
         excerpt: s.string().max(200),
         order: s.number().optional(),
+        audio: s.string().optional(),
+        audio_chunks: s.string().optional(),
       }),
     },
     authors: {

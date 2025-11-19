@@ -19,6 +19,8 @@ export type Article = {
   in_evidence: boolean;
   excerpt: string;
   content: string;
+  audio?: string;
+  audio_chunks?: string;
 };
 
 export type Issue = {

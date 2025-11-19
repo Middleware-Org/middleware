@@ -3,6 +3,7 @@
  **************************************************/
 import { createOrUpdateFile, deleteFile, getFileContent, listDirectoryFiles } from "./client";
 import { getAllArticles } from "./articles";
+import { generateSlug, generateUniqueSlug } from "./utils";
 import type { Category } from "./types";
 
 /* **************************************************
@@ -60,7 +61,11 @@ export async function getCategoryBySlug(slug: string): Promise<Category | undefi
 }
 
 export async function createCategory(category: Omit<Category, "slug"> & { slug?: string }) {
-  const slug = category.slug || category.name.toLowerCase().replace(/\s+/g, "-");
+  // Generate slug from name if not provided
+  const baseSlug = category.slug || generateSlug(category.name);
+
+  // Ensure slug is unique
+  const slug = await generateUniqueSlug("content/categories", baseSlug, ".json");
 
   // Se order non è specificato, assegna l'ultimo order + 1
   let order = category.order;

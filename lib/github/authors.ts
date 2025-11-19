@@ -3,6 +3,7 @@
  **************************************************/
 import { createOrUpdateFile, deleteFile, getFileContent, listDirectoryFiles } from "./client";
 import { getAllArticles } from "./articles";
+import { generateSlug, generateUniqueSlug } from "./utils";
 import type { Author } from "./types";
 
 /* **************************************************
@@ -60,7 +61,11 @@ export async function getAuthorBySlug(slug: string): Promise<Author | undefined>
 }
 
 export async function createAuthor(author: Omit<Author, "slug"> & { slug?: string }) {
-  const slug = author.slug || author.name.toLowerCase().replace(/\s+/g, "-");
+  // Generate slug from name if not provided
+  const baseSlug = author.slug || generateSlug(author.name);
+
+  // Ensure slug is unique
+  const slug = await generateUniqueSlug("content/authors", baseSlug, ".json");
 
   // Se order non è specificato, assegna l'ultimo order + 1
   let order = author.order;

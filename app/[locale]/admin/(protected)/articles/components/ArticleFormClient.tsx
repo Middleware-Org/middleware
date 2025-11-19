@@ -59,6 +59,8 @@ export default function ArticleFormClient({
     issue: article?.issue || "",
     in_evidence: article?.in_evidence || false,
     excerpt: article?.excerpt || "",
+    audio: article?.audio || "",
+    audio_chunks: article?.audio_chunks || "",
   });
 
   const [state, formAction] = useActionState<ActionResult<Article> | null, FormData>(
@@ -79,29 +81,33 @@ export default function ArticleFormClient({
     setFormData((prev) => ({ ...prev, [field]: value }));
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const formDataObj = new FormData(event.currentTarget);
-
-    // Add all form data
-    formDataObj.set("title", formData.title);
-    formDataObj.set("date", formData.date);
-    formDataObj.set("author", formData.author);
-    formDataObj.set("category", formData.category);
-    formDataObj.set("issue", formData.issue);
-    formDataObj.set("in_evidence", formData.in_evidence.toString());
-    formDataObj.set("excerpt", formData.excerpt);
-    formDataObj.set("content", content);
-
-    if (editing && article) {
-      formDataObj.set("slug", article.slug);
+  async function handleAction() {
+    const preparedFormData = new FormData();
+    preparedFormData.set("title", formData.title);
+    preparedFormData.set("date", formData.date);
+    preparedFormData.set("author", formData.author);
+    preparedFormData.set("category", formData.category);
+    preparedFormData.set("issue", formData.issue);
+    preparedFormData.set("in_evidence", formData.in_evidence.toString());
+    preparedFormData.set("excerpt", formData.excerpt);
+    preparedFormData.set("content", content);
+    
+    if (formData.audio) {
+      preparedFormData.set("audio", formData.audio);
+    }
+    if (formData.audio_chunks) {
+      preparedFormData.set("audio_chunks", formData.audio_chunks);
     }
 
-    formAction(formDataObj);
+    if (editing && article) {
+      preparedFormData.set("slug", article.slug);
+    }
+
+    return formAction(preparedFormData);
   }
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} className={baseStyles.formContainer}>
+    <form ref={formRef} action={handleAction} className={baseStyles.formContainer}>
       {state && !state.success && (
         <div
           className={`mb-4 ${state.errorType === "warning" ? baseStyles.errorWarning : baseStyles.error}`}
