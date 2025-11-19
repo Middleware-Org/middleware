@@ -100,6 +100,23 @@ export default function ArticleMetaPanel({
         </div>
 
         <div className={styles.field}>
+          <label htmlFor="newSlug" className={styles.label}>
+            Slug {editing ? "(modificabile)" : "(opzionale)"}
+          </label>
+          <input
+            id="newSlug"
+            name="newSlug"
+            type="text"
+            defaultValue={article?.slug || ""}
+            placeholder={editing ? article?.slug || "auto-generato se vuoto" : "auto-generato se vuoto"}
+            className={styles.input}
+          />
+          {editing && (
+            <input type="hidden" name="slug" value={article?.slug || ""} />
+          )}
+        </div>
+
+        <div className={styles.field}>
           <label htmlFor="date" className={styles.label}>
             Data *
           </label>

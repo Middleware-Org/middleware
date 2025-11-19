@@ -2,7 +2,13 @@
  * Imports
  **************************************************/
 import matter from "gray-matter";
-import { createOrUpdateFile, deleteFile, getFileContent, listDirectoryFiles } from "./client";
+import {
+  createOrUpdateFile,
+  deleteFile,
+  getFileContent,
+  listDirectoryFiles,
+  renameFile,
+} from "./client";
 import { generateSlug, generateUniqueSlug } from "./utils";
 import type { Article } from "./types";
 
@@ -114,7 +120,7 @@ export async function getArticlesByIssue(issueSlug: string): Promise<Article[]> 
 export async function createArticle(article: Omit<Article, "slug"> & { slug?: string }) {
   // Generate slug from title if not provided
   const baseSlug = article.slug || generateSlug(article.title);
-  
+
   // Ensure slug is unique
   const slug = await generateUniqueSlug("content/articles", baseSlug, ".md");
 
@@ -146,21 +152,24 @@ export async function createArticle(article: Omit<Article, "slug"> & { slug?: st
   return { ...article, slug };
 }
 
-export async function updateArticle(slug: string, article: Partial<Omit<Article, "slug">>) {
+export async function updateArticle(
+  slug: string,
+  article: Partial<Omit<Article, "slug">> & { newSlug?: string },
+) {
   // Trova il file reale usando lo stesso metodo di getArticleBySlug
   const files = await listDirectoryFiles("content/articles");
   const mdFiles = files.filter((f) => f.type === "file" && f.name.endsWith(".md"));
-  
+
   // Prima cerca per nome file esatto
   let file = mdFiles.find((f) => f.name === `${slug}.md`);
-  
+
   // Se non trovato, cerca per slug nel frontmatter
   if (!file) {
     for (const f of mdFiles) {
       try {
         const content = await getFileContent(f.path);
         if (!content || content.trim().length === 0) continue;
-        
+
         const { data } = matter(content);
         if (data.slug === slug || f.name.replace(".md", "") === slug) {
           file = f;
@@ -183,8 +192,15 @@ export async function updateArticle(slug: string, article: Partial<Omit<Article,
     throw new Error(`Article ${slug} not found`);
   }
 
+  // Gestisci cambio slug se necessario
+  let finalSlug = fileSlug;
+  if (article.newSlug && article.newSlug.trim() !== fileSlug) {
+    const baseSlug = article.newSlug.trim();
+    finalSlug = await generateUniqueSlug("content/articles", baseSlug, ".md", fileSlug);
+  }
+
   const updated: Article = {
-    slug: fileSlug,
+    slug: finalSlug,
     title: article.title ?? existing.title,
     date: article.date ?? existing.date,
     author: article.author ?? existing.author,
@@ -198,7 +214,7 @@ export async function updateArticle(slug: string, article: Partial<Omit<Article,
   };
 
   const frontmatter: Record<string, any> = {
-    slug: fileSlug,
+    slug: finalSlug,
     title: updated.title,
     date: updated.date,
     author: updated.author,
@@ -216,9 +232,20 @@ export async function updateArticle(slug: string, article: Partial<Omit<Article,
   }
 
   const fileContent = matter.stringify(updated.content, frontmatter);
-  const filePath = `content/articles/${fileSlug}.md`;
+  const newFilePath = `content/articles/${finalSlug}.md`;
+  const oldFilePath = `content/articles/${fileSlug}.md`;
 
-  await createOrUpdateFile(filePath, fileContent, `Update article: ${updated.title}`);
+  // Se lo slug è cambiato, rinomina il file, altrimenti aggiorna normalmente
+  if (finalSlug !== fileSlug) {
+    await renameFile(
+      oldFilePath,
+      newFilePath,
+      fileContent,
+      `Rename article: ${updated.title} (${fileSlug} -> ${finalSlug})`,
+    );
+  } else {
+    await createOrUpdateFile(newFilePath, fileContent, `Update article: ${updated.title}`);
+  }
 
   return updated;
 }

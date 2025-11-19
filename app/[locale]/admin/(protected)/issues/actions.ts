@@ -89,6 +89,7 @@ export async function updateIssueAction(
     }
 
     const slug = formData.get("slug") as string;
+    const newSlug = formData.get("newSlug") as string | null;
     const title = formData.get("title") as string;
     const description = formData.get("description") as string;
     const cover = formData.get("cover") as string; // Base64 image or existing path
@@ -123,6 +124,7 @@ export async function updateIssueAction(
       cover: coverPath,
       color: color.trim(),
       date: date.trim(),
+      newSlug: newSlug?.trim() || undefined,
     });
 
     revalidatePath("/admin/issues");

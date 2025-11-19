@@ -146,6 +146,34 @@ export async function deleteFile(path: string, message: string): Promise<void> {
   });
 }
 
+/**
+ * Rinomina un file in GitHub (crea nuovo file e elimina vecchio)
+ */
+export async function renameFile(
+  oldPath: string,
+  newPath: string,
+  content: string,
+  message: string,
+): Promise<void> {
+  // Crea il nuovo file
+  const contentBase64 = Buffer.from(content, "utf-8").toString("base64");
+  await githubPut(`contents/${newPath}`, {
+    message,
+    content: contentBase64,
+    branch,
+  });
+
+  // Elimina il vecchio file
+  const oldSha = await getFileSha(oldPath);
+  if (oldSha) {
+    await githubDelete(`contents/${oldPath}`, {
+      message: `Rename: ${oldPath} -> ${newPath}`,
+      sha: oldSha,
+      branch,
+    });
+  }
+}
+
 export async function uploadImage(imageBase64: string, filename?: string): Promise<string> {
   return uploadFile(imageBase64, filename, "image");
 }

@@ -84,6 +84,7 @@ export async function updateArticleAction(
     }
 
     const slug = formData.get("slug") as string;
+    const newSlug = formData.get("newSlug") as string | null;
     const title = formData.get("title") as string;
     const date = formData.get("date") as string;
     const author = formData.get("author") as string;
@@ -114,6 +115,7 @@ export async function updateArticleAction(
       content: content.trim(),
       audio: audio?.trim() || undefined,
       audio_chunks: audio_chunks?.trim() || undefined,
+      newSlug: newSlug?.trim() || undefined,
     });
 
     revalidatePath("/admin/articles");

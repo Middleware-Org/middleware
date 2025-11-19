@@ -102,20 +102,19 @@ export default function AuthorFormClient({ authorSlug }: AuthorFormClientProps) 
           />
         </div>
 
-        {!editing && (
-          <div className={styles.field}>
-            <label htmlFor="slug" className={styles.label}>
-              Slug (opzionale)
-            </label>
-            <input
-              id="slug"
-              name="slug"
-              type="text"
-              className={styles.input}
-              placeholder="auto-generato se vuoto"
-            />
-          </div>
-        )}
+        <div className={styles.field}>
+          <label htmlFor={editing ? "newSlug" : "slug"} className={styles.label}>
+            Slug {editing ? "(modificabile)" : "(opzionale)"}
+          </label>
+          <input
+            id={editing ? "newSlug" : "slug"}
+            name={editing ? "newSlug" : "slug"}
+            type="text"
+            defaultValue={author?.slug || ""}
+            className={styles.input}
+            placeholder={editing ? author?.slug || "auto-generato se vuoto" : "auto-generato se vuoto"}
+          />
+        </div>
 
         <div className={styles.formActions}>
           <SubmitButton editing={editing} />

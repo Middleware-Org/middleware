@@ -1,7 +1,7 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { createOrUpdateFile, deleteFile, getFileContent, listDirectoryFiles } from "./client";
+import { createOrUpdateFile, deleteFile, getFileContent, listDirectoryFiles, renameFile } from "./client";
 import { getAllArticles } from "./articles";
 import { generateSlug, generateUniqueSlug } from "./utils";
 import type { Author } from "./types";
@@ -94,23 +94,40 @@ export async function createAuthor(author: Omit<Author, "slug"> & { slug?: strin
   return { ...author, slug, order };
 }
 
-export async function updateAuthor(slug: string, author: Partial<Omit<Author, "slug">>) {
+export async function updateAuthor(
+  slug: string,
+  author: Partial<Omit<Author, "slug">> & { newSlug?: string },
+) {
   const existing = await getAuthorBySlug(slug);
   if (!existing) {
     throw new Error(`Author ${slug} not found`);
   }
 
+  // Gestisci cambio slug se necessario
+  let finalSlug = slug;
+  if (author.newSlug && author.newSlug.trim() !== slug) {
+    const baseSlug = author.newSlug.trim();
+    finalSlug = await generateUniqueSlug("content/authors", baseSlug, ".json", slug);
+  }
+
   const updated: Author = {
-    slug,
+    slug: finalSlug,
     name: author.name ?? existing.name,
     description: author.description ?? existing.description,
     order: author.order !== undefined ? author.order : existing.order,
   };
 
-  const filePath = `content/authors/${slug}.json`;
   const content = JSON.stringify(updated, null, 2);
+  const newFilePath = `content/authors/${finalSlug}.json`;
+  const oldFilePath = `content/authors/${slug}.json`;
 
-  await createOrUpdateFile(filePath, content, `Update author: ${updated.name}`);
+  // Se lo slug è cambiato, rinomina il file, altrimenti aggiorna normalmente
+  if (finalSlug !== slug) {
+    await renameFile(oldFilePath, newFilePath, content, `Rename author: ${updated.name} (${slug} -> ${finalSlug})`);
+  } else {
+    await createOrUpdateFile(newFilePath, content, `Update author: ${updated.name}`);
+  }
+
   return updated;
 }
 

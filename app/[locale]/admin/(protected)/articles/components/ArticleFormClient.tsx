@@ -116,6 +116,19 @@ export default function ArticleFormClient({ articleSlug }: ArticleFormClientProp
 
     if (editing && articleSlug) {
       preparedFormData.set("slug", articleSlug);
+      // Aggiungi nuovo slug se presente nel form
+      const newSlugInput = formRef.current?.querySelector(
+        'input[name="newSlug"]',
+      ) as HTMLInputElement;
+      if (newSlugInput?.value) {
+        preparedFormData.set("newSlug", newSlugInput.value);
+      }
+    } else {
+      // In fase di creazione, aggiungi slug se presente
+      const slugInput = formRef.current?.querySelector('input[name="newSlug"]') as HTMLInputElement;
+      if (slugInput?.value) {
+        preparedFormData.set("slug", slugInput.value);
+      }
     }
 
     return formAction(preparedFormData);

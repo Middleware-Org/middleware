@@ -68,6 +68,7 @@ export async function updateCategoryAction(
     }
 
     const slug = formData.get("slug") as string;
+    const newSlug = formData.get("newSlug") as string | null;
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
 
@@ -82,6 +83,7 @@ export async function updateCategoryAction(
     const category = await updateCategory(slug, {
       name: name.trim(),
       description: description.trim(),
+      newSlug: newSlug?.trim() || undefined,
     });
 
     revalidatePath("/admin/categories");

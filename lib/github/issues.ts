@@ -1,7 +1,13 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { createOrUpdateFile, deleteFile, getFileContent, listDirectoryFiles } from "./client";
+import {
+  createOrUpdateFile,
+  deleteFile,
+  getFileContent,
+  listDirectoryFiles,
+  renameFile,
+} from "./client";
 import { getAllArticles } from "./articles";
 import { generateSlug, generateUniqueSlug } from "./utils";
 import type { Issue } from "./types";
@@ -97,14 +103,24 @@ export async function createIssue(issue: Omit<Issue, "slug"> & { slug?: string }
   return { ...issue, slug, order };
 }
 
-export async function updateIssue(slug: string, issue: Partial<Omit<Issue, "slug">>) {
+export async function updateIssue(
+  slug: string,
+  issue: Partial<Omit<Issue, "slug">> & { newSlug?: string },
+) {
   const existing = await getIssueBySlug(slug);
   if (!existing) {
     throw new Error(`Issue ${slug} not found`);
   }
 
+  // Gestisci cambio slug se necessario
+  let finalSlug = slug;
+  if (issue.newSlug && issue.newSlug.trim() !== slug) {
+    const baseSlug = issue.newSlug.trim();
+    finalSlug = await generateUniqueSlug("content/issues", baseSlug, ".json", slug);
+  }
+
   const updated: Issue = {
-    slug,
+    slug: finalSlug,
     title: issue.title ?? existing.title,
     description: issue.description ?? existing.description,
     cover: issue.cover ?? existing.cover,
@@ -113,10 +129,22 @@ export async function updateIssue(slug: string, issue: Partial<Omit<Issue, "slug
     order: issue.order !== undefined ? issue.order : existing.order,
   };
 
-  const filePath = `content/issues/${slug}.json`;
   const content = JSON.stringify(updated, null, 2);
+  const newFilePath = `content/issues/${finalSlug}.json`;
+  const oldFilePath = `content/issues/${slug}.json`;
 
-  await createOrUpdateFile(filePath, content, `Update issue: ${updated.title}`);
+  // Se lo slug è cambiato, rinomina il file, altrimenti aggiorna normalmente
+  if (finalSlug !== slug) {
+    await renameFile(
+      oldFilePath,
+      newFilePath,
+      content,
+      `Rename issue: ${updated.title} (${slug} -> ${finalSlug})`,
+    );
+  } else {
+    await createOrUpdateFile(newFilePath, content, `Update issue: ${updated.title}`);
+  }
+
   return updated;
 }
 

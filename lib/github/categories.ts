@@ -1,7 +1,7 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { createOrUpdateFile, deleteFile, getFileContent, listDirectoryFiles } from "./client";
+import { createOrUpdateFile, deleteFile, getFileContent, listDirectoryFiles, renameFile } from "./client";
 import { getAllArticles } from "./articles";
 import { generateSlug, generateUniqueSlug } from "./utils";
 import type { Category } from "./types";
@@ -94,23 +94,40 @@ export async function createCategory(category: Omit<Category, "slug"> & { slug?:
   return { ...category, slug, order };
 }
 
-export async function updateCategory(slug: string, category: Partial<Omit<Category, "slug">>) {
+export async function updateCategory(
+  slug: string,
+  category: Partial<Omit<Category, "slug">> & { newSlug?: string },
+) {
   const existing = await getCategoryBySlug(slug);
   if (!existing) {
     throw new Error(`Category ${slug} not found`);
   }
 
+  // Gestisci cambio slug se necessario
+  let finalSlug = slug;
+  if (category.newSlug && category.newSlug.trim() !== slug) {
+    const baseSlug = category.newSlug.trim();
+    finalSlug = await generateUniqueSlug("content/categories", baseSlug, ".json", slug);
+  }
+
   const updated: Category = {
-    slug,
+    slug: finalSlug,
     name: category.name ?? existing.name,
     description: category.description ?? existing.description,
     order: category.order !== undefined ? category.order : existing.order,
   };
 
-  const filePath = `content/categories/${slug}.json`;
   const content = JSON.stringify(updated, null, 2);
+  const newFilePath = `content/categories/${finalSlug}.json`;
+  const oldFilePath = `content/categories/${slug}.json`;
 
-  await createOrUpdateFile(filePath, content, `Update category: ${updated.name}`);
+  // Se lo slug è cambiato, rinomina il file, altrimenti aggiorna normalmente
+  if (finalSlug !== slug) {
+    await renameFile(oldFilePath, newFilePath, content, `Rename category: ${updated.name} (${slug} -> ${finalSlug})`);
+  } else {
+    await createOrUpdateFile(newFilePath, content, `Update category: ${updated.name}`);
+  }
+
   return updated;
 }
 

@@ -39,10 +39,10 @@ function SubmitButton({ editing }: { editing: boolean }) {
 export default function CategoryFormClient({ categorySlug }: CategoryFormClientProps) {
   const router = useRouter();
   const editing = !!categorySlug;
-  
+
   // Usa SWR per ottenere la categoria (cache pre-popolata dal server)
   const { category } = useCategory(categorySlug || null);
-  
+
   const formRef = useRef<HTMLFormElement>(null);
   const [state, formAction] = useActionState<ActionResult<Category> | null, FormData>(
     editing ? updateCategoryAction : createCategoryAction,
@@ -66,9 +66,7 @@ export default function CategoryFormClient({ categorySlug }: CategoryFormClientP
       )}
 
       {state?.success && state.message && (
-        <div className={baseStyles.successMessageGreen}>
-          {state.message}
-        </div>
+        <div className={baseStyles.successMessageGreen}>{state.message}</div>
       )}
 
       <form ref={formRef} action={formAction} className={styles.form}>
@@ -104,20 +102,21 @@ export default function CategoryFormClient({ categorySlug }: CategoryFormClientP
           />
         </div>
 
-        {!editing && (
-          <div className={styles.field}>
-            <label htmlFor="slug" className={styles.label}>
-              Slug (opzionale)
-            </label>
-            <input
-              id="slug"
-              name="slug"
-              type="text"
-              className={styles.input}
-              placeholder="auto-generato se vuoto"
-            />
-          </div>
-        )}
+        <div className={styles.field}>
+          <label htmlFor={editing ? "newSlug" : "slug"} className={styles.label}>
+            Slug {editing ? "(modificabile)" : "(opzionale)"}
+          </label>
+          <input
+            id={editing ? "newSlug" : "slug"}
+            name={editing ? "newSlug" : "slug"}
+            type="text"
+            defaultValue={category?.slug || ""}
+            className={styles.input}
+            placeholder={
+              editing ? category?.slug || "auto-generato se vuoto" : "auto-generato se vuoto"
+            }
+          />
+        </div>
 
         <div className={styles.formActions}>
           <SubmitButton editing={editing} />
