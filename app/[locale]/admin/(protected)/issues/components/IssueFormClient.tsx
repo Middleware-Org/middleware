@@ -13,6 +13,7 @@ import styles from "../styles";
 import type { Issue } from "@/lib/github/types";
 import Image from "next/image";
 import { useIssue } from "@/hooks/swr";
+import MediaSelector from "../../articles/components/MediaSelector";
 
 /* **************************************************
  * Types
@@ -42,7 +43,7 @@ function ImageUpload({
   onImageChange,
 }: {
   currentImage?: string;
-  onImageChange: (base64: string) => void;
+  onImageChange: (imageUrl: string) => void;
 }) {
   // If currentImage is a path (not base64), convert it to GitHub URL
   const getPreviewUrl = (image: string | null | undefined): string | null => {
@@ -55,62 +56,31 @@ function ImageUpload({
     return getGitHubImageUrl(image);
   };
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [uploadedPreview, setUploadedPreview] = useState<string | null>(null);
+  const [isMediaSelectorOpen, setIsMediaSelectorOpen] = useState(false);
 
-  // Compute preview URL from currentImage (for existing images) or uploadedPreview (for new uploads)
+  // Compute preview URL from currentImage
   const preview = useMemo(() => {
-    return uploadedPreview || getPreviewUrl(currentImage);
-  }, [currentImage, uploadedPreview]);
-
-  function handleFileSelect(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    // Validate file type
-    if (!file.type.startsWith("image/")) {
-      alert("Please select an image file");
-      return;
-    }
-
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      alert("Image size must be less than 5MB");
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64 = reader.result as string;
-      setUploadedPreview(base64);
-      onImageChange(base64);
-    };
-    reader.readAsDataURL(file);
-  }
+    return getPreviewUrl(currentImage);
+  }, [currentImage]);
 
   function handleClick() {
-    fileInputRef.current?.click();
+    setIsMediaSelectorOpen(true);
   }
 
-  function handleRemove() {
-    setUploadedPreview(null);
+  function handleRemove(e: React.MouseEvent) {
+    e.stopPropagation();
     onImageChange("");
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+  }
+
+  function handleSelectFromMedia(imageUrl: string) {
+    // Quando selezioni da media, passa direttamente l'URL (non base64)
+    onImageChange(imageUrl);
   }
 
   return (
     <div>
       <label className={styles.label}>Cover Image *</label>
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        onChange={handleFileSelect}
-        className="hidden"
-      />
-      <div onClick={handleClick} className={styles.imageUpload}>
+      <div onClick={handleClick} className={styles.imageUpload} style={{ cursor: "pointer" }}>
         {preview ? (
           <div className={styles.imagePreview}>
             <Image
@@ -134,10 +104,7 @@ function ImageUpload({
               </button>
               <button
                 type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleRemove();
-                }}
+                onClick={handleRemove}
                 className="px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200"
               >
                 Rimuovi
@@ -147,10 +114,19 @@ function ImageUpload({
         ) : (
           <div className="text-center py-8">
             <p className="text-secondary/80 mb-2">Clicca per selezionare un&apos;immagine</p>
-            <p className="text-sm text-secondary/60">JPG, PNG, GIF o WEBP (max 5MB)</p>
+            <p className="text-sm text-secondary/60">
+              Scegli da media esistenti o carica una nuova
+            </p>
           </div>
         )}
       </div>
+
+      {/* Media Selector Modal */}
+      <MediaSelector
+        isOpen={isMediaSelectorOpen}
+        onClose={() => setIsMediaSelectorOpen(false)}
+        onSelect={handleSelectFromMedia}
+      />
     </div>
   );
 }
@@ -161,23 +137,26 @@ function ImageUpload({
 export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
   const router = useRouter();
   const editing = !!issueSlug;
-  
+
   // Usa SWR per ottenere l'issue (cache pre-popolata dal server)
   const { issue } = useIssue(issueSlug || null);
-  
+
   const formRef = useRef<HTMLFormElement>(null);
   // Initialize with existing cover if editing, or empty if creating
-  const [coverImage, setCoverImage] = useState<string>(() => issue?.cover || "");
+  // Usa useMemo per derivare il valore iniziale da issue quando disponibile
+  const initialCoverImage = useMemo(() => issue?.cover || "", [issue?.cover]);
+  const [coverImage, setCoverImage] = useState<string>(initialCoverImage);
   const [state, formAction] = useActionState<ActionResult<Issue> | null, FormData>(
     editing ? updateIssueAction : createIssueAction,
     null,
   );
 
-  // Aggiorna coverImage quando l'issue viene caricato
+  // Sincronizza coverImage con issue quando viene caricato (solo se coverImage è ancora vuoto)
   useEffect(() => {
-    if (issue?.cover) {
+    if (issue?.cover && !coverImage) {
       setCoverImage(issue.cover);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [issue?.cover]);
 
   // Reset form and navigate on success
@@ -291,7 +270,9 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
             type="text"
             defaultValue={issue?.slug || ""}
             className={styles.input}
-            placeholder={editing ? issue?.slug || "auto-generato se vuoto" : "auto-generato se vuoto"}
+            placeholder={
+              editing ? issue?.slug || "auto-generato se vuoto" : "auto-generato se vuoto"
+            }
           />
         </div>
 
