@@ -4,6 +4,7 @@
 import { TRANSLATION_NAMESPACES } from "./consts";
 import commonIt from "@/i18n/locales/it/common.json";
 import categoriesIt from "@/i18n/locales/it/categories.json";
+import authorsIt from "@/i18n/locales/it/authors.json";
 
 /* **************************************************
  * Types
@@ -13,10 +14,13 @@ export type TranslationNamespace = (typeof TRANSLATION_NAMESPACES)[TranslationNa
 
 export type CommonDictionary = typeof commonIt;
 export type CategoriesDictionary = typeof categoriesIt;
-export type Dictionary = CommonDictionary | CategoriesDictionary;
+export type AuthorsDictionary = typeof authorsIt;
+export type Dictionary = CommonDictionary | CategoriesDictionary | AuthorsDictionary;
 export type DictionaryByNamespace<T extends TranslationNamespace> =
   T extends typeof TRANSLATION_NAMESPACES.COMMON
     ? CommonDictionary
     : T extends typeof TRANSLATION_NAMESPACES.CATEGORIES
       ? CategoriesDictionary
-      : never;
+      : T extends typeof TRANSLATION_NAMESPACES.AUTHORS
+        ? AuthorsDictionary
+        : never;

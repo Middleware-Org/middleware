@@ -15,3 +15,6 @@ export const getArticlesByIssue = (issueSlug: string) =>
 
 export const getArticlesByCategorySlug = (categorySlug: string) =>
   articles.filter((a) => a.category === categorySlug);
+
+export const getArticlesByAuthorSlug = (authorSlug: string) =>
+  articles.filter((a) => a.author === authorSlug);

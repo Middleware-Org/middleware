@@ -1,0 +1,14 @@
+{
+  "meta": {
+    "title": "Autori",
+    "description": "Autori"
+  },
+  "page": {
+    "title": "Autori",
+    "showQuickLinks": "Mostra gli autori",
+    "hideQuickLinks": "Nascondi gli autori",
+    "showAllArticles": "Mostra tutti gli articoli",
+    "hideAllArticles": "Nascondi tutti gli articoli"
+  }
+}
+
