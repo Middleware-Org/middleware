@@ -1,63 +1,44 @@
-/* **************************************************
- * Imports
- **************************************************/
-import Header from "@/components/organism/header";
-import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
-import { getDictionary } from "@/lib/i18n/utils";
-import "@/globals.css";
-import IssuesDropdown from "@/components/organism/issuesDropDown";
-import Menu from "@/components/organism/menu";
-import { getAllIssues } from "@/lib/content";
+import { Metadata } from 'next';
 
-/* **************************************************
- * Types
- **************************************************/
-interface HomeLayoutProps {
-  params: Promise<{ locale: string }>;
+import { MonoTextLight } from '@/components/atoms';
+import Footer from '@/components/layouts/Footer';
+import Header from '@/components/layouts/Header';
+import Menu from '@/components/layouts/Menu';
+import { config } from '@/data/config';
+import { Locale, getDictionary } from '@/lib/dictionaries';
+
+type Props = {
   children: React.ReactNode;
-}
+  params: {
+    lang: string;
+  };
+};
 
-/* **************************************************
- * Metadata
- **************************************************/
-export async function generateMetadata({ params }: HomeLayoutProps) {
-  const { locale } = await params;
-
-  if (locale !== "it") {
-    return null;
-  }
-
-  const dict = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
-  const meta = dict.meta;
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { lang } = params;
+  const dict = await getDictionary(lang as Locale);
 
   return {
-    title: meta.title,
-    description: meta.description,
-    alternates: {
-      languages: {
-        [locale]: `/${locale}/${TRANSLATION_NAMESPACES.HOME}`,
-      },
-    },
+    title: `${dict.meta.config.title} - ${dict.meta.privacy.title}`,
+    description: dict.meta.privacy.description,
+    themeColor: config.themeColor.light,
   };
 }
 
-/* **************************************************
- * Layout
- **************************************************/
-export default async function HomeLayout({ children, params }: HomeLayoutProps) {
-  const { locale } = await params;
-
-  const dict = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
-
-  const issues = getAllIssues();
+export default async function RootLayout({ children, params }: Props) {
+  const { lang } = params;
+  const dict = await getDictionary(lang as Locale);
 
   return (
     <>
       <Header dict={dict}>
-        <IssuesDropdown issues={issues} />
+        <MonoTextLight className='!text-xs md:!text-base'>
+          {dict.meta.privacy.title}
+        </MonoTextLight>
       </Header>
       <Menu dict={dict} />
-      <main className="w-full">{children}</main>
+      <main className='w-full'>{children}</main>
+      <Footer dict={dict} />
     </>
   );
 }

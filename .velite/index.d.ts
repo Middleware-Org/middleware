@@ -15,3 +15,6 @@ export declare const categories: Category[]
 
 export type Issue = Collections['issues']['schema']['_output']
 export declare const issues: Issue[]
+
+export type Page = Collections['pages']['schema']['_output']
+export declare const pages: Page[]

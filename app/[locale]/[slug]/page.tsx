@@ -1,62 +1,25 @@
-/* **************************************************
- * Imports
- **************************************************/
+import { remark } from "remark";
+import remarkHtml from "remark-html";
 
-import { Article } from "@/.velite";
-import Articles from "@/components/molecules/articles";
-import Cover from "@/components/organism/cover";
-import { getAllIssues, getArticlesByIssue } from "@/lib/content";
-import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
-import { getDictionary } from "@/lib/i18n/utils";
+import StaticPage from "@/components/organism/StaticPage";
+import { getPageBySlug } from "@/lib/github";
+import { notFound } from "next/navigation";
 
-/* **************************************************
- * Types
- **************************************************/
-type RootPageProps = {
-  params: Promise<{ locale: string }>;
+type Props = {
+  params: {
+    slug: string;
+  };
 };
 
-export default async function RootPage({ params }: RootPageProps) {
-  const { locale } = await params;
+export default async function PrivacyPolicyPage({ params }: Props) {
+  const { slug } = params;
+  const page = await getPageBySlug(slug);
 
-  const dict = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
+  if (!page) {
+    notFound();
+  }
 
-  const issues = getAllIssues();
+  const markdown = await remark().use(remarkHtml).process(page.content);
 
-  return (
-    <div className="max-w-[1472px] mx-auto px-0 md:px-4 lg:px-10 py-0 md:py-6 lg:py-10">
-      {issues.map((issue) => {
-        const articles = getArticlesByIssue(issue.slug);
-
-        const { articleInEvidence, otherArticles } = articles.reduce(
-          (acc, article) => {
-            if (article.in_evidence && !acc.articleInEvidence) {
-              acc.articleInEvidence = article;
-            } else {
-              acc.otherArticles.push(article);
-            }
-            return acc;
-          },
-          { articleInEvidence: undefined as Article | undefined, otherArticles: [] as Article[] },
-        );
-
-        if (!articleInEvidence) return null;
-
-        return (
-          <div
-            key={issue.slug}
-            id={`issue-${issue.slug}`}
-            className="grid lg:grid-cols-2 md:grid-cols-2 grid-cols-1 lg:gap-10 md:gap-4 gap-0 lg:mb-8 md:mb-8 mb-0 relative"
-          >
-            <div className="lg:sticky md:sticky lg:top-[155px] md:top-[155px] lg:self-start md:self-start">
-              <Cover issue={issue} articleInEvidence={articleInEvidence} dict={dict} />
-            </div>
-            <div className="flex flex-col">
-              <Articles articles={otherArticles} dict={dict} issue={issue} />
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
+  return <StaticPage markdown={markdown} page={page} />;
 }
