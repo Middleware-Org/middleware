@@ -50,7 +50,6 @@ export default function IssueDeleteButton({ issueSlug }: IssueDeleteButtonProps)
         mutate("/api/issues");
         mutate(`/api/issues/${issueSlug}`);
         router.push("/admin/issues");
-        router.refresh();
       }
     });
   }

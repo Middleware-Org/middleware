@@ -32,11 +32,6 @@ import { useIssues } from "@/hooks/swr";
 import { mutate } from "swr";
 
 /* **************************************************
- * Types
- **************************************************/
-// Non più necessario - i dati vengono da SWR
-
-/* **************************************************
  * Column Configuration
  **************************************************/
 const columnConfig: ColumnConfig[] = [
@@ -125,7 +120,6 @@ export default function IssueListClient() {
       } else {
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/issues");
-        router.refresh();
       }
     });
   }
@@ -168,7 +162,6 @@ export default function IssueListClient() {
       } else {
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/issues");
-        router.refresh();
       }
     });
   }

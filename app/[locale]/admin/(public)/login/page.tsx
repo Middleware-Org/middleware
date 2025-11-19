@@ -44,7 +44,6 @@ export default function AdminLoginPage() {
 
       if (result.data) {
         router.push(CALLBACK_URL);
-        router.refresh();
       }
     } catch {
       setError("Errore durante il login. Riprova.");

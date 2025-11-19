@@ -114,7 +114,6 @@ export default function MediaUploadClient() {
         setTimeout(() => {
           handleRemove();
           formRef.current?.reset();
-          router.refresh();
         }, 100);
       } else {
         setState({

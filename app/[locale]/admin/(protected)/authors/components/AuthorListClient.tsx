@@ -31,11 +31,6 @@ import { useAuthors } from "@/hooks/swr";
 import { mutate } from "swr";
 
 /* **************************************************
- * Types
- **************************************************/
-// Non più necessario - i dati vengono da SWR
-
-/* **************************************************
  * Column Configuration
  **************************************************/
 const columnConfig: ColumnConfig[] = [
@@ -52,7 +47,7 @@ export default function AuthorListClient() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
-  
+
   // Usa SWR per ottenere gli autori (cache pre-popolata dal server)
   const { authors = [], isLoading } = useAuthors();
   const [localAuthors, setLocalAuthors] = useState<Author[]>(authors);
@@ -121,7 +116,6 @@ export default function AuthorListClient() {
       } else {
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/authors");
-        router.refresh();
       }
     });
   }
@@ -164,7 +158,6 @@ export default function AuthorListClient() {
       } else {
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/authors");
-        router.refresh();
       }
     });
   }
@@ -260,16 +253,11 @@ export default function AuthorListClient() {
           <Table>
             <TableHeader>
               <TableRow>
-                <th className={`${baseStyles.tableHeaderCell} w-8`}>
-                  {/* Drag handle column */}
-                </th>
+                <th className={`${baseStyles.tableHeaderCell} w-8`}>{/* Drag handle column */}</th>
                 {visibleColumnConfigs.map((column) => {
                   if (column.key === "actions") {
                     return (
-                      <th
-                        key={column.key}
-                        className={baseStyles.tableHeaderCell}
-                      >
+                      <th key={column.key} className={baseStyles.tableHeaderCell}>
                         {column.label}
                       </th>
                     );
@@ -318,4 +306,3 @@ export default function AuthorListClient() {
     </div>
   );
 }
-

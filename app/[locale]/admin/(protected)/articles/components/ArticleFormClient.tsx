@@ -89,7 +89,6 @@ export default function ArticleFormClient({ articleSlug }: ArticleFormClientProp
     if (state?.success) {
       formRef.current?.reset();
       router.push("/admin/articles");
-      router.refresh();
     }
   }, [state, router]);
 

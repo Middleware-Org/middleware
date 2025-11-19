@@ -76,7 +76,6 @@ export default function ArticleMetaPanel({
         });
       } else {
         router.push("/admin/articles");
-        router.refresh();
       }
     });
   }

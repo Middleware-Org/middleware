@@ -185,7 +185,6 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
     if (state?.success) {
       formRef.current?.reset();
       router.push("/admin/issues");
-      router.refresh();
       // Reset coverImage after navigation
       setTimeout(() => setCoverImage(""), 0);
     }

@@ -54,7 +54,6 @@ export default function AuthorFormClient({ authorSlug }: AuthorFormClientProps) 
     if (state?.success) {
       formRef.current?.reset();
       router.push("/admin/authors");
-      router.refresh();
     }
   }, [state, router]);
 

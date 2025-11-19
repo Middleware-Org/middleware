@@ -52,7 +52,6 @@ export default function CategoryDeleteButton({ categorySlug }: CategoryDeleteBut
         mutate("/api/categories");
         mutate(`/api/categories/${categorySlug}`);
         router.push("/admin/categories");
-        router.refresh();
       }
     });
   }

@@ -29,7 +29,6 @@ export default function Sidebar() {
   async function handleLogout() {
     await authClient.signOut();
     router.push("/admin/login");
-    router.refresh();
   }
 
   // Rimuove il locale dal pathname (es. /it/admin -> /admin)

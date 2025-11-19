@@ -31,11 +31,6 @@ import { useCategories } from "@/hooks/swr";
 import { mutate } from "swr";
 
 /* **************************************************
- * Types
- **************************************************/
-// Non più necessario - i dati vengono da SWR
-
-/* **************************************************
  * Column Configuration
  **************************************************/
 const columnConfig: ColumnConfig[] = [
@@ -52,7 +47,7 @@ export default function CategoryListClient() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
-  
+
   // Usa SWR per ottenere le categorie (cache pre-popolata dal server)
   const { categories = [], isLoading } = useCategories();
   const [localCategories, setLocalCategories] = useState<Category[]>(categories);
@@ -120,7 +115,6 @@ export default function CategoryListClient() {
       } else {
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/categories");
-        router.refresh();
       }
     });
   }
@@ -163,7 +157,6 @@ export default function CategoryListClient() {
       } else {
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/categories");
-        router.refresh();
       }
     });
   }

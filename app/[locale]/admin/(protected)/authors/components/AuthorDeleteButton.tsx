@@ -50,7 +50,6 @@ export default function AuthorDeleteButton({ authorSlug }: AuthorDeleteButtonPro
         mutate("/api/authors");
         mutate(`/api/authors/${authorSlug}`);
         router.push("/admin/authors");
-        router.refresh();
       }
     });
   }

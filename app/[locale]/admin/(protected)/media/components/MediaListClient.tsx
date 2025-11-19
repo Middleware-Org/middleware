@@ -16,22 +16,15 @@ import { useMedia } from "@/hooks/swr";
 import { mutate } from "swr";
 
 /* **************************************************
- * Types
- **************************************************/
-interface MediaListClientProps {
-  mediaFiles: MediaFile[]; // Dati iniziali dal SSR
-}
-
-/* **************************************************
  * Media List Client Component
  **************************************************/
-export default function MediaListClient({ mediaFiles: initialMediaFiles }: MediaListClientProps) {
+export default function MediaListClient() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
 
-  // Usa SWR per cache e revalidazione, con fallback ai dati iniziali SSR
-  const { mediaFiles = initialMediaFiles } = useMedia();
+  // Usa SWR per ottenere i file media (cache pre-popolata dal server)
+  const { mediaFiles = [], isLoading } = useMedia();
 
   async function handleDelete(filename: string) {
     if (!confirm(`Sei sicuro di voler eliminare il file "${filename}"?`)) {
@@ -51,9 +44,17 @@ export default function MediaListClient({ mediaFiles: initialMediaFiles }: Media
       } else {
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/media");
-        router.refresh();
       }
     });
+  }
+
+  // Mostra loading solo se non ci sono dati (prima richiesta)
+  if (isLoading && mediaFiles.length === 0) {
+    return (
+      <div className={baseStyles.container}>
+        <div className={baseStyles.loadingText}>Caricamento file media...</div>
+      </div>
+    );
   }
 
   return (

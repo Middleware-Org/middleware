@@ -27,11 +27,6 @@ import { useArticles } from "@/hooks/swr";
 import { mutate } from "swr";
 
 /* **************************************************
- * Types
- **************************************************/
-// Non più necessario - i dati vengono da SWR
-
-/* **************************************************
  * Column Configuration
  **************************************************/
 const columnConfig: ColumnConfig[] = [
@@ -105,7 +100,6 @@ export default function ArticleListClient() {
       } else {
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/articles");
-        router.refresh();
       }
     });
   }

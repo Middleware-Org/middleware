@@ -24,9 +24,10 @@ export default function SWRCacheIndicator() {
         const entries = cacheKeys.map((key) => {
           const keyStr = String(key);
           const data = cache.get(key);
+          const hasData = data !== undefined;
           return {
             key: keyStr,
-            hasData: cache.has(key),
+            hasData,
             itemCount: Array.isArray(data) ? data.length : data ? 1 : 0,
           };
         });

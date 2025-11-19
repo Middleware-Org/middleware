@@ -42,21 +42,21 @@ export default async function EditCategoryPage({ params }: EditCategoryPageProps
 
   return (
     <SWRPageProvider fallback={swrFallback}>
-      <main className={styles.main}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>Modifica Categoria: {category.name}</h1>
-          <Link href="/admin/categories" className={styles.backButton}>
-            ← Indietro
-          </Link>
-        </div>
+    <main className={styles.main}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>Modifica Categoria: {category.name}</h1>
+        <Link href="/admin/categories" className={styles.backButton}>
+          ← Indietro
+        </Link>
+      </div>
 
-        <Suspense fallback={<CategoryEditSkeleton />}>
+      <Suspense fallback={<CategoryEditSkeleton />}>
           <CategoryFormClient categorySlug={slug} />
-          <div className="mt-6">
+        <div className="mt-6">
             <CategoryDeleteButton categorySlug={slug} />
-          </div>
-        </Suspense>
-      </main>
+        </div>
+      </Suspense>
+    </main>
     </SWRPageProvider>
   );
 }

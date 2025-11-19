@@ -54,7 +54,6 @@ export default function CategoryFormClient({ categorySlug }: CategoryFormClientP
     if (state?.success) {
       formRef.current?.reset();
       router.push("/admin/categories");
-      router.refresh();
     }
   }, [state, router]);
 
