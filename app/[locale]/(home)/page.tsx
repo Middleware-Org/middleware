@@ -48,10 +48,10 @@ export default async function RootPage({ params }: RootPageProps) {
             id={`issue-${issue.slug}`}
             className="grid lg:grid-cols-2 md:grid-cols-2 grid-cols-1 lg:gap-10 md:gap-4 gap-0 lg:mb-8 md:mb-8 mb-0 relative"
           >
-            <div className="lg:sticky md:sticky lg:top-[115px] md:top-[115px] lg:self-start md:self-start lg:h-[calc(100dvh-180px)] md:h-[calc(100dvh-180px)] h-full">
+            <div className="lg:sticky md:sticky lg:top-[155px] md:top-[155px] lg:self-start md:self-start">
               <Cover issue={issue} articleInEvidence={articleInEvidence} dict={dict} />
             </div>
-            <div className="flex flex-col lg:min-h-screen">
+            <div className="flex flex-col">
               <Articles articles={otherArticles} dict={dict} issue={issue} />
             </div>
           </div>

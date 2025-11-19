@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "title": "Categorie",
+    "description": "Categorie"
+  },
+  "page": {
+    "title": "Categorie",
+    "showQuickLinks": "Mostra le categorie",
+    "hideQuickLinks": "Nascondi le categorie",
+    "showAllArticles": "Mostra tutti gli articoli",
+    "hideAllArticles": "Nascondi tutti gli articoli"
+  }
+}

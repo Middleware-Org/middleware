@@ -75,7 +75,7 @@ export default function IssuesDropdown({ issues, className }: IssuesDropdownProp
     const issueElement = document.getElementById(`issue-${issue.slug}`);
     console.log(issueElement);
     if (issueElement) {
-      const elementPosition = issueElement.offsetTop - 115;
+      const elementPosition = issueElement.offsetTop - 155;
       console.log(elementPosition);
       window.scrollTo({
         top: elementPosition,

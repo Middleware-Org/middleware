@@ -20,12 +20,12 @@ const styles = {
   readMoreLink: cn("text-xs hover:underline"),
   footer: cn("border-t border-secondary"),
   category: cn(
-    "border-r border-secondary hover:bg-tertiary hover:text-white transition-colors duration-150 px-2 py-1 text-xs w-fit",
+    "border-r border-secondary hover:bg-tertiary transition-colors duration-150 text-xs w-fit",
   ),
+  categoryText: cn("hover:text-white px-2 py-1"),
 };
 
 /* **************************************************
  * Export
  **************************************************/
 export default styles;
-

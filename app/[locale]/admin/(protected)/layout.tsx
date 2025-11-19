@@ -32,7 +32,7 @@ export default async function AdminProtectedLayout({ children }: AdminProtectedL
         <main className="flex-1 overflow-auto">{children}</main>
       </div>
       {/* Debug indicator solo in development */}
-      {process.env.NODE_ENV === "development" && <SWRCacheIndicator />}
+      {/* {process.env.NODE_ENV === "development" && <SWRCacheIndicator />} */}
     </SWRProvider>
   );
 }

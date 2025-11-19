@@ -56,7 +56,7 @@ export default function ArticleCard({ article, dict }: ArticleCardProps) {
       <footer className={styles.footer}>
         <Link href={`/categories#${category.slug}`}>
           <div className={styles.category}>
-            <MonoTextLight>{category.name}</MonoTextLight>
+            <MonoTextLight className={styles.categoryText}>{category.name}</MonoTextLight>
           </div>
         </Link>
       </footer>

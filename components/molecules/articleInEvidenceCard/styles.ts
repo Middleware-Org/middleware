@@ -18,8 +18,8 @@ const styles = {
   authorInfo: cn("flex items-center gap-2.5"),
   authorLabel: cn("text-sm"),
   authorLink: cn("text-sm hover:underline"),
-  excerpt: cn("text-xs mb-4 leading-relaxed"),
-  readMore: cn("flex justify-end"),
+  excerpt: cn("text-[14px] my-4! leading-relaxed"),
+  readMore: cn("flex justify-end mb-4"),
   readMoreLink: cn("text-xs hover:underline"),
   category: cn("px-2 py-1 text-xs w-fit"),
   categoryLink: cn("hover:underline"),
@@ -29,4 +29,3 @@ const styles = {
  * Export
  **************************************************/
 export default styles;
-
