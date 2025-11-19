@@ -38,19 +38,15 @@ export default async function CategoriesPage({ params }: CategoriesPageProps) {
 
   return (
     <div className={styles.container}>
-      {/* Mobile categories toggle */}
       <div className={styles.mobileToggle}>
         <MobileCategoriesToggle dict={dictCategories} />
       </div>
 
-      {/* Main grid: sidebar + content */}
       <div className={styles.grid}>
-        {/* Sidebar with categories list */}
         <div className={styles.sidebar}>
           <CategoriesList categories={categories} />
         </div>
 
-        {/* Categories content */}
         {categories.map((category) => (
           <Category
             key={category.slug}

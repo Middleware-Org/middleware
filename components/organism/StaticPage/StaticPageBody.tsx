@@ -3,12 +3,10 @@ import { H2 } from "@/components/atoms/typography";
 import Separator from "@/components/atoms/separetor";
 
 type Props = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  markdown: any;
   page: Page;
 };
 
-export default async function StaticPageBody({ markdown, page }: Props) {
+export default function StaticPageBody({ page }: Props) {
   return (
     <section className="w-full flex flex-col max-w-[1472px] mx-auto lg:px-10 md:px-4 px-4 gap-5 pb-10">
       <div className="w-full lg:max-w-[75%] max-w-full">
@@ -22,8 +20,8 @@ export default async function StaticPageBody({ markdown, page }: Props) {
           <Separator />
         </div>
         <div
-          className="prose prose-neutral prose-lg dark:prose-invert lg:w-2/4 md:w-2/3 w-full relative"
-          dangerouslySetInnerHTML={{ __html: markdown.value }}
+          className="prose prose-lg lg:w-2/4 md:w-2/3 w-full relative"
+          dangerouslySetInnerHTML={{ __html: page.content }}
         ></div>
         <div className="lg:w-1/4 md:w-1/3 w-full lg:flex md:flex hidden">
           <Separator />

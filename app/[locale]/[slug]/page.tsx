@@ -1,25 +1,29 @@
+/* **************************************************
+ * Imports
+ **************************************************/
 import { remark } from "remark";
 import remarkHtml from "remark-html";
-
 import StaticPage from "@/components/organism/StaticPage";
-import { getPageBySlug } from "@/lib/github";
+import { getPageBySlug } from "@/lib/content";
 import { notFound } from "next/navigation";
 
+/* **************************************************
+ * Types
+ **************************************************/
 type Props = {
-  params: {
-    slug: string;
-  };
+  params: Promise<{ slug: string }>;
 };
 
-export default async function PrivacyPolicyPage({ params }: Props) {
-  const { slug } = params;
-  const page = await getPageBySlug(slug);
+/* **************************************************
+ * Page
+ **************************************************/
+export default async function SlugPage({ params }: Props) {
+  const { slug } = await params;
+  const page = getPageBySlug(slug);
 
   if (!page) {
     notFound();
   }
 
-  const markdown = await remark().use(remarkHtml).process(page.content);
-
-  return <StaticPage markdown={markdown} page={page} />;
+  return <StaticPage page={page} />;
 }

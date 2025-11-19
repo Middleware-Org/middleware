@@ -33,6 +33,7 @@ export default function PageMetaPanel({
   formData,
   onFormDataChange,
   editing,
+  formRef,
 }: PageMetaPanelProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -102,62 +103,65 @@ export default function PageMetaPanel({
           <input type="hidden" name="excerpt" value={formData.excerpt} />
         </div>
 
-        {/* Slug field (hidden for edit, visible for create) */}
-        {!editing && (
-          <div className={styles.field}>
-            <label htmlFor="slug" className={styles.label}>
-              Slug *
-            </label>
-            <input
-              type="text"
-              id="slug"
-              name="slug"
-              className={styles.input}
-              required
-              placeholder="es: about-us"
-            />
-          </div>
-        )}
+        {/* Slug field */}
+        <div className={styles.field}>
+          <label htmlFor={editing ? "newSlug" : "slug"} className={styles.label}>
+            Slug {editing ? "(modificabile)" : "(opzionale)"}
+          </label>
+          {editing && <input type="hidden" name="slug" value={page?.slug} />}
+          <input
+            type="text"
+            id={editing ? "newSlug" : "slug"}
+            name={editing ? "newSlug" : "slug"}
+            defaultValue={editing ? page?.slug : ""}
+            className={styles.input}
+            placeholder={
+              editing ? page?.slug || "auto-generato se vuoto" : "auto-generato se vuoto"
+            }
+          />
+        </div>
+      </div>
 
-        {/* New Slug field (only for edit) */}
-        {editing && (
+      {/* Actions Card */}
+      <div className={styles.metaCard}>
+        <h3 className={styles.metaCardTitle}>Azioni</h3>
+        <div className={styles.formActions}>
+          <button
+            type="button"
+            onClick={() => {
+              formRef.current?.requestSubmit();
+            }}
+            className={styles.submitButton}
+            disabled={isPending}
+          >
+            {isPending ? "Salvataggio..." : editing ? "Aggiorna" : "Crea"}
+          </button>
+          <button
+            type="button"
+            onClick={() => router.push("/admin/pages")}
+            className={styles.cancelButton}
+            disabled={isPending}
+          >
+            Annulla
+          </button>
+        </div>
+
+        {editing && page && (
           <>
-            <input type="hidden" name="slug" value={page?.slug} />
-            <div className={styles.field}>
-              <label htmlFor="newSlug" className={styles.label}>
-                Slug
-              </label>
-              <input
-                type="text"
-                id="newSlug"
-                name="newSlug"
-                defaultValue={page?.slug}
-                className={styles.input}
-                placeholder="es: about-us"
-              />
+            {error && (
+              <div
+                className={`mt-4 ${error.type === "warning" ? baseStyles.errorWarning : baseStyles.error}`}
+              >
+                ⚠️ {error.message}
+              </div>
+            )}
+            <div className="mt-4 pt-4 border-t border-secondary">
+              <h4 className="text-sm font-semibold mb-2 text-tertiary">Zona Pericolosa</h4>
+              <button onClick={handleDelete} className={styles.deleteButton} disabled={isPending}>
+                {isPending ? "Eliminazione..." : "Elimina Pagina"}
+              </button>
             </div>
           </>
-        )}
-
-        {/* Error Message */}
-        {error && (
-          <div className={error.type === "warning" ? baseStyles.errorWarning : baseStyles.error}>
-            ⚠️ {error.message}
-          </div>
-        )}
-
-        {/* Delete Button (only in edit mode) */}
-        {editing && page && (
-          <div className={styles.field}>
-            <button
-              type="button"
-              onClick={handleDelete}
-              className={styles.deleteButton}
-              disabled={isPending}
-            >
-              {isPending ? "Eliminazione..." : "Elimina Pagina"}
-            </button>
-          </div>
         )}
       </div>
     </div>
