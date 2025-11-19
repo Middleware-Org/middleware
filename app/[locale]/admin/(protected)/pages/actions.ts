@@ -29,18 +29,22 @@ export async function createPageAction(
     }
 
     const slug = formData.get("slug") as string | null;
+    const title = formData.get("title") as string;
+    const excerpt = formData.get("excerpt") as string | null;
     const content = formData.get("content") as string;
 
-    if (!content) {
+    if (!title || !content) {
       return {
         success: false,
-        error: "Content is required",
+        error: "Title and content are required",
         errorType: "error",
       };
     }
 
     const page = await createPage({
       slug: slug?.trim() || undefined,
+      title: title.trim(),
+      excerpt: excerpt?.trim() || "",
       content: content.trim(),
     });
 
@@ -67,17 +71,21 @@ export async function updatePageAction(
 
     const slug = formData.get("slug") as string;
     const newSlug = formData.get("newSlug") as string | null;
+    const title = formData.get("title") as string;
+    const excerpt = formData.get("excerpt") as string | null;
     const content = formData.get("content") as string;
 
-    if (!slug || !content) {
+    if (!slug || !title || !content) {
       return {
         success: false,
-        error: "Slug and content are required",
+        error: "Slug, title and content are required",
         errorType: "error",
       };
     }
 
     const page = await updatePage(slug, {
+      title: title.trim(),
+      excerpt: excerpt?.trim() || "",
       content: content.trim(),
       newSlug: newSlug?.trim() || undefined,
     });

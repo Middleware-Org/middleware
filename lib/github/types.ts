@@ -49,5 +49,7 @@ export type Author = {
 
 export type Page = {
   slug: string;
+  title: string;
+  excerpt: string;
   content: string;
 };

@@ -9,6 +9,8 @@ import { cn } from "@/lib/utils/classes";
 const styles = {
   sidebar: cn("w-64 bg-primary border-l border-secondary min-h-screen flex flex-col"),
   header: cn("p-6 border-b border-secondary"),
+  logoContainer: cn("flex items-center gap-2"),
+  logoText: cn("text-xl"),
   title: cn("text-xl font-bold text-secondary"),
   nav: cn("flex-1 p-4"),
   navList: cn("space-y-2"),
@@ -30,4 +32,3 @@ const styles = {
  * Export
  ************************************************** */
 export default styles;
-

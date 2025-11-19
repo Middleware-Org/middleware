@@ -32,6 +32,8 @@ export async function getAllPages(): Promise<Page[]> {
 
         return {
           slug: data.slug || file.name.replace(".md", ""),
+          title: data.title || "",
+          excerpt: data.excerpt || "",
           content: markdownContent,
         } as Page;
       } catch {
@@ -55,6 +57,8 @@ export async function getPageBySlug(slug: string): Promise<Page | null> {
 
     return {
       slug: data.slug || slug,
+      title: data.title || "",
+      excerpt: data.excerpt || "",
       content: markdownContent,
     };
   } catch {
@@ -63,19 +67,23 @@ export async function getPageBySlug(slug: string): Promise<Page | null> {
 }
 
 export async function createPage(page: Omit<Page, "slug"> & { slug?: string }): Promise<Page> {
-  const baseSlug = page.slug || generateSlug("page");
+  const baseSlug = page.slug || generateSlug(page.title || "page");
   const slug = await generateUniqueSlug("content/pages", baseSlug, ".md");
 
   const frontmatter = {
     slug,
+    title: page.title,
+    excerpt: page.excerpt || "",
   };
 
   const content = matter.stringify(page.content, frontmatter);
 
-  await createOrUpdateFile(`content/pages/${slug}.md`, content, `Create page: ${slug}`);
+  await createOrUpdateFile(`content/pages/${slug}.md`, content, `Create page: ${page.title}`);
 
   return {
     slug,
+    title: page.title,
+    excerpt: page.excerpt || "",
     content: page.content,
   };
 }
@@ -97,11 +105,15 @@ export async function updatePage(
 
   const updated: Page = {
     slug: finalSlug,
+    title: page.title !== undefined ? page.title : existing.title,
+    excerpt: page.excerpt !== undefined ? page.excerpt : existing.excerpt,
     content: page.content !== undefined ? page.content : existing.content,
   };
 
   const frontmatter = {
     slug: finalSlug,
+    title: updated.title,
+    excerpt: updated.excerpt || "",
   };
 
   const content = matter.stringify(updated.content, frontmatter);

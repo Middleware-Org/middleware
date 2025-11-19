@@ -8,6 +8,7 @@ import { useActionState } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { createPageAction, updatePageAction, type ActionResult } from "../actions";
+import PageMetaPanel from "./PageMetaPanel";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Page } from "@/lib/github/types";
@@ -46,9 +47,20 @@ export default function PageFormClient({ pageSlug }: PageFormClientProps) {
   const formRef = useRef<HTMLFormElement>(null);
 
   // Inizializza lo stato con i valori della pagina se disponibile
+  const defaultFormData = {
+    title: "",
+    excerpt: "",
+  };
+
   const [content, setContent] = useState<string>(() => page?.content || "");
-  const [slug, setSlug] = useState<string>(() => pageSlug || "");
-  const [newSlug, setNewSlug] = useState<string>(() => pageSlug || "");
+  const [formData, setFormData] = useState(() =>
+    page
+      ? {
+          title: page.title || "",
+          excerpt: page.excerpt || "",
+        }
+      : defaultFormData,
+  );
 
   const [state, formAction] = useActionState<ActionResult<Page> | null, FormData>(
     editing ? updatePageAction : createPageAction,
@@ -72,101 +84,75 @@ export default function PageFormClient({ pageSlug }: PageFormClientProps) {
   useEffect(() => {
     if (page) {
       setContent(page.content);
-      if (!editing) {
-        setSlug(page.slug);
-        setNewSlug(page.slug);
+      setFormData({
+        title: page.title || "",
+        excerpt: page.excerpt || "",
+      });
+    }
+  }, [page]);
+
+  function handleFormDataChange(field: string, value: string) {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  }
+
+  async function handleAction() {
+    const preparedFormData = new FormData();
+    preparedFormData.set("title", formData.title);
+    preparedFormData.set("excerpt", formData.excerpt);
+    preparedFormData.set("content", content);
+
+    if (editing && pageSlug) {
+      preparedFormData.set("slug", pageSlug);
+      // Aggiungi nuovo slug se presente nel form
+      const newSlugInput = formRef.current?.querySelector(
+        'input[name="newSlug"]',
+      ) as HTMLInputElement;
+      if (newSlugInput?.value) {
+        preparedFormData.set("newSlug", newSlugInput.value);
+      }
+    } else {
+      // In fase di creazione, aggiungi slug se presente
+      const slugInput = formRef.current?.querySelector('input[name="slug"]') as HTMLInputElement;
+      if (slugInput?.value) {
+        preparedFormData.set("slug", slugInput.value);
       }
     }
-  }, [page, editing]);
+
+    return formAction(preparedFormData);
+  }
 
   return (
-    <form ref={formRef} action={formAction} className={styles.editorContainer}>
-      <div className={styles.editorWrapper}>
-        {/* Slug field (hidden for edit, visible for create) */}
-        {!editing && (
-          <div className={styles.field}>
-            <label htmlFor="slug" className={styles.label}>
-              Slug *
-            </label>
-            <input
-              type="text"
-              id="slug"
-              name="slug"
-              value={slug}
-              onChange={(e) => {
-                setSlug(e.target.value);
-              }}
-              className={styles.input}
-              required
-              placeholder="es: about-us"
-            />
-          </div>
-        )}
+    <form ref={formRef} action={handleAction} className={baseStyles.formContainer}>
+      {state && !state.success && (
+        <div
+          className={`mb-4 ${state.errorType === "warning" ? baseStyles.errorWarning : baseStyles.error}`}
+        >
+          {state.error}
+        </div>
+      )}
 
-        {/* New Slug field (only for edit) */}
-        {editing && (
-          <>
-            <input type="hidden" name="slug" value={pageSlug} />
-            <div className={styles.field}>
-              <label htmlFor="newSlug" className={styles.label}>
-                Slug
-              </label>
-              <input
-                type="text"
-                id="newSlug"
-                name="newSlug"
-                value={newSlug}
-                onChange={(e) => {
-                  setNewSlug(e.target.value);
-                }}
-                className={styles.input}
-                placeholder="es: about-us"
-              />
-            </div>
-          </>
-        )}
+      {state?.success && state.message && (
+        <div className={baseStyles.successMessage}>{state.message}</div>
+      )}
 
-        {/* Content Editor */}
-        <div className={styles.field} style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-          <label htmlFor="content" className={styles.editorLabel}>
-            Contenuto *
-          </label>
-          <div style={{ flex: 1, minHeight: 0 }}>
-            <MarkdownEditor
-              value={content}
-              onChange={(value) => setContent(value || "")}
-            />
-          </div>
-          <input type="hidden" name="content" value={content} />
+      <div className={styles.editorContainer}>
+        {/* Editor Markdown - 3/4 width */}
+        <div className={styles.editorWrapper}>
+          <MarkdownEditor
+            value={content}
+            onChange={(value) => setContent(value || "")}
+            label="Contenuto *"
+          />
         </div>
 
-        {/* Error Message */}
-        {state && !state.success && (
-          <div className={state.errorType === "warning" ? styles.errorWarning : styles.error}>
-            ⚠️ {state.error}
-          </div>
-        )}
-
-        {/* Success Message */}
-        {state?.success && state.message && (
-          <div className="mb-4 p-4 bg-green-50 border border-green-200 text-green-800">
-            ✓ {state.message}
-          </div>
-        )}
-
-        {/* Form Actions */}
-        <div className={styles.formActions}>
-          <button type="submit" className={styles.submitButton} disabled={state?.success}>
-            {editing ? "Aggiorna Pagina" : "Crea Pagina"}
-          </button>
-          <button
-            type="button"
-            onClick={() => router.push("/admin/pages")}
-            className={styles.cancelButton}
-          >
-            Annulla
-          </button>
-        </div>
+        {/* Meta Panel - 1/4 width */}
+        <PageMetaPanel
+          page={page || null}
+          formData={formData}
+          onFormDataChange={handleFormDataChange}
+          editing={editing}
+          formRef={formRef}
+        />
       </div>
     </form>
   );

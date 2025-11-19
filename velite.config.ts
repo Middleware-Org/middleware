@@ -57,6 +57,8 @@ export default defineConfig({
       pattern: "pages/**/*.md",
       schema: s.object({
         slug: s.slug("pages"),
+        title: s.string().max(99),
+        excerpt: s.string().max(200),
         content: s.markdown(),
       }),
     },

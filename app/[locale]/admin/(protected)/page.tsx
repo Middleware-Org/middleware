@@ -1,16 +1,16 @@
 /* **************************************************
  * Imports
  **************************************************/
+import Link from "next/link";
 import { getUser } from "@/lib/auth/server";
 import {
   getAllIssues,
   getAllArticles,
   getAllCategories,
   getAllAuthors,
-  getAuthorBySlug,
-  getCategoryBySlug,
-  getIssueBySlug,
+  getAllPages,
 } from "@/lib/github";
+import { getAllMediaFiles } from "@/lib/github/media";
 import styles from "./styles";
 
 /* **************************************************
@@ -23,132 +23,93 @@ export default async function AdminProtectedPage() {
     return null;
   }
 
-  const [issues, articles, categories, authors] = await Promise.all([
+  const [issues, articles, categories, authors, pages, media] = await Promise.all([
     getAllIssues(),
     getAllArticles(),
     getAllCategories(),
     getAllAuthors(),
+    getAllPages(),
+    getAllMediaFiles(),
   ]);
 
-  const articlesWithRelations = await Promise.all(
-    articles.map(async (article) => {
-      const [author, category, issue] = await Promise.all([
-        getAuthorBySlug(article.author),
-        getCategoryBySlug(article.category),
-        getIssueBySlug(article.issue),
-      ]);
-
-      return {
-        ...article,
-        authorRelation: author,
-        categoryRelation: category,
-        issueRelation: issue,
-      };
-    }),
-  );
+  const stats = [
+    {
+      title: "Articoli",
+      count: articles.length,
+      href: "/admin/articles",
+      icon: "📝",
+      description: "Numero totale",
+      color: "tertiary",
+    },
+    {
+      title: "Issues",
+      count: issues.length,
+      href: "/admin/issues",
+      icon: "📚",
+      description: "Numero totale",
+      color: "tertiary",
+    },
+    {
+      title: "Categorie",
+      count: categories.length,
+      href: "/admin/categories",
+      icon: "📁",
+      description: "Numero totale",
+      color: "tertiary",
+    },
+    {
+      title: "Autori",
+      count: authors.length,
+      href: "/admin/authors",
+      icon: "👤",
+      description: "Numero totale",
+      color: "tertiary",
+    },
+    {
+      title: "Pagine",
+      count: pages.length,
+      href: "/admin/pages",
+      icon: "📄",
+      description: "Pagine statiche",
+      color: "tertiary",
+    },
+    {
+      title: "Media",
+      count: media.length,
+      href: "/admin/media",
+      icon: "🖼️",
+      description: "File caricati",
+      color: "tertiary",
+    },
+  ];
 
   return (
     <main className={styles.main}>
       <div className={styles.header}>
-        <h1 className={styles.title}>Dashboard admin</h1>
-        <p className={styles.welcome}>
-          Ciao {user.name ?? user.email}, benvenutə nell&apos;area riservata.
-        </p>
+        <div>
+          <h1 className={styles.title}>Dashboard</h1>
+          <p className={styles.welcome}>
+            Ciao {user.name ?? user.email}, benvenutə nell&apos;area riservata.
+          </p>
+        </div>
       </div>
 
-      <div className={styles.grid}>
-        {/* Issues */}
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Issues ({issues.length})</h2>
-          <ul className={styles.list}>
-            {issues.map((issue) => (
-              <li key={issue.slug} className={styles.listItem}>
-                <div className={styles.itemHeader}>
-                  <span className={styles.itemTitle}>{issue.title}</span>
-                  <span className={styles.itemSlug}>{issue.slug}</span>
-                </div>
-                <p className={styles.itemDescription}>{issue.description}</p>
-                <div className={styles.itemMeta}>
-                  <span className={styles.itemDate}>{issue.date}</span>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        {/* Articles */}
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Articles ({articlesWithRelations.length})</h2>
-          <ul className={styles.list}>
-            {articlesWithRelations.map((article) => {
-              return (
-                <li key={article.slug} className={styles.listItem}>
-                  <div className={styles.itemHeader}>
-                    <span className={styles.itemTitle}>{article.title}</span>
-                    <span className={styles.itemSlug}>{article.slug}</span>
-                  </div>
-                  <p className={styles.itemDescription}>{article.excerpt}</p>
-                  <div className={styles.itemMeta}>
-                    <span className={styles.itemDate}>{article.date}</span>
-                    {article.in_evidence && <span className={styles.badge}>In evidenza</span>}
-                  </div>
-                  <div className={styles.relations}>
-                    <div className={styles.relation}>
-                      <span className={styles.relationLabel}>Author:</span>
-                      <span className={styles.relationValue}>
-                        {article.authorRelation?.name ?? article.author}
-                      </span>
-                    </div>
-                    <div className={styles.relation}>
-                      <span className={styles.relationLabel}>Category:</span>
-                      <span className={styles.relationValue}>
-                        {article.categoryRelation?.name ?? article.category}
-                      </span>
-                    </div>
-                    <div className={styles.relation}>
-                      <span className={styles.relationLabel}>Issue:</span>
-                      <span className={styles.relationValue}>
-                        {article.issueRelation?.title ?? article.issue}
-                      </span>
-                    </div>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-
-        {/* Categories */}
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Categories ({categories.length})</h2>
-          <ul className={styles.list}>
-            {categories.map((category) => (
-              <li key={category.slug} className={styles.listItem}>
-                <div className={styles.itemHeader}>
-                  <span className={styles.itemTitle}>{category.name}</span>
-                  <span className={styles.itemSlug}>{category.slug}</span>
-                </div>
-                <p className={styles.itemDescription}>{category.description}</p>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        {/* Authors */}
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Authors ({authors.length})</h2>
-          <ul className={styles.list}>
-            {authors.map((author) => (
-              <li key={author.slug} className={styles.listItem}>
-                <div className={styles.itemHeader}>
-                  <span className={styles.itemTitle}>{author.name}</span>
-                  <span className={styles.itemSlug}>{author.slug}</span>
-                </div>
-                <p className={styles.itemDescription}>{author.description}</p>
-              </li>
-            ))}
-          </ul>
-        </section>
+      <div className={styles.statsGrid}>
+        {stats.map((stat) => (
+          <Link key={stat.href} href={stat.href} className={styles.statCard}>
+            <div className={styles.statCardHeader}>
+              <span className={styles.statIcon}>{stat.icon}</span>
+              <div className={styles.statCardInfo}>
+                <h3 className={styles.statTitle}>{stat.title}</h3>
+                <p className={styles.statDescription}>{stat.description}</p>
+              </div>
+            </div>
+            <div className={styles.statCardFooter}>
+              <span className={styles.statCount}>{stat.count}</span>
+              <span className={styles.statLink}>Vedi tutti →</span>
+            </div>
+          </Link>
+        ))}
       </div>
     </main>
   );

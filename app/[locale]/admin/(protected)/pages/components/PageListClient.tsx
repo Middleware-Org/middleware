@@ -113,8 +113,9 @@ export default function PageListClient() {
       case "preview":
         return (
           <TableCell className="max-w-md">
+            <div className="font-medium text-secondary mb-1">{page.title}</div>
             <div className="text-sm text-secondary/80 line-clamp-2">
-              {page.content.substring(0, 100)}...
+              {page.excerpt || page.content.substring(0, 100)}...
             </div>
           </TableCell>
         );

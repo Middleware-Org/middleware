@@ -18,12 +18,23 @@ import {
 import { cn } from "@/lib/utils/classes";
 import { authClient } from "@/lib/auth/client";
 import { i18nSettings } from "@/lib/i18n/settings";
+import Pictogram from "@/components/organism/pictogram";
+import { MonoTextBold } from "@/components/atoms/typography";
+import type { CommonDictionary } from "@/lib/i18n/types";
 import styles from "./styles";
+
+/* **************************************************
+ * Types
+ **************************************************/
+interface SidebarProps {
+  dict: Pick<CommonDictionary, "title">;
+  locale: string;
+}
 
 /* **************************************************
  * Sidebar Component
  **************************************************/
-export default function Sidebar() {
+export default function Sidebar({ dict, locale }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -85,7 +96,12 @@ export default function Sidebar() {
   return (
     <aside className={styles.sidebar}>
       <div className={styles.header}>
-        <h1 className={styles.title}>Admin Panel</h1>
+        <div className={styles.logoContainer}>
+          <Pictogram size={40} />
+          <Link href={`/${locale}/admin`}>
+            <MonoTextBold className={styles.logoText}>{dict.title}</MonoTextBold>
+          </Link>
+        </div>
       </div>
 
       <nav className={styles.nav}>

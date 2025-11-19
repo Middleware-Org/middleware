@@ -21,6 +21,14 @@ const styles = {
   editorContainer: cn("flex gap-6 h-[calc(100vh-200px)]"),
   editorWrapper: cn("flex-1 flex flex-col"),
   editorLabel: cn("block mb-2 text-sm font-medium text-secondary"),
+  metaPanel: cn("w-80 flex flex-col gap-4"),
+  metaCard: cn("bg-primary border border-secondary p-4"),
+  metaCardTitle: cn("text-lg font-semibold mb-4"),
+  textarea: cn(
+    "w-full px-3 py-2 border border-secondary bg-primary",
+    "focus:outline-none focus:ring-2 focus:ring-tertiary focus:border-tertiary",
+    "disabled:bg-secondary/10 disabled:cursor-not-allowed resize-y transition-all duration-150",
+  ),
   formActions: cn("flex gap-2 mt-4"),
   submitButton: cn(
     "px-4 py-2 bg-tertiary text-white hover:bg-tertiary/90",
