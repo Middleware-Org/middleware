@@ -29,8 +29,8 @@ const styles = {
     "lg:sticky md:sticky lg:top-[155px] md:top-[155px] lg:self-start md:self-start",
   ),
   issueArticlesContainer: cn("flex flex-col"),
-  link: cn("h-full flex flex-col"),
-  articleInEvidenceContainer: cn("mb-4"),
+  link: cn("h-full flex flex-col px-4 pt-4 md:p-0 lg:p-0"),
+  articleInEvidenceContainer: cn("mb-0 md:mb-4 lg:mb-4 px-4 pt-4 md:pt-0 lg:pt-0"),
 };
 
 export default async function IssuePage({ params }: IssuePageProps) {
@@ -68,7 +68,14 @@ export default async function IssuePage({ params }: IssuePageProps) {
           <div className={styles.articleInEvidenceContainer}>
             <ArticleInEvidenceCard article={articleInEvidence} dict={dict} issue={issue} />
           </div>
-          <Articles articles={otherArticles} dict={dict} issue={issue} />
+          <div className={styles.articleInEvidenceContainer}>
+            <Articles
+              articles={otherArticles}
+              dict={dict}
+              issue={issue}
+              disableShowArticles={true}
+            />
+          </div>
         </div>
       </div>
     </div>
