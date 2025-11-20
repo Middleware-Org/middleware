@@ -47,6 +47,7 @@ const styles = {
   createdAtBadge: cn("absolute top-0 right-0 px-4 py-2"),
   createdAtBadgeText: cn("text-sm"),
   readAllButtonText: cn("text-sm"),
+  // Footer styles
   footer: cn("flex flex-col w-full shrink-0"),
   footerContainer: cn("flex flex-col lg:p-[30px] md:p-[30px] p-4 w-full"),
   issueInfo: cn("flex flex-col"),
