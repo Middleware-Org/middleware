@@ -3,6 +3,7 @@ export const TRANSLATION_NAMESPACES = {
   HOME: "home",
   CATEGORIES: "categories",
   AUTHORS: "authors",
+  ARCHIVE: "archive",
 } as const;
 
 export const DEFAULT_NAMESPACE = TRANSLATION_NAMESPACES.COMMON;
