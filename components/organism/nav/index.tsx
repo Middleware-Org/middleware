@@ -47,7 +47,7 @@ export default function Nav({ dict }: NavProps) {
               <MonoTextLight
                 className={cn(
                   styles.linkText,
-                  headerLink.in_evidence ? styles.linkTextHighlighted : "",
+                  headerLink.in_evidence || isActive ? styles.linkTextHighlighted : "",
                 )}
               >
                 {dict.aria.header[headerLink.label as keyof typeof dict.aria.header]}

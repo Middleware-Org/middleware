@@ -23,8 +23,8 @@ export default function ArchiveScrollWrapper({
     <HorizontalScroll
       enabled={!isMobile}
       stickyOffset={stickyOffset}
-      className={cn(className, isMobile ? "flex flex-col gap-4" : "")}
-      innerClassName={cn(innerClassName, isMobile ? "flex flex-col gap-4" : "")}
+      className={cn(className, isMobile ? "" : "")}
+      innerClassName={cn(innerClassName, isMobile ? "" : "")}
     >
       {children}
     </HorizontalScroll>

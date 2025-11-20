@@ -29,8 +29,12 @@ export function H3({ children, className = "" }: TypographyProps) {
   return <h3 className={cn(editorBold.className, styles.h3, className)}>{children}</h3>;
 }
 
-export function MonoTextBold({ children, className = "" }: TypographyProps) {
-  return <p className={cn(gtAmericaMonoBold.className, className)}>{children}</p>;
+export function MonoTextBold({ children, className = "", style }: TypographyProps) {
+  return (
+    <p style={style} className={cn(gtAmericaMonoBold.className, className)}>
+      {children}
+    </p>
+  );
 }
 
 export function MonoTextLight({ children, className = "", onClick }: TypographyProps) {
@@ -41,8 +45,12 @@ export function MonoTextLight({ children, className = "", onClick }: TypographyP
   );
 }
 
-export function SerifText({ children, className = "" }: TypographyProps) {
-  return <p className={cn(editorRegular.className, className)}>{children}</p>;
+export function SerifText({ children, className = "", style }: TypographyProps) {
+  return (
+    <p style={style} className={cn(editorRegular.className, className)}>
+      {children}
+    </p>
+  );
 }
 
 export function SerifTextBold({ children, className = "" }: TypographyProps) {
