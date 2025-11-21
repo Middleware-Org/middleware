@@ -5,29 +5,22 @@
 
 import Button from "@/components/atoms/button";
 import { MonoTextLight } from "@/components/atoms/typography";
-import { useIssuesList } from "@/lib/store/issuesList";
-import type { Issue } from "@/.velite";
 import styles from "./styles";
-
-/* **************************************************
- * Types
- **************************************************/
-type MobileIssuesToggleProps = {
-  issues: Issue[];
-};
+import { useIssuesList } from "@/lib/store/issuesList";
 
 /* **************************************************
  * MobileIssuesToggle Component
  **************************************************/
-export default function MobileIssuesToggle({ issues }: MobileIssuesToggleProps) {
+export default function MobileIssuesToggle() {
   const { isOpen, toggleOpen } = useIssuesList();
 
+  const buttonText = isOpen ? "Chiudi" : "Mostra Uscite";
+  const buttonVariant = isOpen ? "secondary" : "primary";
+  const buttonTextClass = isOpen ? styles.buttonTextClosed : styles.buttonTextOpen;
+
   return (
-    <Button variants="unstyled" onClick={toggleOpen} className={styles.button}>
-      <MonoTextLight className={styles.buttonText}>
-        {isOpen ? "Chiudi" : `Issues (${issues.length})`}
-      </MonoTextLight>
+    <Button onClick={toggleOpen} variants={buttonVariant}>
+      <MonoTextLight className={buttonTextClass}>{buttonText}</MonoTextLight>
     </Button>
   );
 }
-

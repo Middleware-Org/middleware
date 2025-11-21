@@ -24,6 +24,7 @@ const styles = {
   mobileToggle: cn("lg:hidden md:flex flex mb-6 sticky md:top-[115px] top-0"),
   grid: cn("grid grid-cols-1 lg:grid-cols-[295px_auto] gap-10"),
   sidebar: cn("lg:sticky lg:top-[115px] lg:h-fit"),
+  content: cn("flex flex-col gap-10"),
 };
 
 /* **************************************************
@@ -46,9 +47,11 @@ export default async function PodcastsPage({ params }: PodcastsPageProps) {
           <IssuesList issues={issues} />
         </div>
 
-        {issues.map((issue) => (
-          <Issue key={issue.slug} issue={issue} dictCommon={dictCommon} />
-        ))}
+        <div className={styles.content}>
+          {issues.map((issue) => (
+            <Issue key={issue.slug} issue={issue} dictCommon={dictCommon} />
+          ))}
+        </div>
       </div>
     </div>
   );

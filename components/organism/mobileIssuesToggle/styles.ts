@@ -7,16 +7,11 @@ import { cn } from "@/lib/utils/classes";
  * Styles
  **************************************************/
 const styles = {
-  button: cn(
-    "w-full p-4 border border-secondary bg-primary",
-    "hover:bg-secondary hover:text-primary",
-    "transition-colors duration-150"
-  ),
-  buttonText: cn("text-sm uppercase tracking-wide"),
+  buttonTextOpen: cn("text-sm"),
+  buttonTextClosed: cn("text-white text-sm"),
 };
 
 /* **************************************************
  * Export
  **************************************************/
 export default styles;
-

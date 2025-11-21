@@ -16,8 +16,8 @@ import styles from "./styles";
 /* **************************************************
  * Constants
  **************************************************/
-const MOBILE_OFFSET = 160;
-const DESKTOP_OFFSET = 120;
+const MOBILE_OFFSET = 115;
+const DESKTOP_OFFSET = 155;
 
 /* **************************************************
  * Types
@@ -63,4 +63,3 @@ export default function AuthorsList({ authors }: AuthorsListProps) {
     </div>
   );
 }
-
