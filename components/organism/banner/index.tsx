@@ -26,6 +26,7 @@ export default async function PolicyBanner({
 
   async function accept() {
     "use server";
+    const cookieStore = cookies();
     const maxAge = maxAgeDays * 24 * 60 * 60;
 
     (await cookieStore).set({
