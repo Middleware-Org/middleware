@@ -1,9 +1,8 @@
 import Separator from "@/components/atoms/separetor";
 import { H1, H2, MonoTextBold, MonoTextLight } from "@/components/atoms/typography";
 import { cn } from "@/lib/utils/classes";
-import type { Article } from "@/.velite";
+import { Article } from "@/.velite";
 import HighlightedArticleContent from "./HighlightedArticleContent";
-import HighlightedTextWrapper from "./HighlightedTextWrapper";
 import SeparatorWithLogo from "@/components/molecules/SeparatorWithLogo";
 import { formatDateByLang } from "@/lib/utils/date";
 import { ArticleDictionary } from "@/lib/i18n/types";
@@ -30,30 +29,6 @@ export default function Article({ article, dict }: ArticleProps) {
   }
 
   return (
-    <ArticleWithHighlighting
-      article={article}
-      dict={dict}
-      author={author}
-      category={category}
-      readingTime={readingTime}
-    />
-  );
-}
-
-function ArticleWithHighlighting({
-  article,
-  dict,
-  author,
-  category,
-  readingTime,
-}: {
-  article: Article;
-  dict: Pick<ArticleDictionary, "page">;
-  author: NonNullable<ReturnType<typeof getAuthorBySlug>>;
-  category: NonNullable<ReturnType<typeof getCategoryBySlug>>;
-  readingTime: string;
-}) {
-  return (
     <article>
       <header className="lg:px-10 md:px-4 px-4 lg:pt-10 py-[25px] w-full max-w-[1472px] mx-auto">
         <div className="flex lg:flex-row flex-col lg:justify-between">
@@ -68,13 +43,7 @@ function ArticleWithHighlighting({
                 </MonoTextBold>
               </Link>
             </div>
-            <H1>
-              <HighlightedTextWrapper
-                text={article.title}
-                audioChunksUrl={article.audio_chunks}
-                articleId={article.slug}
-              />
-            </H1>
+            <H1>{article.title}</H1>
           </div>
           <div className="flex lg:flex-col flex-row lg:justify-center justify-between lg:border-none border-t border-secondary lg:pt-5 lg:mt-0 pt-2.5 mt-2.5">
             <MonoTextLight className="lg:text-[16px] text-[14px] flex justify-end items-center gap-2.5 lg:mb-5 mb-0">
@@ -97,13 +66,7 @@ function ArticleWithHighlighting({
       </header>
       <section className="w-full flex flex-col max-w-[1472px] mx-auto lg:px-10 md:px-4 px-4 gap-5 pb-10">
         <div className={cn("w-full lg:max-w-[75%] max-w-full")}>
-          <H2 className="mb-[15px]">
-            <HighlightedTextWrapper
-              text={article.excerpt}
-              audioChunksUrl={article.audio_chunks}
-              articleId={article.slug}
-            />
-          </H2>
+          <H2 className="mb-[15px]">{article.excerpt}</H2>
         </div>
         <div className="lg:hidden md:flex flex w-full mb-4">
           <Separator />
