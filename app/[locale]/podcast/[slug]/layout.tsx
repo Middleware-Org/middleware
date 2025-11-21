@@ -8,12 +8,11 @@ import Menu from "@/components/organism/menu";
 import { MonoTextLight } from "@/components/atoms/typography";
 import { getArticleBySlug } from "@/lib/content";
 import { notFound } from "next/navigation";
-import ReadingProgress from "@/components/molecules/ReadingProgress";
 
 /* **************************************************
  * Types
  **************************************************/
-interface ArticleLayoutProps {
+interface PodcastLayoutProps {
   params: Promise<{ locale: string; slug: string }>;
   children: React.ReactNode;
 }
@@ -21,23 +20,22 @@ interface ArticleLayoutProps {
 /* **************************************************
  * Metadata
  **************************************************/
-export async function generateMetadata({ params }: ArticleLayoutProps) {
+export async function generateMetadata({ params }: PodcastLayoutProps) {
   const resolvedParams = await params;
   const locale = resolvedParams?.locale || "it";
-  const slug = resolvedParams?.slug || "";
 
-  const article = getArticleBySlug(slug);
-
-  if (!article) {
+  if (locale !== "it") {
     return null;
   }
 
+  const dict = await getDictionary(locale, TRANSLATION_NAMESPACES.CATEGORIES);
+
   return {
-    title: article.title,
-    description: article.excerpt,
+    title: dict.meta.title,
+    description: dict.meta.description,
     alternates: {
       languages: {
-        [locale]: `/${locale}/${TRANSLATION_NAMESPACES.AUTHORS}`,
+        [locale]: `/${locale}/${TRANSLATION_NAMESPACES.CATEGORIES}`,
       },
     },
   };
@@ -46,7 +44,7 @@ export async function generateMetadata({ params }: ArticleLayoutProps) {
 /* **************************************************
  * Layout
  **************************************************/
-export default async function ArticleLayout({ children, params }: ArticleLayoutProps) {
+export default async function PodcastLayout({ children, params }: PodcastLayoutProps) {
   const resolvedParams = await params;
   const locale = resolvedParams?.locale || "it";
   const slug = resolvedParams?.slug || "";
@@ -61,7 +59,6 @@ export default async function ArticleLayout({ children, params }: ArticleLayoutP
 
   return (
     <>
-      <ReadingProgress />
       <Header dict={dict}>
         <MonoTextLight className="text-xs! md:text-base!">{article.title}</MonoTextLight>
       </Header>

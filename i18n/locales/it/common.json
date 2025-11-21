@@ -12,7 +12,7 @@
       "issues": "Archivio",
       "categories": "Categorie",
       "authors": "Autori",
-      "subscribe": "Abbonati"
+      "podcasts": "Podcast"
     },
     "menu": {
       "quote": "Non è la crisi che produce la lotta di classe, è la lotta di classe che produce la crisi.",
@@ -27,6 +27,7 @@
   },
   "articleCard": {
     "wordsBy": "Parole di",
-    "readMore": "Leggi di più"
+    "readMore": "Leggi di più",
+    "listenPodcast": "Ascolta podcast"
   }
 }

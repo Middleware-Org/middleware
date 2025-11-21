@@ -3,8 +3,6 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 import Logo from "@/components/organism/logo";
 import Hamburger from "@/components/organism/hamburger";
 import Nav from "@/components/organism/nav";
@@ -23,54 +21,8 @@ interface HeaderProps {
  * Header
  **************************************************/
 export default function Header({ children, dict }: HeaderProps) {
-  const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
-
-  useEffect(() => {
-    let ticking = false;
-
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          const currentScrollY = window.scrollY;
-
-          // Se siamo in cima alla pagina, mostra sempre
-          if (currentScrollY < 100) {
-            setIsVisible(true);
-          } else {
-            // Se scrolliamo verso il basso, nascondi
-            // Se scrolliamo verso l'alto, mostra
-            const scrollDifference = currentScrollY - lastScrollY;
-            if (Math.abs(scrollDifference) > 5) {
-              // Soglia minima per evitare cambiamenti troppo frequenti
-              if (scrollDifference > 0) {
-                setIsVisible(false);
-              } else {
-                setIsVisible(true);
-              }
-            }
-          }
-
-          setLastScrollY(currentScrollY);
-          ticking = false;
-        });
-
-        ticking = true;
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY]);
-
   return (
-    <motion.header
-      className={styles.header}
-      initial={{ y: 0 }}
-      animate={{ y: isVisible ? 0 : -115 }}
-      exit={{ y: -115 }}
-      transition={{ duration: 0.3, ease: "easeInOut" }}
-    >
+    <header className={styles.header}>
       <div className={styles.headerTopSub}>
         <Logo dict={dict} />
         <Hamburger dict={dict} />
@@ -81,6 +33,6 @@ export default function Header({ children, dict }: HeaderProps) {
           <Nav dict={dict} />
         </div>
       </div>
-    </motion.header>
+    </header>
   );
 }

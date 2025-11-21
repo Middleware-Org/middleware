@@ -1,19 +1,11 @@
 export const footerLinks = [
   {
-    label: "clickToSubscribe",
-    href: "/subscribe",
-  },
-  {
     label: "privacyPolicy",
     href: "/privacy-policy",
   },
   {
     label: "cookiePolicy",
     href: "/cookie-policy",
-  },
-  {
-    label: "ethicsStandards",
-    href: "/ethics",
   },
 ];
 
@@ -31,8 +23,8 @@ export const headerLinks = [
     href: "/authors",
   },
   {
-    label: "subscribe",
-    href: "/subscribe",
+    label: "podcasts",
+    href: "/podcasts",
     in_evidence: true,
   },
 ];

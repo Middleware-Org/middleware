@@ -2,7 +2,6 @@ import Separator from "@/components/atoms/separetor";
 import { H1, H2, MonoTextBold, MonoTextLight } from "@/components/atoms/typography";
 import { cn } from "@/lib/utils/classes";
 import { Article } from "@/.velite";
-import HighlightedArticleContent from "./HighlightedArticleContent";
 import SeparatorWithLogo from "@/components/molecules/SeparatorWithLogo";
 import { formatDateByLang } from "@/lib/utils/date";
 import { ArticleDictionary } from "@/lib/i18n/types";
@@ -76,11 +75,10 @@ export default function Article({ article, dict }: ArticleProps) {
             <Separator />
           </div>
           <div className="lg:w-2/4 md:w-2/3 w-full relative">
-            <HighlightedArticleContent
-              content={article.content}
-              audioChunksUrl={article.audio_chunks}
-              articleId={article.slug}
-            />
+            <div
+              className="prose prose-lg max-w-none"
+              dangerouslySetInnerHTML={{ __html: article.content }}
+            ></div>
           </div>
           <div className="lg:w-1/4 md:w-1/3 w-full lg:flex md:flex hidden">
             <Separator />
