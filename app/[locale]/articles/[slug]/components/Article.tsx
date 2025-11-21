@@ -1,7 +1,7 @@
 import Separator from "@/components/atoms/separetor";
 import { H1, H2, MonoTextBold, MonoTextLight } from "@/components/atoms/typography";
 import { cn } from "@/lib/utils/classes";
-import { Article } from "@/.velite";
+import type { Article } from "@/.velite";
 import HighlightedArticleContent from "./HighlightedArticleContent";
 import HighlightedTextWrapper from "./HighlightedTextWrapper";
 import SeparatorWithLogo from "@/components/molecules/SeparatorWithLogo";
