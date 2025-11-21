@@ -27,7 +27,6 @@ interface PodcastProgressDB extends DBSchema {
 class PodcastProgressStorage {
   private dbName = "podcast-progress-db";
   private dbVersion = 1;
-  private storeName = "podcastProgress";
   private db: IDBPDatabase<PodcastProgressDB> | null = null;
   private saveInterval: NodeJS.Timeout | null = null;
   private lastSavedTime: number = -1;
@@ -78,7 +77,7 @@ class PodcastProgressStorage {
     }
 
     try {
-      const progress = await this.db.get(this.storeName, podcastId);
+      const progress = await this.db.get("podcastProgress", podcastId);
       return progress || null;
     } catch (error) {
       console.error(`Errore nel recupero del progresso per ${podcastId}:`, error);
@@ -120,7 +119,7 @@ class PodcastProgressStorage {
         isCompleted,
       };
 
-      await this.db.put(this.storeName, progress);
+      await this.db.put("podcastProgress", progress);
       this.lastSavedTime = currentTime;
       this.lastSavedProgress = progressPercentage;
     } catch (error) {
@@ -206,7 +205,7 @@ class PodcastProgressStorage {
     }
 
     try {
-      await this.db.delete(this.storeName, podcastId);
+      await this.db.delete("podcastProgress", podcastId);
     } catch (error) {
       console.error(`Errore nella rimozione del progresso per ${podcastId}:`, error);
     }
@@ -225,7 +224,7 @@ class PodcastProgressStorage {
     }
 
     try {
-      return await this.db.getAll(this.storeName);
+      return await this.db.getAll("podcastProgress");
     } catch (error) {
       console.error("Errore nel recupero di tutti i progressi:", error);
       return [];
