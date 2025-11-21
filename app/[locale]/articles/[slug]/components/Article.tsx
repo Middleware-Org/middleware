@@ -10,7 +10,7 @@ import { getAuthorBySlug } from "@/lib/content/authors";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getMinText } from "@/lib/utils/text";
-import { Book } from "lucide-react";
+import { Book, Play } from "lucide-react";
 
 type ArticleProps = {
   article: Article;
@@ -30,27 +30,35 @@ export default function Article({ article, dict }: ArticleProps) {
   return (
     <article>
       <header className="lg:px-10 md:px-4 px-4 lg:pt-10 py-[25px] w-full max-w-[1472px] mx-auto">
-        <div className="flex lg:flex-row flex-col lg:justify-between">
-          <div className="w-full flex flex-col">
-            <div className={cn("flex gap-2.5 items-baseline")}>
-              <MonoTextLight className="border-b border-secondary lg:pb-2.5 lg:text-lg text-base mb-5">
-                {dict.page.wordsBy}
-              </MonoTextLight>
-              <Link href={`/authors#${author.slug}`}>
-                <MonoTextBold className="lg:pb-2.5 lg:text-lg text-base mb-5">
-                  {author.name}
-                </MonoTextBold>
-              </Link>
-            </div>
-            <H1>{article.title}</H1>
-          </div>
-          <div className="flex lg:flex-col flex-row lg:justify-center justify-between lg:border-none border-t border-secondary lg:pt-5 lg:mt-0 pt-2.5 mt-2.5">
-            <MonoTextLight className="lg:text-[16px] text-[14px] flex justify-end items-center gap-2.5 lg:mb-5 mb-0">
-              {formatDateByLang(article.date, "it")}
+        <div className="w-full flex flex-col">
+          <div className={cn("flex gap-2.5 items-baseline")}>
+            <MonoTextLight className="border-b border-secondary lg:pb-2.5 lg:text-lg text-base mb-5">
+              {dict.page.wordsBy}
             </MonoTextLight>
+            <Link href={`/authors#${author.slug}`}>
+              <MonoTextBold className="lg:pb-2.5 lg:text-lg text-base mb-5">
+                {author.name}
+              </MonoTextBold>
+            </Link>
           </div>
+          <H1>{article.title}</H1>
         </div>
         <Separator className="lg:mt-[30px] lg:mb-2.5 mt-2.5 mb-2.5" />
+        <div className="flex flex-row justify-between">
+          <MonoTextLight className="lg:text-[16px] text-[14px] flex items-center gap-2.5">
+            {formatDateByLang(article.date, "it")}
+          </MonoTextLight>
+          {article.audio && (
+            <Link
+              href={`/podcasts/${article.slug}`}
+              className="flex items-center gap-2 hover:underline"
+            >
+              <Play className="w-4 h-4" />
+              <MonoTextLight className="lg:text-[16px] text-[14px]">Ascolta podcast</MonoTextLight>
+            </Link>
+          )}
+        </div>
+        <Separator className="lg:mt-2.5 lg:mb-2.5 mt-2.5 mb-2.5" />
         <div className="flex justify-between items-center">
           <Link href={`/categories#${category.slug}`}>
             <MonoTextLight className="hover:underline">{category.name}</MonoTextLight>
@@ -62,6 +70,7 @@ export default function Article({ article, dict }: ArticleProps) {
             <Book className="w-5 h-5" />
           </div>
         </div>
+        <Separator className="lg:mt-2.5 lg:mb-2.5 mt-2.5 mb-2.5" />
       </header>
       <section className="w-full flex flex-col max-w-[1472px] mx-auto lg:px-10 md:px-4 px-4 gap-5 pb-10">
         <div className={cn("w-full lg:max-w-[75%] max-w-full")}>

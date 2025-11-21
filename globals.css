@@ -51,6 +51,14 @@ input[type="radio"] {
   }
 }
 
+@font-face {
+  font-family: "Editor Regular";
+  src: url("/fonts/EditorRegular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 @layer base {
   body {
     background-color: var(--primary);
@@ -97,6 +105,7 @@ p {
   font-size: 1.125rem !important; /* Base font size - prose-lg equivalent */
   line-height: 1.75 !important;
   color: var(--secondary) !important;
+  font-family: "Editor Regular", serif !important;
 }
 
 .ProseMirror h1,
