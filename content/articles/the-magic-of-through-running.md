@@ -10,6 +10,8 @@ excerpt: >-
   Commuter trains often stop at the edge of cities. Short tunnels can link them
   up, creating metro networks for a fraction of the cost of building them from
   scratch.
+audio: /assets/articolo_podcast_politica_lento.mp3
+audio_chunks: /assets/articolo_podcast_politica_lento_segments.json
 ---
 ![](/api/github/image?path=public%2Fassets%2Fimage-1763414275801-m44htkz.jpg)
 
