@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils/classes";
 import { getTextColor } from "@/lib/utils/color";
 import { formatDateByLang } from "@/lib/utils/date";
 import styles from "./styles";
-import { Article, Issue } from "@/.velite";
+import type { Article, Issue } from "@/.velite";
 import { CommonDictionary } from "@/lib/i18n/types";
 import { getAuthorBySlug, getCategoryBySlug } from "@/lib/content";
 

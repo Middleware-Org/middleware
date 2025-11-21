@@ -2,7 +2,7 @@
  * Imports
  **************************************************/
 import Link from "next/link";
-import { Article } from "@/.velite";
+import type { Article } from "@/.velite";
 import { Play } from "lucide-react";
 import Separator from "@/components/atoms/separetor";
 import { H3, MonoTextBold, MonoTextLight, SerifText } from "@/components/atoms/typography";

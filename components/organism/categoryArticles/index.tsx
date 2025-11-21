@@ -7,7 +7,7 @@ import { useState } from "react";
 import Button from "@/components/atoms/button";
 import { MonoTextLight } from "@/components/atoms/typography";
 import ArticleCard from "@/components/molecules/articleCard";
-import { Article, Category } from "@/.velite";
+import type { Article, Category } from "@/.velite";
 import { CategoriesDictionary, CommonDictionary } from "@/lib/i18n/types";
 import styles from "./styles";
 

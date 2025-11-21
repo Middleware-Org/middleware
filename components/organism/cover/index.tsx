@@ -11,7 +11,7 @@ import { formatDateByLang } from "@/lib/utils/date";
 import styles from "./styles";
 import ArticleInEvidenceCard from "@/components/molecules/articleInEvidenceCard";
 import { CommonDictionary } from "@/lib/i18n/types";
-import { Article, Issue } from "@/.velite";
+import type { Article, Issue } from "@/.velite";
 
 /* **************************************************
  * Types
