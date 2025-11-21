@@ -1,5 +1,11 @@
 {
   "title": "Middleware",
+  "banner": {
+    "message": "Non utilizziamo dati personali né tracciamo la tua navigazione. Per dettagli, leggi la nostra",
+    "accept": "Ho capito",
+    "privacy": "Privacy Policy",
+    "cookie": "Cookie Policy"
+  },
   "aria": {
     "hamburger": {
       "open": "Apri il menu",
