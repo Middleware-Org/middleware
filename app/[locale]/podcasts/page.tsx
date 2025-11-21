@@ -39,7 +39,7 @@ export default async function PodcastsPage({ params }: PodcastsPageProps) {
   return (
     <div className={styles.container}>
       <div className={styles.mobileToggle}>
-        <MobileIssuesToggle issues={issues} />
+        <MobileIssuesToggle />
       </div>
 
       <div className={styles.grid}>
