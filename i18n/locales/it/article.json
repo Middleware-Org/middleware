@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "title": "Articolo",
+    "description": "Articolo"
+  },
+  "page": {
+    "title": "Articolo",
+    "wordsBy": "Parole di",
+    "readingTime": "di lettura"
+  }
+}

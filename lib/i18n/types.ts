@@ -7,6 +7,7 @@ import categoriesIt from "@/i18n/locales/it/categories.json";
 import authorsIt from "@/i18n/locales/it/authors.json";
 import archiveIt from "@/i18n/locales/it/archive.json";
 import issueIt from "@/i18n/locales/it/issue.json";
+import articleIt from "@/i18n/locales/it/article.json";
 
 /* **************************************************
  * Types
@@ -19,6 +20,8 @@ export type CategoriesDictionary = typeof categoriesIt;
 export type AuthorsDictionary = typeof authorsIt;
 export type ArchiveDictionary = typeof archiveIt;
 export type IssueDictionary = typeof issueIt;
+export type ArticleDictionary = typeof articleIt;
+
 export type Dictionary = CommonDictionary | CategoriesDictionary | AuthorsDictionary;
 export type DictionaryByNamespace<T extends TranslationNamespace> =
   T extends typeof TRANSLATION_NAMESPACES.COMMON
@@ -31,4 +34,6 @@ export type DictionaryByNamespace<T extends TranslationNamespace> =
           ? ArchiveDictionary
           : T extends typeof TRANSLATION_NAMESPACES.ISSUE
             ? IssueDictionary
-            : never;
+            : T extends typeof TRANSLATION_NAMESPACES.ARTICLE
+              ? ArticleDictionary
+              : never;

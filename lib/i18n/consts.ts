@@ -5,6 +5,7 @@ export const TRANSLATION_NAMESPACES = {
   AUTHORS: "authors",
   ARCHIVE: "archive",
   ISSUE: "issue",
+  ARTICLE: "article",
 } as const;
 
 export const DEFAULT_NAMESPACE = TRANSLATION_NAMESPACES.COMMON;
