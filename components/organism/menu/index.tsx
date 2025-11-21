@@ -9,7 +9,7 @@ import Link from "next/link";
 import { CommonDictionary } from "@/lib/i18n/types";
 import { cn } from "@/lib/utils/classes";
 import { useMenu } from "@/lib/store";
-import { menuItems } from "@/lib/data/links";
+import { headerLinks, menuItems } from "@/lib/data/links";
 import { MonoTextBold, MonoTextLight } from "@/components/atoms/typography";
 import Separator from "@/components/atoms/separetor";
 import Pictogram from "../pictogram";
@@ -83,17 +83,20 @@ export default function Menu({ dict }: MenuProps) {
         })}
       </nav>
       <Separator />
-      <nav className={styles.navMobile} role="navigation">
-        {menuItems.map((item) => {
+      <nav
+        className="flex flex-col gap-2 flex-1 justify-center items-end lg:hidden md:hidden"
+        role="navigation"
+      >
+        {headerLinks.map((item) => {
           const pathnameWithoutLang = getPathnameWithoutLang(pathname);
           const isActive = pathnameWithoutLang === item.href;
           return (
             <Link key={item.href} href={item.href}>
               <MonoTextLight
-                onClick={closeMenu}
-                className={cn(styles.linkMobile, isActive ? styles.linkActive : "")}
+                onClick={() => closeMenu()}
+                className={cn("text-lg", isActive ? "text-tertiary" : "")}
               >
-                {dict.aria.header[item.label as keyof typeof dict.aria.header]}
+                {item.label}
               </MonoTextLight>
             </Link>
           );

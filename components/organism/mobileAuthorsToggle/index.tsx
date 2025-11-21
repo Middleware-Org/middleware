@@ -27,8 +27,9 @@ export default function MobileAuthorsToggle({ dict }: MobileAuthorsToggleProps) 
 
   return (
     <Button onClick={toggleOpen} variants={buttonVariant}>
-      <MonoTextLight className={styles.buttonText}>{buttonText}</MonoTextLight>
+      <MonoTextLight className={isOpen ? styles.buttonTextClosed : styles.buttonTextOpen}>
+        {buttonText}
+      </MonoTextLight>
     </Button>
   );
 }
-

@@ -10,7 +10,7 @@ const styles = {
   article: cn("flex flex-col lg:p-[30px] md:p-[30px] p-4 w-full"),
   header: cn("flex flex-col justify-end pb-[10px]"),
   badgesMobile: cn("mb-2 lg:hidden md:hidden flex"),
-  badgeDate: cn("bg-secondary border-primary border py-1 px-2 w-fit"),
+  badgeDate: cn("bg-secondary border-secondary border py-1 px-2 w-fit"),
   badgeTitle: cn("bg-primary border-secondary border py-1 px-2 w-fit"),
   badgeTextDate: cn("text-xs! md:text-base! text-primary"),
   badgeTextTitle: cn("text-xs! md:text-base!"),

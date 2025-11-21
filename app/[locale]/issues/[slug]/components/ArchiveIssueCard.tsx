@@ -187,11 +187,10 @@ export default function ArchiveIssueCard({
               <Separator className={cn(backgroundColor)} />
             </section>
 
-            {/* Articles List Section */}
             <section className={styles.articlesSection}>
               <div className={styles.articlesHeader}>
                 <MonoTextBold className={cn(styles.articlesTitle, textColor)}>
-                  Anteprima articoli ({articles.length} totali)
+                  Articoli
                 </MonoTextBold>
               </div>
               <Separator className={cn(backgroundColor)} />

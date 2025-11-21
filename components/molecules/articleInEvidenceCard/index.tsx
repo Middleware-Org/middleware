@@ -55,7 +55,7 @@ export default function ArticleInEvidenceCard({
             </MonoTextLight>
           </div>
           <div className={styles.badgeTitle}>
-            <MonoTextLight className={styles.badgeTextTitle}>{article.title}</MonoTextLight>
+            <MonoTextLight className={styles.badgeTextTitle}>{issue.title}</MonoTextLight>
           </div>
         </div>
         <Link href={`/articles/${article.slug}`}>

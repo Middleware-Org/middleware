@@ -33,8 +33,7 @@ export default async function ArchivePage({ params }: ArchivePageProps) {
   return (
     <div className={styles.wrapper}>
       <ArchiveScrollWrapper stickyOffset={155}>
-        {Array.from({ length: 10 }).map((_, index) => {
-          const issue = issues[0];
+        {issues.map((issue, index) => {
           const articles = getArticlesByIssue(issue.slug);
 
           return (

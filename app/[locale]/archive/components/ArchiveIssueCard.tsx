@@ -5,7 +5,6 @@
  **************************************************/
 import Image from "next/image";
 import Link from "next/link";
-import { useParams } from "next/navigation";
 import Separator from "@/components/atoms/separetor";
 import { MonoTextBold, MonoTextLight, SerifText } from "@/components/atoms/typography";
 import { useIsMobile } from "@/hooks/useMediaQuery";
@@ -33,15 +32,17 @@ type ArchiveIssueCardProps = {
 const styles = {
   issueCoverContainer: cn("flex flex-col w-full md:w-1/2 lg:w-1/3 shrink-0 mb-10"),
   link: cn("h-full flex flex-col"),
-  coverContainer: cn("flex flex-row flex-1 min-h-0"),
-  issueLabelContainer: cn("h-full flex items-start justify-center shrink-0 relative"),
+  coverContainer: cn("flex flex-row items-stretch"),
+  issueLabelContainer: cn("flex items-start justify-center shrink-0 relative"),
   issueLabelWrapper: cn("h-full flex items-start pt-4"),
   issueLabel: cn("whitespace-nowrap text-xl md:text-2xl lg:text-2xl p-2"),
-  imageWrapper: cn("flex flex-1 min-h-0 relative"),
-  image: cn("w-full h-full object-cover"),
+  issueLabelLink: cn("h-full flex items-start"),
+  imageWrapper: cn("relative w-full aspect-[4/3] md:aspect-square"),
+  imageLink: cn("absolute inset-0 z-0"),
+  image: cn("object-cover"),
   readAllButton: cn(
     "absolute bottom-0 right-0 px-4 py-2",
-    "hover:bg-secondary hover:text-primary transition-colors duration-150",
+    "transition-colors duration-150",
     "z-10",
   ),
   createdAtBadge: cn("absolute top-0 right-0 px-4 py-2"),
@@ -70,12 +71,6 @@ const styles = {
 };
 
 /* **************************************************
- * Constants
- **************************************************/
-const IMAGE_WIDTH = 800;
-const IMAGE_HEIGHT = 500;
-
-/* **************************************************
  * ArchiveIssueCard
  **************************************************/
 export default function ArchiveIssueCard({
@@ -86,7 +81,6 @@ export default function ArchiveIssueCard({
   index,
 }: ArchiveIssueCardProps) {
   const lightColor = lightenColor(issue.color);
-  const { lang = "it" } = useParams() as { lang: "it" };
   const isMobile = useIsMobile();
   const { textColor, backgroundColor } = getTextColor(issue.color);
 
@@ -100,8 +94,9 @@ export default function ArchiveIssueCard({
       <div className={styles.link}>
         <div className={styles.coverContainer}>
           <div className={styles.issueLabelContainer} style={{ backgroundColor: lightColor }}>
-            <div
-              className={styles.issueLabelWrapper}
+            <Link
+              href={`/issues/${issue.slug}`}
+              className={styles.issueLabelLink}
               style={{
                 borderLeft: `1px solid ${issue.color}`,
                 borderRight: `1px solid ${issue.color}`,
@@ -118,17 +113,19 @@ export default function ArchiveIssueCard({
               >
                 {issue.title}
               </SerifText>
-            </div>
+            </Link>
           </div>
           <div className={styles.imageWrapper} style={{ backgroundColor: issue.color }}>
-            <Image
-              src={issue.cover}
-              alt={issue.title}
-              width={IMAGE_WIDTH}
-              height={IMAGE_HEIGHT}
-              className={styles.image}
-              priority={index === 0}
-            />
+            <Link href={`/issues/${issue.slug}`} className={styles.imageLink}>
+              <Image
+                src={issue.cover}
+                alt={issue.title}
+                fill
+                className={styles.image}
+                priority={index === 0}
+                style={{ objectFit: "cover" }}
+              />
+            </Link>
             <div
               className={styles.createdAtBadge}
               style={{
@@ -137,10 +134,7 @@ export default function ArchiveIssueCard({
                 borderBottom: `1px solid ${issue.color}`,
               }}
             >
-              <MonoTextBold
-                className={styles.createdAtBadgeText}
-                style={{ color: `${issue.color}!important` }}
-              >
+              <MonoTextBold className={styles.createdAtBadgeText} style={{ color: issue.color }}>
                 {formatDateByLang(issue.date, locale as "it")}
               </MonoTextBold>
             </div>
@@ -151,12 +145,10 @@ export default function ArchiveIssueCard({
                 backgroundColor: lightColor,
                 borderLeft: `1px solid ${issue.color}`,
                 borderTop: `1px solid ${issue.color}`,
+                color: issue.color,
               }}
             >
-              <MonoTextBold
-                className={styles.readAllButtonText}
-                style={{ color: `${issue.color}!important` }}
-              >
+              <MonoTextBold className={styles.readAllButtonText} style={{ color: issue.color }}>
                 Leggi tutti gli articoli
               </MonoTextBold>
             </Link>
@@ -167,16 +159,6 @@ export default function ArchiveIssueCard({
           <div className={styles.footerContainer}>
             <section className={styles.issueInfo}>
               <header className={styles.header}>
-                <div className={styles.badgesMobile}>
-                  <div className={styles.badgeDate}>
-                    <MonoTextLight className={styles.badgeTextDate}>
-                      {formatDateByLang(issue.date, lang, isMobile)}
-                    </MonoTextLight>
-                  </div>
-                  <div className={styles.badgeTitle}>
-                    <MonoTextLight className={styles.badgeTextTitle}>{issue.title}</MonoTextLight>
-                  </div>
-                </div>
                 {issue.description && (
                   <SerifText className={cn(styles.description, textColor)}>
                     {issue.description}

@@ -66,14 +66,19 @@ export default function Articles({ articles, dict, issue, disableShowArticles }:
       )}
 
       {!disableShowArticles && (
-        <div className={styles.buttonContainer} style={{ backgroundColor: issue.color }}>
+        <div
+          className={showArticles ? styles.buttonContainerOpen : styles.buttonContainer}
+          style={{
+            backgroundColor: issue.color,
+          }}
+        >
           <Button
             variants="unstyled"
             onClick={handleToggle}
             className={styles.button}
-            style={{ borderColor: color, color }}
+            style={{ borderColor: color }}
           >
-            <MonoTextLight>
+            <MonoTextLight style={{ color: `${color}!important` }}>
               {showArticles ? "Nascondi articoli" : `Mostra ${articles.length} articoli`}
             </MonoTextLight>
           </Button>

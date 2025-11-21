@@ -13,7 +13,8 @@ const styles = {
   mobileWithPadding: cn("lg:hidden md:hidden p-4"),
   mobileWithoutPadding: cn("lg:hidden md:hidden p-0"),
   mobileGrid: cn("grid grid-cols-1 gap-4"),
-  buttonContainer: cn("lg:hidden md:hidden p-4"),
+  buttonContainer: cn("lg:hidden md:hidden pb-4 px-4"),
+  buttonContainerOpen: cn("lg:hidden md:hidden py-4 px-4"),
   button: cn("w-full p-4 bg-transparent border"),
 };
 
