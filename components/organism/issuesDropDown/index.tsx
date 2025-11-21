@@ -5,7 +5,7 @@
  **************************************************/
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { FaChevronDown, FaChevronUp } from "react-icons/fa6";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { MonoTextLight } from "@/components/atoms/typography";
 import { useActiveIssue } from "@/hooks/useActiveIssue";
 import { useIsMobile } from "@/hooks/useMediaQuery";
@@ -99,9 +99,9 @@ export default function IssuesDropdown({ issues, className }: IssuesDropdownProp
       >
         <MonoTextLight className={styles.issueText}>{displayIssue.title}</MonoTextLight>
         {isOpen ? (
-          <FaChevronUp className={styles.chevron} />
+          <ChevronUp className={styles.chevron} />
         ) : (
-          <FaChevronDown className={styles.chevron} />
+          <ChevronDown className={styles.chevron} />
         )}
         <MonoTextLight className={styles.issueText}>
           | {formatDateByLang(displayIssue.date, lang, isMobile)}

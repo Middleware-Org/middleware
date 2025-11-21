@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { FaBackward, FaForward, FaPause, FaPlay } from "react-icons/fa6";
+import { Pause, Play, Rewind, FastForward } from "lucide-react";
 
 import Button from "@/components/atoms/button";
 import { MonoTextLight } from "@/components/atoms/typography";
+import { saveArticleProgress, getArticleProgress } from "@/lib/storage/articleProgress";
 
 interface AudioPlayerProps {
   audioUrl?: string;
@@ -24,6 +25,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUrl, articleId }) => {
   const [wasPlayingBeforeSeek, setWasPlayingBeforeSeek] = useState<boolean>(false);
 
   const iconTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isInitializedRef = useRef<boolean>(false);
 
   useAudioProgress({
     articleId,
@@ -81,6 +83,41 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUrl, articleId }) => {
     const handleCanPlay = () => {
       if (audio.duration > 0 && totalTime === 0) {
         setTotalTime(audio.duration);
+      }
+
+      // Ripristina il progresso salvato quando l'audio è pronto
+      if (!isInitializedRef.current && audio.duration > 0) {
+        isInitializedRef.current = true;
+
+        // Aspetta un po' per assicurarsi che l'audio sia completamente caricato
+        setTimeout(() => {
+          getArticleProgress(articleId).then((savedProgress) => {
+            if (
+              savedProgress &&
+              !savedProgress.isCompleted &&
+              savedProgress.currentTime > 0 &&
+              savedProgress.currentTime < audio.duration
+            ) {
+              // Ripristina la posizione salvata
+              audio.currentTime = savedProgress.currentTime;
+              setCurrentTime(savedProgress.currentTime);
+              const position = Math.floor(
+                (savedProgress.progressPercentage / 100) * totalPositions,
+              );
+              setCurrentPosition(position);
+
+              // Emetti evento per ripristinare la posizione
+              window.dispatchEvent(
+                new CustomEvent("restoreAudioPosition", {
+                  detail: {
+                    time: savedProgress.currentTime,
+                    position: savedProgress.progressPercentage,
+                  },
+                }),
+              );
+            }
+          });
+        }, 300);
       }
     };
 
@@ -260,7 +297,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUrl, articleId }) => {
           className="p-0! w-10! h-10 flex items-center justify-center rounded-full bg-secondary/20 border border-secondary"
           aria-label="Indietro di 5 secondi"
         >
-          <FaBackward className="text-base text-secondary mr-[2px]" />
+          <Rewind className="text-base text-secondary mr-[2px]" />
         </Button>
 
         <Button
@@ -270,9 +307,9 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUrl, articleId }) => {
           aria-label={isPlaying ? "Pausa" : "Riproduci"}
         >
           {displayIsPlaying ? (
-            <FaPause className="text-base text-secondary" />
+            <Pause className="text-base text-secondary" />
           ) : (
-            <FaPlay className="text-base text-secondary" />
+            <Play className="text-base text-secondary" />
           )}
         </Button>
 
@@ -282,7 +319,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUrl, articleId }) => {
           className="p-0! w-10! h-10 flex items-center justify-center rounded-full bg-secondary/20 border border-secondary"
           aria-label="Avanti di 5 secondi"
         >
-          <FaForward className="text-base text-secondary ml-[2px]" />
+          <FastForward className="text-base text-secondary ml-[2px]" />
         </Button>
       </div>
 
@@ -368,7 +405,6 @@ export const useAudioProgress = ({
   const lastSavedTimeRef = useRef<number>(-1);
   const saveProgressIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastPlaybackTimeRef = useRef<number>(0);
-  //const isInitializedRef = useRef<boolean>(false);
   const pendingSaveRef = useRef<boolean>(false);
 
   const saveProgressToStorage = useCallback(async () => {
@@ -387,12 +423,7 @@ export const useAudioProgress = ({
     pendingSaveRef.current = true;
 
     try {
-      //   await articleStorageService.saveAudioProgress(
-      //     articleId,
-      //     currentTime,
-      //     totalTime,
-      //     progressPercentage
-      //   );
+      await saveArticleProgress(articleId, currentTime, totalTime, progressPercentage);
       lastSavedTimeRef.current = progressPercentage;
       lastPlaybackTimeRef.current = currentTime;
     } catch (error) {
@@ -400,7 +431,7 @@ export const useAudioProgress = ({
     } finally {
       pendingSaveRef.current = false;
     }
-  }, [currentTime, totalTime]);
+  }, [articleId, currentTime, totalTime]);
 
   //   useEffect(() => {
   //     if (isInitializedRef.current || totalTime === 0) return;
@@ -451,12 +482,12 @@ export const useAudioProgress = ({
     const handleAudioEnded = async (event: CustomEvent) => {
       if (event.detail.articleId === articleId) {
         try {
-          //   await articleStorageService.saveAudioProgress(
-          //     articleId,
-          //     event.detail.currentTime,
-          //     event.detail.totalTime,
-          //     event.detail.progressPercentage,
-          //   );
+          await saveArticleProgress(
+            articleId,
+            event.detail.currentTime,
+            event.detail.totalTime,
+            event.detail.progressPercentage,
+          );
           lastSavedTimeRef.current = event.detail.progressPercentage;
           lastPlaybackTimeRef.current = event.detail.currentTime;
         } catch (error) {
