@@ -13,7 +13,7 @@ import { notFound } from "next/navigation";
  * Types
  **************************************************/
 interface PodcastsLayoutProps {
-  params: Promise<{ locale: string; slug: undefined | string }>;
+  params: Promise<{ locale: string; slug?: string }>;
   children: React.ReactNode;
 }
 
