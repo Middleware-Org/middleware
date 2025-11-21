@@ -4,7 +4,7 @@ title: Teoria del partito
 date: '2025-11-19'
 author: infoaut
 category: organizzazione
-issue: sperimentazione-strumenti-di-formazione
+issue: formazione-organizzazione
 in_evidence: true
 excerpt: >-
   Abbiamo tradotto questo importante articolo di Phil A. Neel apparso su Ill
