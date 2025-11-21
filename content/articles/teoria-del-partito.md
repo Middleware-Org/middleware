@@ -2,9 +2,9 @@
 slug: teoria-del-partito
 title: Teoria del partito
 date: '2025-11-19'
-author: benedict-springbett
-category: trains
-issue: issue-19
+author: infoaut
+category: organizzazione
+issue: sperimentazione-strumenti-di-formazione
 in_evidence: true
 excerpt: >-
   Abbiamo tradotto questo importante articolo di Phil A. Neel apparso su Ill
