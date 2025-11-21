@@ -9,6 +9,8 @@ in_evidence: false
 excerpt: >-
   Tracce per un’inchiesta sull’università dentro la "fabbrica della guerra" di
   Modena
+audio: /assets/prova.mp3
+audio_chunks: /assets/prova.json
 ---
 **Un’ipotesi a premessa.**
 
