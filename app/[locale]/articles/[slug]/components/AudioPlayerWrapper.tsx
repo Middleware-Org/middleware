@@ -5,24 +5,23 @@
  **************************************************/
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import Logo from "@/components/organism/logo";
-import Hamburger from "@/components/organism/hamburger";
-import Nav from "@/components/organism/nav";
-import styles from "./styles";
-import type { CommonDictionary } from "@/lib/i18n/types";
+import AudioPlayer from "@/components/organism/audioPlayer";
 
 /* **************************************************
  * Types
  **************************************************/
-interface HeaderProps {
-  children: React.ReactNode;
-  dict: CommonDictionary;
-}
+type AudioPlayerWrapperProps = {
+  audioUrl: string;
+  articleId: string;
+};
 
 /* **************************************************
- * Header
+ * AudioPlayerWrapper
  **************************************************/
-export default function Header({ children, dict }: HeaderProps) {
+export default function AudioPlayerWrapper({
+  audioUrl,
+  articleId,
+}: AudioPlayerWrapperProps) {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
 
@@ -64,23 +63,16 @@ export default function Header({ children, dict }: HeaderProps) {
   }, [lastScrollY]);
 
   return (
-    <motion.header
-      className={styles.header}
+    <motion.div
       initial={{ y: 0 }}
-      animate={{ y: isVisible ? 0 : -115 }}
-      exit={{ y: -115 }}
+      animate={{ y: isVisible ? 0 : 100 }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
+      className="max-w-[600px] mx-auto fixed bottom-0 md:bottom-4 left-0 right-0 bg-primary border border-secondary z-40 px-4 py-4 md:px-10 lg:px-10"
     >
-      <div className={styles.headerTopSub}>
-        <Logo dict={dict} />
-        <Hamburger dict={dict} />
+      <div className="w-full mx-auto">
+        <AudioPlayer audioUrl={audioUrl} articleId={articleId} />
       </div>
-      <div className={styles.headerBottomSub}>
-        <div className={styles.headerBottomSubContent}>
-          {children}
-          <Nav dict={dict} />
-        </div>
-      </div>
-    </motion.header>
+    </motion.div>
   );
 }
+

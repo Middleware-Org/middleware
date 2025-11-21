@@ -9,6 +9,7 @@ import { MonoTextLight } from "@/components/atoms/typography";
 import { getArticleBySlug } from "@/lib/content";
 import { notFound } from "next/navigation";
 import ReadingProgress from "@/components/molecules/ReadingProgress";
+import AudioPlayerWrapper from "./components/AudioPlayerWrapper";
 
 /* **************************************************
  * Types
@@ -67,6 +68,7 @@ export default async function ArticleLayout({ children, params }: ArticleLayoutP
       </Header>
       <Menu dict={dict} />
       <main className="w-full">{children}</main>
+      {article.audio && <AudioPlayerWrapper audioUrl={article.audio} articleId={article.slug} />}
     </>
   );
 }
