@@ -132,11 +132,7 @@ class PodcastProgressStorage {
   /**
    * Avvia il salvataggio automatico periodico
    */
-  startAutoSave(
-    podcastId: string,
-    getCurrentTime: () => number,
-    getTotalTime: () => number,
-  ): void {
+  startAutoSave(podcastId: string, getCurrentTime: () => number, getTotalTime: () => number): void {
     this.stopAutoSave();
 
     this.saveInterval = setInterval(() => {
@@ -245,4 +241,3 @@ class PodcastProgressStorage {
 
 // Esporta un'istanza singleton
 export const podcastProgressStorage = new PodcastProgressStorage();
-
