@@ -6,19 +6,19 @@ excerpt: >-
   tecnici e strumenti di analisi senza cookie (cookieless), nel pieno rispetto
   della normativa vigente.
 ---
-# **Ultimo aggiornamento:** 4 agosto 2025
+**Ultimo aggiornamento:** 4 agosto 2025
 
-## Questo sito web ([https://www.middleware.blog](https://www.middleware.blog)) utilizza **esclusivamente cookie tecnici** e strumenti di analisi **senza cookie** (cookieless), nel pieno rispetto della normativa vigente.
+Questo sito web ([https://www.middleware.blog](https://www.middleware.blog)) utilizza **esclusivamente cookie tecnici** e strumenti di analisi **senza cookie** (cookieless), nel pieno rispetto della normativa vigente.
 
-## **Cosa sono i cookie?**
+**Cosa sono i cookie?**
 
 I cookie sono piccoli file di testo che un sito web invia al dispositivo dell’utente durante la navigazione. Servono a memorizzare informazioni utili per garantire il corretto funzionamento del sito o migliorare l’esperienza di navigazione.
 
 * * *
 
-## **Tipologie di cookie e strumenti utilizzati**
+**Tipologie di cookie e strumenti utilizzati**
 
-### **1\. Cookie tecnici**
+**1\. Cookie tecnici**
 
 Utilizziamo **solo cookie tecnici**, che:
 
@@ -37,7 +37,7 @@ Utilizziamo **solo cookie tecnici**, che:
 
 * * *
 
-### **2\. Strumenti di analisi senza cookie (cookieless)**
+**2\. Strumenti di analisi senza cookie (cookieless)**
 
 Utilizziamo anche:
 
@@ -63,7 +63,7 @@ Questi servizi:
 
 * * *
 
-## **Non utilizziamo:**
+**Non utilizziamo:**
 
 -   Cookie analitici o statistici basati su identificatori persistenti.
     
@@ -76,14 +76,14 @@ Questi servizi:
 
 * * *
 
-## **Gestione dei cookie**
+**Gestione dei cookie**
 
 Poiché vengono utilizzati **solo cookie tecnici**, **non è richiesto il consenso preventivo** dell’utente.  
 Se lo desideri, puoi comunque gestire o eliminare i cookie tramite le impostazioni del tuo browser.
 
 * * *
 
-## **Contatti**
+**Contatti**
 
 Per ulteriori informazioni sulla presente Cookie Policy, puoi contattarci via email:  
 [**info@middleware.blog**](mailto:info@middleware.blog)
