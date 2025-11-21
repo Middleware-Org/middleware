@@ -13,7 +13,7 @@ excerpt: >-
 ---
 ![](/api/github/image?path=public%2Fassets%2Fimage-1763414275801-m44htkz.jpg)
 
-# In the nineteenth century, the societies of Europe and North America were profoundly transformed by the vast railway networks they built. When these railway networks entered cities, however, they faced a crucial problem: they had to stop. Rather than carrying on through the city, it was common for them to terminate on its edge.
+In the nineteenth century, the societies of Europe and North America were profoundly transformed by the vast railway networks they built. When these railway networks entered cities, however, they faced a crucial problem: they had to stop. Rather than carrying on through the city, it was common for them to terminate on its edge.
 
 In part, this was due to the high cost of acquiring land in urban areas. It was also a technological problem: the [tunneling technologies](https://worksinprogress.co/issue/why-we-stopped-building-cut-and-cover/) that would enable railways to run into the centre underground without destroying everything in their path had not yet been invented. Finally, the problem was sometimes regulatory as well: in cities such as London railways [were prohibited](https://en.wikipedia.org/wiki/Royal_Commission_on_Metropolitan_Railway_Termini) from penetrating too deep into the urban area.
 
