@@ -12,15 +12,16 @@ import styles from "./styles";
  **************************************************/
 interface LogoProps {
   dict: Pick<CommonDictionary, "title">;
+  size?: number;
 }
 
 /* **************************************************
  * Logo
  **************************************************/
-export default function Logo({ dict }: LogoProps) {
+export default function Logo({ dict, size = 48 }: LogoProps) {
   return (
     <div className={styles.logoContainer}>
-      <Pictogram />
+      <Pictogram size={size} />
       <Link href="/">
         <MonoTextBold className={styles.logoText}>{dict.title}</MonoTextBold>
       </Link>

@@ -12,6 +12,7 @@ import styles from "./styles";
 import ArticleInEvidenceCard from "@/components/molecules/articleInEvidenceCard";
 import { CommonDictionary } from "@/lib/i18n/types";
 import type { Article, Issue } from "@/.velite";
+import Link from "next/link";
 
 /* **************************************************
  * Types
@@ -54,7 +55,9 @@ export default function Cover({ issue, articleInEvidence, dict }: CoverProps) {
               </MonoTextLight>
             </div>
             <div className={styles.badgeTitle}>
-              <MonoTextLight className={styles.badgeTextTitle}>{issue.title}</MonoTextLight>
+              <Link href={`/issues/${issue.slug}`}>
+                <MonoTextLight className={styles.badgeTextTitle}>{issue.title}</MonoTextLight>
+              </Link>
             </div>
           </div>
         </div>

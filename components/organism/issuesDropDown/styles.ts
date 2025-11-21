@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils/classes";
  * Styles
  **************************************************/
 const styles = {
-  container: cn("relative"),
+  container: cn("relative w-full md:w-auto lg:w-auto"),
   button: cn(
     "flex items-center gap-2 hover:opacity-80 transition-opacity duration-200 cursor-pointer",
   ),

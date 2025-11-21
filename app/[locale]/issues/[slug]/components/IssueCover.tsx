@@ -12,7 +12,6 @@ import { cn } from "@/lib/utils/classes";
  **************************************************/
 type IssueCoverProps = {
   issue: Issue;
-  locale: string;
 };
 
 /* **************************************************
@@ -32,7 +31,7 @@ const styles = {
 /* **************************************************
  * IssueCover
  **************************************************/
-export default function IssueCover({ issue, locale }: IssueCoverProps) {
+export default function IssueCover({ issue }: IssueCoverProps) {
   const lightColor = lightenColor(issue.color);
 
   return (
@@ -71,4 +70,3 @@ export default function IssueCover({ issue, locale }: IssueCoverProps) {
     </div>
   );
 }
-

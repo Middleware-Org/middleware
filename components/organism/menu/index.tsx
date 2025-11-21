@@ -96,7 +96,7 @@ export default function Menu({ dict }: MenuProps) {
                 onClick={() => closeMenu()}
                 className={cn("text-lg", isActive ? "text-tertiary" : "")}
               >
-                {item.label}
+                {dict.aria.header[item.label as keyof typeof dict.aria.header]}
               </MonoTextLight>
             </Link>
           );

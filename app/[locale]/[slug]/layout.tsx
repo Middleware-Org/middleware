@@ -24,10 +24,6 @@ interface SlugLayoutProps {
 export async function generateMetadata({ params }: SlugLayoutProps) {
   const { locale, slug } = await params;
 
-  if (locale !== "it") {
-    return null;
-  }
-
   const page = getPageBySlug(slug);
 
   if (!page) {

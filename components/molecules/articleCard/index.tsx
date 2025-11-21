@@ -16,21 +16,19 @@ import styles from "./styles";
 type ArticleCardProps = {
   article: Article;
   dict: Pick<CommonDictionary, "articleCard">;
+  isPodcast?: boolean;
 };
 
 /* **************************************************
  * ArticleCard
  **************************************************/
-export default function ArticleCard({ article, dict }: ArticleCardProps) {
+export default function ArticleCard({ article, dict, isPodcast = false }: ArticleCardProps) {
   const author = getAuthorBySlug(article.author);
   const category = getCategoryBySlug(article.category);
 
   if (!author || !category) return null;
 
-  // In podcasts page, all articles are podcasts (filtered before)
-  // Determine if this is a podcast (has audio) and set the correct link
-  const isPodcast = !!article.audio;
-  const articleLink = isPodcast ? `/podcast/${article.slug}` : `/articles/${article.slug}`;
+  const articleLink = isPodcast ? `/podcasts/${article.slug}` : `/articles/${article.slug}`;
 
   return (
     <article className={styles.article}>
@@ -40,7 +38,7 @@ export default function ArticleCard({ article, dict }: ArticleCardProps) {
             <H3 className={styles.title}>{article.title}</H3>
           </Link>
           {isPodcast && (
-            <Link href={`/podcast/${article.slug}`} className={styles.playIcon}>
+            <Link href={`/podcasts/${article.slug}`} className={styles.playIcon}>
               <Play className={styles.playIconSvg} />
             </Link>
           )}

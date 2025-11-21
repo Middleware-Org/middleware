@@ -22,10 +22,6 @@ export async function generateMetadata({ params }: AuthorsLayoutProps) {
   const resolvedParams = await params;
   const locale = resolvedParams?.locale || "it";
 
-  if (locale !== "it") {
-    return null;
-  }
-
   const dict = await getDictionary(locale, TRANSLATION_NAMESPACES.AUTHORS);
 
   return {
@@ -52,13 +48,10 @@ export default async function AuthorsLayout({ children, params }: AuthorsLayoutP
   return (
     <>
       <Header dict={dict}>
-        <MonoTextLight className="text-xs! md:text-base!">
-          {dictAuthors.page.title}
-        </MonoTextLight>
+        <MonoTextLight className="text-xs! md:text-base!">{dictAuthors.page.title}</MonoTextLight>
       </Header>
       <Menu dict={dict} />
       <main className="w-full">{children}</main>
     </>
   );
 }
-

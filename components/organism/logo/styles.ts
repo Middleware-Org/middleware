@@ -7,8 +7,8 @@ import { cn } from "@/lib/utils/classes";
  * Styles
  **************************************************/
 const styles = {
-  logoContainer: cn("flex items-center gap-4"),
-  logoText: cn("lg:text-5xl md:text-4xl text-3xl"),
+  logoContainer: cn("flex items-center gap-2 md:gap-4 lg:gap-4"),
+  logoText: cn("lg:text-5xl md:text-4xl text-2xl"),
 };
 
 /* **************************************************

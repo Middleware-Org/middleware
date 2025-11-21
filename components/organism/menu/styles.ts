@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils/classes";
  **************************************************/
 const styles = {
   container: cn(
-    "flex flex-col fixed top-[115px] right-0 w-full h-[calc(100dvh-115px)] bg-primary z-50 lg:max-w-[461px] md:max-w-[461px] max-w-none transition-transform duration-300 ease-in-out border-l border-secondary p-[60px]",
+    "flex flex-col fixed top-[95px] md:top-[115px] lg:top-[115px] right-0 w-full lg:h-[calc(100dvh-115px)] md:h-[calc(100dvh-115px)] h-[calc(100dvh-95px)] bg-primary z-50 lg:max-w-[461px] md:max-w-[461px] max-w-none transition-transform duration-300 ease-in-out lg:border-l lg:border-secondary md:border-secondary md:border-secondary p-[60px]",
   ),
   containerOpen: cn("translate-x-0"),
   containerClosed: cn("translate-x-full"),

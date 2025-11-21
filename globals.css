@@ -8,6 +8,10 @@
   --color-black: #000000;
 }
 
+a {
+  cursor: pointer;
+}
+
 button,
 input,
 textarea,

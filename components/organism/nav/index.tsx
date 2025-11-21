@@ -27,6 +27,10 @@ export default function Nav({ dict }: NavProps) {
 
   const mobile = useIsMobile();
 
+  if (mobile) {
+    return null;
+  }
+
   return (
     <nav className={styles.nav}>
       {headerLinks.map((headerLink) => {
@@ -36,19 +40,13 @@ export default function Nav({ dict }: NavProps) {
             key={headerLink.label}
             className={cn(
               styles.linkContainer,
-              mobile && !headerLink.in_evidence
-                ? styles.linkContainerMobile
-                : styles.linkContainerVisible,
-              headerLink.in_evidence ? styles.linkContainerHighlighted : "",
+              styles.linkContainerVisible,
               isActive ? styles.linkContainerActive : "",
             )}
           >
             <Link href={headerLink.href}>
               <MonoTextLight
-                className={cn(
-                  styles.linkText,
-                  headerLink.in_evidence || isActive ? styles.linkTextHighlighted : "",
-                )}
+                className={cn(styles.linkText, isActive ? styles.linkTextHighlighted : "")}
               >
                 {dict.aria.header[headerLink.label as keyof typeof dict.aria.header]}
               </MonoTextLight>

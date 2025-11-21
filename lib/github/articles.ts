@@ -125,6 +125,7 @@ export async function createArticle(article: Omit<Article, "slug"> & { slug?: st
   const slug = await generateUniqueSlug("content/articles", baseSlug, ".md");
 
   // Crea il frontmatter
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   const frontmatter: Record<string, any> = {
     slug,
     title: article.title,

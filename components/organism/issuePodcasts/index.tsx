@@ -41,7 +41,7 @@ export default function IssuePodcasts({ podcasts, dictCommon, issue }: IssuePodc
       {/* Podcasts grid */}
       <div className={styles.grid}>
         {visiblePodcasts.map((podcast) => (
-          <ArticleCard key={podcast.slug} article={podcast} dict={dictCommon} />
+          <ArticleCard key={podcast.slug} article={podcast} dict={dictCommon} isPodcast={true} />
         ))}
       </div>
 

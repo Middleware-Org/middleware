@@ -23,10 +23,6 @@ interface HomeLayoutProps {
 export async function generateMetadata({ params }: HomeLayoutProps) {
   const { locale } = await params;
 
-  if (locale !== "it") {
-    return null;
-  }
-
   const dict = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
   const meta = dict.meta;
 

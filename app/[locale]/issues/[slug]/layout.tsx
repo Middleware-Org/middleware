@@ -25,10 +25,6 @@ export async function generateMetadata({ params }: IssueLayoutProps) {
   const locale = resolvedParams?.locale || "it";
   const slug = resolvedParams?.slug || "";
 
-  if (locale !== "it") {
-    return null;
-  }
-
   const issue = getIssueBySlug(slug);
 
   if (!issue) {

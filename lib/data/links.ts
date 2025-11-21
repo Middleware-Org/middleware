@@ -25,7 +25,6 @@ export const headerLinks = [
   {
     label: "podcasts",
     href: "/podcasts",
-    in_evidence: true,
   },
 ];
 

@@ -9,13 +9,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Button from "@/components/atoms/button";
 import { MonoTextLight, SerifText } from "@/components/atoms/typography";
-import Separator from "@/components/atoms/separetor";
 import { Article } from "@/.velite";
 import { getAuthorBySlug, getCategoryBySlug, getIssueBySlug } from "@/lib/content";
 import { formatDateByLang } from "@/lib/utils/date";
 import { useParams } from "next/navigation";
 import { useIsMobile } from "@/hooks/useMediaQuery";
 import { podcastProgressStorage } from "@/lib/storage/podcastProgress";
+import { cn } from "@/lib/utils/classes";
+import VerticalRange from "./VerticalRange";
 import styles from "./PodcastPlayerStyles";
 
 /* **************************************************
@@ -39,6 +40,10 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const transcriptContainerRef = useRef<HTMLDivElement>(null);
   const activeSegmentRef = useRef<HTMLDivElement>(null);
+  const volumeControlRef = useRef<HTMLDivElement>(null);
+  const speedControlRef = useRef<HTMLDivElement>(null);
+  const volumeButtonWrapperRef = useRef<HTMLDivElement>(null);
+  const speedButtonWrapperRef = useRef<HTMLDivElement>(null);
   const { lang = "it" } = useParams() as { lang: "it" };
   const isMobile = useIsMobile();
 
@@ -99,6 +104,45 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
       container.removeEventListener("touchmove", preventScroll);
     };
   }, []);
+
+  // Close controls when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      const target = event.target as Node;
+
+      // Check if click is outside volume control
+      if (
+        showVolumeControl &&
+        volumeControlRef.current &&
+        volumeButtonWrapperRef.current &&
+        !volumeControlRef.current.contains(target) &&
+        !volumeButtonWrapperRef.current.contains(target)
+      ) {
+        setShowVolumeControl(false);
+      }
+
+      // Check if click is outside speed control
+      if (
+        showSpeedControl &&
+        speedControlRef.current &&
+        speedButtonWrapperRef.current &&
+        !speedControlRef.current.contains(target) &&
+        !speedButtonWrapperRef.current.contains(target)
+      ) {
+        setShowSpeedControl(false);
+      }
+    };
+
+    if (showVolumeControl || showSpeedControl) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("touchstart", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [showVolumeControl, showSpeedControl]);
 
   // Initialize storage
   useEffect(() => {
@@ -383,14 +427,12 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   }, []);
 
-  const handleVolumeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const newVolume = parseFloat(e.target.value);
-    setVolume(newVolume);
+  const handleVolumeChange = useCallback((value: number) => {
+    setVolume(value);
   }, []);
 
-  const handlePlaybackRateChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const newRate = parseFloat(e.target.value);
-    setPlaybackRate(newRate);
+  const handlePlaybackRateChange = useCallback((value: number) => {
+    setPlaybackRate(value);
   }, []);
 
   if (!article.audio) {
@@ -426,7 +468,28 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
                 </div>
               )}
               <div className={styles.infoSection}>
-                <SerifText className={styles.title}>{article.title}</SerifText>
+                <div className={styles.titleContainer}>
+                  <SerifText className={styles.title}>{article.title}</SerifText>
+                  {/* Mobile: Toggle button for transcript */}
+                  {isMobile && (
+                    <div className={styles.transcriptToggleContainer}>
+                      <Button
+                        variants="unstyled"
+                        onClick={() => setShowTranscriptMobile(!showTranscriptMobile)}
+                        className={styles.transcriptToggleButton}
+                        aria-label={
+                          showTranscriptMobile ? "Chiudi transcript" : "Mostra transcript"
+                        }
+                      >
+                        {showTranscriptMobile ? (
+                          <X className={styles.transcriptToggleIcon} />
+                        ) : (
+                          <FileText className={styles.transcriptToggleIcon} />
+                        )}
+                      </Button>
+                    </div>
+                  )}
+                </div>
                 {author && (
                   <MonoTextLight className={styles.author}>
                     {author.name} • {formatDateByLang(article.date, lang, isMobile)}
@@ -436,59 +499,43 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
                   <MonoTextLight className={styles.category}>{category.name}</MonoTextLight>
                 )}
               </div>
-              {/* Mobile: Toggle button for transcript */}
-              {isMobile && (
-                <div className={styles.transcriptToggleContainer}>
-                  <Button
-                    variants="unstyled"
-                    onClick={() => setShowTranscriptMobile(!showTranscriptMobile)}
-                    className={styles.transcriptToggleButton}
-                    aria-label={showTranscriptMobile ? "Chiudi transcript" : "Mostra transcript"}
-                  >
-                    {showTranscriptMobile ? (
-                      <X className={styles.transcriptToggleIcon} />
-                    ) : (
-                      <FileText className={styles.transcriptToggleIcon} />
-                    )}
-                  </Button>
-                </div>
-              )}
             </motion.div>
           )}
         </AnimatePresence>
-
-        <Separator />
 
         {/* Player Section */}
         <div className={styles.playerSection}>
           <div className={styles.buttons}>
             <div className={styles.buttonGroup}>
-              {showVolumeControl && (
-                <div className={styles.expandedControl}>
-                  <input
-                    type="range"
-                    min={0}
-                    max={100}
-                    step={1}
-                    value={volume}
-                    onChange={handleVolumeChange}
-                    className={styles.controlSlider}
-                    aria-label="Volume"
-                    style={{
-                      background: `linear-gradient(to right, var(--tertiary) 0%, var(--tertiary) ${volume}%, var(--secondary) ${volume}%, var(--secondary) 100%)`,
-                    }}
-                  />
-                  <MonoTextLight className={styles.controlValue}>{volume}%</MonoTextLight>
-                </div>
-              )}
-              <Button
-                variants="unstyled"
-                onClick={() => setShowVolumeControl(!showVolumeControl)}
-                className={styles.controlButton}
-                aria-label="Volume"
-              >
-                <Volume2 className={styles.icon} />
-              </Button>
+              <div ref={volumeButtonWrapperRef} className={styles.volumeButtonWrapper}>
+                <Button
+                  variants="unstyled"
+                  onClick={() => setShowVolumeControl(!showVolumeControl)}
+                  className={styles.controlButton}
+                  aria-label="Volume"
+                >
+                  <Volume2 className={styles.icon} />
+                </Button>
+                {/* Volume Control - Absolute Positioned */}
+                {showVolumeControl && (
+                  <div
+                    ref={volumeControlRef}
+                    className={cn(
+                      styles.volumeControlContainer,
+                      isMobile && showTranscriptMobile ? styles.volumeControlContainerBottom : "",
+                    )}
+                  >
+                    <VerticalRange
+                      min={0}
+                      max={100}
+                      step={1}
+                      value={volume}
+                      onChange={handleVolumeChange}
+                      formatValue={(val) => `${Math.round(val)}%`}
+                    />
+                  </div>
+                )}
+              </div>
               <Button
                 variants="unstyled"
                 onClick={backward}
@@ -521,32 +568,35 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
               >
                 <FastForward className={styles.icon} />
               </Button>
-              <Button
-                variants="unstyled"
-                onClick={() => setShowSpeedControl(!showSpeedControl)}
-                className={styles.controlButton}
-                aria-label="Velocità di riproduzione"
-              >
-                <Gauge className={styles.icon} />
-              </Button>
-              {showSpeedControl && (
-                <div className={styles.expandedControl}>
-                  <input
-                    type="range"
-                    min={0.5}
-                    max={2}
-                    step={0.1}
-                    value={playbackRate}
-                    onChange={handlePlaybackRateChange}
-                    className={styles.controlSlider}
-                    aria-label="Velocità di riproduzione"
-                    style={{
-                      background: `linear-gradient(to right, var(--tertiary) 0%, var(--tertiary) ${((playbackRate - 0.5) / 1.5) * 100}%, var(--secondary) ${((playbackRate - 0.5) / 1.5) * 100}%, var(--secondary) 100%)`,
-                    }}
-                  />
-                  <MonoTextLight className={styles.controlValue}>{playbackRate}x</MonoTextLight>
-                </div>
-              )}
+              <div ref={speedButtonWrapperRef} className={styles.speedButtonWrapper}>
+                <Button
+                  variants="unstyled"
+                  onClick={() => setShowSpeedControl(!showSpeedControl)}
+                  className={styles.controlButton}
+                  aria-label="Velocità di riproduzione"
+                >
+                  <Gauge className={styles.icon} />
+                </Button>
+                {/* Speed Control - Absolute Positioned */}
+                {showSpeedControl && (
+                  <div
+                    ref={speedControlRef}
+                    className={cn(
+                      styles.speedControlContainer,
+                      isMobile && showTranscriptMobile ? styles.speedControlContainerBottom : "",
+                    )}
+                  >
+                    <VerticalRange
+                      min={0.5}
+                      max={2}
+                      step={0.1}
+                      value={playbackRate}
+                      onChange={handlePlaybackRateChange}
+                      formatValue={(val) => `${val.toFixed(1)}x`}
+                    />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -573,8 +623,6 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
             <MonoTextLight className={styles.time}>{formatTime(totalTime)}</MonoTextLight>
           </div>
         </div>
-
-        <Separator />
       </div>
 
       {/* Bottom Grid: Transcript */}
@@ -588,8 +636,20 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
               transition={{ duration: 0.3, ease: "easeInOut" }}
               className={styles.transcriptSection}
             >
+              {/* Mobile: Close button */}
+              {isMobile && (
+                <div className={styles.transcriptCloseContainer}>
+                  <Button
+                    variants="unstyled"
+                    onClick={() => setShowTranscriptMobile(false)}
+                    className={styles.transcriptCloseButton}
+                    aria-label="Chiudi transcript"
+                  >
+                    <X className={styles.transcriptCloseIcon} />
+                  </Button>
+                </div>
+              )}
               <div ref={transcriptContainerRef} className={styles.transcriptContent}>
-                <Separator />
                 {segments.map((segment, index) => {
                   const isActive = index === currentSegmentIndex;
                   const isPrevious = index === currentSegmentIndex - 1;

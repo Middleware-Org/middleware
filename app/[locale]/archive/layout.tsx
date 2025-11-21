@@ -22,10 +22,6 @@ export async function generateMetadata({ params }: ArchiveLayoutProps) {
   const resolvedParams = await params;
   const locale = resolvedParams?.locale || "it";
 
-  if (locale !== "it") {
-    return null;
-  }
-
   const dict = await getDictionary(locale, TRANSLATION_NAMESPACES.ARCHIVE);
 
   return {

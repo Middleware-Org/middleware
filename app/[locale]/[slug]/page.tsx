@@ -1,8 +1,6 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { remark } from "remark";
-import remarkHtml from "remark-html";
 import StaticPage from "@/components/organism/StaticPage";
 import { getPageBySlug } from "@/lib/content";
 import { notFound } from "next/navigation";

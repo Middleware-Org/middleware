@@ -19,10 +19,6 @@ interface RootLayoutProps {
 export async function generateMetadata({ params }: RootLayoutProps) {
   const { locale } = await params;
 
-  if (locale !== "it") {
-    return null;
-  }
-
   const dict = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
   const meta = dict.meta;
 
