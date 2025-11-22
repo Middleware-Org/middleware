@@ -8,6 +8,7 @@ import "@/globals.css";
 import IssuesDropdown from "@/components/organism/issuesDropDown";
 import Menu from "@/components/organism/menu";
 import { getAllIssues } from "@/lib/content";
+import Footer from "@/components/organism/footer";
 
 /* **************************************************
  * Types
@@ -54,6 +55,7 @@ export default async function HomeLayout({ children, params }: HomeLayoutProps) 
       </Header>
       <Menu dict={dict} />
       <main className="w-full">{children}</main>
+      <Footer dict={dict} />
     </>
   );
 }

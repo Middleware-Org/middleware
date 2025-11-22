@@ -8,6 +8,7 @@ import Menu from "@/components/organism/menu";
 import { MonoTextLight } from "@/components/atoms/typography";
 import { getArticleBySlug } from "@/lib/content";
 import { notFound } from "next/navigation";
+import Footer from "@/components/organism/footer";
 
 /* **************************************************
  * Types
@@ -75,6 +76,7 @@ export default async function PodcastsLayout({ children, params }: PodcastsLayou
         </Header>
         <Menu dict={dict} />
         <main className="w-full">{children}</main>
+        <Footer dict={dict} />
       </>
     );
   }
@@ -92,6 +94,7 @@ export default async function PodcastsLayout({ children, params }: PodcastsLayou
       </Header>
       <Menu dict={dict} />
       <main className="w-full">{children}</main>
+      <Footer dict={dict} />
     </>
   );
 }

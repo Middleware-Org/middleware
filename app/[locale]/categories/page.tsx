@@ -21,9 +21,9 @@ type CategoriesPageProps = {
  **************************************************/
 const styles = {
   container: cn("max-w-[1472px] mx-auto px-4 lg:px-10 py-6 lg:py-10"),
-  mobileToggle: cn("lg:hidden md:flex flex mb-6 sticky md:top-[115px] top-0"),
+  mobileToggle: cn("lg:hidden md:flex flex mb-6 sticky md:top-[115px] lg:top-[115px] top-0"),
   grid: cn("grid grid-cols-1 lg:grid-cols-[295px_auto] gap-10"),
-  sidebar: cn("lg:sticky lg:top-[115px] lg:h-fit"),
+  sidebar: cn("lg:sticky lg:top-[155px] md:top-[155px] lg:top-[115px] top-[115px] lg:h-fit"),
   content: cn("flex flex-col gap-10"),
 };
 

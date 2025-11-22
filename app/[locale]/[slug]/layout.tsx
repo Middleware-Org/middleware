@@ -9,6 +9,7 @@ import Menu from "@/components/organism/menu";
 import { MonoTextLight } from "@/components/atoms/typography";
 import { notFound } from "next/navigation";
 import { getPageBySlug } from "@/lib/content";
+import Footer from "@/components/organism/footer";
 
 /* **************************************************
  * Types
@@ -65,6 +66,7 @@ export default async function SlugLayout({ children, params }: SlugLayoutProps) 
       </Header>
       <Menu dict={dict} />
       <main className="w-full">{children}</main>
+      <Footer dict={dict} />
     </>
   );
 }

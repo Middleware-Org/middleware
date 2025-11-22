@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils/classes";
 const styles = {
   container: cn(
     "grid grid-rows-[auto_1fr]",
-    "h-[calc(100vh-95px)] md:h-[calc(100vh-115px)] lg:h-[calc(100vh-155px)] max-w-[800px] mx-auto",
+    "h-[calc(100vh-95px)] md:h-[calc(100vh-155px)] lg:h-[calc(100vh-155px)] max-w-[800px] mx-auto",
     "px-0 md:px-8 lg:px-10 py-0 md:py-6 lg:py-8 gap-0 md:gap-6 lg:gap-6",
     "overflow-hidden",
   ),
@@ -24,11 +24,17 @@ const styles = {
   transcriptToggleIcon: cn("w-5 h-5 text-secondary"),
   headerSection: cn("flex flex-col md:flex-row gap-4 md:gap-6", "p-4 md:p-6 w-full"),
   coverWrapper: cn(
-    "relative w-full md:w-[200px] lg:w-[250px] aspect-square shrink-0",
-    "border border-secondary overflow-hidden",
+    "relative w-[150px] md:w-[200px] lg:w-[250px] aspect-square shrink-0",
+    "border border-secondary overflow-hidden m-auto",
   ),
   coverImage: cn("object-cover"),
   infoSection: cn("flex flex-col justify-center flex-1"),
+  infoContainer: cn(
+    "flex justify-center md:justify-between lg:justify-between text-center md:text-left lg:text-left items-center",
+  ),
+  textContainer: cn("flex flex-col"),
+  textTitle: cn("text-lg md:text-2xl lg:text-3xl font-bold leading-tight"),
+  textAuthor: cn("text-xs md:text-sm lg:text-base text-secondary/80"),
   titleContainer: cn("flex items-start justify-between gap-2 md:gap-4"),
   title: cn("text-lg md:text-2xl lg:text-3xl font-bold leading-tight flex-1"),
   author: cn("text-xs md:text-sm lg:text-base text-secondary/80"),
@@ -52,20 +58,18 @@ const styles = {
   buttonGroup: cn("flex items-center gap-2"),
   controlButton: cn(
     "p-0! w-10! h-10! md:w-12! md:h-12! flex items-center justify-center",
-    "bg-primary border border-secondary hover:bg-secondary",
+    "bg-primary border border-secondary hover:bg-tertiary group",
     "transition-colors duration-150",
   ),
   playButton: cn(
     "p-0! w-14! h-14! md:w-16! md:h-16! lg:w-18! lg:h-18!",
     "flex items-center justify-center border border-secondary",
-    "bg-primary hover:bg-secondary",
+    "bg-primary hover:bg-tertiary group",
     "transition-colors duration-150",
   ),
-  icon: cn("text-base md:text-lg text-secondary hover:text-primary transition-colors duration-150"),
-  playIcon: cn(
-    "text-xl md:text-2xl lg:text-3xl text-secondary hover:text-primary ml-0.5 transition-colors duration-150",
-  ),
-  progressContainer: cn("flex items-center gap-3 md:gap-4 w-full"),
+  icon: cn("text-base md:text-lg text-secondary"),
+  playIcon: cn("text-xl md:text-2xl lg:text-3xl text-secondary ml-0.5"),
+  progressContainer: cn("flex items-center gap-3 md:gap-4 w-full px-4 py-2"),
   progressBar: cn(
     "flex-1 h-1 md:h-1.5 bg-secondary/20 appearance-none cursor-pointer",
     "focus:outline-none focus:ring-0",

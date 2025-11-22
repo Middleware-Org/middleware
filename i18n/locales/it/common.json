@@ -32,8 +32,19 @@
     "description": "Magazine dell'Autonomia Modenese"
   },
   "articleCard": {
-    "wordsBy": "Parole di",
+    "wordsBy": "Scritto da",
     "readMore": "Leggi di più",
-    "listenPodcast": "Ascolta podcast"
+    "listenPodcast": "Ascolta il podcast"
+  },
+  "footer": {
+    "contact": "Contatti",
+    "backToTop": "Torna all'inizio",
+    "email": "Email",
+    "subscribe": "Info",
+    "clickToSubscribe": "Clicca qui per iscriverti",
+    "privacyPolicy": "La nostra privacy policy",
+    "cookiePolicy": "La nostra cookie policy",
+    "ethicsStandards": "Etica & standard",
+    "copyright": "Middleware © 2025 - Tutti i diritti riservati"
   }
 }

@@ -84,7 +84,7 @@ export default function Menu({ dict }: MenuProps) {
       </nav>
       <Separator />
       <nav
-        className="flex flex-col gap-2 flex-1 justify-center items-end lg:hidden md:hidden"
+        className="flex flex-col gap-2 flex-1 justify-center items-end lg:hidden"
         role="navigation"
       >
         {headerLinks.map((item) => {

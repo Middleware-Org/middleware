@@ -6,6 +6,7 @@ import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import { getDictionary } from "@/lib/i18n/utils";
 import Menu from "@/components/organism/menu";
 import { MonoTextLight } from "@/components/atoms/typography";
+import Footer from "@/components/organism/footer";
 
 /* **************************************************
  * Types
@@ -54,6 +55,7 @@ export default async function CategoriesLayout({ children, params }: CategoriesL
       </Header>
       <Menu dict={dict} />
       <main className="w-full">{children}</main>
+      <Footer dict={dict} />
     </>
   );
 }

@@ -9,6 +9,7 @@ import { MonoTextLight } from "@/components/atoms/typography";
 import { getArticleBySlug } from "@/lib/content";
 import { notFound } from "next/navigation";
 import ReadingProgress from "@/components/molecules/ReadingProgress";
+import Footer from "@/components/organism/footer";
 
 /* **************************************************
  * Types
@@ -67,6 +68,7 @@ export default async function ArticleLayout({ children, params }: ArticleLayoutP
       </Header>
       <Menu dict={dict} />
       <main className="w-full">{children}</main>
+      <Footer dict={dict} />
     </>
   );
 }

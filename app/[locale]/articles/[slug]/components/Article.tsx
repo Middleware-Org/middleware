@@ -64,10 +64,10 @@ export default function Article({ article, dict }: ArticleProps) {
             <MonoTextLight className="hover:underline">{category.name}</MonoTextLight>
           </Link>
           <div className="lg:text-[16px] text-[12px] flex items-center gap-2 text-secondary">
+            <Book className="w-5 h-5" />
             <MonoTextLight className="lg:text-[16px] text-[12px]">
               {readingTime} {dict.page.readingTime}
             </MonoTextLight>
-            <Book className="w-5 h-5" />
           </div>
         </div>
         <Separator className="lg:mt-2.5 lg:mb-2.5 mt-2.5 mb-2.5" />

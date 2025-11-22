@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils/classes";
 const styles = {
   container: cn("issues-list space-y-2 lg:block"),
   containerOpen: cn("block"),
-  containerClosed: cn("hidden md:flex"),
+  containerClosed: cn("hidden"),
   item: cn(""),
   button: cn("text-left w-full"),
   buttonText: cn("text-sm"),

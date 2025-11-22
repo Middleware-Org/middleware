@@ -8,6 +8,7 @@ import Menu from "@/components/organism/menu";
 import { MonoTextLight } from "@/components/atoms/typography";
 import { getIssueBySlug } from "@/lib/content";
 import { notFound } from "next/navigation";
+import Footer from "@/components/organism/footer";
 
 /* **************************************************
  * Types
@@ -65,6 +66,7 @@ export default async function IssueLayout({ children, params }: IssueLayoutProps
       </Header>
       <Menu dict={dict} />
       <main className="w-full">{children}</main>
+      <Footer dict={dict} />
     </>
   );
 }

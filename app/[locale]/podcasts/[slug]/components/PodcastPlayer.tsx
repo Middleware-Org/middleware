@@ -4,8 +4,7 @@
  * Imports
  **************************************************/
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Rewind, FastForward, Pause, Play, Volume2, Gauge, FileText, X } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Rewind, FastForward, Pause, Play, Volume2, Zap } from "lucide-react";
 import Image from "next/image";
 import Button from "@/components/atoms/button";
 import { MonoTextLight, SerifText } from "@/components/atoms/typography";
@@ -15,7 +14,6 @@ import { formatDateByLang } from "@/lib/utils/date";
 import { useParams } from "next/navigation";
 import { useIsMobile } from "@/hooks/useMediaQuery";
 import { podcastProgressStorage } from "@/lib/storage/podcastProgress";
-import { cn } from "@/lib/utils/classes";
 import VerticalRange from "./VerticalRange";
 import styles from "./PodcastPlayerStyles";
 
@@ -59,7 +57,6 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
   const [playbackRate, setPlaybackRate] = useState<number>(1.0);
   const [showVolumeControl, setShowVolumeControl] = useState<boolean>(false);
   const [showSpeedControl, setShowSpeedControl] = useState<boolean>(false);
-  const [showTranscriptMobile, setShowTranscriptMobile] = useState<boolean>(false);
   const progressRestoredRef = useRef<boolean>(false);
 
   const author = getAuthorBySlug(article.author);
@@ -446,52 +443,25 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
       {/* Top Grid: Header + Player */}
       <div className={styles.topGrid}>
         {/* Header Section */}
-        <AnimatePresence>
-          {(!isMobile || !showTranscriptMobile) && (
-            <motion.div
-              initial={{ height: "auto", opacity: 1 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-              className={styles.headerSection}
-            >
-              {issue?.cover && (
-                <div className={styles.coverWrapper}>
-                  <Image
-                    src={issue.cover}
-                    alt={issue.title}
-                    fill
-                    className={styles.coverImage}
-                    priority
-                    style={{ objectFit: "cover" }}
-                  />
-                </div>
-              )}
-              <div className={styles.infoSection}>
-                <div className={styles.titleContainer}>
-                  <SerifText className={styles.title}>{article.title}</SerifText>
-                  {/* Mobile: Toggle button for transcript */}
-                  {isMobile && (
-                    <div className={styles.transcriptToggleContainer}>
-                      <Button
-                        variants="unstyled"
-                        onClick={() => setShowTranscriptMobile(!showTranscriptMobile)}
-                        className={styles.transcriptToggleButton}
-                        aria-label={
-                          showTranscriptMobile ? "Chiudi transcript" : "Mostra transcript"
-                        }
-                      >
-                        {showTranscriptMobile ? (
-                          <X className={styles.transcriptToggleIcon} />
-                        ) : (
-                          <FileText className={styles.transcriptToggleIcon} />
-                        )}
-                      </Button>
-                    </div>
-                  )}
-                </div>
+        <div className={styles.headerSection}>
+          {issue?.cover && (
+            <div className={styles.coverWrapper}>
+              <Image
+                src={issue.cover}
+                alt={issue.title}
+                fill
+                className={styles.coverImage}
+                priority
+                style={{ objectFit: "cover" }}
+              />
+            </div>
+          )}
+          <div className={styles.infoSection}>
+            <div className={styles.infoContainer}>
+              <div className={styles.textContainer}>
+                <SerifText className={styles.textTitle}>{article.title}</SerifText>
                 {author && (
-                  <MonoTextLight className={styles.author}>
+                  <MonoTextLight className={styles.textAuthor}>
                     {author.name} • {formatDateByLang(article.date, lang, isMobile)}
                   </MonoTextLight>
                 )}
@@ -499,9 +469,32 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
                   <MonoTextLight className={styles.category}>{category.name}</MonoTextLight>
                 )}
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.progressContainer}>
+          <MonoTextLight className={styles.time}>{formatTime(currentTime)}</MonoTextLight>
+          <input
+            type="range"
+            min={0}
+            max={Math.max(totalPositions - 1, 0)}
+            step={1}
+            value={currentPosition}
+            onChange={handleRangeInput}
+            onInput={handleRangeInput}
+            onMouseDown={handleMouseDown}
+            onMouseUp={handleMouseUp}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            className={styles.progressBar}
+            aria-label="Posizione nel podcast"
+            style={{
+              background: `linear-gradient(to right, var(--tertiary) 0%, var(--tertiary) ${totalPositions > 0 ? (currentPosition / Math.max(totalPositions - 1, 1)) * 100 : 0}%, var(--secondary) ${totalPositions > 0 ? (currentPosition / Math.max(totalPositions - 1, 1)) * 100 : 0}%, var(--secondary) 100%)`,
+            }}
+          />
+          <MonoTextLight className={styles.time}>{formatTime(totalTime)}</MonoTextLight>
+        </div>
 
         {/* Player Section */}
         <div className={styles.playerSection}>
@@ -518,13 +511,7 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
                 </Button>
                 {/* Volume Control - Absolute Positioned */}
                 {showVolumeControl && (
-                  <div
-                    ref={volumeControlRef}
-                    className={cn(
-                      styles.volumeControlContainer,
-                      isMobile && showTranscriptMobile ? styles.volumeControlContainerBottom : "",
-                    )}
-                  >
+                  <div ref={volumeControlRef} className={styles.volumeControlContainer}>
                     <VerticalRange
                       min={0}
                       max={100}
@@ -575,17 +562,11 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
                   className={styles.controlButton}
                   aria-label="Velocità di riproduzione"
                 >
-                  <Gauge className={styles.icon} />
+                  <Zap className={styles.icon} />
                 </Button>
                 {/* Speed Control - Absolute Positioned */}
                 {showSpeedControl && (
-                  <div
-                    ref={speedControlRef}
-                    className={cn(
-                      styles.speedControlContainer,
-                      isMobile && showTranscriptMobile ? styles.speedControlContainerBottom : "",
-                    )}
-                  >
+                  <div ref={speedControlRef} className={styles.speedControlContainer}>
                     <VerticalRange
                       min={0.5}
                       max={2}
@@ -599,87 +580,41 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
               </div>
             </div>
           </div>
-
-          <div className={styles.progressContainer}>
-            <MonoTextLight className={styles.time}>{formatTime(currentTime)}</MonoTextLight>
-            <input
-              type="range"
-              min={0}
-              max={Math.max(totalPositions - 1, 0)}
-              step={1}
-              value={currentPosition}
-              onChange={handleRangeInput}
-              onInput={handleRangeInput}
-              onMouseDown={handleMouseDown}
-              onMouseUp={handleMouseUp}
-              onTouchStart={handleTouchStart}
-              onTouchEnd={handleTouchEnd}
-              className={styles.progressBar}
-              aria-label="Posizione nel podcast"
-              style={{
-                background: `linear-gradient(to right, var(--tertiary) 0%, var(--tertiary) ${totalPositions > 0 ? (currentPosition / Math.max(totalPositions - 1, 1)) * 100 : 0}%, var(--secondary) ${totalPositions > 0 ? (currentPosition / Math.max(totalPositions - 1, 1)) * 100 : 0}%, var(--secondary) 100%)`,
-              }}
-            />
-            <MonoTextLight className={styles.time}>{formatTime(totalTime)}</MonoTextLight>
-          </div>
         </div>
       </div>
 
       {/* Bottom Grid: Transcript */}
       {segments.length > 0 && (
-        <AnimatePresence>
-          {(!isMobile || showTranscriptMobile) && (
-            <motion.div
-              initial={isMobile ? { y: "100%", opacity: 0 } : { y: 0, opacity: 1 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={isMobile ? { y: "100%", opacity: 0 } : { y: 0, opacity: 0 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-              className={styles.transcriptSection}
-            >
-              {/* Mobile: Close button */}
-              {isMobile && (
-                <div className={styles.transcriptCloseContainer}>
-                  <Button
-                    variants="unstyled"
-                    onClick={() => setShowTranscriptMobile(false)}
-                    className={styles.transcriptCloseButton}
-                    aria-label="Chiudi transcript"
-                  >
-                    <X className={styles.transcriptCloseIcon} />
-                  </Button>
-                </div>
-              )}
-              <div ref={transcriptContainerRef} className={styles.transcriptContent}>
-                {segments.map((segment, index) => {
-                  const isActive = index === currentSegmentIndex;
-                  const isPrevious = index === currentSegmentIndex - 1;
-                  const isNext = index === currentSegmentIndex + 1;
+        <div className={styles.transcriptSection}>
+          <div ref={transcriptContainerRef} className={styles.transcriptContent}>
+            {segments.map((segment, index) => {
+              const isActive = index === currentSegmentIndex;
+              const isPrevious = index === currentSegmentIndex - 1;
+              const isNext = index === currentSegmentIndex + 1;
 
-                  return (
-                    <div
-                      key={segment.id}
-                      ref={isActive ? activeSegmentRef : null}
-                      className={styles.segmentWrapper}
-                    >
-                      <SerifText
-                        className={
-                          isActive
-                            ? styles.segmentActive
-                            : isPrevious || isNext
-                              ? styles.segmentFade
-                              : styles.segment
-                        }
-                      >
-                        {segment.text}
-                      </SerifText>
-                    </div>
-                  );
-                })}
-              </div>
-              <div className={styles.transcriptFadeBottom} />
-            </motion.div>
-          )}
-        </AnimatePresence>
+              return (
+                <div
+                  key={segment.id}
+                  ref={isActive ? activeSegmentRef : null}
+                  className={styles.segmentWrapper}
+                >
+                  <SerifText
+                    className={
+                      isActive
+                        ? styles.segmentActive
+                        : isPrevious || isNext
+                          ? styles.segmentFade
+                          : styles.segment
+                    }
+                  >
+                    {segment.text}
+                  </SerifText>
+                </div>
+              );
+            })}
+          </div>
+          <div className={styles.transcriptFadeBottom} />
+        </div>
       )}
     </div>
   );
