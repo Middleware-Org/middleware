@@ -46,7 +46,7 @@ export default function AuthorsList({ authors }: AuthorsListProps) {
       {authors.map((author) => {
         const isActive = activeAuthor === author.slug;
         return (
-          <div key={author.slug} className={styles.item}>
+        <div key={author.slug} className={styles.item}>
             <Link
               href={`?author=${author.slug}`}
               onClick={handleAuthorClick}
@@ -55,9 +55,9 @@ export default function AuthorsList({ authors }: AuthorsListProps) {
               <MonoTextLight className={cn(styles.buttonText, isActive ? "text-tertiary" : "")}>
                 {author.name}
               </MonoTextLight>
-            </Link>
-            <Separator />
-          </div>
+          </Link>
+          <Separator />
+        </div>
         );
       })}
     </div>
