@@ -25,6 +25,7 @@ import baseStyles from "../../styles";
 import type { Page } from "@/lib/github/types";
 import { usePages } from "@/hooks/swr";
 import { mutate } from "swr";
+import { emitGitOperationSuccess } from "@/lib/utils/gitEvents";
 
 /* **************************************************
  * Column Configuration
@@ -104,6 +105,7 @@ export default function PageListClient() {
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/pages");
         mutate(`/api/pages/${slug}`);
+        emitGitOperationSuccess();
       }
     });
   }

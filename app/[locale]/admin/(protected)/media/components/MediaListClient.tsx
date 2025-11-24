@@ -12,6 +12,7 @@ import baseStyles from "../../styles";
 import Image from "next/image";
 import { useMedia } from "@/hooks/swr";
 import { mutate } from "swr";
+import { emitGitOperationSuccess } from "@/lib/utils/gitEvents";
 
 /* **************************************************
  * Media List Client Component
@@ -41,6 +42,7 @@ export default function MediaListClient() {
       } else {
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/media");
+        emitGitOperationSuccess();
       }
     });
   }

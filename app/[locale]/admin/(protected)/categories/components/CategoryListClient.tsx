@@ -25,6 +25,7 @@ import baseStyles from "../../styles";
 import type { Category } from "@/lib/github/types";
 import { useCategories } from "@/hooks/swr";
 import { mutate } from "swr";
+import { emitGitOperationSuccess } from "@/lib/utils/gitEvents";
 
 /* **************************************************
  * Column Configuration
@@ -109,6 +110,7 @@ export default function CategoryListClient() {
       } else {
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/categories");
+        emitGitOperationSuccess();
       }
     });
   }
@@ -193,51 +195,51 @@ export default function CategoryListClient() {
 
       {/* Table */}
       <div className={baseStyles.tableContainer}>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                {visibleColumnConfigs.map((column) => {
-                  if (column.key === "actions") {
-                    return (
-                      <th key={column.key} className={baseStyles.tableHeaderCell}>
-                        {column.label}
-                      </th>
-                    );
-                  }
+        <Table>
+          <TableHeader>
+            <TableRow>
+              {visibleColumnConfigs.map((column) => {
+                if (column.key === "actions") {
                   return (
-                    <SortableHeader
-                      key={column.key}
-                      sortKey={column.key}
-                      currentSort={sort || undefined}
-                      onSort={setSort}
-                    >
+                    <th key={column.key} className={baseStyles.tableHeaderCell}>
                       {column.label}
-                    </SortableHeader>
+                    </th>
                   );
-                })}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {tableData.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                  colSpan={visibleColumnConfigs.length}
-                    className={baseStyles.tableEmptyCell}
+                }
+                return (
+                  <SortableHeader
+                    key={column.key}
+                    sortKey={column.key}
+                    currentSort={sort || undefined}
+                    onSort={setSort}
                   >
-                    Nessuna categoria trovata
-                  </TableCell>
-                </TableRow>
-              ) : (
-                tableData.map((category) => (
+                    {column.label}
+                  </SortableHeader>
+                );
+              })}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {tableData.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={visibleColumnConfigs.length}
+                  className={baseStyles.tableEmptyCell}
+                >
+                  Nessuna categoria trovata
+                </TableCell>
+              </TableRow>
+            ) : (
+              tableData.map((category) => (
                 <TableRow key={category.slug}>
-                    {visibleColumnConfigs.map((column) => (
-                      <Fragment key={column.key}>{renderCell(category, column.key)}</Fragment>
-                    ))}
+                  {visibleColumnConfigs.map((column) => (
+                    <Fragment key={column.key}>{renderCell(category, column.key)}</Fragment>
+                  ))}
                 </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+              ))
+            )}
+          </TableBody>
+        </Table>
 
         {/* Pagination */}
         {totalPages > 1 && (

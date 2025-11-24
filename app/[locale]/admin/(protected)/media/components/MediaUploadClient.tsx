@@ -4,16 +4,15 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import type { ActionResult } from "../actions";
 import styles from "../styles";
 import Image from "next/image";
+import { emitGitOperationSuccess } from "@/lib/utils/gitEvents";
 
 /* **************************************************
  * Media Upload Client Component
  **************************************************/
 export default function MediaUploadClient() {
-  const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -111,6 +110,7 @@ export default function MediaUploadClient() {
         // Invalida la cache SWR per forzare il refetch
         const { mutate } = await import("swr");
         mutate("/api/media");
+        emitGitOperationSuccess();
         setTimeout(() => {
           handleRemove();
           formRef.current?.reset();

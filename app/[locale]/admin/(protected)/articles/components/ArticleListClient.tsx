@@ -25,6 +25,7 @@ import baseStyles from "../../styles";
 import type { Article } from "@/lib/github/types";
 import { useArticles } from "@/hooks/swr";
 import { mutate } from "swr";
+import { emitGitOperationSuccess } from "@/lib/utils/gitEvents";
 
 /* **************************************************
  * Column Configuration
@@ -108,6 +109,7 @@ export default function ArticleListClient() {
       } else {
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/articles");
+        emitGitOperationSuccess();
       }
     });
   }

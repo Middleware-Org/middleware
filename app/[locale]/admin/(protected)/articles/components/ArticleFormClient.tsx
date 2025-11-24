@@ -14,7 +14,7 @@ import baseStyles from "../../styles";
 import type { Article } from "@/lib/github/types";
 import { useArticle, useAuthors, useCategories, useIssues } from "@/hooks/swr";
 import { mutate } from "swr";
-
+import { emitGitOperationSuccess } from "@/lib/utils/gitEvents";
 // Import dinamico per evitare problemi SSR con Tiptap
 const MarkdownEditor = dynamic(() => import("./MarkdownEditor"), {
   ssr: false,
@@ -94,6 +94,7 @@ export default function ArticleFormClient({ articleSlug }: ArticleFormClientProp
       if (editing && articleSlug) {
         mutate(`/api/articles/${articleSlug}`);
       }
+      emitGitOperationSuccess();
       router.push("/admin/articles");
     }
   }, [state, router, editing, articleSlug]);
