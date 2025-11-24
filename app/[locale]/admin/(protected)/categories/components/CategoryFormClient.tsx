@@ -20,7 +20,6 @@ import baseStyles from "../../styles";
 import type { Category } from "@/lib/github/types";
 import { useCategory } from "@/hooks/swr";
 import { mutate } from "swr";
-import { emitGitOperationSuccess } from "@/lib/utils/gitEvents";
 
 /* **************************************************
  * Types
@@ -92,8 +91,7 @@ export default function CategoryFormClient({ categorySlug }: CategoryFormClientP
       if (editing && categorySlug) {
         mutate(`/api/categories/${categorySlug}`);
       }
-      // Emit event to trigger merge status check
-      emitGitOperationSuccess();
+      mutate("/api/github/merge/check");
       router.push("/admin/categories");
     }
   }, [state, router, editing, categorySlug]);
@@ -135,7 +133,7 @@ export default function CategoryFormClient({ categorySlug }: CategoryFormClientP
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/categories");
         mutate(`/api/categories/${categorySlug}`);
-        emitGitOperationSuccess();
+        mutate("/api/github/merge/check");
         router.push("/admin/categories");
       }
     });

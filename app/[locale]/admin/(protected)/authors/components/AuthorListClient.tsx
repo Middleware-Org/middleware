@@ -25,7 +25,6 @@ import baseStyles from "../../styles";
 import type { Author } from "@/lib/github/types";
 import { useAuthors } from "@/hooks/swr";
 import { mutate } from "swr";
-import { emitGitOperationSuccess } from "@/lib/utils/gitEvents";
 
 /* **************************************************
  * Column Configuration
@@ -110,7 +109,7 @@ export default function AuthorListClient() {
       } else {
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/authors");
-        emitGitOperationSuccess();
+        mutate("/api/github/merge/check");
       }
     });
   }
