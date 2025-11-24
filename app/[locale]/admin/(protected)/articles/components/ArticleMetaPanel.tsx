@@ -4,8 +4,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
+import { Sparkles } from "lucide-react";
 import { deleteArticleAction } from "../actions";
+import ConfirmDialog from "@/components/molecules/confirmDialog";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Article } from "@/lib/github/types";
@@ -42,6 +44,21 @@ interface ArticleMetaPanelProps {
 /* **************************************************
  * Article Meta Panel Component
  **************************************************/
+/* **************************************************
+ * Slug Generation Utility (Client-side)
+ **************************************************/
+function generateSlug(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .normalize("NFD") // Normalize to decomposed form for handling accents
+    .replace(/[\u0300-\u036f]/g, "") // Remove diacritics
+    .replace(/[^a-z0-9\s-]/g, "") // Remove special characters except spaces and hyphens
+    .replace(/\s+/g, "-") // Replace spaces with hyphens
+    .replace(/-+/g, "-") // Replace multiple hyphens with single hyphen
+    .replace(/^-|-$/g, ""); // Remove leading/trailing hyphens
+}
+
 export default function ArticleMetaPanel({
   article,
   categories,
@@ -57,17 +74,53 @@ export default function ArticleMetaPanel({
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
   const [isAudioSelectorOpen, setIsAudioSelectorOpen] = useState(false);
   const [isAudioChunksSelectorOpen, setIsAudioChunksSelectorOpen] = useState(false);
+  const [isDeleting, startDeleteTransition] = useTransition();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [slugValue, setSlugValue] = useState(article?.slug || "");
 
-  async function handleDelete() {
+  // Sync slug value when article changes
+  useEffect(() => {
+    if (article?.slug) {
+      setSlugValue(article.slug);
+    }
+  }, [article?.slug]);
+
+  // Update hidden input when slugValue changes
+  useEffect(() => {
+    const slugInput = formRef.current?.querySelector('input[name="newSlug"]') as HTMLInputElement;
+    if (slugInput) {
+      slugInput.value = slugValue;
+    }
+  }, [slugValue, formRef]);
+
+  // Handler per generare lo slug dal titolo
+  function handleGenerateSlug() {
+    if (formData.title) {
+      const generatedSlug = generateSlug(formData.title);
+      setSlugValue(generatedSlug);
+      // Aggiorna anche l'input nel form
+      const slugInput = formRef.current?.querySelector('input[name="newSlug"]') as HTMLInputElement;
+      if (slugInput) {
+        slugInput.value = generatedSlug;
+      }
+    }
+  }
+
+  // Handler per aprire il dialog di conferma eliminazione
+  function handleDeleteClick() {
+    if (article) {
+      setIsDeleteDialogOpen(true);
+    }
+  }
+
+  // Handler per confermare l'eliminazione
+  async function handleDeleteConfirm() {
     if (!article) return;
 
-    if (!confirm(`Sei sicuro di voler eliminare l&apos;articolo "${article.title}"?`)) {
-      return;
-    }
-
     setError(null);
+    setIsDeleteDialogOpen(false);
 
-    startTransition(async () => {
+    startDeleteTransition(async () => {
       const result = await deleteArticleAction(article.slug);
 
       if (!result.success) {
@@ -76,7 +129,7 @@ export default function ArticleMetaPanel({
           type: result.errorType || "error",
         });
       } else {
-        // Invalida la cache SWR per forzare il refetch della lista
+        // Invalida la cache SWR per forzare il refetch
         mutate("/api/articles");
         mutate(`/api/articles/${article.slug}`);
         router.push("/admin/articles");
@@ -107,14 +160,29 @@ export default function ArticleMetaPanel({
           <label htmlFor="newSlug" className={styles.label}>
             Slug {editing ? "(modificabile)" : "(opzionale)"}
           </label>
-          <input
-            id="newSlug"
-            name="newSlug"
-            type="text"
-            defaultValue={article?.slug || ""}
-            placeholder={editing ? article?.slug || "auto-generato se vuoto" : "auto-generato se vuoto"}
-            className={styles.input}
-          />
+          <div className="relative">
+            <input
+              id="newSlug"
+              name="newSlug"
+              type="text"
+              value={slugValue}
+              onChange={(e) => {
+                setSlugValue(e.target.value);
+              }}
+              placeholder={
+                editing ? article?.slug || "auto-generato se vuoto" : "auto-generato se vuoto"
+              }
+              className={styles.input}
+            />
+            <button
+              type="button"
+              onClick={handleGenerateSlug}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 hover:bg-tertiary/10 rounded transition-colors duration-150"
+              title="Genera slug dal titolo"
+            >
+              <Sparkles className="w-4 h-4 text-secondary" />
+            </button>
+          </div>
           {editing && (
             <input type="hidden" name="slug" value={article?.slug || ""} />
           )}
@@ -329,26 +397,41 @@ export default function ArticleMetaPanel({
           >
             Annulla
           </button>
-        </div>
-
-        {editing && article && (
-          <>
-            {error && (
-              <div
-                className={`mt-4 ${error.type === "warning" ? styles.errorWarning : styles.error}`}
+          {editing && (
+            <div className="flex justify-end w-full">
+              <button
+                type="button"
+                onClick={handleDeleteClick}
+                className={styles.deleteButton}
+                disabled={isDeleting}
               >
-                ⚠️ {error.message}
-              </div>
-            )}
-            <div className="mt-4 pt-4 border-t border-secondary">
-              <h4 className="text-sm font-semibold mb-2 text-tertiary">Zona Pericolosa</h4>
-              <button onClick={handleDelete} className={styles.deleteButton} disabled={isPending}>
-                {isPending ? "Eliminazione..." : "Elimina Articolo"}
+                Elimina
               </button>
             </div>
-          </>
+          )}
+        </div>
+
+        {editing && article && error && (
+          <div className={`mt-4 ${error.type === "warning" ? styles.errorWarning : styles.error}`}>
+            ⚠️ {error.message}
+          </div>
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      {editing && article && (
+        <ConfirmDialog
+          isOpen={isDeleteDialogOpen}
+          onClose={() => setIsDeleteDialogOpen(false)}
+          onConfirm={handleDeleteConfirm}
+          title="Elimina Articolo"
+          message={`Sei sicuro di voler eliminare l'articolo "${article.title}"? Questa azione non può essere annullata.`}
+          confirmText="Elimina"
+          cancelText="Annulla"
+          confirmButtonClassName={styles.deleteButton}
+          isLoading={isDeleting}
+        />
+      )}
     </div>
   );
 }

@@ -34,11 +34,6 @@ export async function getAllAuthors(): Promise<Author[]> {
   const validAuthors = authors.filter((author): author is Author => author !== null);
 
   return validAuthors.sort((a, b) => {
-    const orderA = a.order ?? Infinity;
-    const orderB = b.order ?? Infinity;
-    if (orderA !== orderB) {
-      return orderA - orderB;
-    }
     return a.name.localeCompare(b.name);
   });
 }
@@ -67,31 +62,19 @@ export async function createAuthor(author: Omit<Author, "slug"> & { slug?: strin
   // Ensure slug is unique
   const slug = await generateUniqueSlug("content/authors", baseSlug, ".json");
 
-  // Se order non è specificato, assegna l'ultimo order + 1
-  let order = author.order;
-  if (order === undefined) {
-    const allAuthors = await getAllAuthors();
-    const maxOrder = allAuthors.reduce((max, auth) => {
-      const authOrder = auth.order ?? 0;
-      return Math.max(max, authOrder);
-    }, -1);
-    order = maxOrder + 1;
-  }
-
   const filePath = `content/authors/${slug}.json`;
   const content = JSON.stringify(
     {
       slug,
       name: author.name,
       description: author.description,
-      order,
     },
     null,
     2,
   );
 
   await createOrUpdateFile(filePath, content, `Create author: ${author.name}`);
-  return { ...author, slug, order };
+  return { ...author, slug };
 }
 
 export async function updateAuthor(
@@ -114,7 +97,6 @@ export async function updateAuthor(
     slug: finalSlug,
     name: author.name ?? existing.name,
     description: author.description ?? existing.description,
-    order: author.order !== undefined ? author.order : existing.order,
   };
 
   const content = JSON.stringify(updated, null, 2);
@@ -152,25 +134,4 @@ export async function deleteAuthor(slug: string) {
   // Se non ci sono articoli che usano l'autore, procedi con l'eliminazione
   const filePath = `content/authors/${slug}.json`;
   await deleteFile(filePath, `Delete author: ${slug}`);
-}
-
-export async function updateAuthorsOrder(slugs: string[]): Promise<void> {
-  // Aggiorna l'order di tutti gli autori in base alla nuova posizione
-  const updatePromises = slugs.map(async (slug, index) => {
-    const author = await getAuthorBySlug(slug);
-    if (!author) {
-      throw new Error(`Author ${slug} not found`);
-    }
-
-    const updated: Author = {
-      ...author,
-      order: index,
-    };
-
-    const filePath = `content/authors/${slug}.json`;
-    const content = JSON.stringify(updated, null, 2);
-    await createOrUpdateFile(filePath, content, `Update author order: ${author.name}`);
-  });
-
-  await Promise.all(updatePromises);
 }

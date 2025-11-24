@@ -49,14 +49,14 @@ export default async function CategoriesPage({ params }: CategoriesPageProps) {
         </div>
 
         <div className={styles.content}>
-          {categories.map((category) => (
-            <Category
-              key={category.slug}
-              category={category}
-              dictCommon={dictCommon}
-              dictCategories={dictCategories}
-            />
-          ))}
+        {categories.map((category) => (
+          <Category
+            key={category.slug}
+            category={category}
+            dictCommon={dictCommon}
+            dictCategories={dictCategories}
+          />
+        ))}
         </div>
       </div>
     </div>

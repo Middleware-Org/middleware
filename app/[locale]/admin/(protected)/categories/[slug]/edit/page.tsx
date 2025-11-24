@@ -7,7 +7,6 @@ import { redirect, notFound } from "next/navigation";
 import { getUser } from "@/lib/auth/server";
 import { getCategoryBySlug } from "@/lib/github/categories";
 import CategoryFormClient from "../../components/CategoryFormClient";
-import CategoryDeleteButton from "../../components/CategoryDeleteButton";
 import CategoryEditSkeleton from "../../components/CategoryEditSkeleton";
 import styles from "../../styles";
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
@@ -52,9 +51,6 @@ export default async function EditCategoryPage({ params }: EditCategoryPageProps
 
       <Suspense fallback={<CategoryEditSkeleton />}>
           <CategoryFormClient categorySlug={slug} />
-        <div className="mt-6">
-            <CategoryDeleteButton categorySlug={slug} />
-        </div>
       </Suspense>
     </main>
     </SWRPageProvider>

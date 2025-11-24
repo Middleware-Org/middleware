@@ -3,13 +3,21 @@
  **************************************************/
 "use client";
 
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState, useMemo, useTransition } from "react";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { useRouter } from "next/navigation";
-import { createIssueAction, updateIssueAction, type ActionResult } from "../actions";
+import { Sparkles } from "lucide-react";
+import {
+  createIssueAction,
+  updateIssueAction,
+  deleteIssueAction,
+  type ActionResult,
+} from "../actions";
 import { getGitHubImageUrl } from "@/lib/github/images";
+import ConfirmDialog from "@/components/molecules/confirmDialog";
 import styles from "../styles";
+import baseStyles from "../../styles";
 import type { Issue } from "@/lib/github/types";
 import Image from "next/image";
 import { useIssue } from "@/hooks/swr";
@@ -21,6 +29,21 @@ import { mutate } from "swr";
  **************************************************/
 interface IssueFormClientProps {
   issueSlug?: string; // Slug per edit mode
+}
+
+/* **************************************************
+ * Slug Generation Utility (Client-side)
+ **************************************************/
+function generateSlug(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .normalize("NFD") // Normalize to decomposed form for handling accents
+    .replace(/[\u0300-\u036f]/g, "") // Remove diacritics
+    .replace(/[^a-z0-9\s-]/g, "") // Remove special characters except spaces and hyphens
+    .replace(/\s+/g, "-") // Replace spaces with hyphens
+    .replace(/-+/g, "-") // Replace multiple hyphens with single hyphen
+    .replace(/^-|-$/g, ""); // Remove leading/trailing hyphens
 }
 
 /* **************************************************
@@ -152,6 +175,15 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
     null,
   );
 
+  // State per il campo slug (per poterlo aggiornare dinamicamente)
+  const [slugValue, setSlugValue] = useState(issue?.slug || "");
+  const [deleteError, setDeleteError] = useState<{
+    message: string;
+    type: "error" | "warning";
+  } | null>(null);
+  const [isDeleting, startDeleteTransition] = useTransition();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
   // Sincronizza coverImage con issue quando viene caricato (solo se coverImage è ancora vuoto)
   useEffect(() => {
     if (issue?.cover && !coverImage) {
@@ -183,11 +215,59 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
     }
   }, [coverImage]);
 
+  // Handler per generare lo slug dal titolo
+  function handleGenerateSlug() {
+    const titleInput = formRef.current?.querySelector('input[name="title"]') as HTMLInputElement;
+    const title = titleInput?.value?.trim();
+
+    if (title) {
+      const generatedSlug = generateSlug(title);
+      setSlugValue(generatedSlug);
+    }
+  }
+
+  // Handler per aprire il dialog di conferma eliminazione
+  function handleDeleteClick() {
+    if (issue) {
+      setIsDeleteDialogOpen(true);
+    }
+  }
+
+  // Handler per confermare l'eliminazione
+  async function handleDeleteConfirm() {
+    if (!issueSlug || !issue) return;
+
+    setDeleteError(null);
+    setIsDeleteDialogOpen(false);
+
+    startDeleteTransition(async () => {
+      const result = await deleteIssueAction(issueSlug);
+
+      if (!result.success) {
+        setDeleteError({
+          message: result.error,
+          type: result.errorType || "error",
+        });
+      } else {
+        // Invalida la cache SWR per forzare il refetch
+        mutate("/api/issues");
+        mutate(`/api/issues/${issueSlug}`);
+        router.push("/admin/issues");
+      }
+    });
+  }
+
   return (
     <>
       {state && !state.success && (
         <div className={state.errorType === "warning" ? styles.errorWarning : styles.error}>
           {state.error}
+        </div>
+      )}
+
+      {deleteError && (
+        <div className={deleteError.type === "warning" ? styles.errorWarning : styles.error}>
+          ⚠️ {deleteError.message}
         </div>
       )}
 
@@ -270,31 +350,69 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
           <label htmlFor={editing ? "newSlug" : "slug"} className={styles.label}>
             Slug {editing ? "(modificabile)" : "(opzionale)"}
           </label>
-          <input
-            id={editing ? "newSlug" : "slug"}
-            name={editing ? "newSlug" : "slug"}
-            type="text"
-            defaultValue={issue?.slug || ""}
-            className={styles.input}
-            placeholder={
-              editing ? issue?.slug || "auto-generato se vuoto" : "auto-generato se vuoto"
-            }
-          />
+          <div className="relative">
+            <input
+              id={editing ? "newSlug" : "slug"}
+              name={editing ? "newSlug" : "slug"}
+              type="text"
+              value={slugValue}
+              onChange={(e) => setSlugValue(e.target.value)}
+              className={styles.input}
+              placeholder={
+                editing ? issue?.slug || "auto-generato se vuoto" : "auto-generato se vuoto"
+              }
+            />
+            <button
+              type="button"
+              onClick={handleGenerateSlug}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 hover:bg-tertiary/10 rounded transition-colors duration-150"
+              title="Genera slug dal titolo"
+            >
+              <Sparkles className="w-4 h-4 text-secondary" />
+            </button>
+          </div>
         </div>
 
         <div className={styles.formActions}>
           <SubmitButton editing={editing} />
           {editing && (
-            <button
-              type="button"
-              onClick={() => router.push("/admin/issues")}
-              className={styles.cancelButton}
-            >
-              Annulla
-            </button>
+            <>
+              <button
+                type="button"
+                onClick={() => router.push("/admin/issues")}
+                className={styles.cancelButton}
+              >
+                Annulla
+              </button>
+              <div className="flex justify-end w-full">
+                <button
+                  type="button"
+                  onClick={handleDeleteClick}
+                  className={styles.deleteButton}
+                  disabled={isDeleting}
+                >
+                  Elimina
+                </button>
+              </div>
+            </>
           )}
         </div>
       </form>
+
+      {/* Delete Confirmation Dialog */}
+      {editing && issue && (
+        <ConfirmDialog
+          isOpen={isDeleteDialogOpen}
+          onClose={() => setIsDeleteDialogOpen(false)}
+          onConfirm={handleDeleteConfirm}
+          title="Elimina Issue"
+          message={`Sei sicuro di voler eliminare l'issue "${issue.title}"? Questa azione non può essere annullata.`}
+          confirmText="Elimina"
+          cancelText="Annulla"
+          confirmButtonClassName={styles.deleteButton}
+          isLoading={isDeleting}
+        />
+      )}
     </>
   );
 }

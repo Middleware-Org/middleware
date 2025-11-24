@@ -7,7 +7,6 @@ import { redirect, notFound } from "next/navigation";
 import { getUser } from "@/lib/auth/server";
 import { getIssueBySlug } from "@/lib/github/issues";
 import IssueFormClient from "../../components/IssueFormClient";
-import IssueDeleteButton from "../../components/IssueDeleteButton";
 import IssueEditSkeleton from "../../components/IssueEditSkeleton";
 import styles from "../../styles";
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
@@ -52,9 +51,6 @@ export default async function EditIssuePage({ params }: EditIssuePageProps) {
 
         <Suspense fallback={<IssueEditSkeleton />}>
           <IssueFormClient issueSlug={slug} />
-          <div className="mt-6">
-            <IssueDeleteButton issueSlug={slug} />
-          </div>
         </Suspense>
       </main>
     </SWRPageProvider>

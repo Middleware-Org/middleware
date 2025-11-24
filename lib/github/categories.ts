@@ -1,7 +1,13 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { createOrUpdateFile, deleteFile, getFileContent, listDirectoryFiles, renameFile } from "./client";
+import {
+  createOrUpdateFile,
+  deleteFile,
+  getFileContent,
+  listDirectoryFiles,
+  renameFile,
+} from "./client";
 import { getAllArticles } from "./articles";
 import { generateSlug, generateUniqueSlug } from "./utils";
 import type { Category } from "./types";
@@ -34,11 +40,6 @@ export async function getAllCategories(): Promise<Category[]> {
   const validCategories = categories.filter((cat): cat is Category => cat !== null);
 
   return validCategories.sort((a, b) => {
-    const orderA = a.order ?? Infinity;
-    const orderB = b.order ?? Infinity;
-    if (orderA !== orderB) {
-      return orderA - orderB;
-    }
     return a.name.localeCompare(b.name);
   });
 }
@@ -67,31 +68,19 @@ export async function createCategory(category: Omit<Category, "slug"> & { slug?:
   // Ensure slug is unique
   const slug = await generateUniqueSlug("content/categories", baseSlug, ".json");
 
-  // Se order non è specificato, assegna l'ultimo order + 1
-  let order = category.order;
-  if (order === undefined) {
-    const allCategories = await getAllCategories();
-    const maxOrder = allCategories.reduce((max, cat) => {
-      const catOrder = cat.order ?? 0;
-      return Math.max(max, catOrder);
-    }, -1);
-    order = maxOrder + 1;
-  }
-
   const filePath = `content/categories/${slug}.json`;
   const content = JSON.stringify(
     {
       slug,
       name: category.name,
       description: category.description,
-      order,
     },
     null,
     2,
   );
 
   await createOrUpdateFile(filePath, content, `Create category: ${category.name}`);
-  return { ...category, slug, order };
+  return { ...category, slug };
 }
 
 export async function updateCategory(
@@ -114,7 +103,6 @@ export async function updateCategory(
     slug: finalSlug,
     name: category.name ?? existing.name,
     description: category.description ?? existing.description,
-    order: category.order !== undefined ? category.order : existing.order,
   };
 
   const content = JSON.stringify(updated, null, 2);
@@ -123,7 +111,12 @@ export async function updateCategory(
 
   // Se lo slug è cambiato, rinomina il file, altrimenti aggiorna normalmente
   if (finalSlug !== slug) {
-    await renameFile(oldFilePath, newFilePath, content, `Rename category: ${updated.name} (${slug} -> ${finalSlug})`);
+    await renameFile(
+      oldFilePath,
+      newFilePath,
+      content,
+      `Rename category: ${updated.name} (${slug} -> ${finalSlug})`,
+    );
   } else {
     await createOrUpdateFile(newFilePath, content, `Update category: ${updated.name}`);
   }
@@ -152,25 +145,4 @@ export async function deleteCategory(slug: string) {
   // Se non ci sono articoli che usano la categoria, procedi con l'eliminazione
   const filePath = `content/categories/${slug}.json`;
   await deleteFile(filePath, `Delete category: ${slug}`);
-}
-
-export async function updateCategoriesOrder(slugs: string[]): Promise<void> {
-  // Aggiorna l'order di tutte le categorie in base alla nuova posizione
-  const updatePromises = slugs.map(async (slug, index) => {
-    const category = await getCategoryBySlug(slug);
-    if (!category) {
-      throw new Error(`Category ${slug} not found`);
-    }
-
-    const updated: Category = {
-      ...category,
-      order: index,
-    };
-
-    const filePath = `content/categories/${slug}.json`;
-    const content = JSON.stringify(updated, null, 2);
-    await createOrUpdateFile(filePath, content, `Update category order: ${category.name}`);
-  });
-
-  await Promise.all(updatePromises);
 }

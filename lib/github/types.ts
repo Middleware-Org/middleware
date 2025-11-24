@@ -30,21 +30,18 @@ export type Issue = {
   cover: string;
   color: string;
   date: string;
-  order?: number;
 };
 
 export type Category = {
   slug: string;
   name: string;
   description: string;
-  order?: number;
 };
 
 export type Author = {
   slug: string;
   name: string;
   description: string;
-  order?: number;
 };
 
 export type Page = {

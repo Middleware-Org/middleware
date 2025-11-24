@@ -4,8 +4,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
+import { Sparkles } from "lucide-react";
 import { deletePageAction } from "../actions";
+import ConfirmDialog from "@/components/molecules/confirmDialog";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Page } from "@/lib/github/types";
@@ -26,6 +28,21 @@ interface PageMetaPanelProps {
 }
 
 /* **************************************************
+ * Slug Generation Utility (Client-side)
+ **************************************************/
+function generateSlug(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .normalize("NFD") // Normalize to decomposed form for handling accents
+    .replace(/[\u0300-\u036f]/g, "") // Remove diacritics
+    .replace(/[^a-z0-9\s-]/g, "") // Remove special characters except spaces and hyphens
+    .replace(/\s+/g, "-") // Replace spaces with hyphens
+    .replace(/-+/g, "-") // Replace multiple hyphens with single hyphen
+    .replace(/^-|-$/g, ""); // Remove leading/trailing hyphens
+}
+
+/* **************************************************
  * Page Meta Panel Component
  **************************************************/
 export default function PageMetaPanel({
@@ -38,17 +55,50 @@ export default function PageMetaPanel({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
+  const [isDeleting, startDeleteTransition] = useTransition();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [slugValue, setSlugValue] = useState(page?.slug || "");
 
-  async function handleDelete() {
+  // Sync slug value when page changes
+  useEffect(() => {
+    if (page?.slug) {
+      setSlugValue(page.slug);
+    }
+  }, [page?.slug]);
+
+  // Update hidden input when slugValue changes
+  useEffect(() => {
+    const slugInput = formRef.current?.querySelector(
+      editing ? 'input[name="newSlug"]' : 'input[name="slug"]',
+    ) as HTMLInputElement;
+    if (slugInput) {
+      slugInput.value = slugValue;
+    }
+  }, [slugValue, formRef, editing]);
+
+  // Handler per generare lo slug dal titolo
+  function handleGenerateSlug() {
+    if (formData.title) {
+      const generatedSlug = generateSlug(formData.title);
+      setSlugValue(generatedSlug);
+    }
+  }
+
+  // Handler per aprire il dialog di conferma eliminazione
+  function handleDeleteClick() {
+    if (page) {
+      setIsDeleteDialogOpen(true);
+    }
+  }
+
+  // Handler per confermare l'eliminazione
+  async function handleDeleteConfirm() {
     if (!page) return;
 
-    if (!confirm(`Sei sicuro di voler eliminare la pagina "${page.title}"?`)) {
-      return;
-    }
-
     setError(null);
+    setIsDeleteDialogOpen(false);
 
-    startTransition(async () => {
+    startDeleteTransition(async () => {
       const result = await deletePageAction(page.slug);
 
       if (!result.success) {
@@ -57,7 +107,7 @@ export default function PageMetaPanel({
           type: result.errorType || "error",
         });
       } else {
-        // Invalida la cache SWR per forzare il refetch della lista
+        // Invalida la cache SWR per forzare il refetch
         mutate("/api/pages");
         mutate(`/api/pages/${page.slug}`);
         router.push("/admin/pages");
@@ -109,16 +159,27 @@ export default function PageMetaPanel({
             Slug {editing ? "(modificabile)" : "(opzionale)"}
           </label>
           {editing && <input type="hidden" name="slug" value={page?.slug} />}
-          <input
-            type="text"
-            id={editing ? "newSlug" : "slug"}
-            name={editing ? "newSlug" : "slug"}
-            defaultValue={editing ? page?.slug : ""}
-            className={styles.input}
-            placeholder={
-              editing ? page?.slug || "auto-generato se vuoto" : "auto-generato se vuoto"
-            }
-          />
+          <div className="relative">
+            <input
+              type="text"
+              id={editing ? "newSlug" : "slug"}
+              name={editing ? "newSlug" : "slug"}
+              value={slugValue}
+              onChange={(e) => setSlugValue(e.target.value)}
+              className={styles.input}
+              placeholder={
+                editing ? page?.slug || "auto-generato se vuoto" : "auto-generato se vuoto"
+              }
+            />
+            <button
+              type="button"
+              onClick={handleGenerateSlug}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 hover:bg-tertiary/10 rounded transition-colors duration-150"
+              title="Genera slug dal titolo"
+            >
+              <Sparkles className="w-4 h-4 text-secondary" />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -144,26 +205,41 @@ export default function PageMetaPanel({
           >
             Annulla
           </button>
-        </div>
-
-        {editing && page && (
-          <>
-            {error && (
-              <div
-                className={`mt-4 ${error.type === "warning" ? baseStyles.errorWarning : baseStyles.error}`}
+          {editing && (
+            <div className="flex justify-end w-full">
+              <button
+                type="button"
+                onClick={handleDeleteClick}
+                className={styles.deleteButton}
+                disabled={isDeleting}
               >
-                ⚠️ {error.message}
-              </div>
-            )}
-            <div className="mt-4 pt-4 border-t border-secondary">
-              <h4 className="text-sm font-semibold mb-2 text-tertiary">Zona Pericolosa</h4>
-              <button onClick={handleDelete} className={styles.deleteButton} disabled={isPending}>
-                {isPending ? "Eliminazione..." : "Elimina Pagina"}
+                Elimina
               </button>
             </div>
-          </>
+          )}
+        </div>
+
+        {editing && page && error && (
+          <div className={`mt-4 ${error.type === "warning" ? baseStyles.errorWarning : baseStyles.error}`}>
+            ⚠️ {error.message}
+          </div>
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      {editing && page && (
+        <ConfirmDialog
+          isOpen={isDeleteDialogOpen}
+          onClose={() => setIsDeleteDialogOpen(false)}
+          onConfirm={handleDeleteConfirm}
+          title="Elimina Pagina"
+          message={`Sei sicuro di voler eliminare la pagina "${page.title || page.slug}"? Questa azione non può essere annullata.`}
+          confirmText="Elimina"
+          cancelText="Annulla"
+          confirmButtonClassName={styles.deleteButton}
+          isLoading={isDeleting}
+        />
+      )}
     </div>
   );
 }

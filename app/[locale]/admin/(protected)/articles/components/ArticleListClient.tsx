@@ -4,7 +4,6 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { useState, useTransition, useMemo, Fragment } from "react";
 import { deleteArticleAction } from "../actions";
 import { useTableState } from "@/hooks/useTableState";
@@ -20,6 +19,7 @@ import {
 } from "@/components/table";
 import { SearchInput } from "@/components/search";
 import { Pagination } from "@/components/pagination";
+import ConfirmDialog from "@/components/molecules/confirmDialog";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Article } from "@/lib/github/types";
@@ -47,6 +47,10 @@ export default function ArticleListClient() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
+  const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; article: Article | null }>({
+    isOpen: false,
+    article: null,
+  });
 
   // Usa SWR per ottenere gli articoli (cache pre-popolata dal server)
   const { articles = [], isLoading } = useArticles();
@@ -82,12 +86,16 @@ export default function ArticleListClient() {
     router.push(`/admin/articles/${article.slug}/edit`);
   }
 
-  async function handleDelete(slug: string, title: string) {
-    if (!confirm(`Sei sicuro di voler eliminare l'articolo "${title}"?`)) {
-      return;
-    }
+  function handleDeleteClick(article: Article) {
+    setDeleteDialog({ isOpen: true, article });
+  }
 
+  async function handleDeleteConfirm() {
+    if (!deleteDialog.article) return;
+
+    const { slug } = deleteDialog.article;
     setError(null);
+    setDeleteDialog({ isOpen: false, article: null });
 
     startTransition(async () => {
       const result = await deleteArticleAction(slug);
@@ -140,13 +148,13 @@ export default function ArticleListClient() {
             <div className={baseStyles.buttonGroup}>
               <button
                 onClick={() => handleEdit(article)}
-                className={styles.submitButton}
+                className={styles.editButton}
                 disabled={isPending}
               >
                 Modifica
               </button>
               <button
-                onClick={() => handleDelete(article.slug, article.title)}
+                onClick={() => handleDeleteClick(article)}
                 className={styles.deleteButton}
                 disabled={isPending}
               >
@@ -192,9 +200,6 @@ export default function ArticleListClient() {
             visibleColumns={visibleColumns}
             onColumnsChange={setVisibleColumns}
           />
-          <Link href="/admin/articles/new" className={baseStyles.newButton}>
-            + Nuovo Articolo
-          </Link>
           <div className={baseStyles.textSecondary}>
             {totalItems} {totalItems === 1 ? "articolo" : "articoli"}
           </div>
@@ -254,6 +259,21 @@ export default function ArticleListClient() {
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setPage} />
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      {deleteDialog.article && (
+        <ConfirmDialog
+          isOpen={deleteDialog.isOpen}
+          onClose={() => setDeleteDialog({ isOpen: false, article: null })}
+          onConfirm={handleDeleteConfirm}
+          title="Elimina Articolo"
+          message={`Sei sicuro di voler eliminare l'articolo "${deleteDialog.article.title}"? Questa azione non può essere annullata.`}
+          confirmText="Elimina"
+          cancelText="Annulla"
+          confirmButtonClassName={styles.deleteButton}
+          isLoading={isPending}
+        />
+      )}
     </div>
   );
 }

@@ -3,11 +3,18 @@
  **************************************************/
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { useRouter } from "next/navigation";
-import { createCategoryAction, updateCategoryAction, type ActionResult } from "../actions";
+import { Sparkles } from "lucide-react";
+import {
+  createCategoryAction,
+  updateCategoryAction,
+  deleteCategoryAction,
+  type ActionResult,
+} from "../actions";
+import ConfirmDialog from "@/components/molecules/confirmDialog";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Category } from "@/lib/github/types";
@@ -19,6 +26,21 @@ import { mutate } from "swr";
  **************************************************/
 interface CategoryFormClientProps {
   categorySlug?: string; // Slug per edit mode
+}
+
+/* **************************************************
+ * Slug Generation Utility (Client-side)
+ **************************************************/
+function generateSlug(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .normalize("NFD") // Normalize to decomposed form for handling accents
+    .replace(/[\u0300-\u036f]/g, "") // Remove diacritics
+    .replace(/[^a-z0-9\s-]/g, "") // Remove special characters except spaces and hyphens
+    .replace(/\s+/g, "-") // Replace spaces with hyphens
+    .replace(/-+/g, "-") // Replace multiple hyphens with single hyphen
+    .replace(/^-|-$/g, ""); // Remove leading/trailing hyphens
 }
 
 /* **************************************************
@@ -50,6 +72,16 @@ export default function CategoryFormClient({ categorySlug }: CategoryFormClientP
     null,
   );
 
+  // State per il campo slug (per poterlo aggiornare dinamicamente)
+  // Initialize with category slug if available
+  const [slugValue, setSlugValue] = useState(category?.slug || "");
+  const [deleteError, setDeleteError] = useState<{
+    message: string;
+    type: "error" | "warning";
+  } | null>(null);
+  const [isDeleting, startDeleteTransition] = useTransition();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
   // Reset form and navigate on success
   useEffect(() => {
     if (state?.success) {
@@ -63,11 +95,59 @@ export default function CategoryFormClient({ categorySlug }: CategoryFormClientP
     }
   }, [state, router, editing, categorySlug]);
 
+  // Handler per generare lo slug dal nome
+  function handleGenerateSlug() {
+    const nameInput = formRef.current?.querySelector('input[name="name"]') as HTMLInputElement;
+    const name = nameInput?.value?.trim();
+
+    if (name) {
+      const generatedSlug = generateSlug(name);
+      setSlugValue(generatedSlug);
+    }
+  }
+
+  // Handler per aprire il dialog di conferma eliminazione
+  function handleDeleteClick() {
+    if (category) {
+      setIsDeleteDialogOpen(true);
+    }
+  }
+
+  // Handler per confermare l'eliminazione
+  async function handleDeleteConfirm() {
+    if (!categorySlug || !category) return;
+
+    setDeleteError(null);
+    setIsDeleteDialogOpen(false);
+
+    startDeleteTransition(async () => {
+      const result = await deleteCategoryAction(categorySlug);
+
+      if (!result.success) {
+        setDeleteError({
+          message: result.error,
+          type: result.errorType || "error",
+        });
+      } else {
+        // Invalida la cache SWR per forzare il refetch
+        mutate("/api/categories");
+        mutate(`/api/categories/${categorySlug}`);
+        router.push("/admin/categories");
+      }
+    });
+  }
+
   return (
     <>
       {state && !state.success && (
         <div className={state.errorType === "warning" ? styles.errorWarning : styles.error}>
           {state.error}
+        </div>
+      )}
+
+      {deleteError && (
+        <div className={deleteError.type === "warning" ? styles.errorWarning : styles.error}>
+          ⚠️ {deleteError.message}
         </div>
       )}
 
@@ -110,33 +190,71 @@ export default function CategoryFormClient({ categorySlug }: CategoryFormClientP
 
         <div className={styles.field}>
           <label htmlFor={editing ? "newSlug" : "slug"} className={styles.label}>
-            Slug {editing ? "(modificabile)" : "(opzionale)"}
+            Slug
           </label>
-          <input
-            id={editing ? "newSlug" : "slug"}
-            name={editing ? "newSlug" : "slug"}
-            type="text"
-            defaultValue={category?.slug || ""}
-            className={styles.input}
-            placeholder={
-              editing ? category?.slug || "auto-generato se vuoto" : "auto-generato se vuoto"
-            }
-          />
+          <div className="relative">
+            <input
+              id={editing ? "newSlug" : "slug"}
+              name={editing ? "newSlug" : "slug"}
+              type="text"
+              value={slugValue}
+              onChange={(e) => setSlugValue(e.target.value)}
+              className={styles.input}
+              placeholder={
+                editing ? category?.slug || "auto-generato se vuoto" : "auto-generato se vuoto"
+              }
+            />
+            <button
+              type="button"
+              onClick={handleGenerateSlug}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 hover:bg-tertiary/10 rounded transition-colors duration-150"
+              title="Genera slug dal nome"
+            >
+              <Sparkles className="w-4 h-4 text-secondary" />
+            </button>
+          </div>
         </div>
 
         <div className={styles.formActions}>
           <SubmitButton editing={editing} />
           {editing && (
-            <button
-              type="button"
-              onClick={() => router.push("/admin/categories")}
-              className={styles.cancelButton}
-            >
-              Annulla
-            </button>
+            <>
+              <button
+                type="button"
+                onClick={() => router.push("/admin/categories")}
+                className={styles.cancelButton}
+              >
+                Annulla
+              </button>
+              <div className="flex justify-end w-full">
+                <button
+                  type="button"
+                  onClick={handleDeleteClick}
+                  className={styles.deleteButton}
+                  disabled={isDeleting}
+                >
+                  Elimina
+                </button>
+              </div>
+            </>
           )}
         </div>
       </form>
+
+      {/* Delete Confirmation Dialog */}
+      {editing && category && (
+        <ConfirmDialog
+          isOpen={isDeleteDialogOpen}
+          onClose={() => setIsDeleteDialogOpen(false)}
+          onConfirm={handleDeleteConfirm}
+          title="Elimina Categoria"
+          message={`Sei sicuro di voler eliminare la categoria "${category.name}"? Questa azione non può essere annullata.`}
+          confirmText="Elimina"
+          cancelText="Annulla"
+          confirmButtonClassName={styles.deleteButton}
+          isLoading={isDeleting}
+        />
+      )}
     </>
   );
 }

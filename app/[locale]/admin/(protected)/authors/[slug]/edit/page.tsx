@@ -7,7 +7,6 @@ import { redirect, notFound } from "next/navigation";
 import { getUser } from "@/lib/auth/server";
 import { getAuthorBySlug } from "@/lib/github/authors";
 import AuthorFormClient from "../../components/AuthorFormClient";
-import AuthorDeleteButton from "../../components/AuthorDeleteButton";
 import AuthorEditSkeleton from "../../components/AuthorEditSkeleton";
 import styles from "../../styles";
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
@@ -52,9 +51,6 @@ export default async function EditAuthorPage({ params }: EditAuthorPageProps) {
 
         <Suspense fallback={<AuthorEditSkeleton />}>
           <AuthorFormClient authorSlug={slug} />
-          <div className="mt-6">
-            <AuthorDeleteButton authorSlug={slug} />
-          </div>
         </Suspense>
       </main>
     </SWRPageProvider>

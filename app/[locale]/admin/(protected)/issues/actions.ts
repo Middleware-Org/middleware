@@ -5,7 +5,7 @@
 
 import { revalidatePath } from "next/cache";
 import { getUser } from "@/lib/auth/server";
-import { createIssue, updateIssue, deleteIssue, updateIssuesOrder } from "@/lib/github/issues";
+import { createIssue, updateIssue, deleteIssue } from "@/lib/github/issues";
 import { uploadImage } from "@/lib/github/client";
 import type { Issue } from "@/lib/github/types";
 
@@ -161,30 +161,6 @@ export async function deleteIssueAction(slug: string): Promise<ActionResult> {
       success: false,
       error: errorMessage,
       errorType: isRelationError ? "warning" : "error",
-    };
-  }
-}
-
-export async function reorderIssuesAction(slugs: string[]): Promise<ActionResult> {
-  try {
-    const user = await getUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized", errorType: "error" };
-    }
-
-    if (!slugs || slugs.length === 0) {
-      return { success: false, error: "Slugs array is required", errorType: "error" };
-    }
-
-    await updateIssuesOrder(slugs);
-    revalidatePath("/admin/issues");
-
-    return { success: true, message: "Issues reordered successfully" };
-  } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Failed to reorder issues",
-      errorType: "error",
     };
   }
 }

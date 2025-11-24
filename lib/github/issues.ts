@@ -40,12 +40,7 @@ export async function getAllIssues(): Promise<Issue[]> {
   const validIssues = issues.filter((issue): issue is Issue => issue !== null);
 
   return validIssues.sort((a, b) => {
-    const orderA = a.order ?? Infinity;
-    const orderB = b.order ?? Infinity;
-    if (orderA !== orderB) {
-      return orderA - orderB;
-    }
-    return b.date.localeCompare(a.date); // Most recent first if same order
+    return b.date.localeCompare(a.date); // Most recent first
   });
 }
 
@@ -73,17 +68,6 @@ export async function createIssue(issue: Omit<Issue, "slug"> & { slug?: string }
   // Ensure slug is unique
   const slug = await generateUniqueSlug("content/issues", baseSlug, ".json");
 
-  // Se order non è specificato, assegna l'ultimo order + 1
-  let order = issue.order;
-  if (order === undefined) {
-    const allIssues = await getAllIssues();
-    const maxOrder = allIssues.reduce((max, iss) => {
-      const issOrder = iss.order ?? 0;
-      return Math.max(max, issOrder);
-    }, -1);
-    order = maxOrder + 1;
-  }
-
   const filePath = `content/issues/${slug}.json`;
   const content = JSON.stringify(
     {
@@ -93,14 +77,13 @@ export async function createIssue(issue: Omit<Issue, "slug"> & { slug?: string }
       cover: issue.cover,
       color: issue.color,
       date: issue.date,
-      order,
     },
     null,
     2,
   );
 
   await createOrUpdateFile(filePath, content, `Create issue: ${issue.title}`);
-  return { ...issue, slug, order };
+  return { ...issue, slug };
 }
 
 export async function updateIssue(
@@ -126,7 +109,6 @@ export async function updateIssue(
     cover: issue.cover ?? existing.cover,
     color: issue.color ?? existing.color,
     date: issue.date ?? existing.date,
-    order: issue.order !== undefined ? issue.order : existing.order,
   };
 
   const content = JSON.stringify(updated, null, 2);
@@ -169,25 +151,4 @@ export async function deleteIssue(slug: string) {
   // Se non ci sono articoli che usano l'issue, procedi con l'eliminazione
   const filePath = `content/issues/${slug}.json`;
   await deleteFile(filePath, `Delete issue: ${slug}`);
-}
-
-export async function updateIssuesOrder(slugs: string[]): Promise<void> {
-  // Aggiorna l'order di tutte le issue in base alla nuova posizione
-  const updatePromises = slugs.map(async (slug, index) => {
-    const issue = await getIssueBySlug(slug);
-    if (!issue) {
-      throw new Error(`Issue ${slug} not found`);
-    }
-
-    const updated: Issue = {
-      ...issue,
-      order: index,
-    };
-
-    const filePath = `content/issues/${slug}.json`;
-    const content = JSON.stringify(updated, null, 2);
-    await createOrUpdateFile(filePath, content, `Update issue order: ${issue.title}`);
-  });
-
-  await Promise.all(updatePromises);
 }

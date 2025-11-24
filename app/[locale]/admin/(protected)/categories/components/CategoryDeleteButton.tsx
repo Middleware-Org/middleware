@@ -23,16 +23,14 @@ interface CategoryDeleteButtonProps {
 export default function CategoryDeleteButton({ categorySlug }: CategoryDeleteButtonProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(
-    null,
-  );
-  
+  const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
+
   // Usa SWR per ottenere la categoria (cache pre-popolata dal server)
   const { category } = useCategory(categorySlug);
 
   async function handleDelete() {
     if (!category) return;
-    
+
     if (!confirm(`Sei sicuro di voler eliminare la categoria "${category.name}"?`)) {
       return;
     }
@@ -64,14 +62,9 @@ export default function CategoryDeleteButton({ categorySlug }: CategoryDeleteBut
           ⚠️ {error.message}
         </div>
       )}
-      <button
-        onClick={handleDelete}
-        className={styles.deleteButton}
-        disabled={isPending}
-      >
+      <button onClick={handleDelete} className={styles.deleteButton} disabled={isPending}>
         {isPending ? "Eliminazione..." : "Elimina Categoria"}
       </button>
     </div>
   );
 }
-

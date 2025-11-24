@@ -4,12 +4,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { useState, useTransition, useMemo, useEffect, Fragment } from "react";
-import { KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
-import { arrayMove } from "@dnd-kit/sortable";
-import { DndTableWrapper } from "@/components/table/DndTableWrapper";
-import { deleteCategoryAction, reorderCategoriesAction } from "../actions";
+import { deleteCategoryAction } from "../actions";
 import { useTableState } from "@/hooks/useTableState";
 import {
   Table,
@@ -19,11 +15,11 @@ import {
   TableCell,
   SortableHeader,
   ColumnSelector,
-  SortableTableRow,
   type ColumnConfig,
 } from "@/components/table";
 import { SearchInput } from "@/components/search";
 import { Pagination } from "@/components/pagination";
+import ConfirmDialog from "@/components/molecules/confirmDialog";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Category } from "@/lib/github/types";
@@ -47,20 +43,14 @@ export default function CategoryListClient() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
+  const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; category: Category | null }>({
+    isOpen: false,
+    category: null,
+  });
 
   // Usa SWR per ottenere le categorie (cache pre-popolata dal server)
   const { categories = [], isLoading } = useCategories();
   const [localCategories, setLocalCategories] = useState<Category[]>(categories);
-
-  // Sensors for drag and drop
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8, // 8px di movimento prima di attivare il drag
-      },
-    }),
-    useSensor(KeyboardSensor),
-  );
 
   // Initialize visible columns from defaultVisible
   const [visibleColumns, setVisibleColumns] = useState<string[]>(() =>
@@ -97,12 +87,16 @@ export default function CategoryListClient() {
     router.push(`/admin/categories/${category.slug}/edit`);
   }
 
-  async function handleDelete(slug: string, name: string) {
-    if (!confirm(`Sei sicuro di voler eliminare la categoria "${name}"?`)) {
-      return;
-    }
+  function handleDeleteClick(category: Category) {
+    setDeleteDialog({ isOpen: true, category });
+  }
 
+  async function handleDeleteConfirm() {
+    if (!deleteDialog.category) return;
+
+    const { slug } = deleteDialog.category;
     setError(null);
+    setDeleteDialog({ isOpen: false, category: null });
 
     startTransition(async () => {
       const result = await deleteCategoryAction(slug);
@@ -112,48 +106,6 @@ export default function CategoryListClient() {
           message: result.error,
           type: result.errorType || "error",
         });
-      } else {
-        // Invalida la cache SWR per forzare il refetch
-        mutate("/api/categories");
-      }
-    });
-  }
-
-  async function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
-
-    if (!over) {
-      return;
-    }
-
-    if (active.id === over.id) {
-      return;
-    }
-
-    // Trova gli indici nelle categorie locali (non paginate)
-    const oldIndex = localCategories.findIndex((cat) => String(cat.slug) === String(active.id));
-    const newIndex = localCategories.findIndex((cat) => String(cat.slug) === String(over.id));
-
-    if (oldIndex === -1 || newIndex === -1) {
-      return;
-    }
-
-    // Update local state immediately for better UX
-    const newCategories = arrayMove(localCategories, oldIndex, newIndex);
-    setLocalCategories(newCategories);
-
-    // Update order on server
-    startTransition(async () => {
-      const slugs = newCategories.map((cat) => cat.slug);
-      const result = await reorderCategoriesAction(slugs);
-
-      if (!result.success) {
-        setError({
-          message: result.error,
-          type: result.errorType || "error",
-        });
-        // Revert on error
-        setLocalCategories(categories);
       } else {
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/categories");
@@ -187,7 +139,7 @@ export default function CategoryListClient() {
                 Modifica
               </button>
               <button
-                onClick={() => handleDelete(category.slug, category.name)}
+                onClick={() => handleDeleteClick(category)}
                 className={styles.deleteButton}
                 disabled={isPending}
               >
@@ -233,9 +185,6 @@ export default function CategoryListClient() {
             visibleColumns={visibleColumns}
             onColumnsChange={setVisibleColumns}
           />
-          <Link href="/admin/categories/new" className={baseStyles.newButton}>
-            + Nuova Categoria
-          </Link>
           <div className={baseStyles.textSecondary}>
             {totalItems} {totalItems === 1 ? "categoria" : "categorie"}
           </div>
@@ -244,15 +193,9 @@ export default function CategoryListClient() {
 
       {/* Table */}
       <div className={baseStyles.tableContainer}>
-        <DndTableWrapper
-          items={tableData.map((cat) => cat.slug)}
-          onDragEnd={handleDragEnd}
-          sensors={sensors}
-        >
           <Table>
             <TableHeader>
               <TableRow>
-                <th className={`${baseStyles.tableHeaderCell} w-8`}>{/* Drag handle column */}</th>
                 {visibleColumnConfigs.map((column) => {
                   if (column.key === "actions") {
                     return (
@@ -278,7 +221,7 @@ export default function CategoryListClient() {
               {tableData.length === 0 ? (
                 <TableRow>
                   <TableCell
-                    colSpan={visibleColumnConfigs.length + 1}
+                  colSpan={visibleColumnConfigs.length}
                     className={baseStyles.tableEmptyCell}
                   >
                     Nessuna categoria trovata
@@ -286,22 +229,36 @@ export default function CategoryListClient() {
                 </TableRow>
               ) : (
                 tableData.map((category) => (
-                  <SortableTableRow key={category.slug} id={category.slug}>
+                <TableRow key={category.slug}>
                     {visibleColumnConfigs.map((column) => (
                       <Fragment key={column.key}>{renderCell(category, column.key)}</Fragment>
                     ))}
-                  </SortableTableRow>
+                </TableRow>
                 ))
               )}
             </TableBody>
           </Table>
-        </DndTableWrapper>
 
         {/* Pagination */}
         {totalPages > 1 && (
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setPage} />
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      {deleteDialog.category && (
+        <ConfirmDialog
+          isOpen={deleteDialog.isOpen}
+          onClose={() => setDeleteDialog({ isOpen: false, category: null })}
+          onConfirm={handleDeleteConfirm}
+          title="Elimina Categoria"
+          message={`Sei sicuro di voler eliminare la categoria "${deleteDialog.category.name}"? Questa azione non può essere annullata.`}
+          confirmText="Elimina"
+          cancelText="Annulla"
+          confirmButtonClassName={styles.deleteButton}
+          isLoading={isPending}
+        />
+      )}
     </div>
   );
 }

@@ -6,10 +6,7 @@
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState, useTransition, useMemo, useEffect, Fragment } from "react";
-import { KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
-import { arrayMove } from "@dnd-kit/sortable";
-import { DndTableWrapper } from "@/components/table/DndTableWrapper";
-import { deleteIssueAction, reorderIssuesAction } from "../actions";
+import { deleteIssueAction } from "../actions";
 import { useTableState } from "@/hooks/useTableState";
 import {
   Table,
@@ -19,11 +16,11 @@ import {
   TableCell,
   SortableHeader,
   ColumnSelector,
-  SortableTableRow,
   type ColumnConfig,
 } from "@/components/table";
 import { SearchInput } from "@/components/search";
 import { Pagination } from "@/components/pagination";
+import ConfirmDialog from "@/components/molecules/confirmDialog";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Issue } from "@/lib/github/types";
@@ -51,20 +48,14 @@ export default function IssueListClient() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
+  const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; issue: Issue | null }>({
+    isOpen: false,
+    issue: null,
+  });
 
   // Usa SWR per ottenere le issues (cache pre-popolata dal server)
   const { issues = [], isLoading } = useIssues();
   const [localIssues, setLocalIssues] = useState<Issue[]>(issues);
-
-  // Sensors for drag and drop
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8, // 8px di movimento prima di attivare il drag
-      },
-    }),
-    useSensor(KeyboardSensor),
-  );
 
   // Initialize visible columns from defaultVisible
   const [visibleColumns, setVisibleColumns] = useState<string[]>(() =>
@@ -82,10 +73,9 @@ export default function IssueListClient() {
     setSort,
     setPage,
   } = useTableState<Issue>({
-    data: localIssues, // Use localIssues for table state
+    data: localIssues,
     searchKeys: ["title", "slug", "description"],
     itemsPerPage: 10,
-    initialSort: { key: "order", direction: "asc" }, // Initial sort by order
   });
 
   // Get visible column configs
@@ -102,12 +92,16 @@ export default function IssueListClient() {
     router.push(`/admin/issues/${issue.slug}/edit`);
   }
 
-  async function handleDelete(slug: string, title: string) {
-    if (!confirm(`Sei sicuro di voler eliminare l'issue "${title}"?`)) {
-      return;
-    }
+  function handleDeleteClick(issue: Issue) {
+    setDeleteDialog({ isOpen: true, issue });
+  }
 
+  async function handleDeleteConfirm() {
+    if (!deleteDialog.issue) return;
+
+    const { slug } = deleteDialog.issue;
     setError(null);
+    setDeleteDialog({ isOpen: false, issue: null });
 
     startTransition(async () => {
       const result = await deleteIssueAction(slug);
@@ -117,48 +111,6 @@ export default function IssueListClient() {
           message: result.error,
           type: result.errorType || "error",
         });
-      } else {
-        // Invalida la cache SWR per forzare il refetch
-        mutate("/api/issues");
-      }
-    });
-  }
-
-  async function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
-
-    if (!over) {
-      return;
-    }
-
-    if (active.id === over.id) {
-      return;
-    }
-
-    // Trova gli indici nelle issue locali (non paginate)
-    const oldIndex = localIssues.findIndex((iss) => String(iss.slug) === String(active.id));
-    const newIndex = localIssues.findIndex((iss) => String(iss.slug) === String(over.id));
-
-    if (oldIndex === -1 || newIndex === -1) {
-      return;
-    }
-
-    // Update local state immediately for better UX
-    const newIssues = arrayMove(localIssues, oldIndex, newIndex);
-    setLocalIssues(newIssues);
-
-    // Update order on server
-    startTransition(async () => {
-      const slugs = newIssues.map((iss) => iss.slug);
-      const result = await reorderIssuesAction(slugs);
-
-      if (!result.success) {
-        setError({
-          message: result.error,
-          type: result.errorType || "error",
-        });
-        // Revert on error
-        setLocalIssues(issues);
       } else {
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/issues");
@@ -226,7 +178,7 @@ export default function IssueListClient() {
                 Modifica
               </button>
               <button
-                onClick={() => handleDelete(issue.slug, issue.title)}
+                onClick={() => handleDeleteClick(issue)}
                 className={styles.deleteButton}
                 disabled={isPending}
               >
@@ -272,9 +224,6 @@ export default function IssueListClient() {
             visibleColumns={visibleColumns}
             onColumnsChange={setVisibleColumns}
           />
-          <Link href="/admin/issues/new" className={baseStyles.newButton}>
-            + Nuova Issue
-          </Link>
           <div className={baseStyles.textSecondary}>
             {totalItems} {totalItems === 1 ? "issue" : "issues"}
           </div>
@@ -283,64 +232,72 @@ export default function IssueListClient() {
 
       {/* Table */}
       <div className={baseStyles.tableContainer}>
-        <DndTableWrapper
-          items={tableData.map((iss) => iss.slug)}
-          onDragEnd={handleDragEnd}
-          sensors={sensors}
-        >
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <th className={`${baseStyles.tableHeaderCell} w-8`}>{/* Drag handle column */}</th>
-                {visibleColumnConfigs.map((column) => {
-                  if (column.key === "actions") {
-                    return (
-                      <th key={column.key} className={baseStyles.tableHeaderCell}>
-                        {column.label}
-                      </th>
-                    );
-                  }
+        <Table>
+          <TableHeader>
+            <TableRow>
+              {visibleColumnConfigs.map((column) => {
+                if (column.key === "actions") {
                   return (
-                    <SortableHeader
-                      key={column.key}
-                      sortKey={column.key}
-                      currentSort={sort || undefined}
-                      onSort={setSort}
-                    >
+                    <th key={column.key} className={baseStyles.tableHeaderCell}>
                       {column.label}
-                    </SortableHeader>
+                    </th>
                   );
-                })}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {tableData.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={visibleColumnConfigs.length + 1}
-                    className={baseStyles.tableEmptyCell}
+                }
+                return (
+                  <SortableHeader
+                    key={column.key}
+                    sortKey={column.key}
+                    currentSort={sort || undefined}
+                    onSort={setSort}
                   >
-                    Nessuna issue trovata
-                  </TableCell>
+                    {column.label}
+                  </SortableHeader>
+                );
+              })}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {tableData.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={visibleColumnConfigs.length}
+                  className={baseStyles.tableEmptyCell}
+                >
+                  Nessuna issue trovata
+                </TableCell>
+              </TableRow>
+            ) : (
+              tableData.map((issue) => (
+                <TableRow key={issue.slug}>
+                  {visibleColumnConfigs.map((column) => (
+                    <Fragment key={column.key}>{renderCell(issue, column.key)}</Fragment>
+                  ))}
                 </TableRow>
-              ) : (
-                tableData.map((issue) => (
-                  <SortableTableRow key={issue.slug} id={issue.slug}>
-                    {visibleColumnConfigs.map((column) => (
-                      <Fragment key={column.key}>{renderCell(issue, column.key)}</Fragment>
-                    ))}
-                  </SortableTableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </DndTableWrapper>
+              ))
+            )}
+          </TableBody>
+        </Table>
 
         {/* Pagination */}
         {totalPages > 1 && (
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setPage} />
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      {deleteDialog.issue && (
+        <ConfirmDialog
+          isOpen={deleteDialog.isOpen}
+          onClose={() => setDeleteDialog({ isOpen: false, issue: null })}
+          onConfirm={handleDeleteConfirm}
+          title="Elimina Issue"
+          message={`Sei sicuro di voler eliminare l'issue "${deleteDialog.issue.title}"? Questa azione non può essere annullata.`}
+          confirmText="Elimina"
+          cancelText="Annulla"
+          confirmButtonClassName={styles.deleteButton}
+          isLoading={isPending}
+        />
+      )}
     </div>
   );
 }

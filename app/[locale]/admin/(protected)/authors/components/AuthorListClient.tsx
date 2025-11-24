@@ -4,12 +4,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { useState, useTransition, useMemo, useEffect, Fragment } from "react";
-import { KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
-import { arrayMove } from "@dnd-kit/sortable";
-import { DndTableWrapper } from "@/components/table/DndTableWrapper";
-import { deleteAuthorAction, reorderAuthorsAction } from "../actions";
+import { deleteAuthorAction } from "../actions";
 import { useTableState } from "@/hooks/useTableState";
 import {
   Table,
@@ -19,11 +15,11 @@ import {
   TableCell,
   SortableHeader,
   ColumnSelector,
-  SortableTableRow,
   type ColumnConfig,
 } from "@/components/table";
 import { SearchInput } from "@/components/search";
 import { Pagination } from "@/components/pagination";
+import ConfirmDialog from "@/components/molecules/confirmDialog";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Author } from "@/lib/github/types";
@@ -47,20 +43,14 @@ export default function AuthorListClient() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
+  const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; author: Author | null }>({
+    isOpen: false,
+    author: null,
+  });
 
   // Usa SWR per ottenere gli autori (cache pre-popolata dal server)
   const { authors = [], isLoading } = useAuthors();
   const [localAuthors, setLocalAuthors] = useState<Author[]>(authors);
-
-  // Sensors for drag and drop
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8, // 8px di movimento prima di attivare il drag
-      },
-    }),
-    useSensor(KeyboardSensor),
-  );
 
   // Initialize visible columns from defaultVisible
   const [visibleColumns, setVisibleColumns] = useState<string[]>(() =>
@@ -78,10 +68,9 @@ export default function AuthorListClient() {
     setSort,
     setPage,
   } = useTableState<Author>({
-    data: localAuthors, // Use localAuthors for table state
+    data: localAuthors,
     searchKeys: ["name", "slug", "description"],
     itemsPerPage: 10,
-    initialSort: { key: "order", direction: "asc" }, // Initial sort by order
   });
 
   // Get visible column configs
@@ -98,12 +87,16 @@ export default function AuthorListClient() {
     router.push(`/admin/authors/${author.slug}/edit`);
   }
 
-  async function handleDelete(slug: string, name: string) {
-    if (!confirm(`Sei sicuro di voler eliminare l'autore "${name}"?`)) {
-      return;
-    }
+  function handleDeleteClick(author: Author) {
+    setDeleteDialog({ isOpen: true, author });
+  }
 
+  async function handleDeleteConfirm() {
+    if (!deleteDialog.author) return;
+
+    const { slug } = deleteDialog.author;
     setError(null);
+    setDeleteDialog({ isOpen: false, author: null });
 
     startTransition(async () => {
       const result = await deleteAuthorAction(slug);
@@ -113,48 +106,6 @@ export default function AuthorListClient() {
           message: result.error,
           type: result.errorType || "error",
         });
-      } else {
-        // Invalida la cache SWR per forzare il refetch
-        mutate("/api/authors");
-      }
-    });
-  }
-
-  async function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
-
-    if (!over) {
-      return;
-    }
-
-    if (active.id === over.id) {
-      return;
-    }
-
-    // Trova gli indici negli autori locali (non paginati)
-    const oldIndex = localAuthors.findIndex((auth) => String(auth.slug) === String(active.id));
-    const newIndex = localAuthors.findIndex((auth) => String(auth.slug) === String(over.id));
-
-    if (oldIndex === -1 || newIndex === -1) {
-      return;
-    }
-
-    // Update local state immediately for better UX
-    const newAuthors = arrayMove(localAuthors, oldIndex, newIndex);
-    setLocalAuthors(newAuthors);
-
-    // Update order on server
-    startTransition(async () => {
-      const slugs = newAuthors.map((auth) => auth.slug);
-      const result = await reorderAuthorsAction(slugs);
-
-      if (!result.success) {
-        setError({
-          message: result.error,
-          type: result.errorType || "error",
-        });
-        // Revert on error
-        setLocalAuthors(authors);
       } else {
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/authors");
@@ -188,7 +139,7 @@ export default function AuthorListClient() {
                 Modifica
               </button>
               <button
-                onClick={() => handleDelete(author.slug, author.name)}
+                onClick={() => handleDeleteClick(author)}
                 className={styles.deleteButton}
                 disabled={isPending}
               >
@@ -234,9 +185,6 @@ export default function AuthorListClient() {
             visibleColumns={visibleColumns}
             onColumnsChange={setVisibleColumns}
           />
-          <Link href="/admin/authors/new" className={baseStyles.newButton}>
-            + Nuovo Autore
-          </Link>
           <div className={baseStyles.textSecondary}>
             {totalItems} {totalItems === 1 ? "autore" : "autori"}
           </div>
@@ -245,64 +193,72 @@ export default function AuthorListClient() {
 
       {/* Table */}
       <div className={baseStyles.tableContainer}>
-        <DndTableWrapper
-          items={tableData.map((auth) => auth.slug)}
-          onDragEnd={handleDragEnd}
-          sensors={sensors}
-        >
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <th className={`${baseStyles.tableHeaderCell} w-8`}>{/* Drag handle column */}</th>
-                {visibleColumnConfigs.map((column) => {
-                  if (column.key === "actions") {
-                    return (
-                      <th key={column.key} className={baseStyles.tableHeaderCell}>
-                        {column.label}
-                      </th>
-                    );
-                  }
+        <Table>
+          <TableHeader>
+            <TableRow>
+              {visibleColumnConfigs.map((column) => {
+                if (column.key === "actions") {
                   return (
-                    <SortableHeader
-                      key={column.key}
-                      sortKey={column.key}
-                      currentSort={sort || undefined}
-                      onSort={setSort}
-                    >
+                    <th key={column.key} className={baseStyles.tableHeaderCell}>
                       {column.label}
-                    </SortableHeader>
+                    </th>
                   );
-                })}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {tableData.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={visibleColumnConfigs.length + 1}
-                    className={baseStyles.tableEmptyCell}
+                }
+                return (
+                  <SortableHeader
+                    key={column.key}
+                    sortKey={column.key}
+                    currentSort={sort || undefined}
+                    onSort={setSort}
                   >
-                    Nessun autore trovato
-                  </TableCell>
+                    {column.label}
+                  </SortableHeader>
+                );
+              })}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {tableData.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={visibleColumnConfigs.length}
+                  className={baseStyles.tableEmptyCell}
+                >
+                  Nessun autore trovato
+                </TableCell>
+              </TableRow>
+            ) : (
+              tableData.map((author) => (
+                <TableRow key={author.slug}>
+                  {visibleColumnConfigs.map((column) => (
+                    <Fragment key={column.key}>{renderCell(author, column.key)}</Fragment>
+                  ))}
                 </TableRow>
-              ) : (
-                tableData.map((author) => (
-                  <SortableTableRow key={author.slug} id={author.slug}>
-                    {visibleColumnConfigs.map((column) => (
-                      <Fragment key={column.key}>{renderCell(author, column.key)}</Fragment>
-                    ))}
-                  </SortableTableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </DndTableWrapper>
+              ))
+            )}
+          </TableBody>
+        </Table>
 
         {/* Pagination */}
         {totalPages > 1 && (
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setPage} />
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      {deleteDialog.author && (
+        <ConfirmDialog
+          isOpen={deleteDialog.isOpen}
+          onClose={() => setDeleteDialog({ isOpen: false, author: null })}
+          onConfirm={handleDeleteConfirm}
+          title="Elimina Autore"
+          message={`Sei sicuro di voler eliminare l'autore "${deleteDialog.author.name}"? Questa azione non può essere annullata.`}
+          confirmText="Elimina"
+          cancelText="Annulla"
+          confirmButtonClassName={styles.deleteButton}
+          isLoading={isPending}
+        />
+      )}
     </div>
   );
 }

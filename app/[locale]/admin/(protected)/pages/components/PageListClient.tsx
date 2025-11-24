@@ -4,7 +4,6 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { useState, useTransition, useMemo, Fragment } from "react";
 import { deletePageAction } from "../actions";
 import { useTableState } from "@/hooks/useTableState";
@@ -20,6 +19,7 @@ import {
 } from "@/components/table";
 import { SearchInput } from "@/components/search";
 import { Pagination } from "@/components/pagination";
+import ConfirmDialog from "@/components/molecules/confirmDialog";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Page } from "@/lib/github/types";
@@ -42,6 +42,10 @@ export default function PageListClient() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
+  const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; page: Page | null }>({
+    isOpen: false,
+    page: null,
+  });
 
   // Usa SWR per ottenere le pagine (cache pre-popolata dal server)
   const { pages = [], isLoading } = usePages();
@@ -77,12 +81,16 @@ export default function PageListClient() {
     router.push(`/admin/pages/${page.slug}/edit`);
   }
 
-  async function handleDelete(slug: string) {
-    if (!confirm(`Sei sicuro di voler eliminare la pagina "${slug}"?`)) {
-      return;
-    }
+  function handleDeleteClick(page: Page) {
+    setDeleteDialog({ isOpen: true, page });
+  }
 
+  async function handleDeleteConfirm() {
+    if (!deleteDialog.page) return;
+
+    const { slug } = deleteDialog.page;
     setError(null);
+    setDeleteDialog({ isOpen: false, page: null });
 
     startTransition(async () => {
       const result = await deletePageAction(slug);
@@ -125,13 +133,13 @@ export default function PageListClient() {
             <div className={baseStyles.buttonGroup}>
               <button
                 onClick={() => handleEdit(page)}
-                className={styles.submitButton}
+                className={styles.editButton}
                 disabled={isPending}
               >
                 Modifica
               </button>
               <button
-                onClick={() => handleDelete(page.slug)}
+                onClick={() => handleDeleteClick(page)}
                 className={styles.deleteButton}
                 disabled={isPending}
               >
@@ -166,20 +174,13 @@ export default function PageListClient() {
       <div className={baseStyles.searchContainer}>
         <div className={baseStyles.searchRow}>
           <div className={baseStyles.searchInputWrapper}>
-            <SearchInput
-              value={search}
-              onChange={setSearch}
-              placeholder="Cerca per slug..."
-            />
+            <SearchInput value={search} onChange={setSearch} placeholder="Cerca per slug..." />
           </div>
           <ColumnSelector
             columns={columnConfig}
             visibleColumns={visibleColumns}
             onColumnsChange={setVisibleColumns}
           />
-          <Link href="/admin/pages/new" className={baseStyles.newButton}>
-            + Nuova Pagina
-          </Link>
           <div className={baseStyles.textSecondary}>
             {totalItems} {totalItems === 1 ? "pagina" : "pagine"}
           </div>
@@ -239,7 +240,21 @@ export default function PageListClient() {
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setPage} />
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      {deleteDialog.page && (
+        <ConfirmDialog
+          isOpen={deleteDialog.isOpen}
+          onClose={() => setDeleteDialog({ isOpen: false, page: null })}
+          onConfirm={handleDeleteConfirm}
+          title="Elimina Pagina"
+          message={`Sei sicuro di voler eliminare la pagina "${deleteDialog.page.title || deleteDialog.page.slug}"? Questa azione non può essere annullata.`}
+          confirmText="Elimina"
+          cancelText="Annulla"
+          confirmButtonClassName={styles.deleteButton}
+          isLoading={isPending}
+        />
+      )}
     </div>
   );
 }
-

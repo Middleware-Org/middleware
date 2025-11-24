@@ -50,7 +50,7 @@ export default async function PodcastsPage({ params }: PodcastsPageProps) {
         <div className={styles.content}>
           {issues.map((issue) => (
             <Issue key={issue.slug} issue={issue} dictCommon={dictCommon} />
-          ))}
+        ))}
         </div>
       </div>
     </div>

@@ -53,14 +53,14 @@ export default async function AuthorsPage({ params }: AuthorsPageProps) {
 
         {/* Authors content */}
         <div className={styles.content}>
-          {authors.map((author) => (
-            <Author
-              key={author.slug}
-              author={author}
-              dictCommon={dictCommon}
-              dictAuthors={dictAuthors}
-            />
-          ))}
+        {authors.map((author) => (
+          <Author
+            key={author.slug}
+            author={author}
+            dictCommon={dictCommon}
+            dictAuthors={dictAuthors}
+          />
+        ))}
         </div>
       </div>
     </div>
