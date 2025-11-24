@@ -8,6 +8,7 @@ import { getDictionary } from "@/lib/i18n/utils";
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import Category from "@/components/organism/category";
 import { cn } from "@/lib/utils/classes";
+import AutoScroll from "@/components/AutoScroll";
 
 /* **************************************************
  * Types
@@ -39,6 +40,7 @@ export default async function CategoriesPage({ params }: CategoriesPageProps) {
 
   return (
     <div className={styles.container}>
+      <AutoScroll paramName="category" />
       <div className={styles.mobileToggle}>
         <MobileCategoriesToggle dict={dictCategories} />
       </div>
@@ -49,14 +51,14 @@ export default async function CategoriesPage({ params }: CategoriesPageProps) {
         </div>
 
         <div className={styles.content}>
-        {categories.map((category) => (
-          <Category
-            key={category.slug}
-            category={category}
-            dictCommon={dictCommon}
-            dictCategories={dictCategories}
-          />
-        ))}
+          {categories.map((category) => (
+            <Category
+              key={category.slug}
+              category={category}
+              dictCommon={dictCommon}
+              dictCategories={dictCategories}
+            />
+          ))}
         </div>
       </div>
     </div>

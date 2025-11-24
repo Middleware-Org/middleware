@@ -35,7 +35,7 @@ export default function Article({ article, dict }: ArticleProps) {
             <MonoTextLight className="border-b border-secondary lg:pb-2.5 lg:text-lg text-base mb-5">
               {dict.page.wordsBy}
             </MonoTextLight>
-            <Link href={`/authors#${author.slug}`}>
+            <Link href={`/authors?author=${author.slug}`}>
               <MonoTextBold className="lg:pb-2.5 lg:text-lg text-base mb-5">
                 {author.name}
               </MonoTextBold>
@@ -60,7 +60,7 @@ export default function Article({ article, dict }: ArticleProps) {
         </div>
         <Separator className="lg:mt-2.5 lg:mb-2.5 mt-2.5 mb-2.5" />
         <div className="flex justify-between items-center">
-          <Link href={`/categories#${category.slug}`}>
+          <Link href={`/categories?category=${category.slug}`}>
             <MonoTextLight className="hover:underline">{category.name}</MonoTextLight>
           </Link>
           <div className="lg:text-[16px] text-[12px] flex items-center gap-2 text-secondary">

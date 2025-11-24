@@ -9,6 +9,8 @@ import { i18nSettings } from "@/lib/i18n/settings";
  **************************************************/
 export function proxy(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
+  const search = req.nextUrl.search;
+  const hash = req.nextUrl.hash;
 
   if (pathname.includes(".")) {
     return NextResponse.next();
@@ -23,7 +25,7 @@ export function proxy(req: NextRequest) {
   const detected =
     locale && i18nSettings.locales.includes(locale) ? locale : i18nSettings.defaultLocale;
 
-  return NextResponse.redirect(new URL(`/${detected}${pathname}`, req.url));
+  return NextResponse.redirect(new URL(`/${detected}${pathname}${search}${hash}`, req.url));
 }
 
 export const config = {

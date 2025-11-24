@@ -46,7 +46,7 @@ export default function ArticleCard({ article, dict, isPodcast = false }: Articl
 
         <div className={styles.authorInfo}>
           <MonoTextLight className={styles.authorLabel}>{dict.articleCard.wordsBy}</MonoTextLight>
-          <Link href={`/authors#${author.slug}`}>
+          <Link href={`/authors?author=${author.slug}`}>
             <MonoTextBold className={styles.authorLink}>{author.name}</MonoTextBold>
           </Link>
         </div>
@@ -65,7 +65,7 @@ export default function ArticleCard({ article, dict, isPodcast = false }: Articl
         </div>
       </section>
       <footer className={styles.footer}>
-        <Link href={`/categories#${category.slug}`}>
+        <Link href={`/categories?category=${category.slug}`}>
           <div className={styles.category}>
             <MonoTextLight className={styles.categoryText}>{category.name}</MonoTextLight>
           </div>

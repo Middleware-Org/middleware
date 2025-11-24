@@ -68,7 +68,7 @@ export default function ArticleInEvidenceCard({
           <MonoTextLight className={cn(styles.authorLabel, textColor)}>
             {dict.articleCard.wordsBy}
           </MonoTextLight>
-          <Link href={`/authors#${author.slug}`}>
+          <Link href={`/authors?author=${author.slug}`}>
             <MonoTextBold className={cn(styles.authorLink, textColor)}>{author.name}</MonoTextBold>
           </Link>
         </div>
@@ -86,7 +86,7 @@ export default function ArticleInEvidenceCard({
       </section>
       <Separator className={cn(backgroundColor)} />
       <footer>
-        <Link href={`/categories#${category.slug}`}>
+        <Link href={`/categories?category=${category.slug}`}>
           <div className={styles.category}>
             <MonoTextLight className={cn(styles.categoryLink, textColor)}>
               {category.name}

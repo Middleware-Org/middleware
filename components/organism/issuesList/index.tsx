@@ -4,6 +4,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { MonoTextLight } from "@/components/atoms/typography";
 import Separator from "@/components/atoms/separetor";
 import { cn } from "@/lib/utils/classes";
@@ -23,11 +24,17 @@ type IssuesListProps = {
  **************************************************/
 export default function IssuesList({ issues }: IssuesListProps) {
   const { isOpen, toggleOpen } = useIssuesList();
+  const searchParams = useSearchParams();
+  const activeIssue = searchParams.get("issue");
 
   /* **************************************************
    * Handlers
    **************************************************/
   function handleIssueClick() {
+    // Save current scroll position before Next.js resets it
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("scrollPosition", window.scrollY.toString());
+    }
     toggleOpen();
   }
 
@@ -36,14 +43,23 @@ export default function IssuesList({ issues }: IssuesListProps) {
    **************************************************/
   return (
     <div className={cn(styles.container, isOpen ? styles.containerOpen : styles.containerClosed)}>
-      {issues.map((issue) => (
-        <div key={issue.slug} className={styles.item}>
-          <Link href={`#${issue.slug}`} onClick={handleIssueClick} className={styles.button}>
-            <MonoTextLight className={styles.buttonText}>{issue.title}</MonoTextLight>
-          </Link>
-          <Separator />
-        </div>
-      ))}
+      {issues.map((issue) => {
+        const isActive = activeIssue === issue.slug;
+        return (
+          <div key={issue.slug} className={styles.item}>
+            <Link
+              href={`?issue=${issue.slug}`}
+              onClick={handleIssueClick}
+              className={styles.button}
+            >
+              <MonoTextLight className={cn(styles.buttonText, isActive && "text-tertiary")}>
+                {issue.title}
+              </MonoTextLight>
+            </Link>
+            <Separator />
+          </div>
+        );
+      })}
     </div>
   );
 }

@@ -211,11 +211,11 @@ export default function ArchiveIssueCard({
                       <div className={styles.articleMeta}>
                         <MonoTextLight className={cn(styles.articleAuthor, textColor)}>
                           {dict.articleCard.wordsBy}{" "}
-                          <Link href={`/authors#${author.slug}`}>
+                          <Link href={`/authors?author=${author.slug}`}>
                             <span className={styles.articleAuthorLink}>{author.name}</span>
                           </Link>
                         </MonoTextLight>
-                        <Link href={`/categories#${category.slug}`}>
+                        <Link href={`/categories?category=${category.slug}`}>
                           <MonoTextLight className={cn(styles.articleCategory, textColor)}>
                             {category.name}
                           </MonoTextLight>
