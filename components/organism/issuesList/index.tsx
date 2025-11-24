@@ -52,7 +52,7 @@ export default function IssuesList({ issues }: IssuesListProps) {
               onClick={handleIssueClick}
               className={styles.button}
             >
-              <MonoTextLight className={cn(styles.buttonText, isActive && "text-tertiary")}>
+              <MonoTextLight className={cn(styles.buttonText, isActive ? "text-tertiary" : "")}>
                 {issue.title}
               </MonoTextLight>
             </Link>
