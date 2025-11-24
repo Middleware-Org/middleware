@@ -119,11 +119,13 @@ const styles = {
     "flex flex-col gap-3 md:gap-4",
     "w-full",
     "relative",
-    "overflow-y-scroll",
+    "overflow-hidden",
     "h-full",
-    "[&::-webkit-scrollbar]:hidden",
-    "[-ms-overflow-style]:none",
-    "[scrollbar-width]:none",
+  ),
+  transcriptContentInner: cn(
+    "flex flex-col gap-3 md:gap-4",
+    "w-full",
+    "transition-transform duration-300 ease-out",
   ),
   segmentWrapper: cn("relative"),
   transcriptFadeTop: cn(

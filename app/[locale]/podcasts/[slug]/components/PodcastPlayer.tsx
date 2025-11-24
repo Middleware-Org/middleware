@@ -37,6 +37,7 @@ type PodcastPlayerProps = {
 export default function PodcastPlayer({ article }: PodcastPlayerProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const transcriptContainerRef = useRef<HTMLDivElement>(null);
+  const transcriptContentInnerRef = useRef<HTMLDivElement>(null);
   const activeSegmentRef = useRef<HTMLDivElement>(null);
   const volumeControlRef = useRef<HTMLDivElement>(null);
   const speedControlRef = useRef<HTMLDivElement>(null);
@@ -66,41 +67,53 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
   // Podcast ID per lo storage
   const podcastId = article.slug;
 
-  // Auto-scroll to active segment
+  // Auto-scroll to active segment using transform with progressive scrolling for long segments
   useEffect(() => {
-    if (activeSegmentRef.current && transcriptContainerRef.current && currentSegmentIndex >= 0) {
+    if (
+      activeSegmentRef.current &&
+      transcriptContainerRef.current &&
+      transcriptContentInnerRef.current &&
+      currentSegmentIndex >= 0 &&
+      segments.length > 0
+    ) {
       const container = transcriptContainerRef.current;
+      const innerContent = transcriptContentInnerRef.current;
       const activeElement = activeSegmentRef.current;
 
+      // Get dimensions
       const elementOffsetTop = activeElement.offsetTop;
+      const elementHeight = activeElement.offsetHeight;
+      const containerHeight = container.clientHeight;
+      const targetOffset = 80; // Preferred offset from top
+      const availableHeight = containerHeight - targetOffset - 20; // 20px padding at bottom
 
-      // Position the active segment at 80px from the top
-      const targetScrollTop = elementOffsetTop - 80;
+      // Get current segment
+      const currentSegment = segments[currentSegmentIndex];
+      const segmentDuration = currentSegment.end - currentSegment.start;
+      const timeInSegment = currentTime - currentSegment.start;
+      const segmentProgress = Math.max(0, Math.min(1, timeInSegment / segmentDuration));
 
-      container.scrollTo({
-        top: targetScrollTop,
-        behavior: "smooth",
-      });
+      let translateY: number;
+
+      if (elementHeight <= availableHeight) {
+        // Segment fits: position it at targetOffset from top
+        translateY = targetOffset - elementOffsetTop;
+      } else {
+        // Segment is too long: scroll progressively based on audio progress
+        // Calculate how much we need to scroll to show the relevant part
+        const totalScrollableHeight = elementHeight - availableHeight;
+        // Scroll from top (0) to bottom (totalScrollableHeight) based on segment progress
+        const scrollOffset = segmentProgress * totalScrollableHeight;
+        // Base position: align top of element to targetOffset
+        const baseTranslateY = targetOffset - elementOffsetTop;
+        // Add progressive scroll offset
+        translateY = baseTranslateY - scrollOffset;
+      }
+
+      // Apply transform to move the content
+      innerContent.style.transform = `translateY(${translateY}px)`;
     }
-  }, [currentSegmentIndex]);
-
-  // Disable manual scrolling
-  useEffect(() => {
-    const container = transcriptContainerRef.current;
-    if (!container) return;
-
-    const preventScroll = (e: WheelEvent | TouchEvent) => {
-      e.preventDefault();
-    };
-
-    container.addEventListener("wheel", preventScroll, { passive: false });
-    container.addEventListener("touchmove", preventScroll, { passive: false });
-
-    return () => {
-      container.removeEventListener("wheel", preventScroll);
-      container.removeEventListener("touchmove", preventScroll);
-    };
-  }, []);
+  }, [currentSegmentIndex, currentTime, segments]);
 
   // Close controls when clicking outside
   useEffect(() => {
@@ -587,31 +600,33 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
       {segments.length > 0 && (
         <div className={styles.transcriptSection}>
           <div ref={transcriptContainerRef} className={styles.transcriptContent}>
-            {segments.map((segment, index) => {
-              const isActive = index === currentSegmentIndex;
-              const isPrevious = index === currentSegmentIndex - 1;
-              const isNext = index === currentSegmentIndex + 1;
+            <div ref={transcriptContentInnerRef} className={styles.transcriptContentInner}>
+              {segments.map((segment, index) => {
+                const isActive = index === currentSegmentIndex;
+                const isPrevious = index === currentSegmentIndex - 1;
+                const isNext = index === currentSegmentIndex + 1;
 
-              return (
-                <div
-                  key={segment.id}
-                  ref={isActive ? activeSegmentRef : null}
-                  className={styles.segmentWrapper}
-                >
-                  <SerifText
-                    className={
-                      isActive
-                        ? styles.segmentActive
-                        : isPrevious || isNext
-                          ? styles.segmentFade
-                          : styles.segment
-                    }
+                return (
+                  <div
+                    key={segment.id}
+                    ref={isActive ? activeSegmentRef : null}
+                    className={styles.segmentWrapper}
                   >
-                    {segment.text}
-                  </SerifText>
-                </div>
-              );
-            })}
+                    <SerifText
+                      className={
+                        isActive
+                          ? styles.segmentActive
+                          : isPrevious || isNext
+                            ? styles.segmentFade
+                            : styles.segment
+                      }
+                    >
+                      {segment.text}
+                    </SerifText>
+                  </div>
+                );
+              })}
+            </div>
           </div>
           <div className={styles.transcriptFadeBottom} />
         </div>
