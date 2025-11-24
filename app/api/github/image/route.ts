@@ -11,70 +11,67 @@ const token = process.env.GITHUB_TOKEN!;
 
 /* **************************************************
  * GitHub Image Proxy API Route
-  * 
+ *
  * This route proxies image requests to GitHub for private repositories.
  * It handles authentication server-side and streams the image to the client.
-  **************************************************/
+ * Uses GitHub API raw endpoint for better performance (no base64 decoding needed).
+ **************************************************/
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const path = searchParams.get("path");
 
     if (!path) {
-      return NextResponse.json({ error: "Path parameter is required" }, { status: 400 });
+      return NextResponse.json({ error: "Missing 'path' query param" }, { status: 400 });
     }
 
-    // Get file content from GitHub
-    const url = `${GITHUB_API_URL}/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
+    // Use GitHub API raw endpoint for direct binary response
+    const apiUrl = `${GITHUB_API_URL}/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
 
-    const res = await fetch(url, {
+    const res = await fetch(apiUrl, {
       headers: {
         Authorization: `Bearer ${token}`,
-        Accept: "application/vnd.github+json",
+        Accept: "application/vnd.github.v3.raw",
       },
+      // IMPORTANTE: facciamo girare solo lato server
       cache: "no-store",
     });
 
     if (!res.ok) {
-      console.error("GitHub API error", url, await res.text());
-      return NextResponse.json(
-        { error: `GitHub API error: ${res.status}` },
-        { status: res.status },
-      );
+      console.error("GitHub API error", res.status, await res.text());
+      return new NextResponse("Image not found", { status: 404 });
     }
 
-    const file = await res.json();
+    // GitHub con Accept: raw restituisce direttamente i bytes
+    const arrayBuffer = await res.arrayBuffer();
+    const bytes = new Uint8Array(arrayBuffer);
 
-    if (!("content" in file) || !("encoding" in file)) {
-      return NextResponse.json(
-        { error: "Unexpected GitHub response" },
-        { status: 500 },
-      );
-    }
-
-    if (file.encoding !== "base64") {
-      return NextResponse.json(
-        { error: `Unsupported encoding: ${file.encoding}` },
-        { status: 500 },
-      );
-    }
-
-    // Decode base64 content
-    const imageBuffer = Buffer.from(file.content, "base64");
-
-    // Determine content type from file extension or default to jpeg
+    // Determine content type from file extension
     const extension = path.split(".").pop()?.toLowerCase();
-    const contentType =
-      extension === "png"
-        ? "image/png"
-        : extension === "gif"
-          ? "image/gif"
-          : extension === "webp"
-            ? "image/webp"
-            : "image/jpeg";
+    let contentType = "image/jpeg"; // default
+
+    switch (extension) {
+      case "png":
+        contentType = "image/png";
+        break;
+      case "gif":
+        contentType = "image/gif";
+        break;
+      case "webp":
+        contentType = "image/webp";
+        break;
+      case "svg":
+        contentType = "image/svg+xml";
+        break;
+      case "jpg":
+      case "jpeg":
+      default:
+        contentType = "image/jpeg";
+    }
 
     // Return image with proper headers and caching
-    return new NextResponse(imageBuffer, {
+    return new NextResponse(bytes, {
+      status: 200,
       headers: {
         "Content-Type": contentType,
         "Cache-Control": "public, max-age=3600, s-maxage=3600", // Cache for 1 hour
@@ -82,10 +79,6 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error proxying GitHub image:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
-
