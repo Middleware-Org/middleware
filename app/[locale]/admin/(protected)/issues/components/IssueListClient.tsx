@@ -4,7 +4,6 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { useState, useTransition, useMemo, useEffect, Fragment } from "react";
 import { deleteIssueAction } from "../actions";
 import { useTableState } from "@/hooks/useTableState";
@@ -28,6 +27,7 @@ import Image from "next/image";
 import { useIssues } from "@/hooks/swr";
 import { mutate } from "swr";
 import { getGitHubImageUrl } from "@/lib/github/images";
+import { emitGitOperationSuccess } from "@/lib/utils/gitEvents";
 
 /* **************************************************
  * Column Configuration
@@ -115,6 +115,7 @@ export default function IssueListClient() {
       } else {
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/issues");
+        emitGitOperationSuccess();
       }
     });
   }

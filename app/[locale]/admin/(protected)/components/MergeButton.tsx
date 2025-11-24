@@ -22,32 +22,41 @@ export default function MergeButton() {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
   // Check for changes to merge
-  useEffect(() => {
-    async function checkMergeStatus() {
-      try {
-        setIsChecking(true);
-        const res = await fetch("/api/github/merge/check");
-        if (res.ok) {
-          const data = await res.json();
-          setHasChanges(data.hasChanges);
-          setAheadBy(data.aheadBy || 0);
-          setError(null);
-        } else {
-          setError("Failed to check merge status");
-        }
-      } catch (err) {
-        console.error("Error checking merge status:", err);
-        setError("Error checking merge status");
-      } finally {
-        setIsChecking(false);
+  async function checkMergeStatus() {
+    try {
+      setIsChecking(true);
+      const res = await fetch("/api/github/merge/check");
+      if (res.ok) {
+        const data = await res.json();
+        setHasChanges(data.hasChanges);
+        setAheadBy(data.aheadBy || 0);
+        setError(null);
+      } else {
+        setError("Failed to check merge status");
       }
+    } catch (err) {
+      console.error("Error checking merge status:", err);
+      setError("Error checking merge status");
+    } finally {
+      setIsChecking(false);
+    }
+  }
+
+  useEffect(() => {
+    // Initial check
+    checkMergeStatus();
+
+    // Listen for git operation success events
+    function handleGitOperationSuccess() {
+      // Check immediately - GitHub API should be ready
+      checkMergeStatus();
     }
 
-    checkMergeStatus();
-    // Check every 30 seconds
-    const interval = setInterval(checkMergeStatus, 30000);
+    window.addEventListener("git-operation-success", handleGitOperationSuccess);
 
-    return () => clearInterval(interval);
+    return () => {
+      window.removeEventListener("git-operation-success", handleGitOperationSuccess);
+    };
   }, []);
 
   function handlePublishClick() {
@@ -94,22 +103,35 @@ export default function MergeButton() {
     }
   }
 
-  // Don't show button if checking or if no changes
+  // Show button states (checking or no changes)
   if (isChecking) {
     return (
-      <button
-        type="button"
-        disabled
-        className={cn(styles.mergeButton, "opacity-50 cursor-not-allowed")}
-      >
-        <Loader2 className={cn(styles.navIcon, "animate-spin")} />
-        <span>Controllo...</span>
-      </button>
+      <div className="mb-2">
+        <button
+          type="button"
+          disabled
+          className={cn(styles.mergeButton, "opacity-50 cursor-not-allowed")}
+        >
+          <Loader2 className={cn(styles.navIcon, "animate-spin")} />
+          <span>Controllo...</span>
+        </button>
+      </div>
     );
   }
 
   if (!hasChanges) {
-    return null; // Don't show button if no changes
+    return (
+      <div className="mb-2">
+        <button
+          type="button"
+          disabled
+          className={cn(styles.mergeButton, "opacity-50 cursor-not-allowed")}
+        >
+          <Rocket className={styles.navIcon} />
+          <span>Nessuna modifica</span>
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -130,9 +152,9 @@ export default function MergeButton() {
           ) : (
             <Rocket className={styles.navIcon} />
           )}
-          <span>{isLoading ? "Pubblicando..." : `Pubblica (${aheadBy})`}</span>
+          <span>{isLoading ? "Pubblicando..." : `Pubblica Modifiche`}</span>
           {aheadBy > 0 && (
-            <span className="absolute -top-1 -right-1 bg-tertiary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+            <span className="absolute -top-1 -right-1 bg-secondary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
               {aheadBy}
             </span>
           )}

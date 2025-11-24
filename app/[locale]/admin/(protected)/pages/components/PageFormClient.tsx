@@ -14,6 +14,7 @@ import baseStyles from "../../styles";
 import type { Page } from "@/lib/github/types";
 import { usePage } from "@/hooks/swr";
 import { mutate } from "swr";
+import { emitGitOperationSuccess } from "@/lib/utils/gitEvents";
 
 // Import dinamico per evitare problemi SSR con Tiptap
 const MarkdownEditor = dynamic(() => import("../../articles/components/MarkdownEditor"), {
@@ -76,6 +77,7 @@ export default function PageFormClient({ pageSlug }: PageFormClientProps) {
       if (editing && pageSlug) {
         mutate(`/api/pages/${pageSlug}`);
       }
+      emitGitOperationSuccess();
       router.push("/admin/pages");
     }
   }, [state, router, editing, pageSlug]);
@@ -157,4 +159,3 @@ export default function PageFormClient({ pageSlug }: PageFormClientProps) {
     </form>
   );
 }
-

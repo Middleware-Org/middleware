@@ -135,8 +135,9 @@ export default function Sidebar({ dict, locale }: SidebarProps) {
         </ul>
       </nav>
 
+      <MergeButton />
+
       <div className={styles.footer}>
-        <MergeButton />
         <button type="button" onClick={handleLogout} className={styles.logoutButton}>
           <LogOut className={styles.navIcon} />
           <span>Logout</span>
