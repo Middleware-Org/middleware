@@ -103,14 +103,16 @@ export default function ConfirmDialog({
         </div>
 
         <div className={styles.actions}>
-          <button
-            type="button"
-            onClick={handleCancel}
-            disabled={isLoading}
-            className={styles.cancelButton}
-          >
-            {cancelText}
-          </button>
+          {cancelText && (
+            <button
+              type="button"
+              onClick={handleCancel}
+              disabled={isLoading}
+              className={styles.cancelButton}
+            >
+              {cancelText}
+            </button>
+          )}
           <button
             type="button"
             onClick={handleConfirm}
