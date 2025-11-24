@@ -4,12 +4,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { GitMerge, Loader2 } from "lucide-react";
+import { Rocket, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils/classes";
+import ConfirmDialog from "@/components/molecules/confirmDialog";
 import styles from "./Sidebar/styles";
 
 /* **************************************************
- * Merge Button Component
+ * Publish Button Component
  **************************************************/
 export default function MergeButton() {
   const [hasChanges, setHasChanges] = useState(false);
@@ -17,6 +18,8 @@ export default function MergeButton() {
   const [isLoading, setIsLoading] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
   // Check for changes to merge
   useEffect(() => {
@@ -47,13 +50,13 @@ export default function MergeButton() {
     return () => clearInterval(interval);
   }, []);
 
-  async function handleMerge() {
+  function handlePublishClick() {
     if (!hasChanges || isLoading) return;
+    setShowConfirmDialog(true);
+  }
 
-    if (!confirm(`Sei sicuro di voler mergiare ${aheadBy} commit(s) da develop a main?`)) {
-      return;
-    }
-
+  async function handlePublishConfirm() {
+    setShowConfirmDialog(false);
     setIsLoading(true);
     setError(null);
 
@@ -67,11 +70,11 @@ export default function MergeButton() {
       if (res.ok && data.success) {
         setHasChanges(false);
         setAheadBy(0);
-        alert("Merge completato con successo!");
+        setShowSuccessDialog(true);
         // Refresh the page after a short delay
         setTimeout(() => {
           window.location.reload();
-        }, 1000);
+        }, 2000);
       } else {
         if (data.conflict) {
           setError("Conflitto di merge rilevato. Risolvi manualmente.");
@@ -80,13 +83,13 @@ export default function MergeButton() {
           setAheadBy(0);
           setError(null);
         } else {
-          setError(data.error || "Errore durante il merge");
+          setError(data.error || "Errore durante la pubblicazione");
         }
+        setIsLoading(false);
       }
     } catch (err) {
-      console.error("Error merging:", err);
-      setError("Errore durante il merge");
-    } finally {
+      console.error("Error publishing:", err);
+      setError("Errore durante la pubblicazione");
       setIsLoading(false);
     }
   }
@@ -110,30 +113,61 @@ export default function MergeButton() {
   }
 
   return (
-    <div className="mb-2">
-      <button
-        type="button"
-        onClick={handleMerge}
-        disabled={isLoading}
-        className={cn(
-          styles.mergeButton,
-          "relative",
-          isLoading ? "opacity-50 cursor-not-allowed" : "",
-        )}
-      >
-        {isLoading ? (
-          <Loader2 className={cn(styles.navIcon, "animate-spin")} />
-        ) : (
-          <GitMerge className={styles.navIcon} />
-        )}
-        <span>{isLoading ? "Mergiando..." : `Merge (${aheadBy})`}</span>
-        {aheadBy > 0 && (
-          <span className="absolute -top-1 -right-1 bg-tertiary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-            {aheadBy}
-          </span>
-        )}
-      </button>
-      {error && <div className="mt-1 text-xs text-red-500 px-4">{error}</div>}
-    </div>
+    <>
+      <div className="mb-2">
+        <button
+          type="button"
+          onClick={handlePublishClick}
+          disabled={isLoading}
+          className={cn(
+            styles.mergeButton,
+            "relative",
+            isLoading ? "opacity-50 cursor-not-allowed" : "",
+          )}
+        >
+          {isLoading ? (
+            <Loader2 className={cn(styles.navIcon, "animate-spin")} />
+          ) : (
+            <Rocket className={styles.navIcon} />
+          )}
+          <span>{isLoading ? "Pubblicando..." : `Pubblica (${aheadBy})`}</span>
+          {aheadBy > 0 && (
+            <span className="absolute -top-1 -right-1 bg-tertiary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              {aheadBy}
+            </span>
+          )}
+        </button>
+        {error && <div className="mt-1 text-xs text-red-500 px-4">{error}</div>}
+      </div>
+
+      {/* Confirm Dialog */}
+      <ConfirmDialog
+        isOpen={showConfirmDialog}
+        onClose={() => setShowConfirmDialog(false)}
+        onConfirm={handlePublishConfirm}
+        title="Pubblica modifiche"
+        message={`Sei sicuro di voler pubblicare ${aheadBy} modifiche? Questa azione attiverà il processo di pubblicazione.`}
+        confirmText="Pubblica"
+        cancelText="Annulla"
+        isLoading={isLoading}
+      />
+
+      {/* Success Dialog */}
+      <ConfirmDialog
+        isOpen={showSuccessDialog}
+        onClose={() => {
+          setShowSuccessDialog(false);
+          window.location.reload();
+        }}
+        onConfirm={() => {
+          setShowSuccessDialog(false);
+          window.location.reload();
+        }}
+        title="Pubblicazione completata"
+        message="Le modifiche sono state pubblicate con successo! La pipeline è stata avviata."
+        confirmText="OK"
+        cancelText=""
+      />
+    </>
   );
 }
