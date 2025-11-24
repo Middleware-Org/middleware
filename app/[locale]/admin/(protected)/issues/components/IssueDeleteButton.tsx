@@ -24,13 +24,13 @@ export default function IssueDeleteButton({ issueSlug }: IssueDeleteButtonProps)
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
-  
+
   // Usa SWR per ottenere l'issue (cache pre-popolata dal server)
   const { issue } = useIssue(issueSlug);
 
   async function handleDelete() {
     if (!issue) return;
-    
+
     if (!confirm(`Sei sicuro di voler eliminare l'issue "${issue.title}"?`)) {
       return;
     }
@@ -62,14 +62,9 @@ export default function IssueDeleteButton({ issueSlug }: IssueDeleteButtonProps)
           ⚠️ {error.message}
         </div>
       )}
-      <button
-        onClick={handleDelete}
-        className={styles.deleteButton}
-        disabled={isPending}
-      >
+      <button onClick={handleDelete} className={styles.deleteButton} disabled={isPending}>
         {isPending ? "Eliminazione..." : "Elimina Issue"}
       </button>
     </div>
   );
 }
-
