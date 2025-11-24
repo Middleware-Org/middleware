@@ -33,8 +33,9 @@ const styles = {
     "flex justify-center md:justify-between lg:justify-between text-center md:text-left lg:text-left items-center",
   ),
   textContainer: cn("flex flex-col"),
+  textFlexContainer: cn("flex items-center gap-2"),
   textTitle: cn("text-lg md:text-2xl lg:text-3xl font-bold leading-tight"),
-  textAuthor: cn("text-xs md:text-sm lg:text-base text-secondary/80 hover:underline"),
+  textAuthor: cn("text-xs md:text-xs lg:text-sm text-secondary/80"),
   titleContainer: cn("flex items-start justify-between gap-2 md:gap-4"),
   title: cn("text-lg md:text-2xl lg:text-3xl font-bold leading-tight flex-1"),
   category: cn(
@@ -72,7 +73,7 @@ const styles = {
   ),
   icon: cn("text-base md:text-lg text-secondary"),
   playIcon: cn("text-xl md:text-2xl lg:text-3xl text-secondary ml-0.5"),
-  progressContainer: cn("flex items-center gap-3 md:gap-4 w-full pb-4 pt-2 px-4"),
+  progressContainer: cn("flex items-center gap-3 md:gap-4 w-full px-4 py-2"),
   progressBar: cn(
     "flex-1 h-1 md:h-1.5 bg-secondary/20 appearance-none cursor-pointer",
     "focus:outline-none focus:ring-0",
