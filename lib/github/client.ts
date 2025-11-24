@@ -10,7 +10,10 @@ const GITHUB_API_URL = "https://api.github.com";
 
 const owner = process.env.GITHUB_OWNER!;
 const repo = process.env.GITHUB_REPO!;
-const branch = process.env.GITHUB_BRANCH || "main";
+const devBranch = process.env.GITHUB_DEV_BRANCH || "develop";
+// All operations (read and write) use dev branch
+// Only merge operations use main branch
+const writeBranch = devBranch;
 const token = process.env.GITHUB_TOKEN!;
 
 if (!owner || !repo || !token) {
@@ -40,7 +43,8 @@ export async function githubFetch(path: string) {
 }
 
 export async function getFileContent(path: string): Promise<string> {
-  const file = await githubFetch(`contents/${path}?ref=${branch}`);
+  // Read from dev branch to see latest changes
+  const file = await githubFetch(`contents/${path}?ref=${writeBranch}`);
 
   if (!("content" in file) || !("encoding" in file)) {
     throw new Error("Unexpected GitHub response for file content");
@@ -59,7 +63,8 @@ export async function getFileContent(path: string): Promise<string> {
 }
 
 export async function listDirectoryFiles(dir: string): Promise<GitHubFile[]> {
-  const files = await githubFetch(`contents/${dir}?ref=${branch}`);
+  // Read from dev branch to see latest changes
+  const files = await githubFetch(`contents/${dir}?ref=${writeBranch}`);
   return Array.isArray(files) ? files : [];
 }
 
@@ -107,9 +112,13 @@ export async function githubDelete(path: string, body: unknown) {
   return res.json();
 }
 
-export async function getFileSha(path: string): Promise<string | null> {
+export async function getFileSha(
+  path: string,
+  useDevBranch: boolean = true, // Default to dev branch for all operations
+): Promise<string | null> {
   try {
-    const file = await githubFetch(`contents/${path}?ref=${branch}`);
+    // Always use dev branch (useDevBranch is kept for backward compatibility but defaults to true)
+    const file = await githubFetch(`contents/${path}?ref=${writeBranch}`);
     return (file.sha as string) || null;
   } catch {
     return null;
@@ -121,19 +130,19 @@ export async function createOrUpdateFile(
   content: string,
   message: string,
 ): Promise<void> {
-  const sha = await getFileSha(path);
+  const sha = await getFileSha(path, true); // Check in dev branch
   const contentBase64 = Buffer.from(content, "utf-8").toString("base64");
 
   await githubPut(`contents/${path}`, {
     message,
     content: contentBase64,
-    branch,
+    branch: writeBranch,
     ...(sha && { sha }),
   });
 }
 
 export async function deleteFile(path: string, message: string): Promise<void> {
-  const sha = await getFileSha(path);
+  const sha = await getFileSha(path, true); // Check in dev branch
 
   if (!sha) {
     throw new Error(`File ${path} not found`);
@@ -142,7 +151,7 @@ export async function deleteFile(path: string, message: string): Promise<void> {
   await githubDelete(`contents/${path}`, {
     message,
     sha,
-    branch,
+    branch: writeBranch,
   });
 }
 
@@ -160,16 +169,16 @@ export async function renameFile(
   await githubPut(`contents/${newPath}`, {
     message,
     content: contentBase64,
-    branch,
+    branch: writeBranch,
   });
 
   // Elimina il vecchio file
-  const oldSha = await getFileSha(oldPath);
+  const oldSha = await getFileSha(oldPath, true); // Check in dev branch
   if (oldSha) {
     await githubDelete(`contents/${oldPath}`, {
       message: `Rename: ${oldPath} -> ${newPath}`,
       sha: oldSha,
-      branch,
+      branch: writeBranch,
     });
   }
 }
@@ -212,12 +221,12 @@ export async function uploadFile(
   }
 
   const filePath = `public/assets/${filename}`;
-  const sha = await getFileSha(filePath);
+  const sha = await getFileSha(filePath, true); // Check in dev branch
 
   await githubPut(`contents/${filePath}`, {
     message: `Upload ${fileType}: ${filename}`,
     content: base64Data,
-    branch,
+    branch: writeBranch,
     ...(sha && { sha }),
   });
 

@@ -20,6 +20,11 @@ const styles = {
   navItemInactive: cn("text-secondary hover:text-white"),
   navIcon: cn("w-5 h-5"),
   footer: cn("p-4 border-t border-secondary"),
+  mergeButton: cn(
+    "w-full flex items-center gap-3 px-4 py-3 transition-all duration-150",
+    "hover:bg-tertiary text-secondary/60 hover:text-white",
+    "relative",
+  ),
   logoutButton: cn(
     "w-full flex items-center gap-3 px-4 py-3 transition-all duration-150",
     "hover:bg-tertiary text-secondary/60 hover:text-white",
@@ -30,4 +35,3 @@ const styles = {
  * Export
  ************************************************** */
 export default styles;
-

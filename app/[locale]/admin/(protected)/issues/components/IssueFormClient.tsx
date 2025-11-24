@@ -17,7 +17,6 @@ import {
 import { getGitHubImageUrl } from "@/lib/github/images";
 import ConfirmDialog from "@/components/molecules/confirmDialog";
 import styles from "../styles";
-import baseStyles from "../../styles";
 import type { Issue } from "@/lib/github/types";
 import Image from "next/image";
 import { useIssue } from "@/hooks/swr";

@@ -27,6 +27,7 @@ import type { Issue } from "@/lib/github/types";
 import Image from "next/image";
 import { useIssues } from "@/hooks/swr";
 import { mutate } from "swr";
+import { getGitHubImageUrl } from "@/lib/github/images";
 
 /* **************************************************
  * Column Configuration
@@ -125,11 +126,12 @@ export default function IssueListClient() {
           <TableCell>
             {issue.cover ? (
               <Image
-                src={issue.cover}
+                src={getGitHubImageUrl(issue.cover)}
                 width={64}
                 height={64}
                 alt={issue.title}
                 className="w-16 h-16 object-cover border border-secondary"
+                unoptimized
               />
             ) : (
               <div className="w-16 h-16 bg-secondary/20 border border-secondary flex items-center justify-center text-xs text-secondary/60">

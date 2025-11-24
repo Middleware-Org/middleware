@@ -6,7 +6,9 @@ import { NextRequest, NextResponse } from "next/server";
 const GITHUB_API_URL = "https://api.github.com";
 const owner = process.env.GITHUB_OWNER!;
 const repo = process.env.GITHUB_REPO!;
-const branch = process.env.GITHUB_BRANCH || "main";
+const devBranch = process.env.GITHUB_DEV_BRANCH || "develop";
+// Read images from dev branch to see latest changes
+const readBranch = devBranch;
 const token = process.env.GITHUB_TOKEN!;
 
 /* **************************************************
@@ -26,7 +28,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Use GitHub API raw endpoint for direct binary response
-    const apiUrl = `${GITHUB_API_URL}/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
+    // Read from dev branch to see latest changes
+    const apiUrl = `${GITHUB_API_URL}/repos/${owner}/${repo}/contents/${path}?ref=${readBranch}`;
 
     const res = await fetch(apiUrl, {
       headers: {

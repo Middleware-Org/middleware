@@ -3,7 +3,8 @@
  **************************************************/
 const owner = process.env.GITHUB_OWNER!;
 const repo = process.env.GITHUB_REPO!;
-const branch = process.env.GITHUB_BRANCH || "main";
+// All operations use dev branch (images are read from develop)
+const branch = process.env.GITHUB_DEV_BRANCH || "develop";
 
 /* **************************************************
  * GitHub Image URL Helper
@@ -50,4 +51,3 @@ export function getGitHubRawUrl(imagePath: string): string {
   // Return GitHub raw URL
   return `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${fullPath}`;
 }
-

@@ -6,11 +6,9 @@
 import { useState, useTransition } from "react";
 import { deleteMediaAction } from "../actions";
 import { getGitHubImageUrl } from "@/lib/github/images";
-import { useRouter } from "next/navigation";
 import { Music, FileJson } from "lucide-react";
 import styles from "../styles";
 import baseStyles from "../../styles";
-import type { MediaFile } from "@/lib/github/media";
 import Image from "next/image";
 import { useMedia } from "@/hooks/swr";
 import { mutate } from "swr";
@@ -19,7 +17,6 @@ import { mutate } from "swr";
  * Media List Client Component
  **************************************************/
 export default function MediaListClient() {
-  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
 

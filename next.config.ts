@@ -11,8 +11,16 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "via.placeholder.com",
       },
+      {
+        protocol: "http",
+        hostname: "localhost",
+      },
+      {
+        protocol: "https",
+        hostname: "localhost",
+      },
     ],
-    // Allow local API routes with query strings
+    // Allow unoptimized images for local API routes with query strings
     unoptimized: false,
   },
   experimental: {

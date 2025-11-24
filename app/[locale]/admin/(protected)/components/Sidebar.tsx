@@ -21,6 +21,7 @@ import { i18nSettings } from "@/lib/i18n/settings";
 import Pictogram from "@/components/organism/pictogram";
 import { MonoTextBold } from "@/components/atoms/typography";
 import type { CommonDictionary } from "@/lib/i18n/types";
+import MergeButton from "./MergeButton";
 import styles from "./styles";
 
 /* **************************************************
@@ -135,6 +136,7 @@ export default function Sidebar({ dict, locale }: SidebarProps) {
       </nav>
 
       <div className={styles.footer}>
+        <MergeButton />
         <button type="button" onClick={handleLogout} className={styles.logoutButton}>
           <LogOut className={styles.navIcon} />
           <span>Logout</span>
