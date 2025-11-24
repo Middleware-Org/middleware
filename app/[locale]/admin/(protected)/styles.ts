@@ -25,7 +25,7 @@ const styles = {
   // Dashboard stats
   statsGrid: cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"),
   statCard: cn(
-    "bg-primary border border-secondary p-6 rounded-lg",
+    "bg-primary border border-secondary p-6",
     "hover:border-tertiary hover:shadow-lg transition-all duration-150",
     "flex flex-col justify-between",
   ),

@@ -34,11 +34,14 @@ const styles = {
   ),
   textContainer: cn("flex flex-col"),
   textTitle: cn("text-lg md:text-2xl lg:text-3xl font-bold leading-tight"),
-  textAuthor: cn("text-xs md:text-sm lg:text-base text-secondary/80"),
+  textAuthor: cn("text-xs md:text-sm lg:text-base text-secondary/80 hover:underline"),
   titleContainer: cn("flex items-start justify-between gap-2 md:gap-4"),
   title: cn("text-lg md:text-2xl lg:text-3xl font-bold leading-tight flex-1"),
-  author: cn("text-xs md:text-sm lg:text-base text-secondary/80"),
-  category: cn("text-xs md:text-sm lg:text-base uppercase tracking-wide text-secondary/60"),
+  category: cn(
+    "text-xs md:text-sm lg:text-base uppercase tracking-wide text-secondary/60 hover:underline",
+  ),
+  textTTS: cn("text-[10px] text-secondary/60 hover:underline"),
+  textDate: cn("text-xs text-secondary/60"),
   playerSection: cn("flex flex-col gap-4 md:gap-6", "p-2 md:p-6 lg:p-6 w-full", "relative"),
   volumeButtonWrapper: cn("relative"),
   speedButtonWrapper: cn("relative"),
@@ -69,7 +72,7 @@ const styles = {
   ),
   icon: cn("text-base md:text-lg text-secondary"),
   playIcon: cn("text-xl md:text-2xl lg:text-3xl text-secondary ml-0.5"),
-  progressContainer: cn("flex items-center gap-3 md:gap-4 w-full px-4 py-2"),
+  progressContainer: cn("flex items-center gap-3 md:gap-4 w-full pb-4 pt-2 px-4"),
   progressBar: cn(
     "flex-1 h-1 md:h-1.5 bg-secondary/20 appearance-none cursor-pointer",
     "focus:outline-none focus:ring-0",
@@ -142,10 +145,7 @@ const styles = {
   segment: cn("text-sm md:text-base leading-relaxed text-secondary/50"),
   segmentActive: cn("text-base md:text-lg leading-relaxed"),
   segmentFade: cn("text-sm md:text-base leading-relaxed opacity-40"),
-  citationFooter: cn(
-    "mt-4 pt-4 border-t border-secondary/20",
-    "text-center",
-  ),
+  citationFooter: cn("mt-4 pt-4 border-t border-secondary/20", "text-center"),
   citationText: cn("text-xs md:text-sm text-secondary/60 leading-relaxed"),
   citationLink: cn(
     "text-secondary/80 hover:text-tertiary underline transition-colors duration-150",

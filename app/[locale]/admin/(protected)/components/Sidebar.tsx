@@ -63,6 +63,26 @@ export default function Sidebar({ dict, locale }: SidebarProps) {
       icon: LayoutDashboard,
     },
     {
+      href: "/admin/articles",
+      label: "Articoli",
+      icon: FileText,
+    },
+    {
+      href: "/admin/media",
+      label: "Media",
+      icon: ImageIcon,
+    },
+    {
+      href: "/admin/issues",
+      label: "Issues",
+      icon: BookOpen,
+    },
+    {
+      href: "/admin/pages",
+      label: "Pagine",
+      icon: FileCode,
+    },
+    {
       href: "/admin/categories",
       label: "Categorie",
       icon: FolderTree,
@@ -71,26 +91,6 @@ export default function Sidebar({ dict, locale }: SidebarProps) {
       href: "/admin/authors",
       label: "Autori",
       icon: Users,
-    },
-    {
-      href: "/admin/issues",
-      label: "Issues",
-      icon: BookOpen,
-    },
-    {
-      href: "/admin/media",
-      label: "Media",
-      icon: ImageIcon,
-    },
-    {
-      href: "/admin/articles",
-      label: "Articoli",
-      icon: FileText,
-    },
-    {
-      href: "/admin/pages",
-      label: "Pagine",
-      icon: FileCode,
     },
   ];
 
@@ -109,8 +109,6 @@ export default function Sidebar({ dict, locale }: SidebarProps) {
         <ul className={styles.navList}>
           {navItems.map((item) => {
             const Icon = item.icon;
-            // Per "/admin", deve essere attivo solo se il pathname è esattamente "/admin" o "/admin/"
-            // Per gli altri link, devono essere attivi se il pathname inizia con il loro href
             const isActive =
               item.href === "/admin"
                 ? pathnameWithoutLocale === "/admin" || pathnameWithoutLocale === "/admin/"
@@ -127,7 +125,9 @@ export default function Sidebar({ dict, locale }: SidebarProps) {
                   )}
                 >
                   <Icon className={styles.navIcon} />
-                  <span>{item.label}</span>
+                  <span className={isActive ? styles.navItemActiveText : styles.navItemText}>
+                    {item.label}
+                  </span>
                 </Link>
               </li>
             );
