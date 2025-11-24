@@ -660,6 +660,21 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
             </div>
           </div>
           <div className={styles.transcriptFadeBottom} />
+          {/* Citation Footer */}
+          <div className={styles.citationFooter}>
+            <MonoTextLight className={styles.citationText}>
+              TTS powered by{" "}
+              <a
+                href="https://github.com/resemble-ai/chatterbox"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.citationLink}
+              >
+                Chatterbox-TTS
+              </a>{" "}
+              by Resemble AI (2025)
+            </MonoTextLight>
+          </div>
         </div>
       )}
     </div>
