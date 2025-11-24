@@ -20,7 +20,6 @@ import baseStyles from "../../styles";
 import type { Author } from "@/lib/github/types";
 import { useAuthor } from "@/hooks/swr";
 import { mutate } from "swr";
-import { emitGitOperationSuccess } from "@/lib/utils/gitEvents";
 
 /* **************************************************
  * Types
@@ -91,7 +90,7 @@ export default function AuthorFormClient({ authorSlug }: AuthorFormClientProps) 
       if (editing && authorSlug) {
         mutate(`/api/authors/${authorSlug}`);
       }
-      emitGitOperationSuccess();
+      mutate("/api/github/merge/check");
       router.push("/admin/authors");
     }
   }, [state, router, editing, authorSlug]);
@@ -133,7 +132,7 @@ export default function AuthorFormClient({ authorSlug }: AuthorFormClientProps) 
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/authors");
         mutate(`/api/authors/${authorSlug}`);
-        emitGitOperationSuccess();
+        mutate("/api/github/merge/check");
         router.push("/admin/authors");
       }
     });

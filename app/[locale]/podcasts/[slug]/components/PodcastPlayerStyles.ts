@@ -142,6 +142,14 @@ const styles = {
   segment: cn("text-sm md:text-base leading-relaxed text-secondary/50"),
   segmentActive: cn("text-base md:text-lg leading-relaxed"),
   segmentFade: cn("text-sm md:text-base leading-relaxed opacity-40"),
+  citationFooter: cn(
+    "mt-4 pt-4 border-t border-secondary/20",
+    "text-center",
+  ),
+  citationText: cn("text-xs md:text-sm text-secondary/60 leading-relaxed"),
+  citationLink: cn(
+    "text-secondary/80 hover:text-tertiary underline transition-colors duration-150",
+  ),
 };
 
 /* **************************************************

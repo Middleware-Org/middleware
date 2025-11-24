@@ -13,11 +13,11 @@ const token = process.env.GITHUB_TOKEN!;
 
 /* **************************************************
  * GitHub Image Proxy API Route
- *
+  * 
  * This route proxies image requests to GitHub for private repositories.
  * It handles authentication server-side and streams the image to the client.
  * Uses GitHub API raw endpoint for better performance (no base64 decoding needed).
- **************************************************/
+  **************************************************/
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;

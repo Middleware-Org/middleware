@@ -22,7 +22,7 @@ import Image from "next/image";
 import { useIssue } from "@/hooks/swr";
 import MediaSelector from "../../articles/components/MediaSelector";
 import { mutate } from "swr";
-import { emitGitOperationSuccess } from "@/lib/utils/gitEvents";
+
 /* **************************************************
  * Types
  **************************************************/
@@ -200,7 +200,7 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
       if (editing && issueSlug) {
         mutate(`/api/issues/${issueSlug}`);
       }
-      emitGitOperationSuccess();
+      mutate("/api/github/merge/check");
       router.push("/admin/issues");
       // Reset coverImage after navigation
       setTimeout(() => setCoverImage(""), 0);
@@ -251,8 +251,8 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
       } else {
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/issues");
-        emitGitOperationSuccess();
         mutate(`/api/issues/${issueSlug}`);
+        mutate("/api/github/merge/check");
         router.push("/admin/issues");
       }
     });
