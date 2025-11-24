@@ -91,7 +91,11 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
       const currentSegment = segments[currentSegmentIndex];
       const segmentDuration = currentSegment.end - currentSegment.start;
       const timeInSegment = currentTime - currentSegment.start;
-      const segmentProgress = Math.max(0, Math.min(1, timeInSegment / segmentDuration));
+      let segmentProgress = Math.max(0, Math.min(1, timeInSegment / segmentDuration));
+
+      // Accelerate scroll by 30% to keep text ahead of audio
+      // This ensures the text is always visible when being spoken
+      segmentProgress = Math.min(1, segmentProgress * 1.3);
 
       let translateY: number;
 
@@ -102,7 +106,7 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
         // Segment is too long: scroll progressively based on audio progress
         // Calculate how much we need to scroll to show the relevant part
         const totalScrollableHeight = elementHeight - availableHeight;
-        // Scroll from top (0) to bottom (totalScrollableHeight) based on segment progress
+        // Scroll from top (0) to bottom (totalScrollableHeight) based on accelerated segment progress
         const scrollOffset = segmentProgress * totalScrollableHeight;
         // Base position: align top of element to targetOffset
         const baseTranslateY = targetOffset - elementOffsetTop;
@@ -167,22 +171,34 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
     initStorage();
   }, []);
 
-  // Start auto-save when audio is ready
+  // Start auto-save when audio is ready and playing
   useEffect(() => {
     if (totalTime === 0) {
       return;
     }
 
+    // Use refs to get current values in real-time
+    const audio = audioRef.current;
+    if (!audio) {
+      return;
+    }
+
     podcastProgressStorage.startAutoSave(
       podcastId,
-      () => currentTime,
-      () => totalTime,
+      () => {
+        // Get current time directly from audio element for accuracy
+        return audio.currentTime;
+      },
+      () => {
+        // Get total time directly from audio element for accuracy
+        return audio.duration || totalTime;
+      },
     );
 
     return () => {
       podcastProgressStorage.stopAutoSave();
     };
-  }, [podcastId, totalTime, currentTime]);
+  }, [podcastId, totalTime, isPlaying]);
 
   // Load segments JSON
   useEffect(() => {
@@ -252,17 +268,32 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
       setIsPlaying(true);
     };
 
-    const handlePause = () => {
+    const handlePause = async () => {
       setIsPlaying(false);
+      // Save progress when pausing
+      const audio = audioRef.current;
+      if (audio && audio.duration > 0) {
+        const progressPercentage = (audio.currentTime / audio.duration) * 100;
+        await podcastProgressStorage.saveImmediately(
+          podcastId,
+          audio.currentTime,
+          audio.duration,
+          progressPercentage,
+        );
+      }
     };
 
     const handleEnded = async () => {
       setIsPlaying(false);
       setCurrentTime(0);
       setCurrentPosition(0);
-      // Segna come completato
+
+      // Stop auto-save
+      podcastProgressStorage.stopAutoSave();
+
+      // Reset progress to 0 when audio ends
       if (totalTime > 0) {
-        await podcastProgressStorage.markAsCompleted(podcastId, totalTime);
+        await podcastProgressStorage.saveProgress(podcastId, 0, totalTime, 0, false);
       }
     };
 
