@@ -52,7 +52,7 @@ export default function CategoriesList({ categories }: CategoriesListProps) {
               onClick={handleCategoryClick}
               className={styles.button}
             >
-              <MonoTextLight className={cn(styles.buttonText, isActive && "text-tertiary")}>
+              <MonoTextLight className={cn(styles.buttonText, isActive ? "text-tertiary" : "")}>
                 {category.name}
               </MonoTextLight>
             </Link>
