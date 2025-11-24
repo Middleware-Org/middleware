@@ -505,19 +505,23 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
             <div className={styles.infoContainer}>
               <div className={styles.textContainer}>
                 <SerifText className={styles.textTitle}>{article.title}</SerifText>
-                <MonoTextLight className={styles.textDate}>
-                  {formatDateByLang(article.date, lang, isMobile)}
-                </MonoTextLight>
-                {author && (
-                  <Link href={`/authors?author=${author.slug}`}>
-                    <MonoTextLight className={styles.textAuthor}>{author.name}</MonoTextLight>
-                  </Link>
-                )}
-                {category && (
-                  <Link href={`/categories?category=${category.slug}`}>
-                    <MonoTextLight className={styles.category}>{category.name}</MonoTextLight>
-                  </Link>
-                )}
+                <div className={styles.textFlexContainer}>
+                  <MonoTextLight className={styles.textAuthor}>
+                    {author ? (
+                      <Link href={`/authors?author=${author.slug}`}>{author.name}</Link>
+                    ) : (
+                      ""
+                    )}
+                    {author && " - "}
+                    {category ? (
+                      <Link href={`/categories?category=${category.slug}`}>{category.name}</Link>
+                    ) : (
+                      ""
+                    )}
+                    {category && " - "}
+                    {formatDateByLang(article.date, lang, isMobile)}
+                  </MonoTextLight>
+                </div>
                 <Link
                   href="https://github.com/resemble-ai/chatterbox"
                   target="_blank"
