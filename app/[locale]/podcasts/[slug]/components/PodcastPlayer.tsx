@@ -16,6 +16,7 @@ import { useIsMobile } from "@/hooks/useMediaQuery";
 import { podcastProgressStorage } from "@/lib/storage/podcastProgress";
 import VerticalRange from "./VerticalRange";
 import styles from "./PodcastPlayerStyles";
+import Link from "next/link";
 
 /* **************************************************
  * Types
@@ -504,14 +505,28 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
             <div className={styles.infoContainer}>
               <div className={styles.textContainer}>
                 <SerifText className={styles.textTitle}>{article.title}</SerifText>
+                <MonoTextLight className={styles.textDate}>
+                  {formatDateByLang(article.date, lang, isMobile)}
+                </MonoTextLight>
                 {author && (
-                  <MonoTextLight className={styles.textAuthor}>
-                    {author.name} • {formatDateByLang(article.date, lang, isMobile)}
-                  </MonoTextLight>
+                  <Link href={`/authors?author=${author.slug}`}>
+                    <MonoTextLight className={styles.textAuthor}>{author.name}</MonoTextLight>
+                  </Link>
                 )}
                 {category && (
-                  <MonoTextLight className={styles.category}>{category.name}</MonoTextLight>
+                  <Link href={`/categories?category=${category.slug}`}>
+                    <MonoTextLight className={styles.category}>{category.name}</MonoTextLight>
+                  </Link>
                 )}
+                <Link
+                  href="https://github.com/resemble-ai/chatterbox"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <MonoTextLight className={styles.textTTS}>
+                    Podcast powered by Chatterbox-TTS by Resemble AI (2025)
+                  </MonoTextLight>
+                </Link>
               </div>
             </div>
           </div>
@@ -660,21 +675,6 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
             </div>
           </div>
           <div className={styles.transcriptFadeBottom} />
-          {/* Citation Footer */}
-          <div className={styles.citationFooter}>
-            <MonoTextLight className={styles.citationText}>
-              TTS powered by{" "}
-              <a
-                href="https://github.com/resemble-ai/chatterbox"
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.citationLink}
-              >
-                Chatterbox-TTS
-              </a>{" "}
-              by Resemble AI (2025)
-            </MonoTextLight>
-          </div>
         </div>
       )}
     </div>
