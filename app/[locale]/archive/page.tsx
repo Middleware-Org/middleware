@@ -33,23 +33,12 @@ export default async function ArchivePage({ params }: ArchivePageProps) {
   return (
     <div className={styles.wrapper}>
       <ArchiveScrollWrapper stickyOffset={155}>
-        {[
-          ...issues,
-          ...issues,
-          ...issues,
-          ...issues,
-          ...issues,
-          ...issues,
-          ...issues,
-          ...issues,
-          ...issues,
-          ...issues,
-        ].map((issue, index) => {
+        {issues.map((issue, index) => {
           const articles = getArticlesByIssue(issue.slug);
 
           return (
             <ArchiveIssueCard
-              key={`${issue.slug}-${index}`}
+              key={issue.slug}
               issue={issue}
               articles={articles}
               dict={dict}
