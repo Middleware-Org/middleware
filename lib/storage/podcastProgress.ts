@@ -29,10 +29,12 @@ class PodcastProgressStorage {
   private dbVersion = 1;
   private db: IDBPDatabase<PodcastProgressDB> | null = null;
   private saveInterval: NodeJS.Timeout | null = null;
+  private pendingSaveTimeout: NodeJS.Timeout | null = null;
   private lastSavedTime: number = -1;
   private lastSavedProgress: number = -1;
   private pendingSave: boolean = false;
   private saveIntervalMs = 5000; // 5 secondi
+  private pendingSaveTimeoutMs = 2000; // 2 secondi di timeout per pendingSave
 
   /**
    * Inizializza il database IndexedDB
@@ -94,20 +96,46 @@ class PodcastProgressStorage {
     totalTime: number,
     progressPercentage: number,
     isCompleted: boolean = false,
+    force: boolean = false,
   ): Promise<void> {
     if (!this.db) {
-      await this.init();
+      try {
+        await this.init();
+      } catch (error) {
+        console.error("Errore nell'inizializzazione del database durante il salvataggio:", error);
+        return;
+      }
     }
 
     if (!this.db) {
+      console.warn("Database non disponibile per il salvataggio");
       return;
     }
 
-    if (this.pendingSave) {
+    // Se c'è un salvataggio in corso e non è forzato, aspetta o salta
+    if (this.pendingSave && !force) {
       return;
+    }
+
+    // Pulisci il timeout precedente se esiste
+    if (this.pendingSaveTimeout) {
+      clearTimeout(this.pendingSaveTimeout);
+      this.pendingSaveTimeout = null;
     }
 
     this.pendingSave = true;
+
+    // Timeout di sicurezza per evitare che pendingSave rimanga bloccato
+    this.pendingSaveTimeout = setTimeout(() => {
+      if (this.pendingSave) {
+        console.warn("Timeout del salvataggio, resettando pendingSave");
+        this.pendingSave = false;
+      }
+      if (this.pendingSaveTimeout) {
+        clearTimeout(this.pendingSaveTimeout);
+        this.pendingSaveTimeout = null;
+      }
+    }, this.pendingSaveTimeoutMs);
 
     try {
       const progress: PodcastProgress = {
@@ -124,8 +152,38 @@ class PodcastProgressStorage {
       this.lastSavedProgress = progressPercentage;
     } catch (error) {
       console.error(`Errore nel salvataggio del progresso per ${podcastId}:`, error);
+      // Su mobile, a volte IndexedDB può fallire silenziosamente
+      // Proviamo a reinizializzare il database
+      try {
+        const oldDb = this.db;
+        this.db = null;
+        await this.init();
+        // Riprova il salvataggio una volta
+        if (this.db) {
+          const progress: PodcastProgress = {
+            podcastId,
+            currentTime,
+            totalTime,
+            progressPercentage,
+            lastUpdated: Date.now(),
+            isCompleted,
+          };
+          await (this.db as IDBPDatabase<PodcastProgressDB>).put("podcastProgress", progress);
+          this.lastSavedTime = currentTime;
+          this.lastSavedProgress = progressPercentage;
+        } else {
+          // Se il retry fallisce, ripristina il vecchio db
+          this.db = oldDb;
+        }
+      } catch (retryError) {
+        console.error(`Errore nel retry del salvataggio per ${podcastId}:`, retryError);
+      }
     } finally {
       this.pendingSave = false;
+      if (this.pendingSaveTimeout) {
+        clearTimeout(this.pendingSaveTimeout);
+        this.pendingSaveTimeout = null;
+      }
     }
   }
 
@@ -167,6 +225,10 @@ class PodcastProgressStorage {
       clearInterval(this.saveInterval);
       this.saveInterval = null;
     }
+    if (this.pendingSaveTimeout) {
+      clearTimeout(this.pendingSaveTimeout);
+      this.pendingSaveTimeout = null;
+    }
   }
 
   /**
@@ -178,7 +240,7 @@ class PodcastProgressStorage {
     totalTime: number,
     progressPercentage: number,
   ): Promise<void> {
-    await this.saveProgress(podcastId, currentTime, totalTime, progressPercentage, false);
+    await this.saveProgress(podcastId, currentTime, totalTime, progressPercentage, false, true);
   }
 
   /**
