@@ -9,7 +9,7 @@ import { useParams } from "next/navigation";
 import Separator from "@/components/atoms/separetor";
 import { MonoTextBold, MonoTextLight, SerifText } from "@/components/atoms/typography";
 import { lightenColor, getTextColor } from "@/lib/utils/color";
-import Date from "@/components/atoms/date";
+import FormattedDate from "@/components/atoms/date";
 import { Article, Issue } from "@/.velite";
 import { CommonDictionary } from "@/lib/i18n/types";
 import { getAuthorBySlug, getCategoryBySlug } from "@/lib/content";
@@ -139,7 +139,7 @@ export default function ArchiveIssueCard({
                 className={styles.createdAtBadgeText}
                 style={{ color: `${issue.color}!important` }}
               >
-                <Date date={issue.date} lang={locale as "it"} />
+                <FormattedDate date={issue.date} lang={locale as "it"} />
               </MonoTextBold>
             </div>
             <Link
@@ -167,7 +167,7 @@ export default function ArchiveIssueCard({
               <header className={styles.header}>
                 <div className={styles.badgesMobile}>
                   <div className={styles.badgeDate}>
-                    <Date date={issue.date} lang={lang} className={styles.badgeTextDate} />
+                    <FormattedDate date={issue.date} lang={lang} className={styles.badgeTextDate} />
                   </div>
                   <div className={styles.badgeTitle}>
                     <MonoTextLight className={styles.badgeTextTitle}>{issue.title}</MonoTextLight>

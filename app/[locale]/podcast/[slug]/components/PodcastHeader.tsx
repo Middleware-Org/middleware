@@ -7,7 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { MonoTextLight, SerifText } from "@/components/atoms/typography";
 import { Article } from "@/.velite";
-import Date from "@/components/atoms/date";
+import FormattedDate from "@/components/atoms/date";
 import { useParams } from "next/navigation";
 import styles from "./PodcastPlayerStyles";
 
@@ -54,7 +54,7 @@ export default function PodcastHeader({ article, issue, author, category }: Podc
               </Link>
             )}
             {article.date && (
-              <Date date={article.date} lang={lang} className={styles.textDate} />
+              <FormattedDate date={article.date} lang={lang} className={styles.textDate} />
             )}
             <Link
               href="https://github.com/resemble-ai/chatterbox"

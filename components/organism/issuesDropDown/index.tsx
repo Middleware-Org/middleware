@@ -9,7 +9,7 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import { MonoTextLight } from "@/components/atoms/typography";
 import { useActiveIssue } from "@/hooks/useActiveIssue";
 import { cn } from "@/lib/utils/classes";
-import Date from "@/components/atoms/date";
+import FormattedDate from "@/components/atoms/date";
 import Button from "@/components/atoms/button";
 import styles from "./styles";
 import { Issue } from "@/.velite";
@@ -102,7 +102,7 @@ export default function IssuesDropdown({ issues, className }: IssuesDropdownProp
           <ChevronDown className={styles.chevron} />
         )}
         <MonoTextLight className={styles.issueText}>
-          | <Date date={displayIssue.date} lang={lang} />
+          | <FormattedDate date={displayIssue.date} lang={lang} />
         </MonoTextLight>
       </button>
 

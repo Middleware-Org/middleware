@@ -6,7 +6,7 @@
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import { MonoTextLight } from "@/components/atoms/typography";
-import Date from "@/components/atoms/date";
+import FormattedDate from "@/components/atoms/date";
 import styles from "./styles";
 import ArticleInEvidenceCard from "@/components/molecules/articleInEvidenceCard";
 import { CommonDictionary } from "@/lib/i18n/types";
@@ -48,7 +48,7 @@ export default function Cover({ issue, articleInEvidence, dict }: CoverProps) {
           />
           <div className={styles.badgesWrapper}>
             <div className={styles.badgeDate}>
-              <Date date={issue.date} lang={lang as "it"} className={styles.badgeTextDate} />
+              <FormattedDate date={issue.date} lang={lang as "it"} className={styles.badgeTextDate} />
             </div>
             <div className={styles.badgeTitle}>
               <Link href={`/issues/${issue.slug}`}>

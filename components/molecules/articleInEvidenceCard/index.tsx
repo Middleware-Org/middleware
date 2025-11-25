@@ -9,7 +9,7 @@ import Separator from "@/components/atoms/separetor";
 import { H3, MonoTextBold, MonoTextLight, SerifText } from "@/components/atoms/typography";
 import { cn } from "@/lib/utils/classes";
 import { getTextColor } from "@/lib/utils/color";
-import Date from "@/components/atoms/date";
+import FormattedDate from "@/components/atoms/date";
 import styles from "./styles";
 import type { Article, Issue } from "@/.velite";
 import { CommonDictionary } from "@/lib/i18n/types";
@@ -47,7 +47,7 @@ export default function ArticleInEvidenceCard({
       <header className={styles.header}>
         <div className={styles.badgesMobile}>
           <div className={styles.badgeDate}>
-            <Date date={article.date} lang={lang} className={styles.badgeTextDate} />
+            <FormattedDate date={article.date} lang={lang} className={styles.badgeTextDate} />
           </div>
           <div className={styles.badgeTitle}>
             <Link href={`/issues/${issue.slug}`}>

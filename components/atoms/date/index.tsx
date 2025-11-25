@@ -7,18 +7,18 @@ import { cn } from "@/lib/utils/classes";
 /* **************************************************
  * Types
  **************************************************/
-interface DateProps {
+interface FormattedDateProps {
   date: string;
   lang?: "it" | "en";
   className?: string;
 }
 
 /* **************************************************
- * Date Component
+ * FormattedDate Component
  * Renderizza entrambe le versioni (mobile e desktop) e le mostra/nasconde con CSS
  **************************************************/
-export default function Date({ date, lang = "it", className }: DateProps) {
-  const mobileDate = new Date(date).toLocaleDateString(
+export default function FormattedDate({ date, lang = "it", className }: FormattedDateProps) {
+  const mobileDate = new globalThis.Date(date).toLocaleDateString(
     lang === "it" ? "it-IT" : "en-US",
     {
       day: "numeric",
@@ -27,7 +27,7 @@ export default function Date({ date, lang = "it", className }: DateProps) {
     },
   );
 
-  const desktopDate = new Date(date).toLocaleDateString(
+  const desktopDate = new globalThis.Date(date).toLocaleDateString(
     lang === "it" ? "it-IT" : "en-US",
     {
       day: "numeric",

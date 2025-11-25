@@ -8,7 +8,7 @@ import Link from "next/link";
 import Separator from "@/components/atoms/separetor";
 import { MonoTextBold, MonoTextLight, SerifText } from "@/components/atoms/typography";
 import { lightenColor, getTextColor } from "@/lib/utils/color";
-import Date from "@/components/atoms/date";
+import FormattedDate from "@/components/atoms/date";
 import { Article, Issue } from "@/.velite";
 import { CommonDictionary } from "@/lib/i18n/types";
 import { getAuthorBySlug, getCategoryBySlug } from "@/lib/content";
@@ -132,7 +132,7 @@ export default function ArchiveIssueCard({
               }}
             >
               <MonoTextBold className={styles.createdAtBadgeText} style={{ color: issue.color }}>
-                <Date date={issue.date} lang={locale as "it"} />
+                <FormattedDate date={issue.date} lang={locale as "it"} />
               </MonoTextBold>
             </div>
             <Link
