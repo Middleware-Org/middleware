@@ -16,7 +16,7 @@ type PolicyBannerProps = {
 export default async function PolicyBanner({
   className,
   dict,
-  cookieName = "policyAccepted_v2",
+  cookieName = "policyAccepted",
   maxAgeDays = 180,
 }: PolicyBannerProps) {
   const cookieStore = cookies();

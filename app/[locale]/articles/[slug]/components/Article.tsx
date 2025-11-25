@@ -50,7 +50,7 @@ export default function Article({ article, dict }: ArticleProps) {
           </MonoTextLight>
           {article.audio && (
             <Link
-              href={`/podcasts/${article.slug}`}
+              href={`/podcast/${article.slug}`}
               className="flex items-center gap-2 hover:underline"
             >
               <Play className="w-4 h-4" />
