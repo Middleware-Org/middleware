@@ -10,7 +10,10 @@ import { prisma } from "../prisma";
 /* ****************************************************************
  * Auth Configuration
  ***************************************************************** */
+const baseURL = process.env.NEXT_PUBLIC_BASE_URL || "https://middleware.media";
+
 export const auth = betterAuth({
+  baseURL,
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
@@ -20,6 +23,13 @@ export const auth = betterAuth({
     requireEmailVerification: false,
     minPasswordLength: 8,
   },
+
+  trustedOrigins: [
+    baseURL,
+    "https://middleware.media",
+    "http://localhost:3000",
+    ...(process.env.NODE_ENV === "development" ? ["http://localhost:3000"] : []),
+  ],
 
   plugins: [nextCookies()],
 });
