@@ -9,6 +9,11 @@ import { MonoTextLight } from "@/components/atoms/typography";
 import { getIssueBySlug } from "@/lib/content";
 import { notFound } from "next/navigation";
 import Footer from "@/components/organism/footer";
+import {
+  getBaseUrl,
+  createOpenGraphMetadata,
+  createTwitterMetadata,
+} from "@/lib/utils/metadata";
 
 /* **************************************************
  * Types
@@ -33,14 +38,30 @@ export async function generateMetadata({ params }: IssueLayoutProps) {
     return null;
   }
 
+  const ogImage = issue.cover ? `${getBaseUrl()}${issue.cover}` : undefined;
+  const url = `${getBaseUrl()}/${locale}/${TRANSLATION_NAMESPACES.ISSUE}/${issue.slug}`;
+  const title = `${dictCommon.meta.title} - ${issue.title}`;
+
   return {
-    title: `${dictCommon.meta.title} - ${issue.title}`,
+    title,
     description: issue.description,
     alternates: {
       languages: {
         [locale]: `/${locale}/${TRANSLATION_NAMESPACES.ISSUE}`,
       },
     },
+    openGraph: createOpenGraphMetadata({
+      title: issue.title,
+      description: issue.description,
+      url,
+      type: "website",
+      image: ogImage,
+    }),
+    twitter: createTwitterMetadata({
+      title: issue.title,
+      description: issue.description,
+      image: ogImage,
+    }),
   };
 }
 

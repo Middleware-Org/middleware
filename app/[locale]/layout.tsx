@@ -7,6 +7,11 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "@/globals.css";
 import PolicyBanner from "@/components/organism/banner";
+import {
+  getBaseUrl,
+  createOpenGraphMetadata,
+  createTwitterMetadata,
+} from "@/lib/utils/metadata";
 
 /* **************************************************
  * Types
@@ -25,6 +30,8 @@ export async function generateMetadata({ params }: RootLayoutProps) {
   const dict = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
   const meta = dict.meta;
 
+  const url = `${getBaseUrl()}/${locale}`;
+
   return {
     title: meta.title,
     description: meta.description,
@@ -33,6 +40,16 @@ export async function generateMetadata({ params }: RootLayoutProps) {
         [locale]: `/${locale}/${TRANSLATION_NAMESPACES.HOME}`,
       },
     },
+    openGraph: createOpenGraphMetadata({
+      title: meta.title,
+      description: meta.description,
+      url,
+      type: "website",
+    }),
+    twitter: createTwitterMetadata({
+      title: meta.title,
+      description: meta.description,
+    }),
     manifest: "/manifest.json",
     appleWebApp: {
       capable: true,

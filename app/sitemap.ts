@@ -10,7 +10,7 @@ import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
  * Sitemap
  **************************************************/
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://middleware.it";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://middleware.media";
   const locale = i18nSettings.defaultLocale;
 
   // Ottieni tutti i contenuti
