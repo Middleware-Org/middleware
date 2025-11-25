@@ -26,6 +26,7 @@ export async function generateMetadata({ params }: IssueLayoutProps) {
   const locale = resolvedParams?.locale || "it";
   const slug = resolvedParams?.slug || "";
 
+  const dictCommon = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
   const issue = getIssueBySlug(slug);
 
   if (!issue) {
@@ -33,7 +34,7 @@ export async function generateMetadata({ params }: IssueLayoutProps) {
   }
 
   return {
-    title: issue.title,
+    title: `${dictCommon.meta.title} - ${issue.title}`,
     description: issue.description,
     alternates: {
       languages: {

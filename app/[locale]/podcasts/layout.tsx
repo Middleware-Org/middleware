@@ -27,6 +27,7 @@ export async function generateMetadata({ params }: PodcastsLayoutProps) {
   const slug = resolvedParams?.slug || undefined;
 
   const dict = await getDictionary(locale, TRANSLATION_NAMESPACES.PODCAST);
+  const dictCommon = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
 
   if (!slug) {
     return {
@@ -47,7 +48,7 @@ export async function generateMetadata({ params }: PodcastsLayoutProps) {
   }
 
   return {
-    title: article.title,
+    title: `${dictCommon.meta.title} - ${article.title}`,
     description: article.excerpt,
     alternates: {
       languages: {

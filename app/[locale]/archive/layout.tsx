@@ -24,9 +24,10 @@ export async function generateMetadata({ params }: ArchiveLayoutProps) {
   const locale = resolvedParams?.locale || "it";
 
   const dict = await getDictionary(locale, TRANSLATION_NAMESPACES.ARCHIVE);
+  const dictCommon = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
 
   return {
-    title: dict.meta.title,
+    title: `${dictCommon.meta.title} - ${dict.meta.title}`,
     description: dict.meta.description,
     alternates: {
       languages: {

@@ -25,18 +25,18 @@ interface SlugLayoutProps {
 export async function generateMetadata({ params }: SlugLayoutProps) {
   const { locale, slug } = await params;
 
+  const dictCommon = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
   const page = getPageBySlug(slug);
 
   if (!page) {
-    const dict = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
     return {
-      title: dict.meta.title,
-      description: dict.meta.description,
+      title: dictCommon.meta.title,
+      description: dictCommon.meta.description,
     };
   }
 
   return {
-    title: page.title,
+    title: `${dictCommon.meta.title} - ${page.title}`,
     description: page.excerpt,
     alternates: {
       languages: {
