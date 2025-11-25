@@ -7,9 +7,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { MonoTextLight, SerifText } from "@/components/atoms/typography";
 import { Article } from "@/.velite";
-import { formatDateByLang } from "@/lib/utils/date";
+import Date from "@/components/atoms/date";
 import { useParams } from "next/navigation";
-import { useIsMobile } from "@/hooks/useMediaQuery";
 import styles from "./PodcastPlayerStyles";
 
 /* **************************************************
@@ -27,7 +26,6 @@ type PodcastHeaderProps = {
  **************************************************/
 export default function PodcastHeader({ article, issue, author, category }: PodcastHeaderProps) {
   const { lang = "it" } = useParams() as { lang: "it" };
-  const isMobile = useIsMobile();
 
   return (
     <div className={styles.headerSection}>
@@ -56,9 +54,7 @@ export default function PodcastHeader({ article, issue, author, category }: Podc
               </Link>
             )}
             {article.date && (
-              <MonoTextLight className={styles.textDate}>
-                {formatDateByLang(article.date, lang, isMobile)}
-              </MonoTextLight>
+              <Date date={article.date} lang={lang} className={styles.textDate} />
             )}
             <Link
               href="https://github.com/resemble-ai/chatterbox"

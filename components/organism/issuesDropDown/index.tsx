@@ -8,9 +8,8 @@ import { useEffect, useRef, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { MonoTextLight } from "@/components/atoms/typography";
 import { useActiveIssue } from "@/hooks/useActiveIssue";
-import { useIsMobile } from "@/hooks/useMediaQuery";
 import { cn } from "@/lib/utils/classes";
-import { formatDateByLang } from "@/lib/utils/date";
+import Date from "@/components/atoms/date";
 import Button from "@/components/atoms/button";
 import styles from "./styles";
 import { Issue } from "@/.velite";
@@ -28,7 +27,6 @@ interface IssuesDropdownProps {
  **************************************************/
 export default function IssuesDropdown({ issues, className }: IssuesDropdownProps) {
   const { lang = "it" } = useParams() as { lang: "it" };
-  const isMobile = useIsMobile();
 
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -104,7 +102,7 @@ export default function IssuesDropdown({ issues, className }: IssuesDropdownProp
           <ChevronDown className={styles.chevron} />
         )}
         <MonoTextLight className={styles.issueText}>
-          | {formatDateByLang(displayIssue.date, lang, isMobile)}
+          | <Date date={displayIssue.date} lang={lang} />
         </MonoTextLight>
       </button>
 

@@ -3,9 +3,8 @@
  **************************************************/
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef } from "react";
 import { uploadMediaAction } from "../../media/actions";
-import type { MediaFile } from "@/lib/github/media";
 import baseStyles from "../../styles";
 import styles from "../../media/styles";
 import { useMedia } from "@/hooks/swr";
@@ -41,7 +40,7 @@ export default function AudioJsonMediaSelector({
 
   // Usa SWR per caricare i media files con cache
   const { mediaFiles: allMediaFiles = [], isLoading: loading, isError } = useMedia();
-  
+
   // Filtra i file per tipo
   const mediaFiles = allMediaFiles.filter((file) => file.type === fileType);
   const error = isError ? "Failed to load media files" : null;
@@ -71,9 +70,7 @@ export default function AudioJsonMediaSelector({
     // Validate file size (max 50MB for audio, 10MB for JSON)
     const maxSize = fileType === "audio" ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
     if (file.size > maxSize) {
-      alert(
-        `La dimensione del file deve essere inferiore a ${maxSize / 1024 / 1024}MB`,
-      );
+      alert(`La dimensione del file deve essere inferiore a ${maxSize / 1024 / 1024}MB`);
       return;
     }
 
@@ -103,7 +100,9 @@ export default function AudioJsonMediaSelector({
 
   async function handleUpload() {
     if (!preview) {
-      setUploadError(`Seleziona un file ${fileType === "audio" ? "audio" : "JSON"} prima di caricare`);
+      setUploadError(
+        `Seleziona un file ${fileType === "audio" ? "audio" : "JSON"} prima di caricare`,
+      );
       return;
     }
 
@@ -147,7 +146,6 @@ export default function AudioJsonMediaSelector({
 
   const acceptTypes = fileType === "audio" ? "audio/*,.mp3,.wav" : ".json,application/json";
   const fileTypeLabel = fileType === "audio" ? "audio" : "JSON";
-  const maxSizeLabel = fileType === "audio" ? "50MB" : "10MB";
 
   return (
     <div className={baseStyles.modalOverlay}>
@@ -222,9 +220,7 @@ export default function AudioJsonMediaSelector({
                       Clicca per selezionare un file {fileTypeLabel}
                     </p>
                     <p className="text-sm text-secondary/60 mt-2">
-                      {fileType === "audio"
-                        ? "MP3, WAV (max 50MB)"
-                        : "JSON (max 10MB)"}
+                      {fileType === "audio" ? "MP3, WAV (max 50MB)" : "JSON (max 10MB)"}
                     </p>
                   </div>
                 </div>
@@ -244,9 +240,7 @@ export default function AudioJsonMediaSelector({
               File {fileTypeLabel.toUpperCase()} Disponibili
             </h3>
             {loading && (
-              <div className={baseStyles.loadingText}>
-                Caricamento file {fileTypeLabel}...
-              </div>
+              <div className={baseStyles.loadingText}>Caricamento file {fileTypeLabel}...</div>
             )}
 
             {error && <div className={baseStyles.error}>{error}</div>}
@@ -292,5 +286,3 @@ export default function AudioJsonMediaSelector({
     </div>
   );
 }
-
-

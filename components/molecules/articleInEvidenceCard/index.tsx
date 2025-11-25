@@ -7,10 +7,9 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import Separator from "@/components/atoms/separetor";
 import { H3, MonoTextBold, MonoTextLight, SerifText } from "@/components/atoms/typography";
-import { useIsMobile } from "@/hooks/useMediaQuery";
 import { cn } from "@/lib/utils/classes";
 import { getTextColor } from "@/lib/utils/color";
-import { formatDateByLang } from "@/lib/utils/date";
+import Date from "@/components/atoms/date";
 import styles from "./styles";
 import type { Article, Issue } from "@/.velite";
 import { CommonDictionary } from "@/lib/i18n/types";
@@ -35,8 +34,6 @@ export default function ArticleInEvidenceCard({
 }: ArticleInEvidenceCardProps) {
   const { lang = "it" } = useParams() as { lang: "it" };
 
-  const isMobile = useIsMobile();
-
   const { textColor, backgroundColor } = getTextColor(issue.color);
 
   const author = getAuthorBySlug(article.author);
@@ -50,9 +47,7 @@ export default function ArticleInEvidenceCard({
       <header className={styles.header}>
         <div className={styles.badgesMobile}>
           <div className={styles.badgeDate}>
-            <MonoTextLight className={styles.badgeTextDate}>
-              {formatDateByLang(article.date, lang, isMobile)}
-            </MonoTextLight>
+            <Date date={article.date} lang={lang} className={styles.badgeTextDate} />
           </div>
           <div className={styles.badgeTitle}>
             <Link href={`/issues/${issue.slug}`}>

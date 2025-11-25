@@ -3,7 +3,7 @@ import { H1, H2, MonoTextBold, MonoTextLight } from "@/components/atoms/typograp
 import { cn } from "@/lib/utils/classes";
 import type { Article } from "@/.velite";
 import SeparatorWithLogo from "@/components/molecules/SeparatorWithLogo";
-import { formatDateByLang } from "@/lib/utils/date";
+import Date from "@/components/atoms/date";
 import { ArticleDictionary } from "@/lib/i18n/types";
 import { getCategoryBySlug } from "@/lib/content/categories";
 import { getAuthorBySlug } from "@/lib/content/authors";
@@ -46,7 +46,7 @@ export default function Article({ article, dict }: ArticleProps) {
         <Separator className="lg:mt-[30px] lg:mb-2.5 mt-2.5 mb-2.5" />
         <div className="flex flex-row justify-between">
           <MonoTextLight className="lg:text-[16px] text-[14px] flex items-center gap-2.5">
-            {formatDateByLang(article.date, "it")}
+            <Date date={article.date} lang="it" />
           </MonoTextLight>
           {article.audio && (
             <Link

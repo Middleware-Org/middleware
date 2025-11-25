@@ -2,7 +2,6 @@
 
 import { cn } from "@/lib/utils/classes";
 import HorizontalScroll from "@/components/molecules/HorizontalScroll";
-import { useIsMobile } from "@/hooks/useMediaQuery";
 
 type ArchiveScrollWrapperProps = {
   children: React.ReactNode;
@@ -17,14 +16,14 @@ export default function ArchiveScrollWrapper({
   className,
   innerClassName,
 }: ArchiveScrollWrapperProps) {
-  const isMobile = useIsMobile();
-
+  // Lo scroll orizzontale è abilitato solo su desktop (md e superiori)
+  // Su mobile, il contenuto viene semplicemente renderizzato senza scroll orizzontale
   return (
     <HorizontalScroll
-      enabled={!isMobile}
+      enabled={true}
       stickyOffset={stickyOffset}
-      className={cn(className, isMobile ? "" : "")}
-      innerClassName={cn(innerClassName, isMobile ? "" : "")}
+      className={cn(className)}
+      innerClassName={cn(innerClassName)}
     >
       {children}
     </HorizontalScroll>

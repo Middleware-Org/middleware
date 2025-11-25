@@ -8,7 +8,6 @@ import Hamburger from "@/components/organism/hamburger";
 import Nav from "@/components/organism/nav";
 import styles from "./styles";
 import type { CommonDictionary } from "@/lib/i18n/types";
-import { useIsMobile } from "@/hooks/useMediaQuery";
 
 /* **************************************************
  * Types
@@ -22,13 +21,12 @@ interface HeaderProps {
  * Header
  **************************************************/
 export default function Header({ children, dict }: HeaderProps) {
-  const isMobile = useIsMobile();
-
-  const logoSize = isMobile ? 40 : 48;
   return (
     <header className={styles.header}>
       <div className={styles.headerTopSub}>
-        <Logo size={logoSize} dict={dict} />
+        <div className="scale-[0.833] md:scale-100">
+          <Logo size={48} dict={dict} />
+        </div>
         <Hamburger dict={dict} />
       </div>
       <div className={styles.headerBottomSub}>

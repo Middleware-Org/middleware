@@ -6,7 +6,6 @@
 import { usePathname } from "next/navigation";
 import { MonoTextLight } from "@/components/atoms/typography";
 import { headerLinks } from "@/lib/data/links";
-import { useIsMobile, useIsTablet } from "@/hooks/useMediaQuery";
 import { cn } from "@/lib/utils/classes";
 import Link from "next/link";
 import styles from "./styles";
@@ -25,15 +24,8 @@ interface NavProps {
 export default function Nav({ dict }: NavProps) {
   const pathname = usePathname();
 
-  const tablet = useIsTablet();
-  const mobile = useIsMobile();
-
-  if (tablet || mobile) {
-    return null;
-  }
-
   return (
-    <nav className={styles.nav}>
+    <nav className={cn(styles.nav, "hidden md:block")}>
       {headerLinks.map((headerLink) => {
         const isActive = pathname?.includes(headerLink.href) || false;
         return (

@@ -6,8 +6,7 @@
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import { MonoTextLight } from "@/components/atoms/typography";
-import { useIsMobile } from "@/hooks/useMediaQuery";
-import { formatDateByLang } from "@/lib/utils/date";
+import Date from "@/components/atoms/date";
 import styles from "./styles";
 import ArticleInEvidenceCard from "@/components/molecules/articleInEvidenceCard";
 import { CommonDictionary } from "@/lib/i18n/types";
@@ -33,7 +32,6 @@ const IMAGE_HEIGHT = 500;
  * Cover
  **************************************************/
 export default function Cover({ issue, articleInEvidence, dict }: CoverProps) {
-  const isMobile = useIsMobile();
   const { lang = "it" } = useParams() as { lang: string };
 
   return (
@@ -50,9 +48,7 @@ export default function Cover({ issue, articleInEvidence, dict }: CoverProps) {
           />
           <div className={styles.badgesWrapper}>
             <div className={styles.badgeDate}>
-              <MonoTextLight className={styles.badgeTextDate}>
-                {formatDateByLang(issue.date, lang as "it", isMobile)}
-              </MonoTextLight>
+              <Date date={issue.date} lang={lang as "it"} className={styles.badgeTextDate} />
             </div>
             <div className={styles.badgeTitle}>
               <Link href={`/issues/${issue.slug}`}>

@@ -8,9 +8,8 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import Separator from "@/components/atoms/separetor";
 import { MonoTextBold, MonoTextLight, SerifText } from "@/components/atoms/typography";
-import { useIsMobile } from "@/hooks/useMediaQuery";
 import { lightenColor, getTextColor } from "@/lib/utils/color";
-import { formatDateByLang } from "@/lib/utils/date";
+import Date from "@/components/atoms/date";
 import { Article, Issue } from "@/.velite";
 import { CommonDictionary } from "@/lib/i18n/types";
 import { getAuthorBySlug, getCategoryBySlug } from "@/lib/content";
@@ -88,15 +87,13 @@ export default function ArchiveIssueCard({
 }: ArchiveIssueCardProps) {
   const lightColor = lightenColor(issue.color);
   const { lang = "it" } = useParams() as { lang: "it" };
-  const isMobile = useIsMobile();
   const { textColor, backgroundColor } = getTextColor(issue.color);
 
   return (
     <div
       key={issue.slug}
       id={`issue-${issue.slug}`}
-      className={styles.issueCoverContainer}
-      style={{ marginLeft: index === 0 ? "0" : isMobile ? "0" : "40px" }}
+      className={cn(styles.issueCoverContainer, index === 0 ? "" : "ml-0 md:ml-10")}
     >
       <div className={styles.link}>
         <div className={styles.coverContainer}>
@@ -142,7 +139,7 @@ export default function ArchiveIssueCard({
                 className={styles.createdAtBadgeText}
                 style={{ color: `${issue.color}!important` }}
               >
-                {formatDateByLang(issue.date, locale as "it")}
+                <Date date={issue.date} lang={locale as "it"} />
               </MonoTextBold>
             </div>
             <Link
@@ -170,9 +167,7 @@ export default function ArchiveIssueCard({
               <header className={styles.header}>
                 <div className={styles.badgesMobile}>
                   <div className={styles.badgeDate}>
-                    <MonoTextLight className={styles.badgeTextDate}>
-                      {formatDateByLang(issue.date, lang, isMobile)}
-                    </MonoTextLight>
+                    <Date date={issue.date} lang={lang} className={styles.badgeTextDate} />
                   </div>
                   <div className={styles.badgeTitle}>
                     <MonoTextLight className={styles.badgeTextTitle}>{issue.title}</MonoTextLight>
