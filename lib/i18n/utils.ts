@@ -12,7 +12,7 @@ export async function getDictionary<T extends TranslationNamespace>(
   locale: string,
   ns: T,
 ): Promise<DictionaryByNamespace<T>> {
-  const sanitizedLocale = locale.replace(/[^a-z]/gi, "");
+  const sanitizedLocale = locale?.replace(/[^a-z]/gi, "") || i18nSettings.defaultLocale;
 
   const validLocale = i18nSettings.locales.includes(sanitizedLocale)
     ? sanitizedLocale
