@@ -59,3 +59,48 @@ export function createTwitterMetadata({
   };
 }
 
+export function createArticleSchema({
+  headline,
+  datePublished,
+  dateModified,
+  authorName,
+  url,
+  description,
+  image,
+}: {
+  headline: string;
+  datePublished: string;
+  dateModified?: string;
+  authorName: string;
+  url: string;
+  description?: string;
+  image?: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline,
+    datePublished,
+    dateModified: dateModified || datePublished,
+    author: {
+      "@type": "Person",
+      name: authorName,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Middleware",
+      url: baseUrl,
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": url,
+    },
+    ...(description && { description }),
+    ...(image && {
+      image: {
+        "@type": "ImageObject",
+        url: image,
+      },
+    }),
+  };
+}

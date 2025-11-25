@@ -9,11 +9,7 @@ import IssuesDropdown from "@/components/organism/issuesDropDown";
 import Menu from "@/components/organism/menu";
 import { getAllIssues } from "@/lib/content";
 import Footer from "@/components/organism/footer";
-import {
-  getBaseUrl,
-  createOpenGraphMetadata,
-  createTwitterMetadata,
-} from "@/lib/utils/metadata";
+import { getBaseUrl, createOpenGraphMetadata, createTwitterMetadata } from "@/lib/utils/metadata";
 
 /* **************************************************
  * Types

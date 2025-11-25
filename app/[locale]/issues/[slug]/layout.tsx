@@ -9,11 +9,7 @@ import { MonoTextLight } from "@/components/atoms/typography";
 import { getIssueBySlug } from "@/lib/content";
 import { notFound } from "next/navigation";
 import Footer from "@/components/organism/footer";
-import {
-  getBaseUrl,
-  createOpenGraphMetadata,
-  createTwitterMetadata,
-} from "@/lib/utils/metadata";
+import { getBaseUrl, createOpenGraphMetadata, createTwitterMetadata } from "@/lib/utils/metadata";
 
 /* **************************************************
  * Types
