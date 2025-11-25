@@ -33,6 +33,23 @@ export async function generateMetadata({ params }: RootLayoutProps) {
         [locale]: `/${locale}/${TRANSLATION_NAMESPACES.HOME}`,
       },
     },
+    manifest: "/manifest.json",
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "default",
+      title: "Middleware",
+    },
+    icons: {
+      icon: [
+        { url: "/icon1.png", sizes: "32x32", type: "image/png" },
+        { url: "/icon0.svg", type: "image/svg+xml" },
+        { url: "/favicon.ico", sizes: "any" },
+      ],
+      apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
+    },
+    other: {
+      "apple-mobile-web-app-title": "Middleware",
+    },
   };
 }
 
