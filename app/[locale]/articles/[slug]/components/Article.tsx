@@ -54,7 +54,9 @@ export default function Article({ article, dict }: ArticleProps) {
               className="flex items-center gap-2 hover:underline"
             >
               <Play className="w-4 h-4" />
-              <MonoTextLight className="lg:text-[16px] text-[14px]">Ascolta podcast</MonoTextLight>
+              <MonoTextLight className="lg:text-[16px] text-[14px]">
+                Ascolta il podcast
+              </MonoTextLight>
             </Link>
           )}
         </div>

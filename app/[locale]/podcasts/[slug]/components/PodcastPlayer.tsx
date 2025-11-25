@@ -60,6 +60,8 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
   const [showVolumeControl, setShowVolumeControl] = useState<boolean>(false);
   const [showSpeedControl, setShowSpeedControl] = useState<boolean>(false);
   const progressRestoredRef = useRef<boolean>(false);
+  const lastSaveTimeRef = useRef<number>(0);
+  const saveThrottleMs = 3000; // Salva ogni 3 secondi sugli eventi timeupdate (più affidabile su mobile)
 
   const author = getAuthorBySlug(article.author);
   const category = getCategoryBySlug(article.category);
@@ -226,6 +228,19 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
       if (audio.duration > 0) {
         const newPosition = Math.floor((newTime / audio.duration) * totalPositions);
         setCurrentPosition(newPosition);
+
+        // Salva periodicamente anche sugli eventi timeupdate (più affidabile su mobile)
+        // Questo funziona anche quando la pagina è in background su mobile
+        const now = Date.now();
+        if (now - lastSaveTimeRef.current >= saveThrottleMs && isPlaying) {
+          lastSaveTimeRef.current = now;
+          const progressPercentage = (newTime / audio.duration) * 100;
+          podcastProgressStorage
+            .saveProgress(podcastId, newTime, audio.duration, progressPercentage, false)
+            .catch((error) => {
+              console.error("Errore nel salvataggio durante timeupdate:", error);
+            });
+        }
       }
 
       // Find current segment
@@ -275,6 +290,7 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
       const audio = audioRef.current;
       if (audio && audio.duration > 0) {
         const progressPercentage = (audio.currentTime / audio.duration) * 100;
+        lastSaveTimeRef.current = Date.now();
         await podcastProgressStorage.saveImmediately(
           podcastId,
           audio.currentTime,
@@ -313,7 +329,7 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
       audio.removeEventListener("pause", handlePause);
       audio.removeEventListener("ended", handleEnded);
     };
-  }, [totalTime, totalPositions, segments, currentSegmentIndex, podcastId]);
+  }, [totalTime, totalPositions, segments, currentSegmentIndex, podcastId, isPlaying]);
 
   useEffect(() => {
     const audio = audioRef.current;
