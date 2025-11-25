@@ -28,7 +28,7 @@ export default function ArticleCard({ article, dict, isPodcast = false }: Articl
 
   if (!author || !category) return null;
 
-  const articleLink = isPodcast ? `/podcasts/${article.slug}` : `/articles/${article.slug}`;
+  const articleLink = isPodcast ? `/podcast/${article.slug}` : `/articles/${article.slug}`;
 
   return (
     <article className={styles.article}>
@@ -38,7 +38,7 @@ export default function ArticleCard({ article, dict, isPodcast = false }: Articl
             <H3 className={styles.title}>{article.title}</H3>
           </Link>
           {isPodcast && (
-            <Link href={`/podcasts/${article.slug}`} className={styles.playIcon}>
+            <Link href={`/podcast/${article.slug}`} className={styles.playIcon}>
               <Play className={styles.playIconSvg} />
             </Link>
           )}
