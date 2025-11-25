@@ -38,7 +38,7 @@ export default async function ArchivePage({ params }: ArchivePageProps) {
 
           return (
             <ArchiveIssueCard
-              key={`${issue.slug}-${index}`}
+              key={issue.slug}
               issue={issue}
               articles={articles}
               dict={dict}
