@@ -25,12 +25,7 @@ type PodcastHeaderProps = {
 /* **************************************************
  * PodcastHeader
  **************************************************/
-export default function PodcastHeader({
-  article,
-  issue,
-  author,
-  category,
-}: PodcastHeaderProps) {
+export default function PodcastHeader({ article, issue, author, category }: PodcastHeaderProps) {
   const { lang = "it" } = useParams() as { lang: "it" };
   const isMobile = useIsMobile();
 
@@ -52,23 +47,19 @@ export default function PodcastHeader({
         <div className={styles.infoContainer}>
           <div className={styles.textContainer}>
             <SerifText className={styles.textTitle}>{article.title}</SerifText>
-            <div className={styles.textFlexContainer}>
-              <MonoTextLight className={styles.textAuthor}>
-                {author ? (
-                  <Link href={`/authors?author=${author.slug}`}>{author.name}</Link>
-                ) : (
-                  ""
-                )}
-                {author && " - "}
-                {category ? (
-                  <Link href={`/categories?category=${category.slug}`}>{category.name}</Link>
-                ) : (
-                  ""
-                )}
-                {category && " - "}
+            <Link href={`/authors?author=${author?.slug}`}>
+              <MonoTextLight className={styles.textAuthor}>{author?.name}</MonoTextLight>
+            </Link>
+            {category && (
+              <Link href={`/categories?category=${category.slug}`}>
+                <MonoTextLight className={styles.textAuthor}>{category.name}</MonoTextLight>
+              </Link>
+            )}
+            {article.date && (
+              <MonoTextLight className={styles.textDate}>
                 {formatDateByLang(article.date, lang, isMobile)}
               </MonoTextLight>
-            </div>
+            )}
             <Link
               href="https://github.com/resemble-ai/chatterbox"
               target="_blank"
@@ -84,4 +75,3 @@ export default function PodcastHeader({
     </div>
   );
 }
-
