@@ -50,6 +50,7 @@ export async function generateMetadata({ params }: ArticleLayoutProps) {
     title,
     description: article.excerpt,
     alternates: {
+      canonical: url,
       languages: {
         [locale]: `/${locale}/${TRANSLATION_NAMESPACES.AUTHORS}`,
       },

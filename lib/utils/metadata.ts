@@ -104,3 +104,14 @@ export function createArticleSchema({
     }),
   };
 }
+
+export function createOrganizationSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Middleware",
+    url: baseUrl,
+    logo: getOpenGraphImage(),
+    sameAs: [], // Aggiungi qui i link ai social media se disponibili
+  };
+}

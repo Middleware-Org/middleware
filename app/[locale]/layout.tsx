@@ -7,7 +7,13 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "@/globals.css";
 import PolicyBanner from "@/components/organism/banner";
-import { getBaseUrl, createOpenGraphMetadata, createTwitterMetadata } from "@/lib/utils/metadata";
+import {
+  getBaseUrl,
+  createOpenGraphMetadata,
+  createTwitterMetadata,
+  createOrganizationSchema,
+} from "@/lib/utils/metadata";
+import StructuredData from "@/components/StructuredData";
 
 /* **************************************************
  * Types
@@ -32,6 +38,7 @@ export async function generateMetadata({ params }: RootLayoutProps) {
     title: meta.title,
     description: meta.description,
     alternates: {
+      canonical: url,
       languages: {
         [locale]: `/${locale}/${TRANSLATION_NAMESPACES.HOME}`,
       },
@@ -74,9 +81,12 @@ export default async function RootLayout({ children, params }: RootLayoutProps) 
 
   const dict = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
 
+  const organizationSchema = createOrganizationSchema();
+
   return (
     <html lang={locale}>
       <body>
+        <StructuredData data={organizationSchema} />
         {children}
         <PolicyBanner dict={dict} />
         <Analytics />

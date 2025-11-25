@@ -42,6 +42,7 @@ export async function generateMetadata({ params }: IssueLayoutProps) {
     title,
     description: issue.description,
     alternates: {
+      canonical: url,
       languages: {
         [locale]: `/${locale}/${TRANSLATION_NAMESPACES.ISSUE}`,
       },

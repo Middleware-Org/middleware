@@ -38,6 +38,7 @@ export async function generateMetadata({ params }: AuthorsLayoutProps) {
     title,
     description: dict.meta.description,
     alternates: {
+      canonical: url,
       languages: {
         [locale]: `/${locale}/${TRANSLATION_NAMESPACES.AUTHORS}`,
       },

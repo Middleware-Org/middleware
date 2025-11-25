@@ -34,6 +34,7 @@ export async function generateMetadata({ params }: HomeLayoutProps) {
     title: meta.title,
     description: meta.description,
     alternates: {
+      canonical: url,
       languages: {
         [locale]: `/${locale}/${TRANSLATION_NAMESPACES.HOME}`,
       },

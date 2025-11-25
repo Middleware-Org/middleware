@@ -42,6 +42,7 @@ export async function generateMetadata({ params }: PodcastsLayoutProps) {
       title: dict.meta.title,
       description: dict.meta.description,
       alternates: {
+        canonical: url,
         languages: {
           [locale]: `/${locale}/${TRANSLATION_NAMESPACES.PODCAST}`,
         },
@@ -74,6 +75,7 @@ export async function generateMetadata({ params }: PodcastsLayoutProps) {
     title,
     description: article.excerpt,
     alternates: {
+      canonical: url,
       languages: {
         [locale]: `/${locale}/${TRANSLATION_NAMESPACES.PODCAST}`,
       },

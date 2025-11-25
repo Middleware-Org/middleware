@@ -38,6 +38,9 @@ export async function generateMetadata({ params }: SlugLayoutProps) {
     return {
       title: dictCommon.meta.title,
       description: dictCommon.meta.description,
+      alternates: {
+        canonical: url,
+      },
       openGraph: createOpenGraphMetadata({
         title: dictCommon.meta.title,
         description: dictCommon.meta.description,
@@ -58,6 +61,7 @@ export async function generateMetadata({ params }: SlugLayoutProps) {
     title,
     description: page.excerpt,
     alternates: {
+      canonical: url,
       languages: {
         [locale]: `/${locale}/${slug}`,
       },
