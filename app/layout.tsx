@@ -1,57 +1,40 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
-import { getDictionary } from "@/lib/i18n/utils";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import "@/globals.css";
-import PolicyBanner from "@/components/organism/banner";
-import {
-  getBaseUrl,
-  createOpenGraphMetadata,
-  createTwitterMetadata,
-  createOrganizationSchema,
-} from "@/lib/utils/metadata";
-import StructuredData from "@/components/StructuredData";
+import { getBaseUrl, createOpenGraphMetadata, createTwitterMetadata } from "@/lib/utils/metadata";
 
 /* **************************************************
  * Types
  **************************************************/
 interface RootLayoutProps {
-  params: Promise<{ locale: string }>;
   children: React.ReactNode;
 }
 
 /* **************************************************
  * Metadata
  **************************************************/
-export async function generateMetadata({ params }: RootLayoutProps) {
-  const { locale } = await params;
-
-  const dict = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
-  const meta = dict.meta;
-
-  const url = `${getBaseUrl()}/${locale}`;
+export async function generateMetadata() {
+  const url = `${getBaseUrl()}/it`;
 
   return {
-    title: meta.title,
-    description: meta.description,
+    title: "Middleware",
+    description: "Middleware",
     alternates: {
       canonical: url,
       languages: {
-        [locale]: `/${locale}/${TRANSLATION_NAMESPACES.HOME}`,
+        it: `/it/`,
       },
     },
     openGraph: createOpenGraphMetadata({
-      title: meta.title,
-      description: meta.description,
+      title: "Middleware",
+      description: "Middleware",
       url,
       type: "website",
     }),
     twitter: createTwitterMetadata({
-      title: meta.title,
-      description: meta.description,
+      title: "Middleware",
+      description: "Middleware",
     }),
     manifest: "/manifest.json",
     appleWebApp: {
@@ -76,22 +59,10 @@ export async function generateMetadata({ params }: RootLayoutProps) {
 /* **************************************************
  * Layout
  **************************************************/
-export default async function RootLayout({ children, params }: RootLayoutProps) {
-  const { locale } = await params;
-
-  const dict = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
-
-  const organizationSchema = createOrganizationSchema();
-
+export default async function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang={locale}>
-      <body>
-        <StructuredData data={organizationSchema} />
-        {children}
-        <PolicyBanner dict={dict} />
-        <Analytics />
-        <SpeedInsights />
-      </body>
+    <html lang="it">
+      <body>{children}</body>
     </html>
   );
 }
