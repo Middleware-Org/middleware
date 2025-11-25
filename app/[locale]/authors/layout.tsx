@@ -7,6 +7,11 @@ import { getDictionary } from "@/lib/i18n/utils";
 import Menu from "@/components/organism/menu";
 import { MonoTextLight } from "@/components/atoms/typography";
 import Footer from "@/components/organism/footer";
+import {
+  getBaseUrl,
+  createOpenGraphMetadata,
+  createTwitterMetadata,
+} from "@/lib/utils/metadata";
 
 /* **************************************************
  * Types
@@ -24,15 +29,30 @@ export async function generateMetadata({ params }: AuthorsLayoutProps) {
   const locale = resolvedParams?.locale || "it";
 
   const dict = await getDictionary(locale, TRANSLATION_NAMESPACES.AUTHORS);
+  const dictCommon = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
+
+  const url = `${getBaseUrl()}/${locale}/${TRANSLATION_NAMESPACES.AUTHORS}`;
+  const title = `${dictCommon.meta.title} - ${dict.meta.title}`;
 
   return {
-    title: dict.meta.title,
+    title,
     description: dict.meta.description,
     alternates: {
+      canonical: url,
       languages: {
         [locale]: `/${locale}/${TRANSLATION_NAMESPACES.AUTHORS}`,
       },
     },
+    openGraph: createOpenGraphMetadata({
+      title: dict.meta.title,
+      description: dict.meta.description,
+      url,
+      type: "website",
+    }),
+    twitter: createTwitterMetadata({
+      title: dict.meta.title,
+      description: dict.meta.description,
+    }),
   };
 }
 

@@ -7,6 +7,13 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "@/globals.css";
 import PolicyBanner from "@/components/organism/banner";
+import {
+  getBaseUrl,
+  createOpenGraphMetadata,
+  createTwitterMetadata,
+  createOrganizationSchema,
+} from "@/lib/utils/metadata";
+import StructuredData from "@/components/StructuredData";
 
 /* **************************************************
  * Types
@@ -25,13 +32,43 @@ export async function generateMetadata({ params }: RootLayoutProps) {
   const dict = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
   const meta = dict.meta;
 
+  const url = `${getBaseUrl()}/${locale}`;
+
   return {
     title: meta.title,
     description: meta.description,
     alternates: {
+      canonical: url,
       languages: {
         [locale]: `/${locale}/${TRANSLATION_NAMESPACES.HOME}`,
       },
+    },
+    openGraph: createOpenGraphMetadata({
+      title: meta.title,
+      description: meta.description,
+      url,
+      type: "website",
+    }),
+    twitter: createTwitterMetadata({
+      title: meta.title,
+      description: meta.description,
+    }),
+    manifest: "/manifest.json",
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "default",
+      title: "Middleware",
+    },
+    icons: {
+      icon: [
+        { url: "/icon1.png", sizes: "32x32", type: "image/png" },
+        { url: "/icon0.svg", type: "image/svg+xml" },
+        { url: "/favicon.ico", sizes: "any" },
+      ],
+      apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
+    },
+    other: {
+      "apple-mobile-web-app-title": "Middleware",
     },
   };
 }
@@ -44,9 +81,12 @@ export default async function RootLayout({ children, params }: RootLayoutProps) 
 
   const dict = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
 
+  const organizationSchema = createOrganizationSchema();
+
   return (
     <html lang={locale}>
       <body>
+        <StructuredData data={organizationSchema} />
         {children}
         <PolicyBanner dict={dict} />
         <Analytics />

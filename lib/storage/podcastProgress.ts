@@ -45,6 +45,12 @@ class PodcastProgressStorage {
       return;
     }
 
+    // Verifica che IndexedDB sia disponibile
+    if (!window.indexedDB) {
+      console.error("PodcastProgressStorage: IndexedDB non è disponibile su questo browser");
+      throw new Error("IndexedDB non disponibile");
+    }
+
     if (this.db) {
       return;
     }
@@ -60,8 +66,14 @@ class PodcastProgressStorage {
           }
         },
       });
+
+      // Verifica che il database sia effettivamente aperto
+      if (!this.db) {
+        throw new Error("Database non inizializzato correttamente");
+      }
     } catch (error) {
       console.error("Errore nell'inizializzazione del database:", error);
+      this.db = null; // Reset per permettere un nuovo tentativo
       throw error;
     }
   }
@@ -70,11 +82,18 @@ class PodcastProgressStorage {
    * Ottiene il progresso salvato per un podcast
    */
   async getProgress(podcastId: string): Promise<PodcastProgress | null> {
+    // Assicurati che il database sia inizializzato
     if (!this.db) {
-      await this.init();
+      try {
+        await this.init();
+      } catch (error) {
+        console.error("Errore nell'inizializzazione del database per getProgress:", error);
+        return null;
+      }
     }
 
     if (!this.db) {
+      console.warn("Database non disponibile per il recupero del progresso");
       return null;
     }
 
@@ -240,6 +259,17 @@ class PodcastProgressStorage {
     totalTime: number,
     progressPercentage: number,
   ): Promise<void> {
+    // Assicurati che il database sia inizializzato prima di salvare
+    if (!this.db) {
+      try {
+        await this.init();
+      } catch (error) {
+        console.error("Errore nell'inizializzazione del database per saveImmediately:", error);
+        throw error;
+      }
+    }
+
+    // Forza il salvataggio anche se c'è un salvataggio in corso
     await this.saveProgress(podcastId, currentTime, totalTime, progressPercentage, false, true);
   }
 

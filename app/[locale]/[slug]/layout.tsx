@@ -10,6 +10,11 @@ import { MonoTextLight } from "@/components/atoms/typography";
 import { notFound } from "next/navigation";
 import { getPageBySlug } from "@/lib/content";
 import Footer from "@/components/organism/footer";
+import {
+  getBaseUrl,
+  createOpenGraphMetadata,
+  createTwitterMetadata,
+} from "@/lib/utils/metadata";
 
 /* **************************************************
  * Types
@@ -25,24 +30,52 @@ interface SlugLayoutProps {
 export async function generateMetadata({ params }: SlugLayoutProps) {
   const { locale, slug } = await params;
 
+  const dictCommon = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
   const page = getPageBySlug(slug);
 
   if (!page) {
-    const dict = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
+    const url = `${getBaseUrl()}/${locale}`;
     return {
-      title: dict.meta.title,
-      description: dict.meta.description,
+      title: dictCommon.meta.title,
+      description: dictCommon.meta.description,
+      alternates: {
+        canonical: url,
+      },
+      openGraph: createOpenGraphMetadata({
+        title: dictCommon.meta.title,
+        description: dictCommon.meta.description,
+        url,
+        type: "website",
+      }),
+      twitter: createTwitterMetadata({
+        title: dictCommon.meta.title,
+        description: dictCommon.meta.description,
+      }),
     };
   }
 
+  const url = `${getBaseUrl()}/${locale}/${slug}`;
+  const title = `${dictCommon.meta.title} - ${page.title}`;
+
   return {
-    title: page.title,
+    title,
     description: page.excerpt,
     alternates: {
+      canonical: url,
       languages: {
         [locale]: `/${locale}/${slug}`,
       },
     },
+    openGraph: createOpenGraphMetadata({
+      title: page.title,
+      description: page.excerpt,
+      url,
+      type: "website",
+    }),
+    twitter: createTwitterMetadata({
+      title: page.title,
+      description: page.excerpt,
+    }),
   };
 }
 

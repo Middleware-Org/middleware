@@ -9,6 +9,7 @@ import IssuesDropdown from "@/components/organism/issuesDropDown";
 import Menu from "@/components/organism/menu";
 import { getAllIssues } from "@/lib/content";
 import Footer from "@/components/organism/footer";
+import { getBaseUrl, createOpenGraphMetadata, createTwitterMetadata } from "@/lib/utils/metadata";
 
 /* **************************************************
  * Types
@@ -27,14 +28,27 @@ export async function generateMetadata({ params }: HomeLayoutProps) {
   const dict = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
   const meta = dict.meta;
 
+  const url = `${getBaseUrl()}/${locale}`;
+
   return {
     title: meta.title,
     description: meta.description,
     alternates: {
+      canonical: url,
       languages: {
         [locale]: `/${locale}/${TRANSLATION_NAMESPACES.HOME}`,
       },
     },
+    openGraph: createOpenGraphMetadata({
+      title: meta.title,
+      description: meta.description,
+      url,
+      type: "website",
+    }),
+    twitter: createTwitterMetadata({
+      title: meta.title,
+      description: meta.description,
+    }),
   };
 }
 

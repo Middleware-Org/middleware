@@ -27,7 +27,7 @@ export function useAudioPlayer({
   const audioRef = useRef<HTMLAudioElement>(null);
   const progressRestoredRef = useRef<boolean>(false);
   const lastSaveTimeRef = useRef<number>(0);
-  const saveThrottleMs = 3000; // Salva ogni 3 secondi sugli eventi timeupdate
+  const saveThrottleMs = 3000;
 
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
@@ -37,18 +37,49 @@ export function useAudioPlayer({
   const [volume, setVolume] = useState<number>(100);
   const [playbackRate, setPlaybackRate] = useState<number>(1.0);
 
-  // Initialize storage
+  // Initialize storage and restore progress
   useEffect(() => {
-    const initStorage = async () => {
+    const initStorageAndRestore = async () => {
       try {
         await podcastProgressStorage.init();
+
+        // Prova a ripristinare il progresso subito se l'audio è già caricato
+        const audio = audioRef.current;
+        if (audio && audio.duration > 0 && !progressRestoredRef.current) {
+          progressRestoredRef.current = true;
+
+          try {
+            const savedProgress = await podcastProgressStorage.getProgress(podcastId);
+
+            if (savedProgress) {
+              const timeDifference = Math.abs(savedProgress.totalTime - audio.duration);
+              const isDurationMatch = timeDifference < 0.5;
+
+              if (
+                !savedProgress.isCompleted &&
+                savedProgress.currentTime > 0 &&
+                savedProgress.currentTime < savedProgress.totalTime &&
+                isDurationMatch
+              ) {
+                audio.currentTime = savedProgress.currentTime;
+                setCurrentTime(savedProgress.currentTime);
+                setTotalTime(audio.duration);
+                setCurrentPosition(
+                  Math.floor((savedProgress.currentTime / audio.duration) * totalPositions),
+                );
+              }
+            }
+          } catch (error) {
+            console.error("Errore nel ripristino anticipato:", error);
+          }
+        }
       } catch (error) {
         console.error("Errore nell'inizializzazione dello storage:", error);
       }
     };
 
-    initStorage();
-  }, []);
+    initStorageAndRestore();
+  }, [podcastId, totalPositions]);
 
   // Start auto-save when audio is ready and playing
   useEffect(() => {
@@ -85,7 +116,7 @@ export function useAudioPlayer({
         const newPosition = Math.floor((newTime / audio.duration) * totalPositions);
         setCurrentPosition(newPosition);
 
-        // Salva periodicamente anche sugli eventi timeupdate (più affidabile su mobile)
+        // Salva periodicamente sugli eventi timeupdate
         const now = Date.now();
         if (now - lastSaveTimeRef.current >= saveThrottleMs && isPlaying) {
           lastSaveTimeRef.current = now;
@@ -106,24 +137,37 @@ export function useAudioPlayer({
     };
 
     const handleCanPlay = async () => {
-      if (audio.duration > 0 && totalTime === 0) {
-        setTotalTime(audio.duration);
+      if (audio.duration > 0) {
+        if (totalTime === 0) {
+          setTotalTime(audio.duration);
+        }
 
         // Ripristina la posizione salvata quando l'audio è pronto (solo una volta)
         if (!progressRestoredRef.current) {
           progressRestoredRef.current = true;
-          const savedProgress = await podcastProgressStorage.getProgress(podcastId);
-          if (
-            savedProgress &&
-            !savedProgress.isCompleted &&
-            savedProgress.currentTime > 0 &&
-            savedProgress.totalTime === audio.duration
-          ) {
-            audio.currentTime = savedProgress.currentTime;
-            setCurrentTime(savedProgress.currentTime);
-            setCurrentPosition(
-              Math.floor((savedProgress.currentTime / audio.duration) * totalPositions),
-            );
+
+          try {
+            const savedProgress = await podcastProgressStorage.getProgress(podcastId);
+
+            if (savedProgress) {
+              const timeDifference = Math.abs(savedProgress.totalTime - audio.duration);
+              const isDurationMatch = timeDifference < 0.5;
+
+              if (
+                !savedProgress.isCompleted &&
+                savedProgress.currentTime > 0 &&
+                savedProgress.currentTime < savedProgress.totalTime &&
+                isDurationMatch
+              ) {
+                audio.currentTime = savedProgress.currentTime;
+                setCurrentTime(savedProgress.currentTime);
+                setCurrentPosition(
+                  Math.floor((savedProgress.currentTime / audio.duration) * totalPositions),
+                );
+              }
+            }
+          } catch (error) {
+            console.error("Errore nel ripristino del progresso:", error);
           }
         }
       }
@@ -139,12 +183,16 @@ export function useAudioPlayer({
       if (audio && audio.duration > 0) {
         const progressPercentage = (audio.currentTime / audio.duration) * 100;
         lastSaveTimeRef.current = Date.now();
-        await podcastProgressStorage.saveImmediately(
-          podcastId,
-          audio.currentTime,
-          audio.duration,
-          progressPercentage,
-        );
+        try {
+          await podcastProgressStorage.saveImmediately(
+            podcastId,
+            audio.currentTime,
+            audio.duration,
+            progressPercentage,
+          );
+        } catch (error) {
+          console.error("Errore nel salvataggio dopo pause:", error);
+        }
       }
     };
 
@@ -175,7 +223,7 @@ export function useAudioPlayer({
       audio.removeEventListener("pause", handlePause);
       audio.removeEventListener("ended", handleEnded);
     };
-  }, [totalTime, totalPositions, podcastId, isPlaying, onTimeUpdate]);
+  }, [totalTime, totalPositions, podcastId, isPlaying, onTimeUpdate, saveThrottleMs]);
 
   // Load audio source
   useEffect(() => {
@@ -244,12 +292,17 @@ export function useAudioPlayer({
 
       if (audio.duration > 0) {
         const progressPercentage = (newTime / audio.duration) * 100;
-        await podcastProgressStorage.saveImmediately(
-          podcastId,
-          newTime,
-          audio.duration,
-          progressPercentage,
-        );
+        lastSaveTimeRef.current = Date.now();
+        try {
+          await podcastProgressStorage.saveImmediately(
+            podcastId,
+            newTime,
+            audio.duration,
+            progressPercentage,
+          );
+        } catch (error) {
+          console.error("Errore nel salvataggio dopo forward:", error);
+        }
       }
     }
   }, [totalPositions, podcastId]);
@@ -264,12 +317,17 @@ export function useAudioPlayer({
 
       if (audio.duration > 0) {
         const progressPercentage = (newTime / audio.duration) * 100;
-        await podcastProgressStorage.saveImmediately(
-          podcastId,
-          newTime,
-          audio.duration,
-          progressPercentage,
-        );
+        lastSaveTimeRef.current = Date.now();
+        try {
+          await podcastProgressStorage.saveImmediately(
+            podcastId,
+            newTime,
+            audio.duration,
+            progressPercentage,
+          );
+        } catch (error) {
+          console.error("Errore nel salvataggio dopo backward:", error);
+        }
       }
     }
   }, [totalPositions, podcastId]);
@@ -285,12 +343,17 @@ export function useAudioPlayer({
 
         if (audio.duration > 0) {
           const progressPercentage = (newTime / audio.duration) * 100;
-          await podcastProgressStorage.saveImmediately(
-            podcastId,
-            newTime,
-            audio.duration,
-            progressPercentage,
-          );
+          lastSaveTimeRef.current = Date.now();
+          try {
+            await podcastProgressStorage.saveImmediately(
+              podcastId,
+              newTime,
+              audio.duration,
+              progressPercentage,
+            );
+          } catch (error) {
+            console.error("Errore nel salvataggio dopo seek:", error);
+          }
         }
       }
     },
