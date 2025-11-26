@@ -7,3 +7,4 @@ export { useCategories, useCategory } from "./useCategories";
 export { useIssues, useIssue } from "./useIssues";
 export { useMedia } from "./useMedia";
 export { usePages, usePage } from "./usePages";
+export { useUsers, useUser } from "./useUsers";
