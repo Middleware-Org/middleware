@@ -66,7 +66,12 @@ export default async function IssuePage({ params }: IssuePageProps) {
         </div>
         <div className={styles.issueArticlesContainer}>
           <div className={styles.articleInEvidenceContainer}>
-            <ArticleInEvidenceCard article={articleInEvidence} dict={dict} issue={issue} />
+            <ArticleInEvidenceCard
+              article={articleInEvidence}
+              dict={dict}
+              issue={issue}
+              disableBadges={true}
+            />
           </div>
           <div className={styles.articleInEvidenceContainer}>
             <Articles

@@ -22,6 +22,7 @@ type ArticleInEvidenceCardProps = {
   article: Article;
   issue: Issue;
   dict: Pick<CommonDictionary, "articleCard">;
+  disableBadges?: boolean;
 };
 
 /* **************************************************
@@ -31,6 +32,7 @@ export default function ArticleInEvidenceCard({
   article,
   issue,
   dict,
+  disableBadges = false,
 }: ArticleInEvidenceCardProps) {
   const { lang = "it" } = useParams() as { lang: "it" };
 
@@ -45,16 +47,18 @@ export default function ArticleInEvidenceCard({
   return (
     <article className={styles.article} style={{ backgroundColor: issue.color }}>
       <header className={styles.header}>
-        <div className={styles.badgesMobile}>
-          <div className={styles.badgeDate}>
-            <FormattedDate date={article.date} lang={lang} className={styles.badgeTextDate} />
+        {!disableBadges && (
+          <div className={styles.badgesMobile}>
+            <div className={styles.badgeDate}>
+              <FormattedDate date={article.date} lang={lang} className={styles.badgeTextDate} />
+            </div>
+            <div className={styles.badgeTitle}>
+              <Link href={`/issues/${issue.slug}`}>
+                <MonoTextLight className={styles.badgeTextTitle}>{issue.title}</MonoTextLight>
+              </Link>
+            </div>
           </div>
-          <div className={styles.badgeTitle}>
-            <Link href={`/issues/${issue.slug}`}>
-              <MonoTextLight className={styles.badgeTextTitle}>{issue.title}</MonoTextLight>
-            </Link>
-          </div>
-        </div>
+        )}
         <Link href={`/articles/${article.slug}`}>
           <H3 className={cn(styles.title, textColor)}>{article.title}</H3>
         </Link>
