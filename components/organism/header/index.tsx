@@ -24,7 +24,7 @@ export default function Header({ children, dict }: HeaderProps) {
   return (
     <header className={styles.header}>
       <div className={styles.headerTopSub}>
-        <div className="scale-[0.833] md:scale-100">
+        <div className="scale-[0.833] md:scale-100 origin-left">
           <Logo size={48} dict={dict} />
         </div>
         <Hamburger dict={dict} />
