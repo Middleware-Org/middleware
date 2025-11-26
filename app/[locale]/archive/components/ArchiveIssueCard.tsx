@@ -8,7 +8,6 @@ import Link from "next/link";
 import Separator from "@/components/atoms/separetor";
 import { MonoTextBold, MonoTextLight, SerifText } from "@/components/atoms/typography";
 import { lightenColor, getTextColor } from "@/lib/utils/color";
-import FormattedDate from "@/components/atoms/date";
 import { Article, Issue } from "@/.velite";
 import { CommonDictionary } from "@/lib/i18n/types";
 import { getAuthorBySlug, getCategoryBySlug } from "@/lib/content";
@@ -21,7 +20,6 @@ type ArchiveIssueCardProps = {
   issue: Issue;
   articles: Article[];
   dict: Pick<CommonDictionary, "articleCard">;
-  locale: string;
   index: number;
 };
 
@@ -39,46 +37,30 @@ const styles = {
   imageWrapper: cn("relative w-full aspect-[4/3] md:aspect-square"),
   imageLink: cn("absolute inset-0 z-0"),
   image: cn("object-cover"),
-  readAllButton: cn(
-    "absolute bottom-0 right-0 px-4 py-2",
-    "transition-colors duration-150",
-    "z-10",
-  ),
-  createdAtBadge: cn("absolute top-0 right-0 px-4 py-2"),
-  createdAtBadgeText: cn("text-sm"),
-  readAllButtonText: cn("text-sm"),
   footer: cn("flex flex-col w-full shrink-0"),
   footerContainer: cn("flex flex-col lg:p-[30px] md:p-[30px] p-4 w-full"),
   issueInfo: cn("flex flex-col"),
-  header: cn("flex flex-col justify-end pb-[10px]"),
-  badgesMobile: cn("mb-2 lg:hidden md:hidden flex"),
-  badgeDate: cn("bg-secondary border-primary border py-1 px-2 w-fit"),
-  badgeTitle: cn("bg-primary border-secondary border py-1 px-2 w-fit"),
-  badgeTextDate: cn("text-xs! md:text-base! text-primary"),
-  badgeTextTitle: cn("text-xs! md:text-base!"),
-  description: cn("text-[14px] leading-relaxed"),
+  header: cn("flex flex-col pb-[10px]"),
+  issueTitle: cn("text-xl md:text-2xl font-bold mb-3 hover:underline transition-all"),
+  issueHeaderInfo: cn("flex flex-col gap-2 mb-4"),
+  issueDate: cn("text-sm pb-3 border-b"),
+  description: cn("text-[14px] leading-relaxed mt-4"),
   articlesSection: cn("flex flex-col mt-2"),
   articlesHeader: cn("pb-1"),
   articlesTitle: cn("text-sm!"),
   articlesList: cn("flex flex-col gap-0.5 mt-1"),
   articleItem: cn("flex flex-col gap-0.5 py-1"),
-  articleTitle: cn("text-xs hover:underline leading-tight"),
+  articleTitle: cn("text-xs hover:underline leading-tight transition-all"),
   articleMeta: cn("flex items-center gap-2 text-[10px]"),
   articleAuthor: cn(""),
-  articleAuthorLink: cn("hover:underline"),
-  articleCategory: cn("hover:underline"),
+  articleAuthorLink: cn("hover:underline transition-all"),
+  articleCategory: cn("hover:underline transition-all"),
 };
 
 /* **************************************************
  * ArchiveIssueCard
  **************************************************/
-export default function ArchiveIssueCard({
-  issue,
-  articles,
-  dict,
-  locale,
-  index,
-}: ArchiveIssueCardProps) {
+export default function ArchiveIssueCard({ issue, articles, dict, index }: ArchiveIssueCardProps) {
   const lightColor = lightenColor(issue.color);
   const { textColor, backgroundColor } = getTextColor(issue.color);
 
@@ -122,32 +104,6 @@ export default function ArchiveIssueCard({
                 priority={index === 0}
                 style={{ objectFit: "cover" }}
               />
-            </Link>
-            <div
-              className={styles.createdAtBadge}
-              style={{
-                backgroundColor: lightColor,
-                borderLeft: `1px solid ${issue.color}`,
-                borderBottom: `1px solid ${issue.color}`,
-              }}
-            >
-              <span className={styles.createdAtBadgeText} style={{ color: issue.color }}>
-                <FormattedDate date={issue.date} lang={locale as "it"} />
-              </span>
-            </div>
-            <Link
-              href={`/issues/${issue.slug}`}
-              className={styles.readAllButton}
-              style={{
-                backgroundColor: lightColor,
-                borderLeft: `1px solid ${issue.color}`,
-                borderTop: `1px solid ${issue.color}`,
-                color: issue.color,
-              }}
-            >
-              <MonoTextBold className={styles.readAllButtonText} style={{ color: issue.color }}>
-                Leggi tutti gli articoli
-              </MonoTextBold>
             </Link>
           </div>
         </div>

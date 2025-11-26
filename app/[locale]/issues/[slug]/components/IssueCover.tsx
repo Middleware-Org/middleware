@@ -40,8 +40,9 @@ export default function IssueCover({ issue }: IssueCoverProps) {
         <div
           className={styles.issueLabelWrapper}
           style={{
+            borderTop: `1px solid ${issue.color}`,
+            borderBottom: `1px solid ${issue.color}`,
             borderLeft: `1px solid ${issue.color}`,
-            borderRight: `1px solid ${issue.color}`,
           }}
         >
           <SerifText

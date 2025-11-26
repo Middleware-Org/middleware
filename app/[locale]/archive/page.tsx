@@ -42,7 +42,6 @@ export default async function ArchivePage({ params }: ArchivePageProps) {
               issue={issue}
               articles={articles}
               dict={dict}
-              locale={locale}
               index={index}
             />
           );
