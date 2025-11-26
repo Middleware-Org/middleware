@@ -45,9 +45,9 @@ export default function Article({ article, dict }: ArticleProps) {
         </div>
         <Separator className="lg:mt-[30px] lg:mb-2.5 mt-2.5 mb-2.5" />
         <div className="flex flex-row justify-between">
-          <MonoTextLight className="lg:text-[16px] text-[14px] flex items-center gap-2.5">
+          <span className="lg:text-[16px] text-[14px] flex items-center gap-2.5">
             <FormattedDate date={article.date} lang="it" />
-          </MonoTextLight>
+          </span>
           {article.audio && (
             <Link
               href={`/podcast/${article.slug}`}

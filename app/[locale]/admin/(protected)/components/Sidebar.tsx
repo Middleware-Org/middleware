@@ -92,6 +92,11 @@ export default function Sidebar({ dict, locale }: SidebarProps) {
       label: "Autori",
       icon: Users,
     },
+    {
+      href: "/admin/users",
+      label: "Utenti",
+      icon: Users,
+    },
   ];
 
   return (
