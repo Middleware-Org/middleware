@@ -2,6 +2,7 @@
  * Imports
  **************************************************/
 import Image from "next/image";
+import Link from "next/link";
 import { SerifText } from "@/components/atoms/typography";
 import { lightenColor } from "@/lib/utils/color";
 import { Issue } from "@/.velite";
@@ -19,10 +20,9 @@ type IssueCoverProps = {
  **************************************************/
 const styles = {
   coverContainer: cn("flex flex-row items-stretch"),
-  issueLabelContainer: cn(
-    "flex items-start justify-center shrink-0 relative aspect-[4/3] md:aspect-square",
-  ),
+  issueLabelContainer: cn("flex items-start justify-center shrink-0 relative"),
   issueLabelWrapper: cn("h-full flex items-start pt-4"),
+  issueLabelLink: cn("h-full flex items-start"),
   issueLabel: cn("whitespace-nowrap text-xl md:text-2xl lg:text-2xl p-2"),
   imageWrapper: cn("relative w-full aspect-[4/3] md:aspect-square"),
   image: cn("object-cover"),
@@ -37,12 +37,12 @@ export default function IssueCover({ issue }: IssueCoverProps) {
   return (
     <div className={styles.coverContainer}>
       <div className={styles.issueLabelContainer} style={{ backgroundColor: lightColor }}>
-        <div
-          className={styles.issueLabelWrapper}
+        <Link
+          href={`/issues/${issue.slug}`}
+          className={styles.issueLabelLink}
           style={{
-            borderTop: `1px solid ${issue.color}`,
-            borderBottom: `1px solid ${issue.color}`,
             borderLeft: `1px solid ${issue.color}`,
+            borderRight: `1px solid ${issue.color}`,
           }}
         >
           <SerifText
@@ -56,7 +56,7 @@ export default function IssueCover({ issue }: IssueCoverProps) {
           >
             {issue.title}
           </SerifText>
-        </div>
+        </Link>
       </div>
       <div className={styles.imageWrapper} style={{ backgroundColor: issue.color }}>
         <Image
