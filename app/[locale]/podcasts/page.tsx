@@ -22,7 +22,9 @@ type PodcastsPageProps = {
  **************************************************/
 const styles = {
   container: cn("max-w-[1472px] mx-auto px-4 lg:px-10 py-6 lg:py-10"),
-  mobileToggle: cn("lg:hidden md:flex flex mb-6 sticky md:top-[115px] top-0"),
+  mobileToggle: cn(
+    "lg:hidden md:flex flex mb-6 fixed w-full top-[95px] z-50 bg-primary py-2 -mx-4 lg:-mx-10 px-4 lg:px-10",
+  ),
   grid: cn("grid grid-cols-1 lg:grid-cols-[295px_auto] gap-10"),
   sidebar: cn("lg:sticky lg:top-[155px] md:top-[155px] lg:top-[115px] top-[115px] lg:h-fit"),
   content: cn("flex flex-col gap-10"),
@@ -50,8 +52,13 @@ export default async function PodcastsPage({ params }: PodcastsPageProps) {
         </div>
 
         <div className={styles.content}>
-          {issues.map((issue) => (
-            <Issue key={issue.slug} issue={issue} dictCommon={dictCommon} />
+          {issues.map((issue, index) => (
+            <Issue
+              key={issue.slug}
+              issue={issue}
+              dictCommon={dictCommon}
+              isLastIssue={index === issues.length - 1}
+            />
           ))}
         </div>
       </div>
