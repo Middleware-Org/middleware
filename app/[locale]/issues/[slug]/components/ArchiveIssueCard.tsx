@@ -135,12 +135,12 @@ export default function ArchiveIssueCard({
                 borderBottom: `1px solid ${issue.color}`,
               }}
             >
-              <MonoTextBold
+              <span
                 className={styles.createdAtBadgeText}
                 style={{ color: `${issue.color}!important` }}
               >
                 <FormattedDate date={issue.date} lang={locale as "it"} />
-              </MonoTextBold>
+              </span>
             </div>
             <Link
               href={`/issues/${issue.slug}`}

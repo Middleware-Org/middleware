@@ -25,17 +25,13 @@ export default function Nav({ dict }: NavProps) {
   const pathname = usePathname();
 
   return (
-    <nav className={cn(styles.nav, "hidden md:block")}>
+    <nav className={cn(styles.nav)}>
       {headerLinks.map((headerLink) => {
         const isActive = pathname?.includes(headerLink.href) || false;
         return (
           <div
             key={headerLink.label}
-            className={cn(
-              styles.linkContainer,
-              styles.linkContainerVisible,
-              isActive ? styles.linkContainerActive : "",
-            )}
+            className={cn(styles.linkContainer, isActive ? styles.linkContainerActive : "")}
           >
             <Link href={headerLink.href}>
               <MonoTextLight
