@@ -101,9 +101,9 @@ export default function IssuesDropdown({ issues, className }: IssuesDropdownProp
         ) : (
           <ChevronDown className={styles.chevron} />
         )}
-        <MonoTextLight className={styles.issueText}>
-          | <FormattedDate date={displayIssue.date} lang={lang} />
-        </MonoTextLight>
+        <span className={styles.issueText}>
+          | <FormattedDate date={displayIssue.date} lang={lang} className={styles.issueText} />
+        </span>
       </button>
 
       {isOpen && (
