@@ -17,12 +17,18 @@ type AuthorProps = {
   author: Author;
   dictCommon: Pick<CommonDictionary, "articleCard">;
   dictAuthors: Pick<AuthorsDictionary, "page">;
+  isLastAuthor: boolean;
 };
 
 /* **************************************************
  * Author Component
  **************************************************/
-export default async function Author({ author, dictCommon, dictAuthors }: AuthorProps) {
+export default async function Author({
+  author,
+  dictCommon,
+  dictAuthors,
+  isLastAuthor,
+}: AuthorProps) {
   const articles = getArticlesByAuthorSlug(author.slug);
 
   if (!articles || articles.length === 0) return null;
@@ -49,7 +55,7 @@ export default async function Author({ author, dictCommon, dictAuthors }: Author
       />
 
       {/* Bottom separator */}
-      <Separator className={styles.separatorBottom} />
+      {!isLastAuthor && <Separator className={styles.separatorBottom} />}
     </section>
   );
 }

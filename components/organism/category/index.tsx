@@ -17,12 +17,18 @@ type CategoryProps = {
   category: Category;
   dictCommon: Pick<CommonDictionary, "articleCard">;
   dictCategories: Pick<CategoriesDictionary, "page">;
+  isLastCategory: boolean;
 };
 
 /* **************************************************
  * Category Component
  **************************************************/
-export default async function Category({ category, dictCommon, dictCategories }: CategoryProps) {
+export default async function Category({
+  category,
+  dictCommon,
+  dictCategories,
+  isLastCategory,
+}: CategoryProps) {
   const articles = getArticlesByCategorySlug(category.slug);
 
   if (!articles || articles.length === 0) return null;
@@ -49,7 +55,7 @@ export default async function Category({ category, dictCommon, dictCategories }:
       />
 
       {/* Bottom separator */}
-      <Separator className={styles.separatorBottom} />
+      {!isLastCategory && <Separator className={styles.separatorBottom} />}
     </section>
   );
 }

@@ -53,12 +53,13 @@ export default async function CategoriesPage({ params }: CategoriesPageProps) {
         </div>
 
         <div className={styles.content}>
-          {categories.map((category) => (
+          {categories.map((category, index) => (
             <Category
               key={category.slug}
               category={category}
               dictCommon={dictCommon}
               dictCategories={dictCategories}
+              isLastCategory={index === categories.length - 1}
             />
           ))}
         </div>

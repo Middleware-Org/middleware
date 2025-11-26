@@ -16,12 +16,13 @@ import styles from "./styles";
 type IssueProps = {
   issue: Issue;
   dictCommon: Pick<CommonDictionary, "articleCard">;
+  isLastIssue: boolean;
 };
 
 /* **************************************************
  * Issue Component
  **************************************************/
-export default async function Issue({ issue, dictCommon }: IssueProps) {
+export default async function Issue({ issue, dictCommon, isLastIssue }: IssueProps) {
   const articles = getArticlesByIssue(issue.slug);
 
   // Filter only articles with audio (podcasts) - if no audio, don't show the card
@@ -46,7 +47,7 @@ export default async function Issue({ issue, dictCommon }: IssueProps) {
       <IssuePodcasts podcasts={podcasts} dictCommon={dictCommon} issue={issue} />
 
       {/* Bottom separator */}
-      <Separator className={styles.separatorBottom} />
+      {!isLastIssue && <Separator className={styles.separatorBottom} />}
     </section>
   );
 }
