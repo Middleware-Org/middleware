@@ -21,12 +21,12 @@ type PodcastsPageProps = {
  * Styles
  **************************************************/
 const styles = {
-  container: cn("max-w-[1472px] mx-auto px-4 lg:px-10 py-6 lg:py-10"),
+  container: cn("max-w-[1472px] mx-auto px-4 lg:px-10 py-0 lg:py-10"),
   mobileToggle: cn(
-    "lg:hidden md:flex flex mb-6 fixed w-full top-[95px] z-50 bg-primary py-2 -mx-4 lg:-mx-10 px-4 lg:px-10",
+    "lg:hidden md:flex flex sticky top-[95px] md:top-[115px] pt-[20px] bg-primary w-full",
   ),
   grid: cn("grid grid-cols-1 lg:grid-cols-[295px_auto] gap-10"),
-  sidebar: cn("lg:sticky lg:top-[155px] md:top-[155px] lg:top-[115px] top-[115px] lg:h-fit"),
+  sidebar: cn("lg:sticky lg:top-[155px] lg:h-fit"),
   content: cn("flex flex-col gap-10"),
 };
 
@@ -43,12 +43,14 @@ export default async function PodcastsPage({ params }: PodcastsPageProps) {
     <div className={styles.container}>
       <AutoScroll paramName="issue" />
       <div className={styles.mobileToggle}>
-        <MobileIssuesToggle />
+        <MobileIssuesToggle issues={issues} />
       </div>
 
       <div className={styles.grid}>
         <div className={styles.sidebar}>
-          <IssuesList issues={issues} />
+          <div className="hidden lg:block">
+            <IssuesList issues={issues} />
+          </div>
         </div>
 
         <div className={styles.content}>
