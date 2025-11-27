@@ -7,13 +7,11 @@ import { cn } from "@/lib/utils/classes";
  * Styles
  **************************************************/
 const styles = {
-  overlay: cn(
-    "fixed inset-0 bg-transparent z-40 transition-opacity duration-300 ease-in-out",
-  ),
+  overlay: cn("fixed inset-0 bg-transparent z-40 transition-opacity duration-300 ease-in-out"),
   overlayOpen: cn("opacity-100 pointer-events-auto"),
   overlayClosed: cn("opacity-0 pointer-events-none"),
   container: cn(
-    "flex flex-col fixed top-[95px] md:top-[115px] lg:top-[115px] right-0 w-full lg:h-[calc(100dvh-115px)] md:h-[calc(100dvh-115px)] h-[calc(100dvh-95px)] bg-primary z-50 lg:max-w-[461px] md:max-w-[461px] max-w-none transition-transform duration-300 ease-in-out lg:border-l lg:border-secondary md:border-secondary md:border-secondary p-[60px]",
+    "flex flex-col fixed top-[95px] md:top-[115px] lg:top-[115px] right-0 w-full lg:h-[calc(100dvh-115px)] md:h-[calc(100dvh-115px)] h-[calc(100dvh-95px)] bg-primary z-50 lg:max-w-[461px] md:max-w-[461px] max-w-none transition-transform duration-300 ease-in-out lg:border-l md:border-l lg:border-secondary md:border-secondary md:border-secondary p-[60px]",
   ),
   containerOpen: cn("translate-x-0"),
   containerClosed: cn("translate-x-full"),
