@@ -1,89 +1,87 @@
 ---
 slug: privacy-policy
 title: Privacy Policy
-excerpt: >-
-  Questo sito web (https://www.middleware.blog) utilizza esclusivamente cookie
-  tecnici e strumenti di analisi senza cookie (cookieless), nel pieno rispetto
-  della normativa vigente.
+excerpt: Spiegazione e elenco della privacy del sito
 ---
 **Ultimo aggiornamento:** 4 agosto 2025
 
-Questo sito web ([https://www.middleware.blog](https://www.middleware.blog)) utilizza **esclusivamente cookie tecnici** e strumenti di analisi **senza cookie** (cookieless), nel pieno rispetto della normativa vigente.
-
-**Cosa sono i cookie?**
-
-I cookie sono piccoli file di testo che un sito web invia al dispositivo dell’utente durante la navigazione. Servono a memorizzare informazioni utili per garantire il corretto funzionamento del sito o migliorare l’esperienza di navigazione.
-
-* * *
-
-**Tipologie di cookie e strumenti utilizzati**
-
-**1\. Cookie tecnici**
-
-Utilizziamo **solo cookie tecnici**, che:
-
--   Sono necessari per fornire il servizio richiesto dall’utente.
-    
--   Consentono il corretto funzionamento e la sicurezza del sito.
-    
--   **Non** tracciano il comportamento dell’utente.
-    
--   **Non** raccolgono dati personali identificabili.
-    
--   **Non** sono condivisi con terze parti.
-    
--   Un esempio è il cookie utilizzato per ricordare la chiusura del banner informativo.
-    
+Il presente documento descrive la politica di riservatezza del sito **Middleware**  
+([https://www.middleware.blog](https://www.middleware.blog)), gestito da Middleware, con sede in:  
+Via Dante Alighieri 20, Modena 41013, Italia  
+Email: [**info@middleware.blog**](mailto:info@middleware.blog) – Tel: +39 370 3211722.
 
 * * *
 
-**2\. Strumenti di analisi senza cookie (cookieless)**
+**1\. Tipologia di dati raccolti**
 
-Utilizziamo anche:
+Questo sito **non raccoglie né tratta dati personali** per finalità di profilazione o marketing.  
+Non utilizziamo strumenti di tracciamento di terze parti o tecnologie di profilazione.
 
--   **Vercel Web Analytics**  
-    Finalità: statistiche aggregate sul traffico del sito per migliorare contenuti e fruibilità.
+Per finalità strettamente tecniche e statistiche ci affidiamo a servizi che rispettano la privacy:
+
+**a) Vercel Web Analytics**
+
+-   **Fornitore:** Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, USA.
     
--   **Vercel Speed Insights**  
-    Finalità: monitoraggio delle prestazioni tecniche (Core Web Vitals) per garantire velocità e stabilità.
+-   **Finalità:** statistiche aggregate sul traffico del sito per migliorare i contenuti e la fruibilità.
+    
+-   **Base giuridica:** legittimo interesse (art. 6(1)(f) GDPR) a misurare il traffico in forma aggregata.
+    
+-   **Dati raccolti (aggregati e anonimi):** URL/route della pagina, referrer (quando disponibile), tipo di dispositivo, browser e versione, paese approssimato, informazioni di rete di base.
+    
+-   **Cosa non raccogliamo:** indirizzi IP completi, identificatori persistenti o advertising ID.
+    
+-   **Comportamento delle sessioni:** l’identificatore di visita viene reimpostato indicativamente ogni 24 ore e non consente il tracciamento continuativo dell’utente.
     
 
-Questi servizi:
+**b) Vercel Speed Insights**
 
--   **Non** utilizzano cookie o tecnologie simili.
+-   **Fornitore:** Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, USA.
     
--   Raccolgono **solo dati aggregati e anonimi** (es. pagine visitate, tipo di browser, paese di provenienza, metriche di performance).
+-   **Finalità:** monitoraggio delle prestazioni tecniche del sito (Core Web Vitals) per garantire velocità e stabilità.
     
--   Sono forniti da **Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, USA**.
+-   **Base giuridica:** legittimo interesse (art. 6(1)(f) GDPR) a mantenere il sito performante.
     
--   Non consentono di identificare direttamente l’utente.
+-   **Dati raccolti (aggregati e anonimi):** metriche di performance come LCP (Largest Contentful Paint), CLS (Cumulative Layout Shift), INP (Interaction to Next Paint), tipo di dispositivo, browser e versione, paese approssimato.
     
--   I dati sono trattati sulla base del **legittimo interesse** (art. 6(1)(f) GDPR) per finalità di analisi statistica e miglioramento dei servizi.
+-   **Cosa non raccogliamo:** dati identificativi, indirizzi IP completi, identificatori persistenti, advertising ID.
+    
+-   **Comportamento delle sessioni:** ogni misurazione è legata al singolo caricamento di pagina e non è associata a un identificatore persistente.
     
 
 * * *
 
-**Non utilizziamo:**
-
--   Cookie analitici o statistici basati su identificatori persistenti.
-    
--   Cookie di profilazione o pubblicitari.
-    
--   Cookie di terze parti.
-    
--   Script esterni (es. Google Analytics, Facebook, ecc.).
-    
+I **soli cookie utilizzati sono tecnici**, necessari al corretto funzionamento del sito, e non comportano alcuna raccolta di informazioni personali né identificabili.
 
 * * *
 
-**Gestione dei cookie**
+**2\. Cookie e tecnologie simili**
 
-Poiché vengono utilizzati **solo cookie tecnici**, **non è richiesto il consenso preventivo** dell’utente.  
-Se lo desideri, puoi comunque gestire o eliminare i cookie tramite le impostazioni del tuo browser.
+-   Non utilizziamo cookie analitici, pubblicitari o di profilazione.
+    
+-   Non sono presenti script pubblicitari o di tracciamento social.
+    
+-   Gli strumenti di analisi e performance di Vercel **non impiegano cookie** e forniscono solamente misurazioni aggregate e anonime.
+    
+
+Per maggiori dettagli consulta la nostra [Cookie Policy](https://www.middleware.blog/cookie-policy).
 
 * * *
 
-**Contatti**
+**3\. Condivisione con terze parti**
 
-Per ulteriori informazioni sulla presente Cookie Policy, puoi contattarci via email:  
-[**info@middleware.blog**](mailto:info@middleware.blog)
+Non condividiamo alcuna informazione con soggetti terzi per finalità di marketing o profilazione.  
+Non utilizziamo plugin, script o servizi che trasferiscano dati a server esterni, salvo quanto indicato nella sezione precedente in relazione a Vercel.
+
+* * *
+
+**4\. Modifiche alla presente informativa**
+
+Ci riserviamo il diritto di aggiornare la presente Privacy Policy. In tal caso, pubblicheremo la nuova versione su questa pagina indicando la data di aggiornamento. Ti invitiamo a consultare periodicamente questa sezione.
+
+* * *
+
+**5\. Contatti**
+
+Per qualsiasi informazione o chiarimento:  
+Email: [**info@middleware.blog**](mailto:info@middleware.blog)
