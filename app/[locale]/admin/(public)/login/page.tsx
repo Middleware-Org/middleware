@@ -1,105 +1,54 @@
-"use client";
-
 /* **************************************************
  * Imports
  **************************************************/
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { authClient } from "@/lib/auth/client";
+import Link from "next/link";
+import { getDictionary } from "@/lib/i18n/utils";
+import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
+import Pictogram from "@/components/organism/pictogram";
+import { MonoTextBold } from "@/components/atoms/typography";
+import type { CommonDictionary } from "@/lib/i18n/types";
+import LoginForm from "./LoginForm";
 import styles from "./styles";
 
 /* **************************************************
- * Constants
+ * Types
  ************************************************** */
-const CALLBACK_URL = "/admin";
+type LoginPageProps = {
+  params: Promise<{ locale: string }>;
+};
+
+/* **************************************************
+ * Logo Component
+ ************************************************** */
+function Logo({ dict }: { dict: Pick<CommonDictionary, "title"> }) {
+  return (
+    <div className={styles.logoContainer}>
+      <Pictogram size={48} />
+      <Link href="/">
+        <MonoTextBold className={styles.logoText}>{dict.title}</MonoTextBold>
+      </Link>
+    </div>
+  );
+}
 
 /* **************************************************
  * Login Page
  ************************************************** */
-export default function AdminLoginPage() {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+export default async function AdminLoginPage({ params }: LoginPageProps) {
+  const { locale } = await params;
+  const dict = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
 
-  /* **************************************************
-   * Handlers
-   ************************************************** */
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-
-    try {
-      const result = await authClient.signIn.email({
-        email,
-        password,
-      });
-
-      if (result.error) {
-        setError(result.error.message || "Errore durante il login");
-        return;
-      }
-
-      if (result.data) {
-        router.push(CALLBACK_URL);
-      }
-    } catch {
-      setError("Errore durante il login. Riprova.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  /* **************************************************
-   * Render
-   ************************************************** */
   return (
     <main className={styles.main}>
       <div className={styles.container}>
-        <h1 className={styles.title}>Area admin</h1>
-        <p className={styles.description}>Accedi con email e password.</p>
-
-        {error && <div className={styles.error}>{error}</div>}
-
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <div className={styles.field}>
-            <label htmlFor="email" className={styles.label}>
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              disabled={loading}
-              className={styles.input}
-              autoComplete="email"
-            />
+        <div className={styles.header}>
+          <div className={styles.logoWrapper}>
+            <Logo dict={dict} />
           </div>
-
-          <div className={styles.field}>
-            <label htmlFor="password" className={styles.label}>
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              disabled={loading}
-              className={styles.input}
-              autoComplete="current-password"
-            />
-          </div>
-
-          <button type="submit" disabled={loading} className={styles.button}>
-            {loading ? "Accesso in corso..." : "Accedi"}
-          </button>
-        </form>
+          <h1 className={styles.title}>Area admin</h1>
+          <p className={styles.description}>Accedi con email e password</p>
+        </div>
+        <LoginForm />
       </div>
     </main>
   );
