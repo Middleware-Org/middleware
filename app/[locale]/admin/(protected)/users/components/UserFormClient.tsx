@@ -62,6 +62,7 @@ export default function UserFormClient({ userId }: UserFormClientProps) {
     type: "error" | "warning";
   } | null>(null);
   const [isDeleting, startDeleteTransition] = useTransition();
+  const [, startSubmitTransition] = useTransition();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState<string | null>(null);
@@ -70,8 +71,11 @@ export default function UserFormClient({ userId }: UserFormClientProps) {
   useEffect(() => {
     if (state?.success) {
       formRef.current?.reset();
-      setPassword("");
-      setPasswordError(null);
+      // Reset password state in next tick to avoid cascading renders
+      setTimeout(() => {
+        setPassword("");
+        setPasswordError(null);
+      }, 0);
       // Invalida la cache SWR per forzare il refetch della lista
       mutate("/api/users");
       if (editing && userId) {
@@ -87,11 +91,14 @@ export default function UserFormClient({ userId }: UserFormClientProps) {
     setPasswordError(null);
 
     const formData = new FormData(e.currentTarget);
-    const passwordValue = formData.get("password") as string;
+    const passwordValue = password; // Usa lo state invece del formData
 
-    // Se siamo in modalità edit e la password è vuota, va bene
+    // Se siamo in modalità edit e la password è vuota, va bene - invia direttamente
     if (editing && (!passwordValue || passwordValue.trim().length === 0)) {
-      e.currentTarget.requestSubmit();
+      formData.set("password", ""); // Assicurati che sia vuoto
+      startSubmitTransition(() => {
+        formAction(formData);
+      });
       return;
     }
 
@@ -108,7 +115,11 @@ export default function UserFormClient({ userId }: UserFormClientProps) {
       }
     }
 
-    e.currentTarget.requestSubmit();
+    // Se la validazione passa, aggiungi la password al FormData e invia
+    formData.set("password", passwordValue);
+    startSubmitTransition(() => {
+      formAction(formData);
+    });
   }
 
   // Handler per aprire il dialog di conferma eliminazione
@@ -201,7 +212,6 @@ export default function UserFormClient({ userId }: UserFormClientProps) {
           <label htmlFor="password" className={styles.label}>
             Password {editing ? "(lascia vuoto per non modificare)" : "*"}
           </label>
-          <input type="hidden" name="password" value={password} />
           <PasswordInput
             id="password"
             name="password-display"
