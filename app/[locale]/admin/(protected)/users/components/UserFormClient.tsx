@@ -171,12 +171,7 @@ export default function UserFormClient({ userId }: UserFormClientProps) {
         <div className={baseStyles.successMessageGreen}>{state.message}</div>
       )}
 
-      <form
-        ref={formRef}
-        action={formAction}
-        onSubmit={handleFormSubmit}
-        className={styles.form}
-      >
+      <form ref={formRef} action={formAction} onSubmit={handleFormSubmit} className={styles.form}>
         <h2 className={styles.formTitle}>{editing ? "Modifica Utente" : "Nuovo Utente"}</h2>
 
         {editing && userId && <input type="hidden" name="id" value={userId} />}
@@ -220,9 +215,7 @@ export default function UserFormClient({ userId }: UserFormClientProps) {
             required={!editing}
             placeholder={editing ? "Lascia vuoto per non modificare" : ""}
           />
-          {passwordError && (
-            <div className={styles.passwordError}>{passwordError}</div>
-          )}
+          {passwordError && <div className={styles.passwordError}>{passwordError}</div>}
         </div>
 
         <div className={styles.formActions}>
