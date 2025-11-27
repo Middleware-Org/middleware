@@ -59,13 +59,24 @@ export default function Menu({ dict }: MenuProps) {
   }
 
   return (
-    <div
-      className={cn(styles.container, isOpen ? styles.containerOpen : styles.containerClosed)}
-      id="app-menu"
-      role="dialog"
-      aria-label={dict.aria.menu.middleware}
-      aria-modal="true"
-    >
+    <>
+      {/* Overlay */}
+      <div
+        className={cn(
+          styles.overlay,
+          isOpen ? styles.overlayOpen : styles.overlayClosed,
+        )}
+        onClick={closeMenu}
+        aria-hidden="true"
+      />
+      {/* Menu */}
+      <div
+        className={cn(styles.container, isOpen ? styles.containerOpen : styles.containerClosed)}
+        id="app-menu"
+        role="dialog"
+        aria-label={dict.aria.menu.middleware}
+        aria-modal="true"
+      >
       <nav className={styles.navMain} role="navigation">
         {menuItems.map((item) => {
           const pathnameWithoutLang = getPathnameWithoutLang(pathname);
@@ -109,5 +120,6 @@ export default function Menu({ dict }: MenuProps) {
         <MonoTextLight className={styles.footerQuote}>{dict.aria.menu.footer_quote}</MonoTextLight>
       </div>
     </div>
+    </>
   );
 }
