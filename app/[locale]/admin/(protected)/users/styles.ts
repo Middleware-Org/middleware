@@ -62,6 +62,7 @@ const styles = {
     "transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-tertiary",
     "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent",
   ),
+  passwordError: cn("mt-2 text-sm text-red-500"),
 };
 
 /* **************************************************

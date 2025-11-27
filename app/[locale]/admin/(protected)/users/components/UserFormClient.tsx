@@ -14,6 +14,7 @@ import {
   type ActionResult,
 } from "../actions";
 import ConfirmDialog from "@/components/molecules/confirmDialog";
+import PasswordInput, { isPasswordStrongEnough } from "./PasswordInput";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { User } from "@/lib/github/users";
@@ -62,11 +63,15 @@ export default function UserFormClient({ userId }: UserFormClientProps) {
   } | null>(null);
   const [isDeleting, startDeleteTransition] = useTransition();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [password, setPassword] = useState("");
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
   // Reset form and navigate on success
   useEffect(() => {
     if (state?.success) {
       formRef.current?.reset();
+      setPassword("");
+      setPasswordError(null);
       // Invalida la cache SWR per forzare il refetch della lista
       mutate("/api/users");
       if (editing && userId) {
@@ -75,6 +80,36 @@ export default function UserFormClient({ userId }: UserFormClientProps) {
       router.push("/admin/users");
     }
   }, [state, router, editing, userId]);
+
+  // Validazione password prima del submit
+  function handleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setPasswordError(null);
+
+    const formData = new FormData(e.currentTarget);
+    const passwordValue = formData.get("password") as string;
+
+    // Se siamo in modalità edit e la password è vuota, va bene
+    if (editing && (!passwordValue || passwordValue.trim().length === 0)) {
+      e.currentTarget.requestSubmit();
+      return;
+    }
+
+    // Se siamo in modalità create o la password è stata inserita, deve essere forte
+    if (!editing || (passwordValue && passwordValue.trim().length > 0)) {
+      if (!passwordValue || passwordValue.length < 8) {
+        setPasswordError("La password deve essere di almeno 8 caratteri");
+        return;
+      }
+
+      if (!isPasswordStrongEnough(passwordValue)) {
+        setPasswordError("La password non è abbastanza sicura. Deve essere almeno 'Forte'");
+        return;
+      }
+    }
+
+    e.currentTarget.requestSubmit();
+  }
 
   // Handler per aprire il dialog di conferma eliminazione
   function handleDeleteClick() {
@@ -125,7 +160,12 @@ export default function UserFormClient({ userId }: UserFormClientProps) {
         <div className={baseStyles.successMessageGreen}>{state.message}</div>
       )}
 
-      <form ref={formRef} action={formAction} className={styles.form}>
+      <form
+        ref={formRef}
+        action={formAction}
+        onSubmit={handleFormSubmit}
+        className={styles.form}
+      >
         <h2 className={styles.formTitle}>{editing ? "Modifica Utente" : "Nuovo Utente"}</h2>
 
         {editing && userId && <input type="hidden" name="id" value={userId} />}
@@ -161,14 +201,18 @@ export default function UserFormClient({ userId }: UserFormClientProps) {
           <label htmlFor="password" className={styles.label}>
             Password {editing ? "(lascia vuoto per non modificare)" : "*"}
           </label>
-          <input
+          <input type="hidden" name="password" value={password} />
+          <PasswordInput
             id="password"
-            name="password"
-            type="password"
+            name="password-display"
+            value={password}
+            onChange={setPassword}
             required={!editing}
-            className={styles.input}
             placeholder={editing ? "Lascia vuoto per non modificare" : ""}
           />
+          {passwordError && (
+            <div className={styles.passwordError}>{passwordError}</div>
+          )}
         </div>
 
         <div className={styles.formActions}>
