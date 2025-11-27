@@ -19,7 +19,7 @@ type ArchivePageProps = {
  * Styles
  **************************************************/
 const styles = {
-  wrapper: cn("mx-auto max-w-[1472px] w-full"),
+  wrapper: cn("mx-auto max-w-[1472px] w-full lg:my-10 md:my-0 my-0"),
 };
 
 /* **************************************************
@@ -33,21 +33,12 @@ export default async function ArchivePage({ params }: ArchivePageProps) {
   return (
     <div className={styles.wrapper}>
       <ArchiveScrollWrapper stickyOffset={155}>
-        {[
-          ...issues,
-          ...issues,
-          ...issues,
-          ...issues,
-          ...issues,
-          ...issues,
-          ...issues,
-          ...issues,
-        ].map((issue, index) => {
+        {issues.map((issue, index) => {
           const articles = getArticlesByIssue(issue.slug);
 
           return (
             <ArchiveIssueCard
-              key={index}
+              key={issue.slug}
               issue={issue}
               articles={articles}
               dict={dict}
