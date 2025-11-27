@@ -10,6 +10,7 @@ import { getIssueBySlug } from "@/lib/content";
 import { notFound } from "next/navigation";
 import Footer from "@/components/organism/footer";
 import { getBaseUrl, createOpenGraphMetadata, createTwitterMetadata } from "@/lib/utils/metadata";
+import AutoScrollText from "@/components/organism/autoScrollText";
 
 /* **************************************************
  * Types
@@ -81,7 +82,9 @@ export default async function IssueLayout({ children, params }: IssueLayoutProps
   return (
     <>
       <Header dict={dict}>
-        <MonoTextLight className="text-xs! md:text-base!">{issue.title}</MonoTextLight>
+        <AutoScrollText once={true}>
+          <MonoTextLight className="text-xs! md:text-base!">{issue.title}</MonoTextLight>
+        </AutoScrollText>
       </Header>
       <Menu dict={dict} />
       <main className="w-full">{children}</main>

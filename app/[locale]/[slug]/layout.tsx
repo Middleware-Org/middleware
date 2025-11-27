@@ -10,11 +10,8 @@ import { MonoTextLight } from "@/components/atoms/typography";
 import { notFound } from "next/navigation";
 import { getPageBySlug } from "@/lib/content";
 import Footer from "@/components/organism/footer";
-import {
-  getBaseUrl,
-  createOpenGraphMetadata,
-  createTwitterMetadata,
-} from "@/lib/utils/metadata";
+import { getBaseUrl, createOpenGraphMetadata, createTwitterMetadata } from "@/lib/utils/metadata";
+import AutoScrollText from "@/components/organism/autoScrollText";
 
 /* **************************************************
  * Types
@@ -95,7 +92,9 @@ export default async function SlugLayout({ children, params }: SlugLayoutProps) 
   return (
     <>
       <Header dict={dict}>
-        <MonoTextLight className="text-xs! md:text-base!">{page.title}</MonoTextLight>
+        <AutoScrollText once={true}>
+          <MonoTextLight className="text-xs! md:text-base!">{page.title}</MonoTextLight>
+        </AutoScrollText>
       </Header>
       <Menu dict={dict} />
       <main className="w-full">{children}</main>
