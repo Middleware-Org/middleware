@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils/classes";
 import HorizontalScroll from "@/components/molecules/HorizontalScroll";
 
@@ -16,9 +17,21 @@ export default function ArchiveScrollWrapper({
   className,
   innerClassName,
 }: ArchiveScrollWrapperProps) {
+  const [isDesktop, setIsDesktop] = useState(true);
+
+  useEffect(() => {
+    function checkScreenSize() {
+      setIsDesktop(window.innerWidth >= 1024); // lg breakpoint
+    }
+
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
+
   return (
     <HorizontalScroll
-      enabled={true}
+      enabled={isDesktop}
       stickyOffset={stickyOffset}
       className={cn(className)}
       innerClassName={cn(innerClassName)}
