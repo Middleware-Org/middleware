@@ -1,12 +1,11 @@
 ---
 slug: cookie-policy
 title: Cookie Policy
-excerpt: >-
-  Questo sito web (https://www.middleware.blog) utilizza esclusivamente cookie
-  tecnici e strumenti di analisi senza cookie (cookieless), nel pieno rispetto
-  della normativa vigente.
+excerpt: Spiegazione e elenco dei cookie del sito
 ---
 **Ultimo aggiornamento:** 4 agosto 2025
+
+Questo sito web ([https://www.middleware.blog](https://www.middleware.blog)) utilizza esclusivamente cookie tecnici e strumenti di analisi senza cookie (cookieless), nel pieno rispetto della normativa vigente.
 
 **Cosa sono i cookie?**
 
