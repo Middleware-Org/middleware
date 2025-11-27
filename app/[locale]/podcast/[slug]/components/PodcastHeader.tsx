@@ -45,18 +45,20 @@ export default function PodcastHeader({ article, issue, author, category }: Podc
         <div className={styles.infoContainer}>
           <div className={styles.textContainer}>
             <SerifText className={styles.textTitle}>{article.title}</SerifText>
-            <Link href={`/authors?author=${author?.slug}`}>
-              <MonoTextLight className={styles.textAuthor}>{author?.name}</MonoTextLight>
-            </Link>
-            {category && (
-              <Link href={`/categories?category=${category.slug}`}>
-                <MonoTextLight className={styles.textAuthor}>{category.name}</MonoTextLight>
+            <div className={styles.infoPodcastContainer}>
+              <Link href={`/authors?author=${author?.slug}`}>
+                <MonoTextLight className={styles.textAuthor}>{author?.name}</MonoTextLight>
               </Link>
-            )}
-            {article.date && (
-              <FormattedDate date={article.date} lang={lang} className={styles.textDate} />
-            )}
-            <Link
+              {category && (
+                <Link href={`/categories?category=${category.slug}`}>
+                  <MonoTextLight className={styles.textAuthor}>{category.name}</MonoTextLight>
+                </Link>
+              )}
+              {article.date && (
+                <FormattedDate date={article.date} lang={lang} className={styles.textDate} />
+              )}
+            </div>
+            {/* <Link
               href="https://github.com/resemble-ai/chatterbox"
               target="_blank"
               rel="noopener noreferrer"
@@ -64,7 +66,7 @@ export default function PodcastHeader({ article, issue, author, category }: Podc
               <MonoTextLight className={styles.textTTS}>
                 Podcast powered by Chatterbox-TTS by Resemble AI (2025)
               </MonoTextLight>
-            </Link>
+            </Link> */}
           </div>
         </div>
       </div>

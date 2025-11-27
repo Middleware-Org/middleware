@@ -32,6 +32,9 @@ const styles = {
   infoContainer: cn(
     "flex justify-center md:justify-between lg:justify-between text-center md:text-left lg:text-left items-center",
   ),
+  infoPodcastContainer: cn(
+    "flex lg:flex-col md:flex-col flex-row justify-center items-center md:items-start lg:items-start gap-2 md:gap-0 lg:gap-0",
+  ),
   textContainer: cn("flex flex-col"),
   textFlexContainer: cn("flex items-center gap-2"),
   textTitle: cn("text-lg md:text-2xl lg:text-3xl font-bold leading-tight"),
