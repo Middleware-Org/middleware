@@ -17,6 +17,7 @@ import {
   createArticleSchema,
 } from "@/lib/utils/metadata";
 import StructuredData from "@/components/StructuredData";
+import AutoScrollText from "@/components/organism/autoScrollText";
 
 /* **************************************************
  * Types
@@ -106,7 +107,9 @@ export default async function ArticleLayout({ children, params }: ArticleLayoutP
       <StructuredData data={articleSchema} />
       <ReadingProgress />
       <Header dict={dict}>
-        <MonoTextLight className="text-xs! md:text-base!">{article.title}</MonoTextLight>
+        <AutoScrollText once={true}>
+          <MonoTextLight className="text-xs! md:text-base!">{article.title}</MonoTextLight>
+        </AutoScrollText>
       </Header>
       <Menu dict={dict} />
       <main className="w-full">{children}</main>
