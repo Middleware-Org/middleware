@@ -31,6 +31,7 @@ export type Issue = {
   cover: string;
   color: string;
   date: string;
+  published: boolean;
 };
 
 export type Category = {

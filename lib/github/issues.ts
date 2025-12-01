@@ -30,6 +30,10 @@ export async function getAllIssues(): Promise<Issue[]> {
 
         const issue = JSON.parse(content) as Issue;
         issue.slug = file.name.replace(".json", "");
+        // Default published to false if not present (retrocompatibility)
+        if (issue.published === undefined) {
+          issue.published = false;
+        }
         return issue;
       } catch {
         return null;
@@ -55,6 +59,10 @@ export async function getIssueBySlug(slug: string): Promise<Issue | undefined> {
 
     const issue = JSON.parse(content) as Issue;
     issue.slug = slug;
+    // Default published to false if not present (retrocompatibility)
+    if (issue.published === undefined) {
+      issue.published = false;
+    }
     return issue;
   } catch {
     return undefined;
@@ -77,6 +85,7 @@ export async function createIssue(issue: Omit<Issue, "slug"> & { slug?: string }
       cover: issue.cover,
       color: issue.color,
       date: issue.date,
+      published: issue.published ?? false,
     },
     null,
     2,
@@ -109,6 +118,7 @@ export async function updateIssue(
     cover: issue.cover ?? existing.cover,
     color: issue.color ?? existing.color,
     date: issue.date ?? existing.date,
+    published: issue.published !== undefined ? issue.published : existing.published,
   };
 
   const content = JSON.stringify(updated, null, 2);

@@ -47,6 +47,7 @@ export default defineConfig({
         description: s.string(),
         cover: s.string(),
         color: s.string(),
+        published: s.boolean().default(false),
       }),
     },
     pages: {
