@@ -8,7 +8,7 @@ type AutoScrollProps = {
   offset?: number;
 };
 
-export default function AutoScroll({ paramName, offset = 155 }: AutoScrollProps) {
+export default function AutoScroll({ paramName, offset = 175 }: AutoScrollProps) {
   const searchParams = useSearchParams();
   const value = searchParams.get(paramName);
 
