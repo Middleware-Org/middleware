@@ -2,6 +2,7 @@
 slug: teoria-del-partito
 title: Teoria del partito
 date: '2025-11-19'
+last_update: '2025-12-01'
 author: infoaut
 category: organizzazione
 issue: esperimento-formazione
