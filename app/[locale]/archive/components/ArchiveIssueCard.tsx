@@ -78,7 +78,8 @@ export default function ArchiveIssueCard({ issue, articles, dict, index }: Archi
               className={styles.issueLabelLink}
               style={{
                 borderLeft: `1px solid ${issue.color}`,
-                borderRight: `1px solid ${issue.color}`,
+                borderBottom: `1px solid ${issue.color}`,
+                borderTop: `1px solid ${issue.color}`,
               }}
             >
               <SerifText
