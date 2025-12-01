@@ -17,6 +17,7 @@ export type Article = {
   category: string;
   issue: string;
   in_evidence: boolean;
+  published: boolean;
   excerpt: string;
   content: string;
   audio?: string;

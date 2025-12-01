@@ -12,6 +12,7 @@ export default defineConfig({
         category: s.string(),
         issue: s.string(),
         in_evidence: s.boolean().default(false),
+        published: s.boolean().default(false),
         content: s.markdown(),
         excerpt: s.string().max(200),
         audio: s.string().optional(),

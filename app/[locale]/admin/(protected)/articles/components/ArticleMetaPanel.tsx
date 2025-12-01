@@ -32,6 +32,7 @@ interface ArticleMetaPanelProps {
     category: string;
     issue: string;
     in_evidence: boolean;
+    published: boolean;
     excerpt: string;
     audio?: string;
     audio_chunks?: string;
@@ -273,6 +274,18 @@ export default function ArticleMetaPanel({
             className={styles.textarea}
             rows={3}
           />
+        </div>
+
+        <div className={styles.field}>
+          <label className={`${baseStyles.buttonGroup} cursor-pointer`}>
+            <input
+              type="checkbox"
+              checked={formData.published}
+              onChange={(e) => onFormDataChange("published", e.target.checked)}
+              className={styles.checkbox}
+            />
+            <span className={styles.label}>Pubblicato</span>
+          </label>
         </div>
 
         <div className={styles.field}>

@@ -38,6 +38,7 @@ export async function getAllArticles(): Promise<Article[]> {
           category: data.category,
           issue: data.issue,
           in_evidence: data.in_evidence ?? false,
+          published: data.published ?? false,
           excerpt: data.excerpt || "",
           content: markdownContent,
           audio: data.audio,
@@ -99,6 +100,7 @@ export async function getArticleBySlug(slug: string): Promise<Article | undefine
         category: (data.category as string) || "",
         issue: (data.issue as string) || "",
         in_evidence: (data.in_evidence as boolean) ?? false,
+        published: (data.published as boolean) ?? false,
         excerpt: (data.excerpt as string) || "",
         content: markdownContent || "",
         audio: (data.audio as string) || undefined,
@@ -134,6 +136,7 @@ export async function createArticle(article: Omit<Article, "slug"> & { slug?: st
     category: article.category,
     issue: article.issue,
     in_evidence: article.in_evidence ?? false,
+    published: article.published ?? false,
     excerpt: article.excerpt || "",
   };
 
@@ -208,6 +211,7 @@ export async function updateArticle(
     category: article.category ?? existing.category,
     issue: article.issue ?? existing.issue,
     in_evidence: article.in_evidence !== undefined ? article.in_evidence : existing.in_evidence,
+    published: article.published !== undefined ? article.published : existing.published,
     excerpt: article.excerpt ?? existing.excerpt,
     content: article.content ?? existing.content,
     audio: article.audio !== undefined ? article.audio : existing.audio,
@@ -222,6 +226,7 @@ export async function updateArticle(
     category: updated.category,
     issue: updated.issue,
     in_evidence: updated.in_evidence,
+    published: updated.published,
     excerpt: updated.excerpt,
   };
 
