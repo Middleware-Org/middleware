@@ -13,6 +13,7 @@ export type Article = {
   slug: string;
   title: string;
   date: string;
+  last_update: string;
   author: string;
   category: string;
   issue: string;
@@ -31,6 +32,7 @@ export type Issue = {
   cover: string;
   color: string;
   date: string;
+  last_update: string;
   published: boolean;
 };
 

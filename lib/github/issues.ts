@@ -34,6 +34,10 @@ export async function getAllIssues(): Promise<Issue[]> {
         if (issue.published === undefined) {
           issue.published = false;
         }
+        // Default last_update to date if not present (retrocompatibility)
+        if (!issue.last_update) {
+          issue.last_update = issue.date;
+        }
         return issue;
       } catch {
         return null;
@@ -44,7 +48,7 @@ export async function getAllIssues(): Promise<Issue[]> {
   const validIssues = issues.filter((issue): issue is Issue => issue !== null);
 
   return validIssues.sort((a, b) => {
-    return b.date.localeCompare(a.date); // Most recent first
+    return b.last_update.localeCompare(a.last_update); // Most recent first
   });
 }
 
@@ -62,6 +66,10 @@ export async function getIssueBySlug(slug: string): Promise<Issue | undefined> {
     // Default published to false if not present (retrocompatibility)
     if (issue.published === undefined) {
       issue.published = false;
+    }
+    // Default last_update to date if not present (retrocompatibility)
+    if (!issue.last_update) {
+      issue.last_update = issue.date;
     }
     return issue;
   } catch {
@@ -85,6 +93,7 @@ export async function createIssue(issue: Omit<Issue, "slug"> & { slug?: string }
       cover: issue.cover,
       color: issue.color,
       date: issue.date,
+      last_update: issue.date, // Alla creazione, last_update = date
       published: issue.published ?? false,
     },
     null,
@@ -111,6 +120,9 @@ export async function updateIssue(
     finalSlug = await generateUniqueSlug("content/issues", baseSlug, ".json", slug);
   }
 
+  // All'aggiornamento, last_update diventa la data corrente
+  const currentDate = new Date().toISOString().split("T")[0];
+
   const updated: Issue = {
     slug: finalSlug,
     title: issue.title ?? existing.title,
@@ -118,10 +130,24 @@ export async function updateIssue(
     cover: issue.cover ?? existing.cover,
     color: issue.color ?? existing.color,
     date: issue.date ?? existing.date,
+    last_update: currentDate,
     published: issue.published !== undefined ? issue.published : existing.published,
   };
 
-  const content = JSON.stringify(updated, null, 2);
+  const content = JSON.stringify(
+    {
+      slug: updated.slug,
+      title: updated.title,
+      description: updated.description,
+      cover: updated.cover,
+      color: updated.color,
+      date: updated.date,
+      last_update: updated.last_update,
+      published: updated.published,
+    },
+    null,
+    2,
+  );
   const newFilePath = `content/issues/${finalSlug}.json`;
   const oldFilePath = `content/issues/${slug}.json`;
 

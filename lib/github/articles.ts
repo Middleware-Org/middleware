@@ -30,10 +30,14 @@ export async function getAllArticles(): Promise<Article[]> {
 
         const { data, content: markdownContent } = matter(content);
 
+        const articleDate = data.date as string;
+        const lastUpdate = (data.last_update as string) || articleDate;
+
         return {
           slug: data.slug || file.name.replace(".md", ""),
           title: data.title,
-          date: data.date,
+          date: articleDate,
+          last_update: lastUpdate,
           author: data.author,
           category: data.category,
           issue: data.issue,
@@ -52,7 +56,7 @@ export async function getAllArticles(): Promise<Article[]> {
 
   const validArticles = articles.filter((article): article is Article => article !== null);
 
-  return validArticles.sort((a, b) => b.date.localeCompare(a.date));
+  return validArticles.sort((a, b) => b.last_update.localeCompare(a.last_update));
 }
 
 export async function getArticleBySlug(slug: string): Promise<Article | undefined> {
@@ -92,10 +96,14 @@ export async function getArticleBySlug(slug: string): Promise<Article | undefine
     try {
       const { data, content: markdownContent } = matter(content);
 
+      const articleDate = (data.date as string) || new Date().toISOString().split("T")[0];
+      const lastUpdate = (data.last_update as string) || articleDate;
+
       return {
         slug: (data.slug as string) || slug,
         title: (data.title as string) || "Untitled",
-        date: (data.date as string) || new Date().toISOString().split("T")[0],
+        date: articleDate,
+        last_update: lastUpdate,
         author: (data.author as string) || "",
         category: (data.category as string) || "",
         issue: (data.issue as string) || "",
@@ -132,6 +140,7 @@ export async function createArticle(article: Omit<Article, "slug"> & { slug?: st
     slug,
     title: article.title,
     date: article.date,
+    last_update: article.date, // Alla creazione, last_update = date
     author: article.author,
     category: article.category,
     issue: article.issue,
@@ -203,10 +212,14 @@ export async function updateArticle(
     finalSlug = await generateUniqueSlug("content/articles", baseSlug, ".md", fileSlug);
   }
 
+  // All'aggiornamento, last_update diventa la data corrente
+  const currentDate = new Date().toISOString().split("T")[0];
+
   const updated: Article = {
     slug: finalSlug,
     title: article.title ?? existing.title,
     date: article.date ?? existing.date,
+    last_update: currentDate,
     author: article.author ?? existing.author,
     category: article.category ?? existing.category,
     issue: article.issue ?? existing.issue,
@@ -222,6 +235,7 @@ export async function updateArticle(
     slug: finalSlug,
     title: updated.title,
     date: updated.date,
+    last_update: updated.last_update,
     author: updated.author,
     category: updated.category,
     issue: updated.issue,

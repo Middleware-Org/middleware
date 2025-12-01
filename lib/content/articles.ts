@@ -7,7 +7,9 @@ import { articles } from "@/.velite";
  * Articles
  **************************************************/
 export const getAllArticles = () =>
-  articles.filter((a) => a.published).sort((a, b) => b.date.localeCompare(a.date));
+  articles
+    .filter((a) => a.published)
+    .sort((a, b) => (b.last_update || b.date).localeCompare(a.last_update || a.date));
 
 export const getArticleBySlug = (slug: string) => {
   const article = articles.find((a) => a.slug === slug);

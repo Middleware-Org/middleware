@@ -8,6 +8,7 @@ export default defineConfig({
         slug: s.slug("articles"),
         title: s.string().max(99),
         date: s.isodate(),
+        last_update: s.isodate(),
         author: s.string(),
         category: s.string(),
         issue: s.string(),
@@ -43,6 +44,7 @@ export default defineConfig({
       schema: s.object({
         slug: s.slug("issues"),
         date: s.isodate(),
+        last_update: s.isodate(),
         title: s.string(),
         description: s.string(),
         cover: s.string(),
