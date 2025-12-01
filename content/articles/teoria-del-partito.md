@@ -6,6 +6,7 @@ author: infoaut
 category: organizzazione
 issue: esperimento-formazione
 in_evidence: true
+published: true
 excerpt: >-
   Abbiamo tradotto questo importante articolo di Phil A. Neel apparso su Ill
   Will che tratta della teoria del partito.
