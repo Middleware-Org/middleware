@@ -6,6 +6,7 @@ author: kamo-modena
 category: universita-della-guerra
 issue: esperimento-formazione
 in_evidence: false
+published: true
 excerpt: >-
   Tracce per un’inchiesta sull’università dentro la "fabbrica della guerra" di
   Modena
