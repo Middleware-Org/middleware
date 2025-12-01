@@ -6,6 +6,7 @@ author: infoaut
 category: conflitti-globali
 issue: esperimento-formazione
 in_evidence: false
+published: true
 excerpt: >-
   In questi mesi la storia corre veloce, in poco tempo alcuni dei capisaldi su
   cui si è retto l’ordine mondiale definitivamente consolidatosi dopo il crollo
