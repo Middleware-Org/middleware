@@ -212,14 +212,14 @@ export async function updateArticle(
     finalSlug = await generateUniqueSlug("content/articles", baseSlug, ".md", fileSlug);
   }
 
-  // All'aggiornamento, last_update diventa la data corrente
-  const currentDate = new Date().toISOString().split("T")[0];
+  // All'aggiornamento, last_update diventa la data e ora corrente
+  const currentDateTime = new Date().toISOString();
 
   const updated: Article = {
     slug: finalSlug,
     title: article.title ?? existing.title,
     date: article.date ?? existing.date,
-    last_update: currentDate,
+    last_update: currentDateTime,
     author: article.author ?? existing.author,
     category: article.category ?? existing.category,
     issue: article.issue ?? existing.issue,

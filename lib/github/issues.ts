@@ -120,8 +120,8 @@ export async function updateIssue(
     finalSlug = await generateUniqueSlug("content/issues", baseSlug, ".json", slug);
   }
 
-  // All'aggiornamento, last_update diventa la data corrente
-  const currentDate = new Date().toISOString().split("T")[0];
+  // All'aggiornamento, last_update diventa la data e ora corrente
+  const currentDateTime = new Date().toISOString();
 
   const updated: Issue = {
     slug: finalSlug,
@@ -130,7 +130,7 @@ export async function updateIssue(
     cover: issue.cover ?? existing.cover,
     color: issue.color ?? existing.color,
     date: issue.date ?? existing.date,
-    last_update: currentDate,
+    last_update: currentDateTime,
     published: issue.published !== undefined ? issue.published : existing.published,
   };
 
