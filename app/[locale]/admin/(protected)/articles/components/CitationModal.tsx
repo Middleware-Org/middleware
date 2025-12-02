@@ -4,51 +4,56 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Link as LinkIcon, X } from "lucide-react";
+import { Quote, X } from "lucide-react";
 import baseStyles from "../../styles";
 
 /* **************************************************
  * Types
  **************************************************/
-interface LinkModalProps {
+interface CitationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onInsert: (url: string) => void;
-  currentUrl?: string;
+  onInsert: (citationId: string | number | null, citationText: string) => void;
+  currentCitationId?: string | number | null;
+  currentCitationText?: string;
+  nextCitationId: number;
 }
 
 /* **************************************************
- * Link Modal Component
+ * Citation Modal Component
  **************************************************/
-export default function LinkModal({ isOpen, onClose, onInsert, currentUrl }: LinkModalProps) {
-  const [url, setUrl] = useState(currentUrl || "");
-  const inputRef = useRef<HTMLInputElement>(null);
+export default function CitationModal({
+  isOpen,
+  onClose,
+  onInsert,
+  currentCitationId,
+  currentCitationText,
+  nextCitationId,
+}: CitationModalProps) {
+  const [text, setText] = useState(currentCitationText || "");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (isOpen) {
-      setUrl(currentUrl || "");
-      // Focus input quando il modal si apre
+      setText(currentCitationText || "");
+      // Focus textarea quando il modal si apre
       setTimeout(() => {
-        inputRef.current?.focus();
+        textareaRef.current?.focus();
       }, 100);
     }
-  }, [isOpen, currentUrl]);
+  }, [isOpen, currentCitationText]);
 
   function handleSubmit() {
-    if (url.trim()) {
-      // Aggiungi https:// se non presente
-      let finalUrl = url.trim();
-      if (!finalUrl.startsWith("http://") && !finalUrl.startsWith("https://")) {
-        finalUrl = `https://${finalUrl}`;
-      }
-      onInsert(finalUrl);
-      setUrl("");
+    if (text.trim()) {
+      const citationId = currentCitationId || nextCitationId;
+      onInsert(citationId, text.trim());
+      setText("");
       onClose();
     }
   }
 
   function handleEnterKey(e: React.KeyboardEvent) {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
       e.preventDefault();
       e.stopPropagation();
       handleSubmit();
@@ -68,12 +73,14 @@ export default function LinkModal({ isOpen, onClose, onInsert, currentUrl }: Lin
       <div
         className={baseStyles.modalContainer}
         onClick={(e) => e.stopPropagation()}
-        style={{ maxWidth: "500px" }}
+        style={{ maxWidth: "600px" }}
       >
         <div className={baseStyles.modalHeader}>
           <div className="flex items-center gap-2">
-            <LinkIcon className="w-5 h-5 text-secondary" />
-            <h2 className={baseStyles.modalTitle}>Inserisci Link</h2>
+            <Quote className="w-5 h-5 text-secondary" />
+            <h2 className={baseStyles.modalTitle}>
+              {currentCitationId ? "Modifica Citazione" : "Inserisci Citazione"}
+            </h2>
           </div>
           <button type="button" onClick={onClose} className={baseStyles.modalCloseButton}>
             <X className="w-5 h-5" />
@@ -82,23 +89,29 @@ export default function LinkModal({ isOpen, onClose, onInsert, currentUrl }: Lin
 
         <div className={baseStyles.modalContent}>
           <div className="mb-4">
-            <label htmlFor="link-url" className="block mb-2 text-sm font-medium text-secondary">
-              URL
+            <label
+              htmlFor="citation-text"
+              className="block mb-2 text-sm font-medium text-secondary"
+            >
+              Testo della citazione
             </label>
-            <input
-              ref={inputRef}
-              id="link-url"
-              type="text"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
+            <textarea
+              ref={textareaRef}
+              id="citation-text"
+              value={text}
+              onChange={(e) => setText(e.target.value)}
               onKeyDown={(e) => {
                 handleKeyDown(e);
                 handleEnterKey(e);
               }}
-              placeholder="https://example.com"
-              className={baseStyles.input}
+              placeholder="Inserisci il testo della citazione..."
+              className={baseStyles.textarea}
+              rows={5}
               autoFocus
             />
+            <p className="mt-2 text-xs text-secondary/60">
+              Premi Ctrl+Enter (o Cmd+Enter su Mac) per salvare
+            </p>
           </div>
 
           <div className="flex gap-2 justify-end">
@@ -108,10 +121,10 @@ export default function LinkModal({ isOpen, onClose, onInsert, currentUrl }: Lin
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={!url.trim()}
+              disabled={!text.trim()}
               className={baseStyles.submitButton}
             >
-              Inserisci
+              {currentCitationId ? "Aggiorna" : "Inserisci"}
             </button>
           </div>
         </div>

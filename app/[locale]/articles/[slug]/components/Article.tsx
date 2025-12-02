@@ -11,6 +11,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getMinText } from "@/lib/utils/text";
 import { Book, Play } from "lucide-react";
+import CitationsSection from "./CitationsSection";
+import { marked } from "marked";
 
 type ArticleProps = {
   article: Article;
@@ -26,6 +28,93 @@ export default function Article({ article, dict }: ArticleProps) {
   if (!author || !category) {
     notFound();
   }
+
+  // Estrai e processa le citazioni dal contenuto (può essere markdown o HTML già processato)
+  const processCitations = (content: string) => {
+    const citations: Array<{ id: string; text: string; index: number }> = [];
+    const citationOrder: string[] = [];
+    const citationData = new Map<string, string>();
+
+    // Prima passata: estrai tutte le citazioni nell'ordine in cui appaiono
+    // Formato: [citation:ID:text] o [citation-ID] (formato vecchio)
+    const citationRegex = /\[citation:([^:]+):([^\]]+)\]/g;
+    let match;
+
+    while ((match = citationRegex.exec(content)) !== null) {
+      const citationId = match[1];
+      // Decodifica il testo (gestisce i due punti escapati)
+      const citationText = match[2].replace(/\\:/g, ":");
+
+      if (citationId && citationText && !citationOrder.includes(citationId)) {
+        citationOrder.push(citationId);
+        citationData.set(citationId, citationText);
+      }
+    }
+
+    // Supporta anche il formato vecchio [citation-ID]
+    const oldCitationRegex = /\[citation-([^\]]+)\]/g;
+    while ((match = oldCitationRegex.exec(content)) !== null) {
+      const citationId = match[1];
+      if (citationId && !citationOrder.includes(citationId)) {
+        citationOrder.push(citationId);
+        citationData.set(citationId, ""); // Formato vecchio senza testo
+      }
+    }
+
+    // Crea l'array delle citazioni con gli indici corretti
+    citationOrder.forEach((citationId, index) => {
+      const text = citationData.get(citationId) || "";
+      if (text || citationId) {
+        citations.push({
+          id: citationId,
+          text,
+          index: index + 1,
+        });
+      }
+    });
+
+    // Sostituisci le citazioni con link cliccabili
+    let processedContent = content;
+    let currentIndex = 0;
+    const indexMap = new Map<string, number>();
+
+    // Sostituisci formato nuovo [citation:ID:text]
+    processedContent = processedContent.replace(
+      /\[citation:([^:]+):([^\]]+)\]/g,
+      (match, citationId) => {
+        if (!indexMap.has(citationId)) {
+          currentIndex++;
+          indexMap.set(citationId, currentIndex);
+        }
+        const index = indexMap.get(citationId) || 1;
+        return `<a id="cit-${index}" href="#citation-${index}" class="citation-link inline text-tertiary hover:text-tertiary/80 transition-colors cursor-pointer" style="font-size: 0.7em; vertical-align: super; text-decoration: none;">${index}</a>`;
+      },
+    );
+
+    // Sostituisci formato vecchio [citation-ID]
+    processedContent = processedContent.replace(/\[citation-([^\]]+)\]/g, (match, citationId) => {
+      if (!indexMap.has(citationId)) {
+        currentIndex++;
+        indexMap.set(citationId, currentIndex);
+      }
+      const index = indexMap.get(citationId) || 1;
+      return `<a href="#citation-${index}" class="citation-link inline text-tertiary hover:text-tertiary/80 transition-colors cursor-pointer" style="font-size: 0.7em; vertical-align: super; text-decoration: none;">${index}</a>`;
+    });
+
+    // Se il contenuto non sembra essere HTML già processato, convertilo da markdown
+    let processedHtml = processedContent;
+    if (!processedContent.includes("<p>") && !processedContent.includes("<h")) {
+      // Sembra essere ancora markdown, convertilo
+      processedHtml = marked.parse(processedContent, { breaks: true }) as string;
+    }
+
+    return {
+      processedHtml,
+      citations,
+    };
+  };
+
+  const { processedHtml, citations } = processCitations(article.content);
 
   return (
     <article>
@@ -88,7 +177,7 @@ export default function Article({ article, dict }: ArticleProps) {
           <div className="lg:w-2/4 md:w-2/3 w-full relative">
             <div
               className="prose prose-lg max-w-none"
-              dangerouslySetInnerHTML={{ __html: article.content }}
+              dangerouslySetInnerHTML={{ __html: processedHtml }}
             ></div>
           </div>
           <div className="lg:w-1/4 md:w-1/3 w-full lg:flex md:flex hidden">
@@ -96,6 +185,7 @@ export default function Article({ article, dict }: ArticleProps) {
           </div>
         </div>
       </section>
+      {citations.length > 0 && <CitationsSection citations={citations} />}
       <footer className="flex flex-col max-w-[1472px] mx-auto lg:px-10 md:px-4 px-4 gap-5 pb-10">
         <div className="flex lg:flex-row md:flex-row flex-col justify-between gap-10">
           <div className="lg:w-1/4 lg:flex hidden"></div>

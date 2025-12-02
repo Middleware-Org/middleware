@@ -10,9 +10,11 @@ import Image from "@tiptap/extension-image";
 import { useEffect, useCallback, useState } from "react";
 import { marked } from "marked";
 import TurndownService from "turndown";
-import { Link as LinkIcon, Image as ImageIcon } from "lucide-react";
+import { Link as LinkIcon, Image as ImageIcon, Quote } from "lucide-react";
 import MediaSelector from "./MediaSelector";
 import LinkModal from "./LinkModal";
+import CitationModal from "./CitationModal";
+import { Citation } from "./CitationExtension";
 import { getGitHubImageUrl } from "@/lib/github/images";
 
 /* **************************************************
@@ -31,11 +33,31 @@ export default function MarkdownEditor({ value, onChange, label }: MarkdownEdito
   const [isMounted] = useState(() => typeof window !== "undefined");
   const [isMediaSelectorOpen, setIsMediaSelectorOpen] = useState(false);
   const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
+  const [isCitationModalOpen, setIsCitationModalOpen] = useState(false);
+  const [currentCitationId, setCurrentCitationId] = useState<number | null>(null);
+  const [currentCitationText, setCurrentCitationText] = useState<string>("");
 
   const markdownToHtml = useCallback((markdown: string): string => {
     if (!markdown) return "";
     try {
-      return marked.parse(markdown, { breaks: true }) as string;
+      // Sostituisci le citazioni nel formato [citation:ID:text] con HTML
+      let processedMarkdown = markdown.replace(
+        /\[citation:([^:]+):([^\]]+)\]/g,
+        (match, citationId, citationText) => {
+          const decodedText = citationText.replace(/\\:/g, ":");
+          return `<span class="citation" data-citation-id="${citationId}" data-citation-text="${decodedText.replace(/"/g, "&quot;")}">[?]</span>`;
+        },
+      );
+
+      // Supporta anche il formato vecchio [citation-ID] per retrocompatibilità
+      processedMarkdown = processedMarkdown.replace(
+        /\[citation-([^\]]+)\]/g,
+        (match, citationId) => {
+          return `<span class="citation" data-citation-id="${citationId}" data-citation-text="">[?]</span>`;
+        },
+      );
+
+      return marked.parse(processedMarkdown, { breaks: true }) as string;
     } catch {
       return markdown;
     }
@@ -49,6 +71,24 @@ export default function MarkdownEditor({ value, onChange, label }: MarkdownEdito
         codeBlockStyle: "fenced",
         bulletListMarker: "-",
       });
+
+      // Aggiungi regola personalizzata per le citazioni
+      turndownService.addRule("citation", {
+        filter: (node) => {
+          return (
+            node.nodeName === "SPAN" &&
+            node.classList?.contains("citation") &&
+            node.hasAttribute("data-citation-id")
+          );
+        },
+        replacement: (content, node) => {
+          const citationId = (node as HTMLElement).getAttribute("data-citation-id") || "";
+          const citationText = (node as HTMLElement).getAttribute("data-citation-text") || "";
+          // Salva in formato [citation:ID:text] per poterlo parsare dopo
+          return `[citation:${citationId}:${citationText.replace(/:/g, "\\:")}]`;
+        },
+      });
+
       return turndownService.turndown(html);
     } catch {
       return html;
@@ -73,13 +113,35 @@ export default function MarkdownEditor({ value, onChange, label }: MarkdownEdito
           class: "max-w-full h-auto",
         },
       }),
+      Citation.configure({
+        HTMLAttributes: {
+          class: "citation",
+        },
+      }),
     ],
     content: markdownToHtml(value),
     immediatelyRender: false,
     editorProps: {
       attributes: {
-        class:
-          "focus:outline-none min-h-[500px] p-4 text-secondary",
+        class: "focus:outline-none min-h-[500px] p-4 text-secondary",
+      },
+      handleClick: (view, pos, event) => {
+        const { state } = view;
+        const $pos = state.doc.resolve(pos);
+        const node = $pos.nodeAfter || $pos.nodeBefore;
+
+        // Controlla se si è cliccato su una citazione
+        if (node && node.type.name === "citation") {
+          event.preventDefault();
+          event.stopPropagation();
+          const citationId = node.attrs.citationId || null;
+          const citationText = node.attrs.citationText || "";
+          setCurrentCitationId(citationId);
+          setCurrentCitationText(citationText);
+          setIsCitationModalOpen(true);
+          return true;
+        }
+        return false;
       },
     },
     onUpdate: ({ editor }) => {
@@ -225,7 +287,6 @@ export default function MarkdownEditor({ value, onChange, label }: MarkdownEdito
           title="Inserisci link"
         >
           <LinkIcon className="w-4 h-4" />
-          <span>Link</span>
         </button>
         <button
           type="button"
@@ -234,7 +295,18 @@ export default function MarkdownEditor({ value, onChange, label }: MarkdownEdito
           title="Inserisci immagine"
         >
           <ImageIcon className="w-4 h-4" />
-          <span>Immagine</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setCurrentCitationId(null);
+            setCurrentCitationText("");
+            setIsCitationModalOpen(true);
+          }}
+          className="px-3 py-1 text-sm transition-all duration-150 hover:bg-tertiary hover:text-white text-secondary flex items-center gap-1"
+          title="Inserisci citazione"
+        >
+          <Quote className="w-4 h-4" />
         </button>
       </div>
 
@@ -270,6 +342,52 @@ export default function MarkdownEditor({ value, onChange, label }: MarkdownEdito
           }
         }}
         currentUrl={editor.getAttributes("link").href}
+      />
+
+      {/* Citation Modal */}
+      <CitationModal
+        isOpen={isCitationModalOpen}
+        onClose={() => {
+          setIsCitationModalOpen(false);
+          setCurrentCitationId(null);
+          setCurrentCitationText("");
+        }}
+        onInsert={(citationId, citationText) => {
+          if (currentCitationId) {
+            // Aggiorna citazione esistente (solo il testo, l'indice viene ricalcolato automaticamente)
+            // Trova il nodo con l'ID corrente e aggiorna solo il testo
+            editor
+              .chain()
+              .focus()
+              .updateAttributes("citation", {
+                citationText,
+              })
+              .run();
+          } else {
+            // Genera un ID univoco basato sul timestamp per identificare la citazione
+            // L'indice visualizzato viene calcolato automaticamente dal nodeView in base alla posizione
+            const uniqueId = `citation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+            // Inserisci nuova citazione
+            editor
+              .chain()
+              .focus()
+              .insertContent({
+                type: "citation",
+                attrs: {
+                  citationId: uniqueId,
+                  citationText,
+                },
+              })
+              .run();
+          }
+        }}
+        currentCitationId={currentCitationId}
+        currentCitationText={currentCitationText}
+        nextCitationId={(() => {
+          // Non serve più calcolare il prossimo ID, ma lo manteniamo per compatibilità
+          return 1;
+        })()}
       />
     </div>
   );
