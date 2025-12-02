@@ -348,6 +348,18 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
         </div>
 
         <div className={styles.field}>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              name="published"
+              defaultChecked={issue?.published ?? false}
+              className="w-4 h-4"
+            />
+            <span className={styles.label}>Pubblicato</span>
+          </label>
+        </div>
+
+        <div className={styles.field}>
           <label htmlFor={editing ? "newSlug" : "slug"} className={styles.label}>
             Slug {editing ? "(modificabile)" : "(opzionale)"}
           </label>

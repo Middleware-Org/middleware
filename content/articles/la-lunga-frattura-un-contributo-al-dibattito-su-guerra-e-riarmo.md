@@ -2,10 +2,12 @@
 slug: la-lunga-frattura-un-contributo-al-dibattito-su-guerra-e-riarmo
 title: La lunga frattura – Un contributo al dibattito su guerra e riarmo
 date: '2025-11-24'
+last_update: '2025-12-01T14:24:33.763Z'
 author: infoaut
 category: conflitti-globali
 issue: esperimento-formazione
 in_evidence: false
+published: true
 excerpt: >-
   In questi mesi la storia corre veloce, in poco tempo alcuni dei capisaldi su
   cui si è retto l’ordine mondiale definitivamente consolidatosi dopo il crollo

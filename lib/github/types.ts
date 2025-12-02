@@ -13,10 +13,12 @@ export type Article = {
   slug: string;
   title: string;
   date: string;
+  last_update: string;
   author: string;
   category: string;
   issue: string;
   in_evidence: boolean;
+  published: boolean;
   excerpt: string;
   content: string;
   audio?: string;
@@ -30,6 +32,8 @@ export type Issue = {
   cover: string;
   color: string;
   date: string;
+  last_update: string;
+  published: boolean;
 };
 
 export type Category = {

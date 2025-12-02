@@ -56,6 +56,7 @@ export default function ArticleFormClient({ articleSlug }: ArticleFormClientProp
     category: "",
     issue: "",
     in_evidence: false,
+    published: false,
     excerpt: "",
     audio: "",
     audio_chunks: "",
@@ -72,6 +73,7 @@ export default function ArticleFormClient({ articleSlug }: ArticleFormClientProp
           category: article.category || "",
           issue: article.issue || "",
           in_evidence: article.in_evidence || false,
+          published: article.published ?? false,
           excerpt: article.excerpt || "",
           audio: article.audio || "",
           audio_chunks: article.audio_chunks || "",
@@ -110,6 +112,7 @@ export default function ArticleFormClient({ articleSlug }: ArticleFormClientProp
     preparedFormData.set("category", formData.category);
     preparedFormData.set("issue", formData.issue);
     preparedFormData.set("in_evidence", formData.in_evidence.toString());
+    preparedFormData.set("published", formData.published.toString());
     preparedFormData.set("excerpt", formData.excerpt);
     preparedFormData.set("content", content);
 

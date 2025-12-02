@@ -34,6 +34,7 @@ export async function createIssueAction(
     const cover = formData.get("cover") as string; // Base64 image or existing path
     const color = formData.get("color") as string;
     const date = formData.get("date") as string;
+    const published = formData.get("published") === "on";
     const slug = formData.get("slug") as string | null;
 
     if (!title || !description || !color || !date) {
@@ -58,12 +59,15 @@ export async function createIssueAction(
       }
     }
 
+    const issueDate = date.trim();
     const issue = await createIssue({
       title: title.trim(),
       description: description.trim(),
       cover: coverPath,
       color: color.trim(),
-      date: date.trim(),
+      date: issueDate,
+      last_update: issueDate, // Alla creazione, last_update = date
+      published,
       slug: slug?.trim() || undefined,
     });
 
@@ -95,6 +99,7 @@ export async function updateIssueAction(
     const cover = formData.get("cover") as string; // Base64 image or existing path
     const color = formData.get("color") as string;
     const date = formData.get("date") as string;
+    const published = formData.get("published") === "on";
 
     if (!slug || !title || !description || !color || !date) {
       return {
@@ -124,6 +129,7 @@ export async function updateIssueAction(
       cover: coverPath,
       color: color.trim(),
       date: date.trim(),
+      published,
       newSlug: newSlug?.trim() || undefined,
     });
 

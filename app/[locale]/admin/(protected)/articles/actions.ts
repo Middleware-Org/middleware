@@ -34,6 +34,7 @@ export async function createArticleAction(
     const category = formData.get("category") as string;
     const issue = formData.get("issue") as string;
     const in_evidence = formData.get("in_evidence") === "true";
+    const published = formData.get("published") === "true";
     const excerpt = formData.get("excerpt") as string;
     const content = formData.get("content") as string;
     const audio = formData.get("audio") as string | null;
@@ -48,13 +49,16 @@ export async function createArticleAction(
       };
     }
 
+    const articleDate = date.trim();
     const article = await createArticle({
       title: title.trim(),
-      date: date.trim(),
+      date: articleDate,
+      last_update: articleDate, // Alla creazione, last_update = date
       author: author.trim(),
       category: category.trim(),
       issue: issue.trim(),
       in_evidence,
+      published,
       excerpt: excerpt?.trim() || "",
       content: content.trim(),
       audio: audio?.trim() || undefined,
@@ -91,6 +95,7 @@ export async function updateArticleAction(
     const category = formData.get("category") as string;
     const issue = formData.get("issue") as string;
     const in_evidence = formData.get("in_evidence") === "true";
+    const published = formData.get("published") === "true";
     const excerpt = formData.get("excerpt") as string;
     const content = formData.get("content") as string;
     const audio = formData.get("audio") as string | null;
@@ -111,6 +116,7 @@ export async function updateArticleAction(
       category: category.trim(),
       issue: issue.trim(),
       in_evidence,
+      published,
       excerpt: excerpt?.trim() || "",
       content: content.trim(),
       audio: audio?.trim() || undefined,
