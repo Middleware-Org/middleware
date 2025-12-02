@@ -2,7 +2,7 @@
 slug: il-laboratorio-della-guerra
 title: Il laboratorio della guerra
 date: '2025-11-21'
-last_update: '2025-12-02T09:26:24.571Z'
+last_update: '2025-12-02T09:49:11.795Z'
 author: kamo-modena
 category: universita-della-guerra
 issue: esperimento-formazione
@@ -14,7 +14,7 @@ excerpt: >-
 audio: /assets/prova.mp3
 audio_chunks: /assets/prova.json
 ---
-**Un’ipotesi a premessa.**
+**Un’ipotesi a premessa.**\[citation-1764668948545-3shoasp03\]
 
 Rita Cucchiara è la nuova rettrice dell’Unimore. Prima donna ad assumere questo ruolo nella storia dell’Università di Modena e Reggio, è stata eletta a giugno 2025 al ballottaggio contro Tommaso Fabbri, con un corpo accademico votante spaccato in due.
 
