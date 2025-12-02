@@ -138,6 +138,11 @@ const styles = {
     "focus:outline-none focus:ring-2 focus:ring-tertiary focus:border-tertiary",
     "disabled:bg-secondary/10 disabled:cursor-not-allowed transition-all duration-150",
   ),
+  textarea: cn(
+    "w-full px-3 py-2 border border-secondary bg-primary",
+    "focus:outline-none focus:ring-2 focus:ring-tertiary focus:border-tertiary",
+    "disabled:bg-secondary/10 disabled:cursor-not-allowed resize-y transition-all duration-150",
+  ),
   // Loading states
   loadingText: cn("text-center py-8 text-secondary/60"),
   emptyState: cn("text-center py-8 text-secondary/60"),

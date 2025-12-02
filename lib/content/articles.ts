@@ -17,10 +17,16 @@ export const getArticleBySlug = (slug: string) => {
 };
 
 export const getArticlesByIssue = (issueSlug: string) =>
-  articles.filter((a) => a.issue === issueSlug && a.published);
+  articles
+    .filter((a) => a.issue === issueSlug && a.published)
+    .sort((a, b) => (b.last_update || b.date).localeCompare(a.last_update || a.date));
 
 export const getArticlesByCategorySlug = (categorySlug: string) =>
-  articles.filter((a) => a.category === categorySlug && a.published);
+  articles
+    .filter((a) => a.category === categorySlug && a.published)
+    .sort((a, b) => (b.last_update || b.date).localeCompare(a.last_update || a.date));
 
 export const getArticlesByAuthorSlug = (authorSlug: string) =>
-  articles.filter((a) => a.author === authorSlug && a.published);
+  articles
+    .filter((a) => a.author === authorSlug && a.published)
+    .sort((a, b) => (b.last_update || b.date).localeCompare(a.last_update || a.date));

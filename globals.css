@@ -284,3 +284,25 @@ p {
   text-decoration: line-through !important;
   color: var(--secondary) !important;
 }
+
+/* Citation links - minimal style like superscript */
+.prose .citation-link,
+.ProseMirror .citation-link {
+  font-size: 0.7em !important;
+  vertical-align: super !important;
+  text-decoration: none !important;
+  color: var(--tertiary) !important;
+  font-weight: 500 !important;
+  line-height: 0 !important;
+  margin: 0 0.1em !important;
+}
+
+.prose .citation-link:hover,
+.ProseMirror .citation-link:hover {
+  opacity: 0.7 !important;
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
