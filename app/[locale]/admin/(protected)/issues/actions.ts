@@ -59,12 +59,14 @@ export async function createIssueAction(
       }
     }
 
+    const issueDate = date.trim();
     const issue = await createIssue({
       title: title.trim(),
       description: description.trim(),
       cover: coverPath,
       color: color.trim(),
-      date: date.trim(),
+      date: issueDate,
+      last_update: issueDate, // Alla creazione, last_update = date
       published,
       slug: slug?.trim() || undefined,
     });

@@ -49,9 +49,11 @@ export async function createArticleAction(
       };
     }
 
+    const articleDate = date.trim();
     const article = await createArticle({
       title: title.trim(),
-      date: date.trim(),
+      date: articleDate,
+      last_update: articleDate, // Alla creazione, last_update = date
       author: author.trim(),
       category: category.trim(),
       issue: issue.trim(),
