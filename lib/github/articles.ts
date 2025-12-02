@@ -140,7 +140,7 @@ export async function createArticle(article: Omit<Article, "slug"> & { slug?: st
     slug,
     title: article.title,
     date: article.date,
-    last_update: article.date, // Alla creazione, last_update = date
+    last_update: article.last_update || article.date,
     author: article.author,
     category: article.category,
     issue: article.issue,

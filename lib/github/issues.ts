@@ -93,7 +93,7 @@ export async function createIssue(issue: Omit<Issue, "slug"> & { slug?: string }
       cover: issue.cover,
       color: issue.color,
       date: issue.date,
-      last_update: issue.date, // Alla creazione, last_update = date
+      last_update: issue.last_update || issue.date,
       published: issue.published ?? false,
     },
     null,
