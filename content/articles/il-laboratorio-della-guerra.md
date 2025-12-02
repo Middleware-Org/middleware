@@ -2,7 +2,7 @@
 slug: il-laboratorio-della-guerra
 title: Il laboratorio della guerra
 date: '2025-11-21'
-last_update: '2025-12-02T10:14:50.738Z'
+last_update: '2025-12-02T10:29:20.638Z'
 author: kamo-modena
 category: universita-della-guerra
 issue: esperimento-formazione
@@ -14,9 +14,9 @@ excerpt: >-
 audio: /assets/prova.mp3
 audio_chunks: /assets/prova.json
 ---
-**Un’ipotesi a premessa.**[citation:citation-1764669122638-pbdrfe22r:prova]
+**Un’ipotesi a premessa.**
 
-Rita Cucchiara è la nuova rettrice[citation:citation-1764670486890-fht4e055v:La retcjdfscnjdschlbsd.ncxsacad fwf cdscndsc dscjdsnjcbdjcbdshcaxa xaxa xabxcahccd cd ehqdequdqijij] dell’Unimore. Prima donna ad assumere questo ruolo nella storia dell’Università di Modena e Reggio, è stata eletta a giugno 2025 al ballottaggio contro Tommaso Fabbri, con un corpo accademico votante spaccato in due.[citation:citation-1764670473596-8rfdbguee:ue]
+Rita Cucchiara è la nuova rettrice dell’Unimore. Prima donna ad assumere questo ruolo nella storia dell’Università di Modena e Reggio, è stata eletta a giugno 2025 al ballottaggio contro Tommaso Fabbri, con un corpo accademico votante spaccato in due.
 
 Come gruppo di inchiesta universitario, è indicativo per il nostro discorso lo spostamento dei rapporti di forza, di bilanciamento e di potere interni all’istituzione Università dal dipartimento di Economia a quello di Ingegneria. Come vedremo, questo elemento può essere già inteso come indizio della direzione e del ruolo che l’istituzione università sta assumendo, in questa fase accelerata e acuta di crisi, sul nostro territorio inteso nelle sue connotazioni produttive e sociali, nel suo rapporto con lo sviluppo capitalistico a vocazione industriale e dei soggetti da esso messi al lavoro, e in relazione alle trasformazioni del contesto politico e capitalistico non solo locale, ma regionale, nazionale ed europeo, dentro la crisi globale che si fa stato di guerra.
 
