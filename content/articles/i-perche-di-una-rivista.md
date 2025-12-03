@@ -2,12 +2,12 @@
 slug: i-perche-di-una-rivista
 title: I perché di una rivista
 date: '2025-12-03'
-last_update: '2025-12-03'
+last_update: '2025-12-03T10:31:22.616Z'
 author: teiko
 category: organizzazione
 issue: l-enigma-dell-organizzazione
 in_evidence: true
-published: false
+published: true
 excerpt: "A spingerci alla creazione di questa rivista è, prima di tutto, la crisi egemonica planetaria turbolenta, e per molti versi indecifrabile,\r\nche sta scompaginando le coordinate politiche con le quali abbiamo a lungo pensato il nostro tempo storico."
 audio: /assets/perche-di-una-rivista.mp3
 audio_chunks: /assets/perche-di-una-rivista.json
