@@ -3,7 +3,7 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { Rewind, FastForward, Pause, Play, Volume2, Zap } from "lucide-react";
+import { Rewind, FastForward, Pause, Play, Volume2, Zap, Bookmark, BookmarkCheck } from "lucide-react";
 import Button from "@/components/atoms/button";
 import VerticalRange from "./VerticalRange";
 import styles from "./PodcastPlayerStyles";
@@ -19,6 +19,7 @@ type PlayerControlsProps = {
   playbackRate: number;
   showVolumeControl: boolean;
   showSpeedControl: boolean;
+  hasBookmarkAtCurrentTime: boolean;
   onPlay: () => void;
   onPause: () => void;
   onForward: () => void;
@@ -27,6 +28,7 @@ type PlayerControlsProps = {
   onPlaybackRateChange: (value: number) => void;
   onToggleVolumeControl: () => void;
   onToggleSpeedControl: () => void;
+  onToggleBookmark: () => void;
 };
 
 /* **************************************************
@@ -38,6 +40,7 @@ export default function PlayerControls({
   playbackRate,
   showVolumeControl,
   showSpeedControl,
+  hasBookmarkAtCurrentTime,
   onPlay,
   onPause,
   onForward,
@@ -46,6 +49,7 @@ export default function PlayerControls({
   onPlaybackRateChange,
   onToggleVolumeControl,
   onToggleSpeedControl,
+  onToggleBookmark,
 }: PlayerControlsProps) {
   const volumeControlRef = useRef<HTMLDivElement>(null);
   const speedControlRef = useRef<HTMLDivElement>(null);
@@ -117,6 +121,19 @@ export default function PlayerControls({
             aria-label="Avanti di 10 secondi"
           >
             <FastForward className={styles.icon} />
+          </Button>
+          <Button
+            variants="unstyled"
+            onClick={onToggleBookmark}
+            className={styles.controlButton}
+            aria-label={hasBookmarkAtCurrentTime ? "Rimuovi segnaposto" : "Aggiungi segnaposto"}
+            title={hasBookmarkAtCurrentTime ? "Rimuovi segnaposto" : "Aggiungi segnaposto"}
+          >
+            {hasBookmarkAtCurrentTime ? (
+              <BookmarkCheck className={styles.icon} />
+            ) : (
+              <Bookmark className={styles.icon} />
+            )}
           </Button>
           <div ref={speedButtonWrapperRef} className={styles.speedButtonWrapper}>
             <Button

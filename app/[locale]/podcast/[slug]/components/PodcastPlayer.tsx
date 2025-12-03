@@ -3,7 +3,7 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { Article } from "@/.velite";
 import { getAuthorBySlug, getCategoryBySlug, getIssueBySlug } from "@/lib/content";
 import { useAudioPlayer } from "./hooks/useAudioPlayer";
@@ -14,6 +14,7 @@ import PlayerControls from "./PlayerControls";
 import Transcript from "./Transcript";
 import { Segment } from "./types";
 import styles from "./PodcastPlayerStyles";
+import { PodcastBookmark, podcastBookmarksStorage } from "@/lib/storage/podcastBookmarks";
 
 /* **************************************************
  * Types
@@ -34,6 +35,7 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
   const [currentSegmentIndex, setCurrentSegmentIndex] = useState<number>(-1);
   const [showVolumeControl, setShowVolumeControl] = useState<boolean>(false);
   const [showSpeedControl, setShowSpeedControl] = useState<boolean>(false);
+  const [bookmarks, setBookmarks] = useState<PodcastBookmark[]>([]);
 
   const author = getAuthorBySlug(article.author);
   const category = getCategoryBySlug(article.category);
@@ -100,6 +102,59 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
     }
   }, [article.audio_chunks]);
 
+  // Load bookmarks
+  useEffect(() => {
+    async function loadBookmarks() {
+      try {
+        await podcastBookmarksStorage.init();
+        const savedBookmarks = await podcastBookmarksStorage.getBookmarks(podcastId);
+        setBookmarks(savedBookmarks);
+      } catch (error) {
+        console.error("Errore nel caricamento dei segnaposto:", error);
+      }
+    }
+    loadBookmarks();
+  }, [podcastId]);
+
+  // Funzione per aggiungere segnaposto al tempo corrente
+  const handleToggleBookmark = useCallback(async () => {
+    try {
+      // Trova il segmento/chunk corrispondente al tempo corrente
+      const currentSegment = segments.find((s) => currentTime >= s.start && currentTime <= s.end);
+
+      if (!currentSegment) {
+        // Se non c'è un segmento corrispondente, non aggiungere il segnaposto
+        return;
+      }
+
+      // Controlla se esiste già un segnaposto nello stesso chunk/segmento
+      const allBookmarks = await podcastBookmarksStorage.getBookmarks(podcastId);
+      const existingBookmark = allBookmarks.find(
+        (b) => b.time >= currentSegment.start && b.time <= currentSegment.end,
+      );
+
+      if (existingBookmark) {
+        // Non aggiungere se esiste già un segnaposto nello stesso chunk
+        return;
+      }
+
+      // Aggiungi un nuovo segnaposto solo se non esiste già nello stesso chunk
+      const newBookmark = await podcastBookmarksStorage.saveBookmark({
+        podcastSlug: podcastId,
+        time: currentTime,
+      });
+      const updated = [...bookmarks, newBookmark].sort((a, b) => a.time - b.time);
+      setBookmarks(updated);
+      // Notifica il cambio ai componenti figli (come PodcastBookmarkManager)
+      // Questo triggera onBookmarksChange in Transcript che ricarica i bookmarks
+    } catch (error) {
+      console.error("Errore nell'aggiunta del segnaposto:", error);
+    }
+  }, [podcastId, currentTime, bookmarks, segments]);
+
+  // Verifica se c'è un segnaposto al tempo corrente
+  const hasBookmarkAtCurrentTime = bookmarks.some((b) => Math.abs(b.time - currentTime) < 2);
+
   // Handlers
   const handleSeekStart = () => {
     setWasPlayingBeforeSeek(isPlaying);
@@ -139,6 +194,7 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
           totalTime={totalTime}
           currentPosition={currentPosition}
           totalPositions={audioTotalPositions}
+          bookmarks={bookmarks}
           onSeek={seek}
           onSeekStart={handleSeekStart}
           onSeekEnd={handleSeekEnd}
@@ -150,6 +206,7 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
           playbackRate={playbackRate}
           showVolumeControl={showVolumeControl}
           showSpeedControl={showSpeedControl}
+          hasBookmarkAtCurrentTime={hasBookmarkAtCurrentTime}
           onPlay={play}
           onPause={pause}
           onForward={forward}
@@ -158,6 +215,7 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
           onPlaybackRateChange={handlePlaybackRateChange}
           onToggleVolumeControl={() => setShowVolumeControl(!showVolumeControl)}
           onToggleSpeedControl={() => setShowSpeedControl(!showSpeedControl)}
+          onToggleBookmark={handleToggleBookmark}
         />
       </div>
 
@@ -168,6 +226,13 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
         transcriptContainerRef={transcriptContainerRef}
         transcriptContentInnerRef={transcriptContentInnerRef}
         activeSegmentRef={activeSegmentRef}
+        podcastSlug={article.slug}
+        onBookmarksChange={async () => {
+          // Ricarica i bookmarks dal database quando cambiano
+          const updatedBookmarks = await podcastBookmarksStorage.getBookmarks(podcastId);
+          setBookmarks(updatedBookmarks);
+          // Questo triggera il ricaricamento anche in PodcastBookmarkManager
+        }}
       />
     </div>
   );
