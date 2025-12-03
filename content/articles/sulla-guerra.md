@@ -2,12 +2,12 @@
 slug: sulla-guerra
 title: Sulla guerra
 date: '2025-12-03'
-last_update: '2025-12-03'
+last_update: '2025-12-03T10:31:53.813Z'
 author: teiko
 category: conflitti-globali
 issue: l-enigma-dell-organizzazione
 in_evidence: false
-published: false
+published: true
 excerpt: "Questo numero zero di Teiko esce mentre nel mondo infuria la guerra.\r\nNel mondo, non soltanto là dove si combatte e quotidianamente si distruggono corpi, ambienti e cose: tra le macerie di Gaza, nelle trincee\r\nucraine, in Congo, in Sudan e in molti altri teatri bellici."
 audio: /assets/sulla-guerra.mp3
 audio_chunks: /assets/sulla-guerra.json
