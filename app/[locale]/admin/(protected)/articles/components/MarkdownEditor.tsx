@@ -369,18 +369,18 @@ export default function MarkdownEditor({ value, onChange, label }: MarkdownEdito
             const uniqueId = `citation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
             // Inserisci nuova citazione
-            editor
-              .chain()
-              .focus()
-              .insertContent({
+              editor
+                .chain()
+                .focus()
+                .insertContent({
                 type: "citation",
                 attrs: {
                   citationId: uniqueId,
                   citationText,
                 },
-              })
-              .run();
-          }
+                })
+                .run();
+            }
         }}
         currentCitationId={currentCitationId}
         currentCitationText={currentCitationText}

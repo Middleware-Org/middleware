@@ -3,7 +3,7 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { Article } from "@/.velite";
 import { getAuthorBySlug, getCategoryBySlug, getIssueBySlug } from "@/lib/content";
 import { useAudioPlayer } from "./hooks/useAudioPlayer";
@@ -14,6 +14,7 @@ import PlayerControls from "./PlayerControls";
 import Transcript from "./Transcript";
 import { Segment } from "./types";
 import styles from "./PodcastPlayerStyles";
+import { usePodcastBookmarks } from "./hooks/usePodcastBookmarks";
 
 /* **************************************************
  * Types
@@ -100,6 +101,29 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
     }
   }, [article.audio_chunks]);
 
+  // Usa il custom hook per gestire i bookmarks
+  const { bookmarks, addBookmark, hasBookmarkInChunk, refreshBookmarks } = usePodcastBookmarks({
+    podcastSlug: podcastId,
+    segments,
+  });
+
+  // Ricarica i bookmarks periodicamente per sincronizzare con eliminazioni da PodcastBookmarkManager
+  // TODO: Migliorare con eventi custom o callback diretti
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      await refreshBookmarks();
+    }, 500);
+    return () => clearInterval(interval);
+  }, [refreshBookmarks]);
+
+  // Funzione per aggiungere segnaposto al tempo corrente
+  const handleToggleBookmark = useCallback(async () => {
+    await addBookmark(currentTime);
+  }, [currentTime, addBookmark]);
+
+  // Verifica se c'è un segnaposto nel chunk corrente (usando logica unificata)
+  const hasBookmarkAtCurrentTime = hasBookmarkInChunk(currentTime);
+
   // Handlers
   const handleSeekStart = () => {
     setWasPlayingBeforeSeek(isPlaying);
@@ -139,6 +163,7 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
           totalTime={totalTime}
           currentPosition={currentPosition}
           totalPositions={audioTotalPositions}
+          bookmarks={bookmarks}
           onSeek={seek}
           onSeekStart={handleSeekStart}
           onSeekEnd={handleSeekEnd}
@@ -150,6 +175,7 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
           playbackRate={playbackRate}
           showVolumeControl={showVolumeControl}
           showSpeedControl={showSpeedControl}
+          hasBookmarkAtCurrentTime={hasBookmarkAtCurrentTime}
           onPlay={play}
           onPause={pause}
           onForward={forward}
@@ -158,6 +184,7 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
           onPlaybackRateChange={handlePlaybackRateChange}
           onToggleVolumeControl={() => setShowVolumeControl(!showVolumeControl)}
           onToggleSpeedControl={() => setShowSpeedControl(!showSpeedControl)}
+          onToggleBookmark={handleToggleBookmark}
         />
       </div>
 
@@ -168,6 +195,8 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
         transcriptContainerRef={transcriptContainerRef}
         transcriptContentInnerRef={transcriptContentInnerRef}
         activeSegmentRef={activeSegmentRef}
+        podcastSlug={article.slug}
+        bookmarks={bookmarks}
       />
     </div>
   );

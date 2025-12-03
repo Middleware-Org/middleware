@@ -12,6 +12,7 @@ import Link from "next/link";
 import { getMinText } from "@/lib/utils/text";
 import { Book, Play } from "lucide-react";
 import CitationsSection from "./CitationsSection";
+import BookmarkManager from "./BookmarkManager";
 import { marked } from "marked";
 
 type ArticleProps = {
@@ -179,9 +180,10 @@ export default function Article({ article, dict }: ArticleProps) {
               className="prose prose-lg max-w-none"
               dangerouslySetInnerHTML={{ __html: processedHtml }}
             ></div>
+            <BookmarkManager articleSlug={article.slug} contentContainerSelector=".prose" />
           </div>
           <div className="lg:w-1/4 md:w-1/3 w-full lg:flex md:flex hidden">
-            <Separator />
+            <Separator className="lg:flex md:hidden hidden" />
           </div>
         </div>
       </section>
