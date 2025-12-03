@@ -6,7 +6,6 @@
 import { useState, useRef } from "react";
 import Image from "next/image";
 import { getGitHubImageUrl } from "@/lib/github/images";
-import { uploadMediaAction } from "../../media/actions";
 import baseStyles from "../../styles";
 import styles from "../../media/styles";
 import { useMedia } from "@/hooks/swr";
@@ -94,17 +93,24 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
 
     try {
       const formData = new FormData();
-      formData.set("image", preview);
+      formData.set("file", preview);
+      formData.set("fileType", "image");
       if (filename) {
         formData.set("filename", filename);
       }
 
-      const result = await uploadMediaAction(null, formData);
+      const response = await fetch("/api/media/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
 
       if (result.success && result.data) {
         setUploadSuccess(result.message || "Immagine caricata con successo");
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/media");
+        mutate("/api/github/merge/check");
         // Seleziona automaticamente il file appena caricato
         handleSelect(result.data);
         // Reset form
@@ -113,7 +119,7 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
         if (fileInputRef.current) {
           fileInputRef.current.value = "";
         }
-      } else if (!result.success) {
+      } else {
         setUploadError(result.error || "Errore durante il caricamento");
       }
     } catch (err) {
