@@ -3,7 +3,16 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { Rewind, FastForward, Pause, Play, Volume2, Zap, Bookmark, BookmarkCheck } from "lucide-react";
+import {
+  Rewind,
+  FastForward,
+  Pause,
+  Play,
+  Volume2,
+  Zap,
+  Bookmark,
+  BookmarkCheck,
+} from "lucide-react";
 import Button from "@/components/atoms/button";
 import VerticalRange from "./VerticalRange";
 import styles from "./PodcastPlayerStyles";
@@ -73,13 +82,26 @@ export default function PlayerControls({
       <div className={styles.buttons}>
         <div className={styles.buttonGroup}>
           <div ref={volumeButtonWrapperRef} className={styles.volumeButtonWrapper}>
-            <Button
+            {/* <Button
               variants="unstyled"
               onClick={onToggleVolumeControl}
               className={styles.controlButton}
               aria-label="Volume"
             >
               <Volume2 className={styles.icon} />
+            </Button> */}
+            <Button
+              variants="unstyled"
+              onClick={onToggleBookmark}
+              className={styles.controlButton}
+              aria-label={hasBookmarkAtCurrentTime ? "Rimuovi segnaposto" : "Aggiungi segnaposto"}
+              title={hasBookmarkAtCurrentTime ? "Rimuovi segnaposto" : "Aggiungi segnaposto"}
+            >
+              {hasBookmarkAtCurrentTime ? (
+                <BookmarkCheck className={styles.icon} />
+              ) : (
+                <Bookmark className={styles.icon} />
+              )}
             </Button>
             {showVolumeControl && (
               <div ref={volumeControlRef} className={styles.volumeControlContainer}>
@@ -121,19 +143,6 @@ export default function PlayerControls({
             aria-label="Avanti di 10 secondi"
           >
             <FastForward className={styles.icon} />
-          </Button>
-          <Button
-            variants="unstyled"
-            onClick={onToggleBookmark}
-            className={styles.controlButton}
-            aria-label={hasBookmarkAtCurrentTime ? "Rimuovi segnaposto" : "Aggiungi segnaposto"}
-            title={hasBookmarkAtCurrentTime ? "Rimuovi segnaposto" : "Aggiungi segnaposto"}
-          >
-            {hasBookmarkAtCurrentTime ? (
-              <BookmarkCheck className={styles.icon} />
-            ) : (
-              <Bookmark className={styles.icon} />
-            )}
           </Button>
           <div ref={speedButtonWrapperRef} className={styles.speedButtonWrapper}>
             <Button
