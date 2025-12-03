@@ -5,7 +5,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { Bookmark, bookmarksStorage } from "@/lib/storage/bookmarks";
-import { Bookmark as BookmarkIcon } from "lucide-react";
+import { Bookmark as BookmarkIcon, Minus } from "lucide-react";
 import { cn } from "@/lib/utils/classes";
 
 /* **************************************************
@@ -31,6 +31,7 @@ export default function BookmarkManager({
   const lastTouchTimeRef = useRef<number>(0);
   const lastTouchTargetRef = useRef<EventTarget | null>(null);
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
+  const isProcessingRef = useRef<boolean>(false);
 
   // Inizializza il database e carica i segnalibri
   useEffect(() => {
@@ -143,36 +144,50 @@ export default function BookmarkManager({
   // Funzione per creare o eliminare un segnalibro
   const toggleBookmark = useCallback(
     async (x: number, y: number) => {
+      // Previene chiamate concorrenti
+      if (isProcessingRef.current) {
+        return;
+      }
+
       const container = contentContainerRef.current;
       if (!container) return;
 
-      // Calcola la posizione Y esatta del click relativa al contenitore
-      const containerRect = container.getBoundingClientRect();
-      // offsetTop è la posizione relativa al contenitore (dalla parte superiore del contenitore)
-      const offsetTop = y - containerRect.top;
+      // Imposta il lock
+      isProcessingRef.current = true;
 
-      // Trova l'elemento più vicino per generare un selettore (per riferimento futuro)
-      const result = findNearestElement(x, y);
-      const selector = result?.selector || "p";
+      try {
+        // Calcola la posizione Y esatta del click relativa al contenitore
+        const containerRect = container.getBoundingClientRect();
+        // offsetTop è la posizione relativa al contenitore (dalla parte superiore del contenitore)
+        const offsetTop = y - containerRect.top;
 
-      // Verifica se esiste già un segnalibro in questa posizione (tolleranza di 20px)
-      const existingBookmark = bookmarks.find((b) => Math.abs(b.offsetTop - offsetTop) < 20);
+        // Trova l'elemento più vicino per generare un selettore (per riferimento futuro)
+        const result = findNearestElement(x, y);
+        const selector = result?.selector || "p";
 
-      if (existingBookmark) {
-        // Elimina il segnalibro esistente
-        await bookmarksStorage.deleteBookmark(existingBookmark.id);
-        setBookmarks((prev) => prev.filter((b) => b.id !== existingBookmark.id));
-      } else {
-        // Crea un nuovo segnalibro con la posizione esatta del click
-        const newBookmark = await bookmarksStorage.saveBookmark({
-          articleSlug,
-          selector,
-          offsetTop,
-        });
-        setBookmarks((prev) => [...prev, newBookmark].sort((a, b) => a.offsetTop - b.offsetTop));
+        // Controlla nel database invece che solo nello stato per evitare race conditions
+        const allBookmarks = await bookmarksStorage.getBookmarks(articleSlug);
+        const existingBookmark = allBookmarks.find((b) => Math.abs(b.offsetTop - offsetTop) < 20);
+
+        if (existingBookmark) {
+          // Elimina il segnalibro esistente
+          await bookmarksStorage.deleteBookmark(existingBookmark.id);
+          setBookmarks((prev) => prev.filter((b) => b.id !== existingBookmark.id));
+        } else {
+          // Crea un nuovo segnalibro con la posizione esatta del click
+          const newBookmark = await bookmarksStorage.saveBookmark({
+            articleSlug,
+            selector,
+            offsetTop,
+          });
+          setBookmarks((prev) => [...prev, newBookmark].sort((a, b) => a.offsetTop - b.offsetTop));
+        }
+      } finally {
+        // Rilascia il lock
+        isProcessingRef.current = false;
       }
     },
-    [articleSlug, findNearestElement, bookmarks],
+    [articleSlug, findNearestElement],
   );
 
   // Gestisce il doppio click
@@ -302,169 +317,55 @@ export default function BookmarkManager({
   }
 
   return (
-    <>
-      {/* Desktop: segnalibri a sinistra */}
-      <div
-        className="pointer-events-none hidden lg:block"
-        style={{
-          position: "absolute",
-          left: "-3rem",
-          top: 0,
-          width: "2rem",
-          height: containerRect.height,
-          zIndex: 5,
-        }}
-      >
-        {bookmarks.map((bookmark) => {
-          const position = bookmarkPositions.get(bookmark.id);
-          if (position === undefined) return null;
+    <div
+      className="pointer-events-none lg:-left-8 md:-left-3 -left-3"
+      style={{
+        position: "absolute",
+        top: 0,
+        width: "1.5rem",
+        height: containerRect.height,
+        zIndex: 5,
+      }}
+    >
+      {bookmarks.map((bookmark) => {
+        const position = bookmarkPositions.get(bookmark.id);
+        if (position === undefined) return null;
 
-          const relativePosition = position;
+        const relativePosition = position;
 
-          if (relativePosition < -50 || relativePosition > containerRect.height + 50) {
-            return null;
-          }
+        if (relativePosition < -50 || relativePosition > containerRect.height + 50) {
+          return null;
+        }
 
-          return (
-            <button
-              key={bookmark.id}
-              onClick={() => handleBookmarkClick(bookmark.id)}
-              className={cn(
-                "pointer-events-auto",
-                "w-8 h-8",
-                "flex items-center justify-center",
-                "bg-tertiary/90 hover:bg-tertiary",
-                "text-primary",
-                "rounded-full",
-                "shadow-lg",
-                "transition-all duration-200",
-                "hover:scale-110",
-                "active:scale-95",
-              )}
-              style={{
-                position: "absolute",
-                left: "0",
-                top: `${relativePosition}px`,
-                transform: "translateY(-50%)",
-              }}
-              title="Clicca per rimuovere il segnalibro"
-              aria-label="Rimuovi segnalibro"
-            >
-              <BookmarkIcon className="w-4 h-4 fill-current" />
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Tablet: segnalibri a destra */}
-      <div
-        className="pointer-events-none lg:hidden md:block hidden"
-        style={{
-          position: "absolute",
-          right: "-3rem",
-          top: 0,
-          width: "2rem",
-          height: containerRect.height,
-          zIndex: 5,
-        }}
-      >
-        {bookmarks.map((bookmark) => {
-          const position = bookmarkPositions.get(bookmark.id);
-          if (position === undefined) return null;
-
-          const relativePosition = position;
-
-          if (relativePosition < -50 || relativePosition > containerRect.height + 50) {
-            return null;
-          }
-
-          return (
-            <button
-              key={bookmark.id}
-              onClick={() => handleBookmarkClick(bookmark.id)}
-              className={cn(
-                "pointer-events-auto",
-                "w-8 h-8",
-                "flex items-center justify-center",
-                "bg-tertiary/90 hover:bg-tertiary",
-                "text-primary",
-                "rounded-full",
-                "shadow-lg",
-                "transition-all duration-200",
-                "hover:scale-110",
-                "active:scale-95",
-              )}
-              style={{
-                position: "absolute",
-                right: "0",
-                top: `${relativePosition}px`,
-                transform: "translateY(-50%)",
-              }}
-              title="Clicca per rimuovere il segnalibro"
-              aria-label="Rimuovi segnalibro"
-            >
-              <BookmarkIcon className="w-4 h-4 fill-current" />
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Mobile: segnalibri all'interno del contenitore a destra */}
-      <div
-        className="pointer-events-none md:hidden block"
-        style={{
-          position: "absolute",
-          right: "0",
-          top: 0,
-          width: "2rem",
-          height: containerRect.height,
-          zIndex: 5,
-        }}
-      >
-        {bookmarks.map((bookmark) => {
-          const position = bookmarkPositions.get(bookmark.id);
-          if (position === undefined) return null;
-
-          // Calcola la posizione relativa al contenitore
-          // position è l'offsetTop relativo al contenitore (salvato quando si crea il segnalibro)
-          // Lo usiamo direttamente perché è già relativo al contenitore
-          const relativePosition = position;
-
-          // Mostra solo se il segnalibro è visibile nella viewport del contenitore
-          if (relativePosition < -50 || relativePosition > containerRect.height + 50) {
-            return null;
-          }
-
-          return (
-            <button
-              key={bookmark.id}
-              onClick={() => handleBookmarkClick(bookmark.id)}
-              className={cn(
-                "pointer-events-auto",
-                "w-8 h-8",
-                "flex items-center justify-center",
-                "bg-tertiary/90 hover:bg-tertiary",
-                "text-primary",
-                "rounded-full",
-                "shadow-lg",
-                "transition-all duration-200",
-                "hover:scale-110",
-                "active:scale-95",
-              )}
-              style={{
-                position: "absolute",
-                right: "0",
-                top: `${relativePosition}px`,
-                transform: "translateY(-50%)",
-              }}
-              title="Clicca per rimuovere il segnalibro"
-              aria-label="Rimuovi segnalibro"
-            >
-              <BookmarkIcon className="w-4 h-4 fill-current" />
-            </button>
-          );
-        })}
-      </div>
-    </>
+        return (
+          <button
+            key={bookmark.id}
+            onClick={() => handleBookmarkClick(bookmark.id)}
+            className={cn(
+              "pointer-events-auto",
+              "group",
+              "w-5 h-5",
+              "flex items-center justify-center",
+              "bg-tertiary/90 hover:bg-tertiary",
+              "text-primary",
+              "rounded-full",
+              "shadow-lg",
+              "transition-all duration-200",
+            )}
+            style={{
+              position: "absolute",
+              left: "0",
+              top: `${relativePosition}px`,
+              transform: "translateY(-50%)",
+            }}
+            title="Clicca per rimuovere il segnalibro"
+            aria-label="Rimuovi segnalibro"
+          >
+            <BookmarkIcon className="w-3 h-3 fill-current group-hover:hidden" />
+            <Minus className="w-3 h-3 hidden group-hover:block" />
+          </button>
+        );
+      })}
+    </div>
   );
 }

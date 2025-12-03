@@ -182,8 +182,8 @@ export default function Article({ article, dict }: ArticleProps) {
             ></div>
             <BookmarkManager articleSlug={article.slug} contentContainerSelector=".prose" />
           </div>
-          <div className="lg:w-1/4 md:w-1/3 w-full lg:flex md:hidden hidden">
-            <Separator />
+          <div className="lg:w-1/4 md:w-1/3 w-full lg:flex md:flex hidden">
+            <Separator className="lg:flex md:hidden hidden" />
           </div>
         </div>
       </section>
