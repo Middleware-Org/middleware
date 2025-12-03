@@ -14,7 +14,7 @@ import PlayerControls from "./PlayerControls";
 import Transcript from "./Transcript";
 import { Segment } from "./types";
 import styles from "./PodcastPlayerStyles";
-import { PodcastBookmark, podcastBookmarksStorage } from "@/lib/storage/podcastBookmarks";
+import { usePodcastBookmarks } from "./hooks/usePodcastBookmarks";
 
 /* **************************************************
  * Types
@@ -35,7 +35,6 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
   const [currentSegmentIndex, setCurrentSegmentIndex] = useState<number>(-1);
   const [showVolumeControl, setShowVolumeControl] = useState<boolean>(false);
   const [showSpeedControl, setShowSpeedControl] = useState<boolean>(false);
-  const [bookmarks, setBookmarks] = useState<PodcastBookmark[]>([]);
 
   const author = getAuthorBySlug(article.author);
   const category = getCategoryBySlug(article.category);
@@ -102,58 +101,28 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
     }
   }, [article.audio_chunks]);
 
-  // Load bookmarks
+  // Usa il custom hook per gestire i bookmarks
+  const { bookmarks, addBookmark, hasBookmarkInChunk, refreshBookmarks } = usePodcastBookmarks({
+    podcastSlug: podcastId,
+    segments,
+  });
+
+  // Ricarica i bookmarks periodicamente per sincronizzare con eliminazioni da PodcastBookmarkManager
+  // TODO: Migliorare con eventi custom o callback diretti
   useEffect(() => {
-    async function loadBookmarks() {
-      try {
-        await podcastBookmarksStorage.init();
-        const savedBookmarks = await podcastBookmarksStorage.getBookmarks(podcastId);
-        setBookmarks(savedBookmarks);
-      } catch (error) {
-        console.error("Errore nel caricamento dei segnaposto:", error);
-      }
-    }
-    loadBookmarks();
-  }, [podcastId]);
+    const interval = setInterval(async () => {
+      await refreshBookmarks();
+    }, 500);
+    return () => clearInterval(interval);
+  }, [refreshBookmarks]);
 
   // Funzione per aggiungere segnaposto al tempo corrente
   const handleToggleBookmark = useCallback(async () => {
-    try {
-      // Trova il segmento/chunk corrispondente al tempo corrente
-      const currentSegment = segments.find((s) => currentTime >= s.start && currentTime <= s.end);
+    await addBookmark(currentTime);
+  }, [currentTime, addBookmark]);
 
-      if (!currentSegment) {
-        // Se non c'è un segmento corrispondente, non aggiungere il segnaposto
-        return;
-      }
-
-      // Controlla se esiste già un segnaposto nello stesso chunk/segmento
-      const allBookmarks = await podcastBookmarksStorage.getBookmarks(podcastId);
-      const existingBookmark = allBookmarks.find(
-        (b) => b.time >= currentSegment.start && b.time <= currentSegment.end,
-      );
-
-      if (existingBookmark) {
-        // Non aggiungere se esiste già un segnaposto nello stesso chunk
-        return;
-      }
-
-      // Aggiungi un nuovo segnaposto solo se non esiste già nello stesso chunk
-      const newBookmark = await podcastBookmarksStorage.saveBookmark({
-        podcastSlug: podcastId,
-        time: currentTime,
-      });
-      const updated = [...bookmarks, newBookmark].sort((a, b) => a.time - b.time);
-      setBookmarks(updated);
-      // Notifica il cambio ai componenti figli (come PodcastBookmarkManager)
-      // Questo triggera onBookmarksChange in Transcript che ricarica i bookmarks
-    } catch (error) {
-      console.error("Errore nell'aggiunta del segnaposto:", error);
-    }
-  }, [podcastId, currentTime, bookmarks, segments]);
-
-  // Verifica se c'è un segnaposto al tempo corrente
-  const hasBookmarkAtCurrentTime = bookmarks.some((b) => Math.abs(b.time - currentTime) < 2);
+  // Verifica se c'è un segnaposto nel chunk corrente (usando logica unificata)
+  const hasBookmarkAtCurrentTime = hasBookmarkInChunk(currentTime);
 
   // Handlers
   const handleSeekStart = () => {
@@ -227,12 +196,7 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
         transcriptContentInnerRef={transcriptContentInnerRef}
         activeSegmentRef={activeSegmentRef}
         podcastSlug={article.slug}
-        onBookmarksChange={async () => {
-          // Ricarica i bookmarks dal database quando cambiano
-          const updatedBookmarks = await podcastBookmarksStorage.getBookmarks(podcastId);
-          setBookmarks(updatedBookmarks);
-          // Questo triggera il ricaricamento anche in PodcastBookmarkManager
-        }}
+        bookmarks={bookmarks}
       />
     </div>
   );

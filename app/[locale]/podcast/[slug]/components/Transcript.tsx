@@ -18,7 +18,7 @@ type TranscriptProps = {
   transcriptContentInnerRef: React.RefObject<HTMLDivElement | null>;
   activeSegmentRef: React.RefObject<HTMLDivElement | null>;
   podcastSlug: string;
-  onBookmarksChange?: (bookmarks: Array<{ time: number }>) => void;
+  bookmarks: Array<{ id: string; time: number }>;
 };
 
 /* **************************************************
@@ -31,7 +31,7 @@ export default function Transcript({
   transcriptContentInnerRef,
   activeSegmentRef,
   podcastSlug,
-  onBookmarksChange,
+  bookmarks,
 }: TranscriptProps) {
   if (segments.length === 0) {
     return null;
@@ -73,10 +73,9 @@ export default function Transcript({
             );
           })}
           <PodcastBookmarkManager
-            podcastSlug={podcastSlug}
             contentContainerSelector="#podcast-transcript-content"
             segments={segments.map((s) => ({ start: s.start, end: s.end }))}
-            onBookmarksChange={onBookmarksChange}
+            bookmarks={bookmarks}
           />
         </div>
       </div>
