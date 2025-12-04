@@ -1,6 +1,7 @@
 /* **************************************************
  * Imports
  **************************************************/
+import { cn } from "@/lib/utils/classes";
 import styles from "../styles";
 
 /* **************************************************
@@ -8,13 +9,7 @@ import styles from "../styles";
  **************************************************/
 export default function ArticleFormSkeleton() {
   return (
-    <main className={styles.main}>
-      <div className={styles.header}>
-        <div className="h-8 w-64 bg-secondary/20 animate-pulse" />
-        <div className="h-10 w-24 bg-secondary/20 animate-pulse" />
-      </div>
-
-      <div className={styles.editorContainer}>
+    <div className={cn(styles.editorContainer, "flex-1 min-h-0 h-full")}>
         {/* Editor Markdown - 3/4 width */}
         <div className={styles.editorWrapper}>
           <div className="mb-2">
@@ -41,12 +36,16 @@ export default function ArticleFormSkeleton() {
 
         {/* Meta Panel - 1/4 width */}
         <div className={styles.metaPanel}>
-          {/* Meta Card */}
-          <div className={styles.metaCard}>
+          {/* Scrollable Metadata Section */}
+          <div className={cn(styles.metaCard, "flex-1 overflow-y-auto min-h-0")}>
             <div className="h-6 w-32 bg-secondary/20 animate-pulse mb-4" />
             <div className="space-y-4">
               <div>
                 <div className="h-4 w-16 bg-secondary/20 animate-pulse mb-2" />
+                <div className="h-10 w-full bg-secondary/20 animate-pulse" />
+              </div>
+              <div>
+                <div className="h-4 w-20 bg-secondary/20 animate-pulse mb-2" />
                 <div className="h-10 w-full bg-secondary/20 animate-pulse" />
               </div>
               <div>
@@ -72,11 +71,19 @@ export default function ArticleFormSkeleton() {
               <div>
                 <div className="h-4 w-6 bg-secondary/20 animate-pulse" />
               </div>
+              <div>
+                <div className="h-4 w-16 bg-secondary/20 animate-pulse mb-2" />
+                <div className="h-10 w-full bg-secondary/20 animate-pulse" />
+              </div>
+              <div>
+                <div className="h-4 w-24 bg-secondary/20 animate-pulse mb-2" />
+                <div className="h-10 w-full bg-secondary/20 animate-pulse" />
+              </div>
             </div>
           </div>
 
-          {/* Actions Card */}
-          <div className={styles.metaCard}>
+          {/* Fixed Actions Section */}
+          <div className={cn(styles.metaCard, "shrink-0")}>
             <div className="h-6 w-24 bg-secondary/20 animate-pulse mb-4" />
             <div className="flex gap-2">
               <div className="h-10 w-24 bg-secondary/20 animate-pulse" />
@@ -85,6 +92,5 @@ export default function ArticleFormSkeleton() {
           </div>
         </div>
       </div>
-    </main>
   );
 }
