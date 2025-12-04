@@ -220,7 +220,7 @@ export default function AudioJsonMediaSelector({
                       Clicca per selezionare un file {fileTypeLabel}
                     </p>
                     <p className="text-sm text-secondary/60 mt-2">
-                      {fileType === "audio" ? "MP3, WAV (max 50MB)" : "JSON (max 10MB)"}
+                      {fileType === "audio" ? "Audio (MP3, WAV)" : "JSON"}
                     </p>
                   </div>
                 </div>

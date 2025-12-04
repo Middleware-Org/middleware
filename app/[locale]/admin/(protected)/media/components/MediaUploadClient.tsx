@@ -246,7 +246,7 @@ export default function MediaUploadClient() {
               <div className="text-center py-8">
                 <p className="text-secondary/80 mb-2">Clicca per selezionare un file</p>
                 <p className="text-sm text-secondary/60">
-                  Immagini (JPG, PNG, GIF, WEBP), Audio (MP3, WAV) o JSON (max 10MB, audio max 50MB)
+                  Immagini (JPG, PNG, GIF, WEBP), Audio (MP3, WAV) o JSON
                 </p>
               </div>
             )}
