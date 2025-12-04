@@ -8,6 +8,7 @@ import { getUser } from "@/lib/auth/server";
 import { getAllCategories } from "@/lib/github/categories";
 import { getAllAuthors } from "@/lib/github/authors";
 import { getAllIssues } from "@/lib/github/issues";
+import { cn } from "@/lib/utils/classes";
 import ArticleFormClient from "../components/ArticleFormClient";
 import ArticleFormSkeleton from "../components/ArticleFormSkeleton";
 import styles from "../styles";
@@ -37,7 +38,7 @@ export default async function NewArticlePage() {
 
   return (
     <SWRPageProvider fallback={swrFallback}>
-      <main className={styles.main}>
+      <div className={cn("h-full flex flex-col", styles.main)}>
         <div className={styles.header}>
           <h1 className={styles.title}>Nuovo Articolo</h1>
           <Link href="/admin/articles" className={styles.backButton}>
@@ -45,10 +46,12 @@ export default async function NewArticlePage() {
           </Link>
         </div>
 
-        <Suspense fallback={<ArticleFormSkeleton />}>
-          <ArticleFormClient />
-        </Suspense>
-      </main>
+        <div className="flex-1 min-h-0">
+          <Suspense fallback={<ArticleFormSkeleton />}>
+            <ArticleFormClient />
+          </Suspense>
+        </div>
+      </div>
     </SWRPageProvider>
   );
 }

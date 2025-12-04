@@ -36,7 +36,7 @@ export default async function AdminProtectedLayout({
 
   return (
     <SWRProvider>
-      <div className="flex min-h-screen">
+      <div className="flex h-screen overflow-hidden">
         <Sidebar dict={dict} locale={locale} />
         <main className="flex-1 overflow-auto">{children}</main>
       </div>

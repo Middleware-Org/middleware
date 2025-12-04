@@ -84,11 +84,15 @@ export default function PageFormClient({ pageSlug }: PageFormClientProps) {
   // Aggiorna lo stato quando la pagina viene caricata
   useEffect(() => {
     if (page) {
-      setContent(page.content);
-      setFormData({
-        title: page.title || "",
-        excerpt: page.excerpt || "",
-      });
+      setTimeout(() => {
+        setContent(page.content);
+      }, 0);
+      setTimeout(() => {
+        setFormData({
+          title: page.title || "",
+          excerpt: page.excerpt || "",
+        });
+      }, 0);
     }
   }, [page]);
 
@@ -139,11 +143,7 @@ export default function PageFormClient({ pageSlug }: PageFormClientProps) {
       <div className={styles.editorContainer}>
         {/* Editor Markdown - 3/4 width */}
         <div className={styles.editorWrapper}>
-          <MarkdownEditor
-            value={content}
-            onChange={(value) => setContent(value || "")}
-            label="Contenuto *"
-          />
+          <MarkdownEditor value={content} onChange={(value) => setContent(value || "")} />
         </div>
 
         {/* Meta Panel - 1/4 width */}
