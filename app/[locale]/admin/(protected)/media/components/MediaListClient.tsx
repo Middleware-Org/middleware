@@ -5,7 +5,6 @@
 
 import { useState, useTransition } from "react";
 import { deleteMediaAction } from "../actions";
-import { getGitHubImageUrl } from "@/lib/github/images";
 import { Music, FileJson } from "lucide-react";
 import styles from "../styles";
 import baseStyles from "../../styles";
@@ -78,7 +77,7 @@ export default function MediaListClient() {
                 <Image
                   width={400}
                   height={300}
-                  src={getGitHubImageUrl(file.url)}
+                  src={file.url}
                   alt={file.name}
                   className={styles.imageCardImg}
                   unoptimized

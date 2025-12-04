@@ -2,7 +2,7 @@
 slug: la-lunga-frattura-un-contributo-al-dibattito-su-guerra-e-riarmo
 title: La lunga frattura – Un contributo al dibattito su guerra e riarmo
 date: '2025-11-24'
-last_update: '2025-12-01T14:24:33.763Z'
+last_update: '2025-12-04T09:50:45.273Z'
 author: infoaut
 category: conflitti-globali
 issue: esperimento-formazione
@@ -12,8 +12,10 @@ excerpt: >-
   In questi mesi la storia corre veloce, in poco tempo alcuni dei capisaldi su
   cui si è retto l’ordine mondiale definitivamente consolidatosi dopo il crollo
   del muro di Berlino stanno vivendo profonde tensioni e ristrutturazioni.
-audio: /assets/la-grande-frattura.mp3
-audio_chunks: /assets/la-grande-frattura.json
+audio: >-
+  https://mdmdfxzts3o3uer1.public.blob.vercel-storage.com/media/la-grande-frattura.mp3
+audio_chunks: >-
+  https://mdmdfxzts3o3uer1.public.blob.vercel-storage.com/media/la-grande-frattura.json
 ---
 Non sono che sintomi di processi più profondi e radicali che ribollono come magma sotto la crosta terrestre tentando di farsi strada, di trovare sbocchi, sfiati ed infine ridefinire il paesaggio.
 

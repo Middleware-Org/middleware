@@ -2,15 +2,17 @@
 slug: i-perche-di-una-rivista
 title: I perché di una rivista
 date: '2025-12-03'
-last_update: '2025-12-03T10:31:22.616Z'
+last_update: '2025-12-04T09:50:20.444Z'
 author: teiko
 category: organizzazione
 issue: l-enigma-dell-organizzazione
 in_evidence: true
 published: true
 excerpt: "A spingerci alla creazione di questa rivista è, prima di tutto, la crisi egemonica planetaria turbolenta, e per molti versi indecifrabile,\r\nche sta scompaginando le coordinate politiche con le quali abbiamo a lungo pensato il nostro tempo storico."
-audio: /assets/perche-di-una-rivista.mp3
-audio_chunks: /assets/perche-di-una-rivista.json
+audio: >-
+  https://mdmdfxzts3o3uer1.public.blob.vercel-storage.com/media/perche-di-una-rivista.mp3
+audio_chunks: >-
+  https://mdmdfxzts3o3uer1.public.blob.vercel-storage.com/media/perche-di-una-rivista.json
 ---
 Teiko nasce dall’interno della rete “Euronomade”, come espressione di un’apertura e di un allargamento che hanno dato vita a un progetto autonomo. Abbiamo condiviso il rischio di perderci nell’accelerazione segnata da genocidi, dal moltiplicarsi delle guerre e dall’intensificazione delle molteplici forme di violenza e sfruttamento che segnano anche le nostre vite. In secondo luogo, abbiamo avuto spesso la sensazione, negli ultimi anni, che a questa indecifrabile e violenta turbolenza si contrapponesse – contrapponessimo – il deserto. Se la difficoltà nell’analizzare le transizioni in corso e la parziale inefficacia degli strumenti che, solitamente, risultavano adeguati allo scopo è indubbia, la sensazione di vivere un momento di scarsa attivazione politica è frutto di un’erronea illusione: le mobilitazioni, in questi ultimi anni – anche solo negli ultimi mesi – sono state molteplici e diffuse. E, tuttavia, l’essersi trovate spesso a condividere questa sensazione ci spinge a individuarne le origini e le motivazioni, mentre cerchiamo nuove chiavi di lettura che siano all’altezza delle trasformazioni in corso. La nostra convinzione è che questa ricerca consentirà di mettere in campo anche nuovi strumenti di mobilitazione politica, evitando di rinchiudersi in piccole patrie locali isolate, per trovare altre e nuove strade, rimettendo in circolazione idee e pratiche politiche che provino a catturare il possibile che c’è oggi e a fargli spazio.
 

@@ -5,7 +5,6 @@
 
 import { useState, useRef } from "react";
 import Image from "next/image";
-import { getGitHubImageUrl } from "@/lib/github/images";
 import baseStyles from "../../styles";
 import styles from "../../media/styles";
 import { useMedia } from "@/hooks/swr";
@@ -237,7 +236,7 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
                   >
                     <div className={baseStyles.mediaCardImage}>
                       <Image
-                        src={getGitHubImageUrl(file.url)}
+                        src={file.url}
                         alt={file.name}
                         fill
                         className="object-cover"

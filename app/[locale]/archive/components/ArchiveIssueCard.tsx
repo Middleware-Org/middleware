@@ -12,6 +12,7 @@ import { Article, Issue } from "@/.velite";
 import { CommonDictionary } from "@/lib/i18n/types";
 import { getAuthorBySlug, getCategoryBySlug } from "@/lib/content";
 import { cn } from "@/lib/utils/classes";
+import { getGitHubImageUrl } from "@/lib/github/images";
 
 /* **************************************************
  * Types
@@ -98,7 +99,7 @@ export default function ArchiveIssueCard({ issue, articles, dict, index }: Archi
           <div className={styles.imageWrapper} style={{ backgroundColor: issue.color }}>
             <Link href={`/issues/${issue.slug}`} className={styles.imageLink}>
               <Image
-                src={issue.cover}
+                src={getGitHubImageUrl(issue.cover)}
                 alt={issue.title}
                 fill
                 className={styles.image}

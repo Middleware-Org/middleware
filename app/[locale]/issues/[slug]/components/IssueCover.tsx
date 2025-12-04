@@ -7,6 +7,7 @@ import { SerifText } from "@/components/atoms/typography";
 import { lightenColor } from "@/lib/utils/color";
 import { Issue } from "@/.velite";
 import { cn } from "@/lib/utils/classes";
+import { getGitHubImageUrl } from "@/lib/github/images";
 
 /* **************************************************
  * Types
@@ -61,7 +62,7 @@ export default function IssueCover({ issue }: IssueCoverProps) {
       </div>
       <div className={styles.imageWrapper} style={{ backgroundColor: issue.color }}>
         <Image
-          src={issue.cover}
+          src={getGitHubImageUrl(issue.cover)}
           alt={issue.title}
           fill
           className={styles.image}

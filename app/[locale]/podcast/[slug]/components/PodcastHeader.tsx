@@ -10,6 +10,7 @@ import { Article } from "@/.velite";
 import FormattedDate from "@/components/atoms/date";
 import { useParams } from "next/navigation";
 import styles from "./PodcastPlayerStyles";
+import { getGitHubImageUrl } from "@/lib/github/images";
 
 /* **************************************************
  * Types
@@ -32,7 +33,7 @@ export default function PodcastHeader({ article, issue, author, category }: Podc
       {issue?.cover && (
         <div className={styles.coverWrapper}>
           <Image
-            src={issue.cover}
+            src={getGitHubImageUrl(issue.cover)}
             alt={issue.title}
             fill
             className={styles.coverImage}
