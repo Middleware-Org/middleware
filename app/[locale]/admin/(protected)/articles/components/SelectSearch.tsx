@@ -124,7 +124,7 @@ export default function SelectSearch({
       <label htmlFor={id} className={styles.label}>
         {label} {required && "*"}
       </label>
-      <div className="relative">
+      <div className="relative flex items-center gap-2">
         {/* Trigger Button */}
         <button
           type="button"
@@ -132,113 +132,109 @@ export default function SelectSearch({
           disabled={disabled}
           className={cn(
             styles.select,
-            "flex items-center justify-between cursor-pointer",
+            "flex items-center justify-between cursor-pointer flex-1",
             "text-left",
             !selectedOption ? "text-secondary/60" : undefined,
             disabled ? "opacity-50 cursor-not-allowed" : undefined,
           )}
         >
           <span className="truncate">{selectedOption ? selectedOption.label : placeholder}</span>
-          <div className="flex items-center gap-2 shrink-0 ml-2">
-            {value && (
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleClear();
-                }}
-                className="p-1 hover:bg-secondary/10 rounded transition-colors"
-                title="Rimuovi selezione"
-              >
-                <X className="w-4 h-4 text-secondary" />
-              </button>
+          <ChevronDown
+            className={cn(
+              "w-4 h-4 text-secondary transition-transform duration-150 shrink-0 ml-2",
+              isOpen ? "transform rotate-180" : undefined,
             )}
-            <ChevronDown
-              className={cn(
-                "w-4 h-4 text-secondary transition-transform duration-150",
-                isOpen ? "transform rotate-180" : undefined,
-              )}
-            />
-          </div>
+          />
         </button>
-
-        {/* Hidden input for form submission */}
-        <input type="hidden" id={id} name={id} value={value} required={required} />
-
-        {/* Modal */}
-        {isOpen && (
-          <div className={baseStyles.modalOverlay}>
-            <div ref={modalRef} className={cn(baseStyles.modalContainer, "max-w-md max-h-[70vh]")}>
-              {/* Header */}
-              <div className={baseStyles.modalHeader}>
-                <h3 className={baseStyles.modalTitle}>{label}</h3>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsOpen(false);
-                    setSearchQuery("");
-                  }}
-                  className={baseStyles.modalCloseButton}
-                  aria-label="Chiudi"
-                >
-                  ×
-                </button>
-              </div>
-
-              {/* Search Input */}
-              <div className="p-4 border-b border-secondary">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary/60" />
-                  <input
-                    ref={searchInputRef}
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Cerca..."
-                    className={cn(styles.input, "pl-10")}
-                  />
-                </div>
-              </div>
-
-              {/* Options List */}
-              <div className="flex-1 overflow-auto">
-                {filteredOptions.length === 0 ? (
-                  <div className={baseStyles.emptyState}>
-                    <p>{emptyMessage}</p>
-                    {searchQuery && (
-                      <p className={baseStyles.emptyStateText}>
-                        Nessun risultato per &quot;{searchQuery}&quot;
-                      </p>
-                    )}
-                  </div>
-                ) : (
-                  <div className="p-2 space-y-1">
-                    {filteredOptions.map((option) => {
-                      const isSelected = option.value === value;
-                      return (
-                        <button
-                          key={option.value}
-                          type="button"
-                          onClick={() => handleSelect(option.value)}
-                          className={cn(
-                            "w-full text-left px-4 py-3 rounded transition-all duration-150",
-                            "hover:bg-tertiary/10 hover:border-tertiary",
-                            isSelected
-                              ? "bg-tertiary/20 border border-tertiary font-medium text-tertiary"
-                              : "border border-transparent text-secondary",
-                          )}
-                        >
-                          {option.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+        {/* Clear Button - Outside the main button */}
+        {value && (
+          <button
+            type="button"
+            onClick={handleClear}
+            className="p-1 hover:bg-secondary/10 rounded transition-colors shrink-0"
+            title="Rimuovi selezione"
+          >
+            <X className="w-4 h-4 text-secondary" />
+          </button>
         )}
       </div>
+
+      {/* Hidden input for form submission */}
+      <input type="hidden" id={id} name={id} value={value} required={required} />
+
+      {/* Modal */}
+      {isOpen && (
+        <div className={baseStyles.modalOverlay}>
+          <div ref={modalRef} className={cn(baseStyles.modalContainer, "max-w-md max-h-[70vh]")}>
+            {/* Header */}
+            <div className={baseStyles.modalHeader}>
+              <h3 className={baseStyles.modalTitle}>{label}</h3>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsOpen(false);
+                  setSearchQuery("");
+                }}
+                className={baseStyles.modalCloseButton}
+                aria-label="Chiudi"
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Search Input */}
+            <div className="p-4 border-b border-secondary">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary/60" />
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Cerca..."
+                  className={cn(styles.input, "pl-10")}
+                />
+              </div>
+            </div>
+
+            {/* Options List */}
+            <div className="flex-1 overflow-auto">
+              {filteredOptions.length === 0 ? (
+                <div className={baseStyles.emptyState}>
+                  <p>{emptyMessage}</p>
+                  {searchQuery && (
+                    <p className={baseStyles.emptyStateText}>
+                      Nessun risultato per &quot;{searchQuery}&quot;
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <div className="p-2 space-y-1">
+                  {filteredOptions.map((option) => {
+                    const isSelected = option.value === value;
+                    return (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => handleSelect(option.value)}
+                        className={cn(
+                          "w-full text-left px-4 py-3 rounded transition-all duration-150",
+                          "hover:bg-tertiary/10 hover:border-tertiary",
+                          isSelected
+                            ? "bg-tertiary/20 border border-tertiary font-medium text-tertiary"
+                            : "border border-transparent text-secondary",
+                        )}
+                      >
+                        {option.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
