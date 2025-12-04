@@ -1,10 +1,13 @@
 /* **************************************************
  * Imports
  **************************************************/
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { getUser } from "@/lib/auth/server";
 import { getPageBySlug } from "@/lib/github/pages";
+import { cn } from "@/lib/utils/classes";
 import PageFormClient from "../../components/PageFormClient";
+import PageEditSkeleton from "../../components/PageEditSkeleton";
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
 import styles from "../../styles";
 
@@ -31,12 +34,17 @@ export default async function EditPagePage({ params }: { params: Promise<{ slug:
 
   return (
     <SWRPageProvider fallback={swrFallback}>
-      <main className={styles.main}>
+      <div className={cn("h-full flex flex-col", styles.main)}>
         <div className={styles.header}>
           <h1 className={styles.title}>Modifica Pagina: {page.slug}</h1>
         </div>
-        <PageFormClient pageSlug={slug} />
-      </main>
+
+        <div className="flex-1 min-h-0">
+          <Suspense fallback={<PageEditSkeleton />}>
+            <PageFormClient pageSlug={slug} />
+          </Suspense>
+        </div>
+      </div>
     </SWRPageProvider>
   );
 }

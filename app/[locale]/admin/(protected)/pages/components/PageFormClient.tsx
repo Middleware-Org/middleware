@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { useActionState } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
+import { cn } from "@/lib/utils/classes";
 import { createPageAction, updatePageAction, type ActionResult } from "../actions";
 import PageMetaPanel from "./PageMetaPanel";
 import styles from "../styles";
@@ -127,7 +128,11 @@ export default function PageFormClient({ pageSlug }: PageFormClientProps) {
   }
 
   return (
-    <form ref={formRef} action={handleAction} className={baseStyles.formContainer}>
+    <form
+      ref={formRef}
+      action={handleAction}
+      className={cn(baseStyles.formContainer, "flex flex-col h-full")}
+    >
       {state && !state.success && (
         <div
           className={`mb-4 ${state.errorType === "warning" ? baseStyles.errorWarning : baseStyles.error}`}
@@ -140,7 +145,7 @@ export default function PageFormClient({ pageSlug }: PageFormClientProps) {
         <div className={baseStyles.successMessage}>{state.message}</div>
       )}
 
-      <div className={styles.editorContainer}>
+      <div className={cn(styles.editorContainer, "flex-1 min-h-0")}>
         {/* Editor Markdown - 3/4 width */}
         <div className={styles.editorWrapper}>
           <MarkdownEditor value={content} onChange={(value) => setContent(value || "")} />
