@@ -9,6 +9,7 @@ import { getArticleBySlug } from "@/lib/github/articles";
 import { getAllCategories } from "@/lib/github/categories";
 import { getAllAuthors } from "@/lib/github/authors";
 import { getAllIssues } from "@/lib/github/issues";
+import { cn } from "@/lib/utils/classes";
 import ArticleFormClient from "../../components/ArticleFormClient";
 import ArticleEditSkeleton from "../../components/ArticleEditSkeleton";
 import styles from "../../styles";
@@ -53,7 +54,7 @@ export default async function EditArticlePage({ params }: EditArticlePageProps) 
 
   return (
     <SWRPageProvider fallback={swrFallback}>
-      <main className={styles.main}>
+      <div className={cn("h-full flex flex-col", styles.main)}>
         <div className={styles.header}>
           <h1 className={styles.title}>Modifica Articolo: {article.title}</h1>
           <Link href="/admin/articles" className={styles.backButton}>
@@ -61,10 +62,12 @@ export default async function EditArticlePage({ params }: EditArticlePageProps) 
           </Link>
         </div>
 
-        <Suspense fallback={<ArticleEditSkeleton />}>
-          <ArticleFormClient articleSlug={slug} />
-        </Suspense>
-      </main>
+        <div className="flex-1 min-h-0">
+          <Suspense fallback={<ArticleEditSkeleton />}>
+            <ArticleFormClient articleSlug={slug} />
+          </Suspense>
+        </div>
+      </div>
     </SWRPageProvider>
   );
 }

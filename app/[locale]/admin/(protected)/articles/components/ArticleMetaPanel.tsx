@@ -17,6 +17,7 @@ import type { Issue } from "@/lib/github/types";
 import AudioJsonMediaSelector from "./AudioJsonMediaSelector";
 import SelectSearch from "./SelectSearch";
 import { mutate } from "swr";
+import { cn } from "@/lib/utils/classes";
 
 /* **************************************************
  * Types
@@ -143,7 +144,8 @@ export default function ArticleMetaPanel({
 
   return (
     <div className={styles.metaPanel}>
-      <div className={styles.metaCard}>
+      {/* Scrollable Metadata Section */}
+      <div className={cn(styles.metaCard, "flex-1 overflow-y-auto min-h-0")}>
         <h3 className={styles.metaCardTitle}>Metadati</h3>
 
         <div className={styles.field}>
@@ -369,7 +371,8 @@ export default function ArticleMetaPanel({
         title="Seleziona JSON Chunk Audio"
       />
 
-      <div className={styles.metaCard}>
+      {/* Fixed Actions Section - Always Visible */}
+      <div className={cn(styles.metaCard, "shrink-0")}>
         <h3 className={styles.metaCardTitle}>Azioni</h3>
         <div className={styles.formActions}>
           <button
