@@ -6,6 +6,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition, useEffect } from "react";
 import { Sparkles } from "lucide-react";
+import { cn } from "@/lib/utils/classes";
 import { deletePageAction } from "../actions";
 import ConfirmDialog from "@/components/molecules/confirmDialog";
 import styles from "../styles";
@@ -117,7 +118,8 @@ export default function PageMetaPanel({
 
   return (
     <div className={styles.metaPanel}>
-      <div className={styles.metaCard}>
+      {/* Scrollable Metadata Section */}
+      <div className={cn(styles.metaCard, "flex-1 overflow-y-auto min-h-0")}>
         <h3 className={styles.metaCardTitle}>Metadati</h3>
 
         {/* Title */}
@@ -183,8 +185,8 @@ export default function PageMetaPanel({
         </div>
       </div>
 
-      {/* Actions Card */}
-      <div className={styles.metaCard}>
+      {/* Fixed Actions Section */}
+      <div className={cn(styles.metaCard, "shrink-0")}>
         <h3 className={styles.metaCardTitle}>Azioni</h3>
         <div className={styles.formActions}>
           <button
@@ -220,7 +222,9 @@ export default function PageMetaPanel({
         </div>
 
         {editing && page && error && (
-          <div className={`mt-4 ${error.type === "warning" ? baseStyles.errorWarning : baseStyles.error}`}>
+          <div
+            className={`mt-4 ${error.type === "warning" ? baseStyles.errorWarning : baseStyles.error}`}
+          >
             ⚠️ {error.message}
           </div>
         )}

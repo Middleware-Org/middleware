@@ -18,10 +18,10 @@ const styles = {
   loading: cn("text-center text-secondary"),
   error: cn("mb-4 p-4 bg-tertiary/10 border border-tertiary text-tertiary"),
   errorWarning: cn("mb-4 p-4 bg-yellow-50 border border-yellow-200 text-yellow-800"),
-  editorContainer: cn("flex gap-6 h-[calc(100vh-200px)]"),
-  editorWrapper: cn("flex-1 flex flex-col"),
+  editorContainer: cn("flex gap-6 max-h-[calc(100vh-200px)] min-h-0"),
+  editorWrapper: cn("flex-1 flex flex-col min-h-0"),
   editorLabel: cn("block mb-2 text-sm font-medium text-secondary"),
-  metaPanel: cn("w-80 flex flex-col gap-4"),
+  metaPanel: cn("w-80 flex flex-col gap-4 h-full min-h-0"),
   metaCard: cn("bg-primary border border-secondary p-4"),
   metaCardTitle: cn("text-lg font-semibold mb-4"),
   textarea: cn(

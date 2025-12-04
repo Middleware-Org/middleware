@@ -2,7 +2,7 @@
  * Imports
  **************************************************/
 import { cn } from "@/lib/utils/classes";
-import ArticleEditSkeleton from "../../components/ArticleEditSkeleton";
+import PageEditSkeleton from "../../components/PageEditSkeleton";
 import styles from "../../styles";
 
 /* **************************************************
@@ -15,9 +15,8 @@ export default function Loading() {
         <div className="h-8 w-96 bg-secondary/20 animate-pulse" />
         <div className="h-10 w-24 bg-secondary/20 animate-pulse" />
       </div>
-
       <div className="flex-1 min-h-0">
-        <ArticleEditSkeleton />
+        <PageEditSkeleton />
       </div>
     </div>
   );

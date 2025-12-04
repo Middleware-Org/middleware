@@ -23,7 +23,7 @@ type RootPageProps = {
 const styles = {
   container: cn("max-w-[1472px] mx-auto px-0 md:px-4 lg:px-10 py-0 md:py-6 lg:py-10"),
   issueContainer: cn(
-    "grid lg:grid-cols-2 md:grid-cols-2 grid-cols-1 lg:gap-10 md:gap-4 gap-0 lg:mb-8 md:mb-8 mb-0 relative",
+    "grid lg:grid-cols-2 md:grid-cols-2 grid-cols-1 lg:gap-10 md:gap-4 gap-0 lg:mb-10 md:mb-10 mb-0 relative",
   ),
   issueCoverContainer: cn(
     "lg:sticky md:sticky lg:top-[155px] md:top-[155px] lg:self-start md:self-start",
