@@ -2,6 +2,7 @@
  * Imports
  **************************************************/
 import { Suspense } from "react";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getUser } from "@/lib/auth/server";
 import { getPageBySlug } from "@/lib/github/pages";
@@ -37,6 +38,9 @@ export default async function EditPagePage({ params }: { params: Promise<{ slug:
       <div className={cn("h-full flex flex-col", styles.main)}>
         <div className={styles.header}>
           <h1 className={styles.title}>Modifica Pagina: {page.slug}</h1>
+          <Link href="/admin/pages" className={styles.backButton}>
+            ← Indietro
+          </Link>
         </div>
 
         <div className="flex-1 min-h-0">
