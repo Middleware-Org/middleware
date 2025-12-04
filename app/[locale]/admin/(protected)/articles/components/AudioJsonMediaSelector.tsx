@@ -3,12 +3,14 @@
  **************************************************/
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
+import { Search, X } from "lucide-react";
 import { uploadMediaAction } from "../../media/actions";
 import baseStyles from "../../styles";
 import styles from "../../media/styles";
 import { useMedia } from "@/hooks/swr";
 import { mutate } from "swr";
+import { cn } from "@/lib/utils/classes";
 
 /* **************************************************
  * Types
@@ -37,12 +39,26 @@ export default function AudioJsonMediaSelector({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [filename, setFilename] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Usa SWR per caricare i media files con cache
   const { mediaFiles: allMediaFiles = [], isLoading: loading, isError } = useMedia();
 
-  // Filtra i file per tipo
-  const mediaFiles = allMediaFiles.filter((file) => file.type === fileType);
+  // Filtra i file per tipo e ricerca
+  const filteredMediaFiles = useMemo(() => {
+    let filtered = allMediaFiles.filter((file) => file.type === fileType);
+
+    // Filtra per ricerca
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (file) => file.name.toLowerCase().includes(query) || file.url.toLowerCase().includes(query),
+      );
+    }
+
+    return filtered;
+  }, [allMediaFiles, fileType, searchQuery]);
+
   const error = isError ? "Failed to load media files" : null;
 
   function handleSelect(fileUrl: string) {
@@ -239,21 +255,66 @@ export default function AudioJsonMediaSelector({
             <h3 className="text-sm font-semibold text-secondary mb-3">
               File {fileTypeLabel.toUpperCase()} Disponibili
             </h3>
+
+            {/* Search Bar */}
+            <div className="mb-4 relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary/60" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={`Cerca file ${fileTypeLabel}...`}
+                className={cn(styles.input, "pl-10 pr-10")}
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-secondary/10 rounded transition-colors"
+                  title="Pulisci ricerca"
+                >
+                  <X className="w-4 h-4 text-secondary" />
+                </button>
+              )}
+            </div>
+
             {loading && (
               <div className={baseStyles.loadingText}>Caricamento file {fileTypeLabel}...</div>
             )}
 
             {error && <div className={baseStyles.error}>{error}</div>}
 
-            {!loading && !error && mediaFiles.length === 0 && (
+            {!loading && !error && filteredMediaFiles.length === 0 && (
               <div className={baseStyles.emptyState}>
-                Nessun file {fileTypeLabel} disponibile. Carica il primo file usando il form sopra.
+                {searchQuery ? (
+                  <>
+                    <p>Nessun file corrisponde alla ricerca &quot;{searchQuery}&quot;</p>
+                    <p className={baseStyles.emptyStateText}>
+                      Prova a modificare i termini di ricerca.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p>Nessun file {fileTypeLabel} disponibile.</p>
+                    <p className={baseStyles.emptyStateText}>
+                      Carica il primo file usando il form sopra.
+                    </p>
+                  </>
+                )}
               </div>
             )}
 
-            {!loading && !error && mediaFiles.length > 0 && (
+            {!loading && !error && filteredMediaFiles.length > 0 && (
               <div className="space-y-2">
-                {mediaFiles.map((file) => (
+                {searchQuery && (
+                  <div className="text-xs text-secondary/60 mb-2">
+                    {filteredMediaFiles.length} file trovati
+                    {allMediaFiles.filter((f) => f.type === fileType).length !==
+                      filteredMediaFiles.length &&
+                      ` (su ${allMediaFiles.filter((f) => f.type === fileType).length} totali)`}
+                  </div>
+                )}
+                {filteredMediaFiles.map((file) => (
                   <button
                     key={file.name}
                     type="button"
