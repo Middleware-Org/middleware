@@ -15,6 +15,7 @@ import type { Category } from "@/lib/github/types";
 import type { Author } from "@/lib/github/types";
 import type { Issue } from "@/lib/github/types";
 import AudioJsonMediaSelector from "./AudioJsonMediaSelector";
+import SelectSearch from "./SelectSearch";
 import { mutate } from "swr";
 
 /* **************************************************
@@ -71,7 +72,7 @@ export default function ArticleMetaPanel({
   formRef,
 }: ArticleMetaPanelProps) {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const [isPending] = useTransition();
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
   const [isAudioSelectorOpen, setIsAudioSelectorOpen] = useState(false);
   const [isAudioChunksSelectorOpen, setIsAudioChunksSelectorOpen] = useState(false);
@@ -82,7 +83,9 @@ export default function ArticleMetaPanel({
   // Sync slug value when article changes
   useEffect(() => {
     if (article?.slug) {
-      setSlugValue(article.slug);
+      setTimeout(() => {
+        setSlugValue(article.slug);
+      }, 0);
     }
   }, [article?.slug]);
 
@@ -184,9 +187,7 @@ export default function ArticleMetaPanel({
               <Sparkles className="w-4 h-4 text-secondary" />
             </button>
           </div>
-          {editing && (
-            <input type="hidden" name="slug" value={article?.slug || ""} />
-          )}
+          {editing && <input type="hidden" name="slug" value={article?.slug || ""} />}
         </div>
 
         <div className={styles.field}>
@@ -203,65 +204,44 @@ export default function ArticleMetaPanel({
           />
         </div>
 
-        <div className={styles.field}>
-          <label htmlFor="author" className={styles.label}>
-            Autore *
-          </label>
-          <select
-            id="author"
-            value={formData.author}
-            onChange={(e) => onFormDataChange("author", e.target.value)}
-            required
-            className={styles.select}
-          >
-            <option value="">Seleziona un autore</option>
-            {authors.map((author) => (
-              <option key={author.slug} value={author.slug}>
-                {author.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        <SelectSearch
+          id="author"
+          label="Autore"
+          value={formData.author}
+          options={authors.map((author) => ({
+            value: author.slug,
+            label: author.name,
+          }))}
+          onChange={(value) => onFormDataChange("author", value)}
+          placeholder="Seleziona un autore"
+          required
+        />
 
-        <div className={styles.field}>
-          <label htmlFor="category" className={styles.label}>
-            Categoria *
-          </label>
-          <select
-            id="category"
-            value={formData.category}
-            onChange={(e) => onFormDataChange("category", e.target.value)}
-            required
-            className={styles.select}
-          >
-            <option value="">Seleziona una categoria</option>
-            {categories.map((category) => (
-              <option key={category.slug} value={category.slug}>
-                {category.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        <SelectSearch
+          id="category"
+          label="Categoria"
+          value={formData.category}
+          options={categories.map((category) => ({
+            value: category.slug,
+            label: category.name,
+          }))}
+          onChange={(value) => onFormDataChange("category", value)}
+          placeholder="Seleziona una categoria"
+          required
+        />
 
-        <div className={styles.field}>
-          <label htmlFor="issue" className={styles.label}>
-            Issue *
-          </label>
-          <select
-            id="issue"
-            value={formData.issue}
-            onChange={(e) => onFormDataChange("issue", e.target.value)}
-            required
-            className={styles.select}
-          >
-            <option value="">Seleziona un&apos;issue</option>
-            {issues.map((issue) => (
-              <option key={issue.slug} value={issue.slug}>
-                {issue.title}
-              </option>
-            ))}
-          </select>
-        </div>
+        <SelectSearch
+          id="issue"
+          label="Issue"
+          value={formData.issue}
+          options={issues.map((issue) => ({
+            value: issue.slug,
+            label: issue.title,
+          }))}
+          onChange={(value) => onFormDataChange("issue", value)}
+          placeholder="Seleziona un'issue"
+          required
+        />
 
         <div className={styles.field}>
           <label htmlFor="excerpt" className={styles.label}>
