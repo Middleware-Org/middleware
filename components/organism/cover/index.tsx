@@ -12,6 +12,7 @@ import ArticleInEvidenceCard from "@/components/molecules/articleInEvidenceCard"
 import { CommonDictionary } from "@/lib/i18n/types";
 import type { Article, Issue } from "@/.velite";
 import Link from "next/link";
+import { getGitHubImageUrl } from "@/lib/github/images";
 
 /* **************************************************
  * Types
@@ -39,7 +40,7 @@ export default function Cover({ issue, articleInEvidence, dict }: CoverProps) {
       <div className={styles.container}>
         <div className={styles.imageWrapper} style={{ backgroundColor: issue.color }}>
           <Image
-            src={issue.cover}
+            src={getGitHubImageUrl(issue.cover)}
             alt={issue.title}
             width={IMAGE_WIDTH}
             height={IMAGE_HEIGHT}
@@ -48,7 +49,11 @@ export default function Cover({ issue, articleInEvidence, dict }: CoverProps) {
           />
           <div className={styles.badgesWrapper}>
             <div className={styles.badgeDate}>
-              <FormattedDate date={issue.date} lang={lang as "it"} className={styles.badgeTextDate} />
+              <FormattedDate
+                date={issue.date}
+                lang={lang as "it"}
+                className={styles.badgeTextDate}
+              />
             </div>
             <div className={styles.badgeTitle}>
               <Link href={`/issues/${issue.slug}`}>

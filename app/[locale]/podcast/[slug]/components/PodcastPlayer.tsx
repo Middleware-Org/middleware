@@ -15,6 +15,7 @@ import Transcript from "./Transcript";
 import { Segment } from "./types";
 import styles from "./PodcastPlayerStyles";
 import { usePodcastBookmarks } from "./hooks/usePodcastBookmarks";
+import { getGitHubMediaUrl } from "@/lib/github/images";
 
 /* **************************************************
  * Types
@@ -63,7 +64,7 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
     backward,
     seek,
   } = useAudioPlayer({
-    audioSrc: article.audio || "",
+    audioSrc: article.audio ? getGitHubMediaUrl(article.audio) : "",
     podcastId,
     totalPositions,
     onTimeUpdate: (newTime) => {
@@ -90,7 +91,8 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
   // Load segments JSON
   useEffect(() => {
     if (article.audio_chunks) {
-      fetch(article.audio_chunks)
+      const chunksUrl = getGitHubMediaUrl(article.audio_chunks);
+      fetch(chunksUrl)
         .then((res) => res.json())
         .then((data: Segment[]) => {
           setSegments(data);
@@ -150,9 +152,11 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
     return null;
   }
 
+  const audioUrl = article.audio ? getGitHubMediaUrl(article.audio) : "";
+
   return (
     <div className={styles.container}>
-      <audio ref={audioRef} src={article.audio} preload="metadata" />
+      <audio ref={audioRef} src={audioUrl} preload="metadata" />
 
       {/* Top Grid: Header + Player */}
       <div className={styles.topGrid}>

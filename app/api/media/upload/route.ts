@@ -16,12 +16,25 @@ export async function POST(request: NextRequest) {
     }
 
     const formData = await request.formData();
-    const fileBase64 = formData.get("file") as string;
+    const fileInput = formData.get("file");
     const filename = formData.get("filename") as string | null;
     const fileType = (formData.get("fileType") as "image" | "audio" | "json") || "image";
 
-    if (!fileBase64) {
+    if (!fileInput) {
       return NextResponse.json({ error: "File is required" }, { status: 400 });
+    }
+
+    // Handle both File objects and base64 strings
+    let fileBase64: string;
+    if (fileInput instanceof File) {
+      // Convert File to base64
+      const arrayBuffer = await fileInput.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      const mimeType = fileInput.type || "image/jpeg";
+      fileBase64 = `data:${mimeType};base64,${buffer.toString("base64")}`;
+    } else {
+      // Already a base64 string
+      fileBase64 = fileInput as string;
     }
 
     const filePath = await uploadMediaFile(
