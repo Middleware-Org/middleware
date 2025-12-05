@@ -103,7 +103,7 @@ export default function MediaListClient() {
             <button
               type="button"
               onClick={() => setSearchQuery("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-secondary/10 rounded transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-secondary/10 transition-colors"
               title="Pulisci ricerca"
             >
               <X className="w-4 h-4 text-secondary" />

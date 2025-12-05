@@ -5,6 +5,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition, useMemo, useEffect, Fragment } from "react";
+import { Hash } from "lucide-react";
 import { deleteIssueAction } from "../actions";
 import { useTableState } from "@/hooks/useTableState";
 import {
@@ -16,6 +17,7 @@ import {
   SortableHeader,
   ColumnSelector,
   type ColumnConfig,
+  ItemsPerPageSelector,
 } from "@/components/table";
 import { SearchInput } from "@/components/search";
 import { Pagination } from "@/components/pagination";
@@ -67,11 +69,13 @@ export default function IssueListClient() {
     totalItems,
     totalPages,
     currentPage,
+    itemsPerPage,
     search,
     sort,
     setSearch,
     setSort,
     setPage,
+    setItemsPerPage,
   } = useTableState<Issue>({
     data: localIssues,
     searchKeys: ["title", "slug", "description"],
@@ -226,8 +230,13 @@ export default function IssueListClient() {
             visibleColumns={visibleColumns}
             onColumnsChange={setVisibleColumns}
           />
-          <div className={baseStyles.textSecondary}>
-            {totalItems} {totalItems === 1 ? "issue" : "issues"}
+          <ItemsPerPageSelector value={itemsPerPage} onChange={setItemsPerPage} />
+          <div
+            className="flex items-center h-[34px] gap-1.5 px-2 py-1 border border-secondary"
+            title={`${totalItems} ${totalItems === 1 ? "issue" : "issues"}`}
+          >
+            <Hash className="h-4 w-4 text-secondary/60" />
+            <span className="text-xs text-secondary/80">{totalItems}</span>
           </div>
         </div>
       </div>

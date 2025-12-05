@@ -142,12 +142,11 @@ export default function MergeButton() {
           ) : (
             <Rocket className={styles.navIcon} />
           )}
-          <span>{isLoading ? "Pubblicando..." : `Pubblica Modifiche`}</span>
-          {aheadBy > 0 && (
-            <span className="absolute -top-1 -right-1 bg-secondary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-              {aheadBy}
-            </span>
-          )}
+          <span>
+            {isLoading
+              ? "Pubblicando..."
+              : `Pubblica Modifiche ${aheadBy > 0 ? `(${aheadBy})` : ""}`}
+          </span>
         </button>
         {error && <div className="mt-1 text-xs text-red-500 px-4">{error}</div>}
       </div>

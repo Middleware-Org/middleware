@@ -23,9 +23,12 @@ export default function PageListSkeleton() {
           <div className="flex-1">
             <div className="h-10 w-full bg-secondary/20 animate-pulse" />
           </div>
-          <div className="h-10 w-32 bg-secondary/20 animate-pulse" />
-          <div className="h-10 w-40 bg-secondary/20 animate-pulse" />
-          <div className="h-6 w-24 bg-secondary/20 animate-pulse" />
+          {/* ColumnSelector (icon only) */}
+          <div className="h-[34px] w-[34px] bg-secondary/20 animate-pulse" />
+          {/* ItemsPerPageSelector (select only) */}
+          <div className="h-[34px] w-14 bg-secondary/20 animate-pulse" />
+          {/* Counter (icon + number) */}
+          <div className="h-[34px] w-16 bg-secondary/20 animate-pulse" />
         </div>
       </div>
 

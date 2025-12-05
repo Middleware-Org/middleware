@@ -9,6 +9,6 @@ export { TableCell } from "./TableCell";
 export { SortableHeader } from "./SortableHeader";
 export { ColumnSelector } from "./ColumnSelector";
 export { SortableTableRow } from "./SortableTableRow";
+export { ItemsPerPageSelector } from "./ItemsPerPageSelector";
 export type { SortDirection } from "./SortableHeader";
 export type { ColumnConfig } from "./ColumnSelector";
-

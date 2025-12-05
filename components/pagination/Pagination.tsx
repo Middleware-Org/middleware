@@ -37,15 +37,23 @@ export function Pagination({ currentPage, totalPages, onPageChange, className }:
   }
 
   return (
-    <div className={cn("flex items-center justify-between px-4 py-3", className)}>
+    <div
+      className={cn(
+        "flex flex-col items-center gap-4 px-4 py-3 border-t border-secondary relative",
+        className,
+      )}
+    >
+      {/* Pagination Buttons - Centered */}
       <div className="flex items-center gap-2">
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
           className={cn(
-            "px-3 py-2 border border-gray-300 rounded-md text-sm",
-            "hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed",
-            "focus:outline-none focus:ring-2 focus:ring-primary",
+            "px-3 py-2 border border-secondary h-[34px] text-sm text-secondary flex items-center justify-center",
+            "hover:bg-tertiary hover:text-white hover:border-tertiary",
+            "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-secondary disabled:hover:border-secondary",
+            "focus:outline-none focus:ring-2 focus:ring-tertiary",
+            "transition-all duration-150",
           )}
         >
           <ChevronLeft className="h-4 w-4" />
@@ -56,13 +64,15 @@ export function Pagination({ currentPage, totalPages, onPageChange, className }:
             <button
               onClick={() => onPageChange(1)}
               className={cn(
-                "px-3 py-2 border border-gray-300 rounded-md text-sm",
-                "hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary",
+                "px-3 py-2 border border-secondary h-[34px] text-sm text-secondary flex items-center justify-center",
+                "hover:bg-tertiary hover:text-white hover:border-tertiary",
+                "focus:outline-none focus:ring-2 focus:ring-tertiary",
+                "transition-all duration-150",
               )}
             >
               1
             </button>
-            {startPage > 2 && <span className="px-2 text-gray-500">...</span>}
+            {startPage > 2 && <span className="px-2 text-secondary/60">...</span>}
           </>
         )}
 
@@ -71,11 +81,12 @@ export function Pagination({ currentPage, totalPages, onPageChange, className }:
             key={page}
             onClick={() => onPageChange(page)}
             className={cn(
-              "px-3 py-2 border rounded-md text-sm",
+              "px-3 py-2 border h-[34px] text-sm font-medium flex items-center justify-center",
+              "focus:outline-none focus:ring-2 focus:ring-tertiary",
+              "transition-all duration-150",
               page === currentPage
-                ? "bg-primary text-white border-primary"
-                : "border-gray-300 hover:bg-gray-50",
-              "focus:outline-none focus:ring-2 focus:ring-primary",
+                ? "bg-tertiary text-white border-tertiary"
+                : "border-secondary text-secondary hover:bg-tertiary hover:text-white hover:border-tertiary",
             )}
           >
             {page}
@@ -84,12 +95,14 @@ export function Pagination({ currentPage, totalPages, onPageChange, className }:
 
         {endPage < totalPages && (
           <>
-            {endPage < totalPages - 1 && <span className="px-2 text-gray-500">...</span>}
+            {endPage < totalPages - 1 && <span className="px-2 text-secondary/60">...</span>}
             <button
               onClick={() => onPageChange(totalPages)}
               className={cn(
-                "px-3 py-2 border border-gray-300 rounded-md text-sm",
-                "hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary",
+                "px-3 py-2 border border-secondary h-[34px] text-sm text-secondary flex items-center justify-center",
+                "hover:bg-tertiary hover:text-white hover:border-tertiary",
+                "focus:outline-none focus:ring-2 focus:ring-tertiary",
+                "transition-all duration-150",
               )}
             >
               {totalPages}
@@ -101,16 +114,19 @@ export function Pagination({ currentPage, totalPages, onPageChange, className }:
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
           className={cn(
-            "px-3 py-2 border border-gray-300 rounded-md text-sm",
-            "hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed",
-            "focus:outline-none focus:ring-2 focus:ring-primary",
+            "px-3 py-2 border border-secondary h-[34px] text-sm text-secondary flex items-center justify-center",
+            "hover:bg-tertiary hover:text-white hover:border-tertiary",
+            "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-secondary disabled:hover:border-secondary",
+            "focus:outline-none focus:ring-2 focus:ring-tertiary",
+            "transition-all duration-150",
           )}
         >
           <ChevronRight className="h-4 w-4" />
         </button>
       </div>
 
-      <div className="text-sm text-gray-700">
+      {/* Page Info - Below buttons */}
+      <div className="text-sm text-secondary/80 absolute right-4 top-1/2 -translate-y-1/2">
         Pagina {currentPage} di {totalPages}
       </div>
     </div>

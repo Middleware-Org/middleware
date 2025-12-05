@@ -72,7 +72,7 @@ export const Citation = Node.create({
       "span",
       mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
         class:
-          "citation inline-flex items-center justify-center min-w-[1.5em] h-[1.5em] px-1 mx-1 text-xs font-semibold bg-tertiary/20 text-tertiary border border-tertiary rounded cursor-pointer hover:bg-tertiary/30",
+          "citation inline-flex items-center justify-center min-w-[1.5em] h-[1.5em] px-1 mx-1 text-xs font-semibold bg-tertiary/20 text-tertiary border border-tertiary cursor-pointer hover:bg-tertiary/30",
         "data-citation-id": citationId,
         "data-citation-text": node?.attrs?.citationText || HTMLAttributes?.citationText || "",
       }),
@@ -84,7 +84,7 @@ export const Citation = Node.create({
     return ({ node, getPos, editor }) => {
       const dom = document.createElement("span");
       dom.className =
-        "citation inline-flex items-center justify-center min-w-[1.5em] h-[1.5em] px-1 mx-1 text-xs font-semibold bg-tertiary/20 text-tertiary border border-tertiary rounded cursor-pointer hover:bg-tertiary/30";
+        "citation inline-flex items-center justify-center min-w-[1.5em] h-[1.5em] px-1 mx-1 text-xs font-semibold bg-tertiary/20 text-tertiary border border-tertiary cursor-pointer hover:bg-tertiary/30";
       dom.setAttribute("data-citation-id", node.attrs.citationId || "");
       dom.setAttribute("data-citation-text", node.attrs.citationText || "");
       dom.contentEditable = "false";

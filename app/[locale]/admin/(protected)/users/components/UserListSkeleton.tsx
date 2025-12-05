@@ -17,9 +17,19 @@ export default function UserListSkeleton() {
         </div>
       </div>
 
-      {/* Search Skeleton */}
+      {/* Search and Filters Skeleton */}
       <div className="bg-primary p-4 border border-secondary mb-4">
-        <div className="h-10 w-full bg-secondary/20 animate-pulse" />
+        <div className="flex items-center gap-4">
+          <div className="flex-1">
+            <div className="h-10 w-full bg-secondary/20 animate-pulse" />
+          </div>
+          {/* ColumnSelector (icon only) */}
+          <div className="h-[34px] w-[34px] bg-secondary/20 animate-pulse" />
+          {/* ItemsPerPageSelector (select only) */}
+          <div className="h-[34px] w-14 bg-secondary/20 animate-pulse" />
+          {/* Counter (icon + number) */}
+          <div className="h-[34px] w-16 bg-secondary/20 animate-pulse" />
+        </div>
       </div>
 
       {/* Table Skeleton */}

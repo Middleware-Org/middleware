@@ -5,6 +5,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition, useMemo, useEffect, Fragment } from "react";
+import { Hash } from "lucide-react";
 import { deleteUserAction } from "../actions";
 import { useTableState } from "@/hooks/useTableState";
 import {
@@ -25,6 +26,7 @@ import baseStyles from "../../styles";
 import type { User } from "@/lib/github/users";
 import { useUsers } from "@/hooks/swr";
 import { mutate } from "swr";
+import { ItemsPerPageSelector } from "@/components/table/ItemsPerPageSelector";
 
 /* **************************************************
  * Column Configuration
@@ -62,11 +64,13 @@ export default function UserListClient() {
     totalItems,
     totalPages,
     currentPage,
+    itemsPerPage,
     search,
     sort,
     setSearch,
     setSort,
     setPage,
+    setItemsPerPage,
   } = useTableState<User>({
     data: localUsers,
     searchKeys: ["email", "name"],
@@ -190,8 +194,13 @@ export default function UserListClient() {
             visibleColumns={visibleColumns}
             onColumnsChange={setVisibleColumns}
           />
-          <div className={baseStyles.textSecondary}>
-            {totalItems} {totalItems === 1 ? "utente" : "utenti"}
+          <ItemsPerPageSelector value={itemsPerPage} onChange={setItemsPerPage} />
+          <div
+            className="flex items-center h-[34px] gap-1.5 px-2 py-1 border border-secondary"
+            title={`${totalItems} ${totalItems === 1 ? "utente" : "utenti"}`}
+          >
+            <Hash className="h-4 w-4 text-secondary/60" />
+            <span className="text-xs text-secondary/80">{totalItems}</span>
           </div>
         </div>
       </div>
@@ -267,4 +276,3 @@ export default function UserListClient() {
     </div>
   );
 }
-

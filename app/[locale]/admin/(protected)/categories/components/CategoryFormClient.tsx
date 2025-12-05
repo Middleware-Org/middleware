@@ -209,7 +209,7 @@ export default function CategoryFormClient({ categorySlug }: CategoryFormClientP
             <button
               type="button"
               onClick={handleGenerateSlug}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 hover:bg-tertiary/10 rounded transition-colors duration-150"
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 h-[34px] w-[34px] hover:bg-tertiary/10 transition-colors duration-150"
               title="Genera slug dal nome"
             >
               <Sparkles className="w-4 h-4 text-secondary" />
