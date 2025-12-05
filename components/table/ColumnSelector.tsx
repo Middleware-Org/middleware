@@ -78,32 +78,38 @@ export function ColumnSelector({
     <div className={cn("relative", className || "")} ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
+        title="Colonne visibili"
         className={cn(
-          "flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-md",
-          "hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary",
-          "text-sm font-medium text-gray-700",
+          "flex items-center justify-center p-2 border border-secondary rounded-md",
+          "hover:bg-tertiary/10 focus:outline-none focus:ring-2 focus:ring-tertiary",
+          "text-secondary transition-all duration-150",
         )}
       >
         <Settings2 className="h-4 w-4" />
-        Colonne
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-md shadow-lg z-50">
-          <div className="p-2 border-b border-gray-200">
+        <div className="absolute right-0 mt-2 w-56 bg-primary border border-secondary rounded-md shadow-lg z-50">
+          <div className="p-2 border-b border-secondary">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold text-gray-700">Colonne visibili</span>
+              <span className="text-xs font-semibold text-secondary">Colonne visibili</span>
               <div className="flex gap-1">
-                <button onClick={showAll} className="text-xs text-primary hover:underline">
+                <button
+                  onClick={showAll}
+                  className="text-xs text-tertiary hover:text-tertiary/80 hover:underline transition-colors"
+                >
                   Tutte
                 </button>
-                <span className="text-gray-300">|</span>
-                <button onClick={hideAll} className="text-xs text-gray-600 hover:underline">
+                <span className="text-secondary/30">|</span>
+                <button
+                  onClick={hideAll}
+                  className="text-xs text-secondary/60 hover:text-secondary hover:underline transition-colors"
+                >
                   Nessuna
                 </button>
               </div>
             </div>
-            <div className="text-xs text-gray-500">
+            <div className="text-xs text-secondary/60">
               {visibleColumns.length} di {columns.length} colonne
             </div>
           </div>
@@ -114,7 +120,7 @@ export function ColumnSelector({
                 <label
                   key={column.key}
                   className={cn(
-                    "flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-50",
+                    "flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-tertiary/10 transition-colors",
                     !isVisible ? "opacity-50" : "",
                   )}
                 >
@@ -123,11 +129,11 @@ export function ColumnSelector({
                     checked={isVisible}
                     onChange={() => toggleColumn(column.key)}
                     disabled={isVisible && visibleColumns.length === 1}
-                    className="rounded border-gray-300 text-primary focus:ring-primary"
+                    className="rounded border-secondary text-tertiary focus:ring-tertiary"
                     aria-label={`Toggle ${column.label} column`}
                   />
-                  <span className="text-sm text-gray-700 flex-1">{column.label}</span>
-                  {isVisible && <Check className="h-4 w-4 text-primary" />}
+                  <span className="text-sm text-secondary flex-1">{column.label}</span>
+                  {isVisible && <Check className="h-4 w-4 text-tertiary" />}
                 </label>
               );
             })}

@@ -26,16 +26,16 @@ export function ItemsPerPageSelector({
   className,
 }: ItemsPerPageSelectorProps) {
   return (
-    <div className={cn("flex items-center gap-1.5", className)}>
-      <label className="text-xs text-secondary/60 whitespace-nowrap">Per pagina:</label>
+    <div className={cn("flex items-center gap-1.5", className)} title="Elementi per pagina">
       <select
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
         className={cn(
           baseStyles.input,
-          "w-14 h-8 px-2 py-1 text-xs text-sm",
-          "border-secondary",
+          "w-14 h-8 p-0! text-xs",
+          "border-secondary rounded-md h-[34px]",
         )}
+        aria-label="Elementi per pagina"
       >
         {options.map((option) => (
           <option key={option} value={option}>

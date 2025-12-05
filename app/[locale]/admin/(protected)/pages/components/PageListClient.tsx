@@ -5,6 +5,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition, useMemo, Fragment } from "react";
+import { Hash } from "lucide-react";
 import { deletePageAction } from "../actions";
 import { useTableState } from "@/hooks/useTableState";
 import {
@@ -186,8 +187,12 @@ export default function PageListClient() {
             onColumnsChange={setVisibleColumns}
           />
           <ItemsPerPageSelector value={itemsPerPage} onChange={setItemsPerPage} />
-          <div className={baseStyles.textSecondary}>
-            {totalItems} {totalItems === 1 ? "pagina" : "pagine"}
+          <div
+            className="flex items-center h-[34px] gap-1.5 px-2 py-1 border border-secondary rounded-md"
+            title={`${totalItems} ${totalItems === 1 ? "pagina" : "pagine"}`}
+          >
+            <Hash className="h-4 w-4 text-secondary/60" />
+            <span className="text-xs text-secondary/80">{totalItems}</span>
           </div>
         </div>
       </div>

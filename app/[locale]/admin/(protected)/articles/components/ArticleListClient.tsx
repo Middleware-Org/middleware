@@ -5,7 +5,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition, useMemo, Fragment, useRef, useEffect } from "react";
-import { Filter, X } from "lucide-react";
+import { Filter, X, Hash } from "lucide-react";
 import { deleteArticleAction } from "../actions";
 import { useTableState } from "@/hooks/useTableState";
 import {
@@ -296,17 +296,17 @@ export default function ArticleListClient() {
           <div className="relative" ref={filtersRef}>
             <button
               onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+              title="Filtri avanzati"
               className={cn(
-                "flex items-center gap-2 px-3 py-2 border border-secondary rounded-md",
+                "flex items-center justify-center p-2 border border-secondary rounded-md relative",
                 "hover:bg-tertiary/10 focus:outline-none focus:ring-2 focus:ring-tertiary",
-                "text-sm font-medium transition-all duration-150",
+                "transition-all duration-150",
                 activeFiltersCount > 0 ? "bg-tertiary/20 border-tertiary" : undefined,
               )}
             >
               <Filter className="h-4 w-4" />
-              Filtri
               {activeFiltersCount > 0 && (
-                <span className="px-2 py-0.5 text-xs bg-tertiary text-white rounded-full">
+                <span className="absolute -top-1 -right-1 px-1.5 py-0.5 text-xs bg-tertiary text-white rounded-full min-w-[18px] text-center">
                   {activeFiltersCount}
                 </span>
               )}
@@ -371,19 +371,18 @@ export default function ArticleListClient() {
               </div>
             )}
           </div>
-        </div>
-        {/* Secondary controls row */}
-        <div className="flex items-center justify-between gap-4 mt-3 pt-3 border-t border-secondary">
-          <div className="flex items-center gap-3">
-            <ColumnSelector
-              columns={columnConfig}
-              visibleColumns={visibleColumns}
-              onColumnsChange={setVisibleColumns}
-            />
-            <ItemsPerPageSelector value={itemsPerPage} onChange={setItemsPerPage} />
-          </div>
-          <div className={cn(baseStyles.textSecondary, "text-xs")}>
-            {totalItems} {totalItems === 1 ? "articolo" : "articoli"}
+          <ColumnSelector
+            columns={columnConfig}
+            visibleColumns={visibleColumns}
+            onColumnsChange={setVisibleColumns}
+          />
+          <ItemsPerPageSelector value={itemsPerPage} onChange={setItemsPerPage} />
+          <div
+            className="flex items-center h-[34px] gap-1.5 px-2 py-1 border border-secondary rounded-md"
+            title={`${totalItems} ${totalItems === 1 ? "articolo" : "articoli"}`}
+          >
+            <Hash className="h-4 w-4 text-secondary/60" />
+            <span className="text-xs text-secondary/80">{totalItems}</span>
           </div>
         </div>
 

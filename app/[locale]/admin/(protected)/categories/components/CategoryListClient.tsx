@@ -5,6 +5,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition, useMemo, useEffect, Fragment } from "react";
+import { Hash } from "lucide-react";
 import { deleteCategoryAction } from "../actions";
 import { useTableState } from "@/hooks/useTableState";
 import {
@@ -21,6 +22,7 @@ import {
 import { SearchInput } from "@/components/search";
 import { Pagination } from "@/components/pagination";
 import ConfirmDialog from "@/components/molecules/confirmDialog";
+import { cn } from "@/lib/utils/classes";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Category } from "@/lib/github/types";
@@ -190,8 +192,12 @@ export default function CategoryListClient() {
             onColumnsChange={setVisibleColumns}
           />
           <ItemsPerPageSelector value={itemsPerPage} onChange={setItemsPerPage} />
-          <div className={baseStyles.textSecondary}>
-            {totalItems} {totalItems === 1 ? "categoria" : "categorie"}
+          <div
+            className="flex items-center h-[34px] gap-1.5 px-2 py-1 border border-secondary rounded-md"
+            title={`${totalItems} ${totalItems === 1 ? "categoria" : "categorie"}`}
+          >
+            <Hash className="h-4 w-4 text-secondary/60" />
+            <span className="text-xs text-secondary/80">{totalItems}</span>
           </div>
         </div>
       </div>
