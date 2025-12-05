@@ -35,11 +35,10 @@ export default function CitationModal({
 
   useEffect(() => {
     if (isOpen) {
-      setText(currentCitationText || "");
-      // Focus textarea quando il modal si apre
       setTimeout(() => {
+        setText(currentCitationText || "");
         textareaRef.current?.focus();
-      }, 100);
+      }, 0);
     }
   }, [isOpen, currentCitationText]);
 

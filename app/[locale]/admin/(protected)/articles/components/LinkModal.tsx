@@ -26,11 +26,10 @@ export default function LinkModal({ isOpen, onClose, onInsert, currentUrl }: Lin
 
   useEffect(() => {
     if (isOpen) {
-      setUrl(currentUrl || "");
-      // Focus input quando il modal si apre
       setTimeout(() => {
+        setUrl(currentUrl || "");
         inputRef.current?.focus();
-      }, 100);
+      }, 0);
     }
   }, [isOpen, currentUrl]);
 
