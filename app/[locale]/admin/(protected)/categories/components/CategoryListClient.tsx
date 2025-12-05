@@ -193,7 +193,7 @@ export default function CategoryListClient() {
           />
           <ItemsPerPageSelector value={itemsPerPage} onChange={setItemsPerPage} />
           <div
-            className="flex items-center h-[34px] gap-1.5 px-2 py-1 border border-secondary rounded-md"
+            className="flex items-center h-[34px] gap-1.5 px-2 py-1 border border-secondary"
             title={`${totalItems} ${totalItems === 1 ? "categoria" : "categorie"}`}
           >
             <Hash className="h-4 w-4 text-secondary/60" />

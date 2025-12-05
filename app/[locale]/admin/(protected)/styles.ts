@@ -38,7 +38,7 @@ const styles = {
   statCount: cn("text-3xl font-bold text-tertiary"),
   statLink: cn("text-sm text-secondary/60 hover:text-tertiary transition-colors"),
   // Recent articles
-  recentSection: cn("bg-primary border border-secondary p-6 rounded-lg"),
+  recentSection: cn("bg-primary border border-secondary p-6"),
   recentSectionHeader: cn("flex items-center justify-between mb-6"),
   recentSectionTitle: cn("text-xl font-semibold text-secondary"),
   recentSectionLink: cn(
@@ -47,20 +47,20 @@ const styles = {
   ),
   recentGrid: cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"),
   recentCard: cn(
-    "bg-primary border border-secondary p-4 rounded-lg",
+    "bg-primary border border-secondary p-4",
     "hover:border-tertiary hover:shadow-md transition-all duration-150",
     "flex flex-col",
   ),
   recentCardHeader: cn("flex items-start justify-between gap-2 mb-2"),
   recentCardTitle: cn("text-base font-semibold text-secondary line-clamp-2 flex-1"),
   recentBadge: cn(
-    "text-xs bg-tertiary/10 text-tertiary px-2 py-1 font-medium border border-tertiary rounded",
+    "text-xs bg-tertiary/10 text-tertiary px-2 py-1 font-medium border border-tertiary",
     "shrink-0",
   ),
   recentCardExcerpt: cn("text-sm text-secondary/80 mb-3 line-clamp-2"),
   recentCardMeta: cn("flex items-center justify-between gap-2 pt-3 border-t border-secondary"),
   recentCardDate: cn("text-xs text-secondary/60"),
-  recentCardSlug: cn("text-xs text-secondary/40 font-mono bg-secondary/10 px-2 py-1 rounded"),
+  recentCardSlug: cn("text-xs text-secondary/40 font-mono bg-secondary/10 px-2 py-1"),
   // Legacy styles (kept for compatibility)
   list: cn("space-y-3"),
   listItem: cn("p-4 border border-secondary hover:bg-tertiary/10 transition-colors duration-150"),

@@ -51,7 +51,7 @@ export default function SWRCacheIndicator() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 bg-black/80 text-white p-4 rounded-lg text-xs max-w-md z-50 shadow-lg">
+    <div className="fixed bottom-4 right-4 bg-black/80 text-white p-4 text-xs max-w-md z-50 shadow-lg">
       <div className="font-bold mb-2 text-sm">SWR Cache Status</div>
       <div className="mb-2">
         <strong>Cache Keys:</strong> {cacheState.length}
@@ -63,7 +63,7 @@ export default function SWRCacheIndicator() {
       ) : (
         <div className="max-h-64 overflow-y-auto">
           {cacheState.map((entry) => (
-            <div key={entry.key} className="mb-2 p-2 bg-white/10 rounded">
+            <div key={entry.key} className="mb-2 p-2 bg-white/10">
               <div className="font-mono text-xs break-all">{entry.key}</div>
               <div className={entry.hasData ? "text-green-400" : "text-red-400"}>
                 {entry.hasData ? "✓ Cached" : "✗ Not cached"}

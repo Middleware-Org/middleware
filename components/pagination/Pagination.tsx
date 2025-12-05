@@ -49,7 +49,7 @@ export function Pagination({ currentPage, totalPages, onPageChange, className }:
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
           className={cn(
-            "px-3 py-2 border border-secondary rounded-md text-sm text-secondary",
+            "px-3 py-2 border border-secondary h-[34px] text-sm text-secondary flex items-center justify-center",
             "hover:bg-tertiary hover:text-white hover:border-tertiary",
             "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-secondary disabled:hover:border-secondary",
             "focus:outline-none focus:ring-2 focus:ring-tertiary",
@@ -64,7 +64,7 @@ export function Pagination({ currentPage, totalPages, onPageChange, className }:
             <button
               onClick={() => onPageChange(1)}
               className={cn(
-                "px-3 py-2 border border-secondary rounded-md text-sm text-secondary",
+                "px-3 py-2 border border-secondary h-[34px] text-sm text-secondary flex items-center justify-center",
                 "hover:bg-tertiary hover:text-white hover:border-tertiary",
                 "focus:outline-none focus:ring-2 focus:ring-tertiary",
                 "transition-all duration-150",
@@ -81,7 +81,7 @@ export function Pagination({ currentPage, totalPages, onPageChange, className }:
             key={page}
             onClick={() => onPageChange(page)}
             className={cn(
-              "px-3 py-2 border rounded-md text-sm font-medium",
+              "px-3 py-2 border h-[34px] text-sm font-medium flex items-center justify-center",
               "focus:outline-none focus:ring-2 focus:ring-tertiary",
               "transition-all duration-150",
               page === currentPage
@@ -99,7 +99,7 @@ export function Pagination({ currentPage, totalPages, onPageChange, className }:
             <button
               onClick={() => onPageChange(totalPages)}
               className={cn(
-                "px-3 py-2 border border-secondary rounded-md text-sm text-secondary",
+                "px-3 py-2 border border-secondary h-[34px] text-sm text-secondary flex items-center justify-center",
                 "hover:bg-tertiary hover:text-white hover:border-tertiary",
                 "focus:outline-none focus:ring-2 focus:ring-tertiary",
                 "transition-all duration-150",
@@ -114,7 +114,7 @@ export function Pagination({ currentPage, totalPages, onPageChange, className }:
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
           className={cn(
-            "px-3 py-2 border border-secondary rounded-md text-sm text-secondary",
+            "px-3 py-2 border border-secondary h-[34px] text-sm text-secondary flex items-center justify-center",
             "hover:bg-tertiary hover:text-white hover:border-tertiary",
             "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-secondary disabled:hover:border-secondary",
             "focus:outline-none focus:ring-2 focus:ring-tertiary",

@@ -151,7 +151,7 @@ export default function SelectSearch({
           <button
             type="button"
             onClick={handleClear}
-            className="p-1 hover:bg-secondary/10 rounded transition-colors shrink-0"
+            className="p-1 hover:bg-secondary/10 transition-colors shrink-0"
             title="Rimuovi selezione"
           >
             <X className="w-4 h-4 text-secondary" />
@@ -218,7 +218,7 @@ export default function SelectSearch({
                         type="button"
                         onClick={() => handleSelect(option.value)}
                         className={cn(
-                          "w-full text-left px-4 py-3 rounded transition-all duration-150",
+                          "w-full text-left px-4 py-3 transition-all duration-150",
                           "hover:bg-tertiary/10 hover:border-tertiary",
                           isSelected
                             ? "bg-tertiary/20 border border-tertiary font-medium text-tertiary"

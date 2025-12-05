@@ -80,7 +80,7 @@ export function ColumnSelector({
         onClick={() => setIsOpen(!isOpen)}
         title="Colonne visibili"
         className={cn(
-          "flex items-center justify-center p-2 border border-secondary rounded-md",
+          "flex items-center justify-center p-2 border border-secondary h-[34px]",
           "hover:bg-tertiary/10 focus:outline-none focus:ring-2 focus:ring-tertiary",
           "text-secondary transition-all duration-150",
         )}
@@ -89,7 +89,7 @@ export function ColumnSelector({
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 bg-primary border border-secondary rounded-md shadow-lg z-50">
+        <div className="absolute right-0 mt-2 w-56 bg-primary border border-secondary shadow-lg z-50">
           <div className="p-2 border-b border-secondary">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-semibold text-secondary">Colonne visibili</span>
@@ -129,7 +129,7 @@ export function ColumnSelector({
                     checked={isVisible}
                     onChange={() => toggleColumn(column.key)}
                     disabled={isVisible && visibleColumns.length === 1}
-                    className="rounded border-secondary text-tertiary focus:ring-tertiary"
+                    className="border-secondary text-tertiary focus:ring-tertiary"
                     aria-label={`Toggle ${column.label} column`}
                   />
                   <span className="text-sm text-secondary flex-1">{column.label}</span>

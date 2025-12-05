@@ -298,7 +298,7 @@ export default function ArticleListClient() {
               onClick={() => setIsFiltersOpen(!isFiltersOpen)}
               title="Filtri avanzati"
               className={cn(
-                "flex items-center justify-center p-2 border border-secondary rounded-md relative",
+                "flex items-center justify-center p-2 border border-secondary h-[34px] relative",
                 "hover:bg-tertiary/10 focus:outline-none focus:ring-2 focus:ring-tertiary",
                 "transition-all duration-150",
                 activeFiltersCount > 0 ? "bg-tertiary/20 border-tertiary" : undefined,
@@ -306,14 +306,14 @@ export default function ArticleListClient() {
             >
               <Filter className="h-4 w-4" />
               {activeFiltersCount > 0 && (
-                <span className="absolute -top-1 -right-1 px-1.5 py-0.5 text-xs bg-tertiary text-white rounded-full min-w-[18px] text-center">
+                <span className="absolute -top-1 -right-1 px-1.5 py-0.5 text-xs bg-tertiary text-white min-w-[18px] text-center">
                   {activeFiltersCount}
                 </span>
               )}
             </button>
 
             {isFiltersOpen && (
-              <div className="absolute right-0 mt-2 w-80 bg-primary border border-secondary rounded-md shadow-lg z-50">
+              <div className="absolute right-0 mt-2 w-80 bg-primary border border-secondary shadow-lg z-50">
                 <div className="p-4 border-b border-secondary">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-sm font-semibold text-secondary">Filtri Avanzati</h3>
@@ -378,7 +378,7 @@ export default function ArticleListClient() {
           />
           <ItemsPerPageSelector value={itemsPerPage} onChange={setItemsPerPage} />
           <div
-            className="flex items-center h-[34px] gap-1.5 px-2 py-1 border border-secondary rounded-md"
+            className="flex items-center h-[34px] gap-1.5 px-2 py-1 border border-secondary"
             title={`${totalItems} ${totalItems === 1 ? "articolo" : "articoli"}`}
           >
             <Hash className="h-4 w-4 text-secondary/60" />
@@ -394,7 +394,7 @@ export default function ArticleListClient() {
               return (
                 <div
                   key={key}
-                  className="flex items-center gap-2 px-3 py-1 bg-tertiary/20 border border-tertiary rounded-md text-sm"
+                  className="flex items-center gap-2 px-3 py-1 bg-tertiary/20 border border-tertiary text-sm"
                 >
                   <span className="text-secondary/60 capitalize">{key}:</span>
                   <span className="text-secondary">{getFilterLabel(key, value as string)}</span>

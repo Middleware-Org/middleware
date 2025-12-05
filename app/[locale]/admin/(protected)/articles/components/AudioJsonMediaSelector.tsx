@@ -192,7 +192,7 @@ export default function AudioJsonMediaSelector({
 
               {preview ? (
                 <div className="relative">
-                  <div className="p-4 border border-secondary rounded bg-primary">
+                  <div className="p-4 border border-secondary bg-primary">
                     <p className="text-sm text-secondary">
                       File selezionato: {fileInputRef.current?.files?.[0]?.name || "file"}
                     </p>
@@ -270,7 +270,7 @@ export default function AudioJsonMediaSelector({
                 <button
                   type="button"
                   onClick={() => setSearchQuery("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-secondary/10 rounded transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-secondary/10 transition-colors"
                   title="Pulisci ricerca"
                 >
                   <X className="w-4 h-4 text-secondary" />
@@ -319,7 +319,7 @@ export default function AudioJsonMediaSelector({
                     key={file.name}
                     type="button"
                     onClick={() => handleSelect(file.url)}
-                    className="w-full p-3 border border-secondary rounded hover:bg-tertiary/10 transition-colors text-left"
+                    className="w-full p-3 border border-secondary hover:bg-tertiary/10 transition-colors text-left"
                   >
                     <div className="flex items-center justify-between">
                       <div>

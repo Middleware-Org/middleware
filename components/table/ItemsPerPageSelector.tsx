@@ -30,11 +30,7 @@ export function ItemsPerPageSelector({
       <select
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        className={cn(
-          baseStyles.input,
-          "w-14 h-8 p-0! text-xs",
-          "border-secondary rounded-md h-[34px]",
-        )}
+        className={cn(baseStyles.input, "w-14 h-8 p-0! text-xs", "border-secondary h-[34px]")}
         aria-label="Elementi per pagina"
       >
         {options.map((option) => (
