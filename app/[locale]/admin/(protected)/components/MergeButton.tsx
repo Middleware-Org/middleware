@@ -70,10 +70,6 @@ export default function MergeButton() {
         // Invalidate the merge check cache to refresh the status
         mutate("/api/github/merge/check");
         setShowSuccessDialog(true);
-        // Refresh the page after a short delay
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
       } else {
         if (data.conflict) {
           setPublishError("Conflitto di merge rilevato. Risolvi manualmente.");

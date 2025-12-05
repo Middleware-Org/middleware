@@ -85,15 +85,11 @@ export default function PageFormClient({ pageSlug }: PageFormClientProps) {
   // Aggiorna lo stato quando la pagina viene caricata
   useEffect(() => {
     if (page) {
-      setTimeout(() => {
-        setContent(page.content);
-      }, 0);
-      setTimeout(() => {
-        setFormData({
-          title: page.title || "",
-          excerpt: page.excerpt || "",
-        });
-      }, 0);
+      setContent(page.content);
+      setFormData({
+        title: page.title || "",
+        excerpt: page.excerpt || "",
+      });
     }
   }, [page]);
 

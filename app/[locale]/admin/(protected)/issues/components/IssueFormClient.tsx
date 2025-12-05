@@ -201,9 +201,9 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
         mutate(`/api/issues/${issueSlug}`);
       }
       mutate("/api/github/merge/check");
+      // Reset coverImage before navigation (component will unmount anyway)
+      setCoverImage("");
       router.push("/admin/issues");
-      // Reset coverImage after navigation
-      setTimeout(() => setCoverImage(""), 0);
     }
   }, [state, router, editing, issueSlug]);
 
