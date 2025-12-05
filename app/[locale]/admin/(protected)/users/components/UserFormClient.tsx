@@ -71,11 +71,9 @@ export default function UserFormClient({ userId }: UserFormClientProps) {
   useEffect(() => {
     if (state?.success) {
       formRef.current?.reset();
-      // Reset password state in next tick to avoid cascading renders
-      setTimeout(() => {
-        setPassword("");
-        setPasswordError(null);
-      }, 0);
+      // Reset password state before navigation (component will unmount anyway)
+      setPassword("");
+      setPasswordError(null);
       // Invalida la cache SWR per forzare il refetch della lista
       mutate("/api/users");
       if (editing && userId) {

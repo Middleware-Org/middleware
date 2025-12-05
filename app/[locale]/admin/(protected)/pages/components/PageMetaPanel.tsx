@@ -58,24 +58,21 @@ export default function PageMetaPanel({
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
   const [isDeleting, startDeleteTransition] = useTransition();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [slugValue, setSlugValue] = useState(page?.slug || "");
+  // Use null to indicate "not modified by user", otherwise use the user's custom value
+  const [slugValue, setSlugValue] = useState<string | null>(null);
 
-  // Sync slug value when page changes
-  useEffect(() => {
-    if (page?.slug) {
-      setSlugValue(page.slug);
-    }
-  }, [page?.slug]);
+  // Derive current slug: use modified value if exists, otherwise fall back to page slug
+  const currentSlug = slugValue ?? page?.slug ?? "";
 
-  // Update hidden input when slugValue changes
+  // Update hidden input when currentSlug changes
   useEffect(() => {
     const slugInput = formRef.current?.querySelector(
       editing ? 'input[name="newSlug"]' : 'input[name="slug"]',
     ) as HTMLInputElement;
     if (slugInput) {
-      slugInput.value = slugValue;
+      slugInput.value = currentSlug;
     }
-  }, [slugValue, formRef, editing]);
+  }, [currentSlug, formRef, editing]);
 
   // Handler per generare lo slug dal titolo
   function handleGenerateSlug() {
@@ -166,7 +163,7 @@ export default function PageMetaPanel({
               type="text"
               id={editing ? "newSlug" : "slug"}
               name={editing ? "newSlug" : "slug"}
-              value={slugValue}
+              value={currentSlug}
               onChange={(e) => setSlugValue(e.target.value)}
               className={styles.input}
               placeholder={
