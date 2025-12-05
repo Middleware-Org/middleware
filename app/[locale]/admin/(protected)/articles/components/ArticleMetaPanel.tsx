@@ -79,35 +79,26 @@ export default function ArticleMetaPanel({
   const [isAudioChunksSelectorOpen, setIsAudioChunksSelectorOpen] = useState(false);
   const [isDeleting, startDeleteTransition] = useTransition();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [slugValue, setSlugValue] = useState(article?.slug || "");
+  // Use null to indicate "not modified by user", otherwise use the user's custom value
+  const [slugValue, setSlugValue] = useState<string | null>(null);
 
-  // Sync slug value when article changes
-  useEffect(() => {
-    if (article?.slug) {
-      setTimeout(() => {
-        setSlugValue(article.slug);
-      }, 0);
-    }
-  }, [article?.slug]);
+  // Derive current slug: use modified value if exists, otherwise fall back to article slug
+  const currentSlug = slugValue ?? article?.slug ?? "";
 
-  // Update hidden input when slugValue changes
+  // Update hidden input when currentSlug changes
   useEffect(() => {
     const slugInput = formRef.current?.querySelector('input[name="newSlug"]') as HTMLInputElement;
     if (slugInput) {
-      slugInput.value = slugValue;
+      slugInput.value = currentSlug;
     }
-  }, [slugValue, formRef]);
+  }, [currentSlug, formRef]);
 
   // Handler per generare lo slug dal titolo
   function handleGenerateSlug() {
     if (formData.title) {
       const generatedSlug = generateSlug(formData.title);
       setSlugValue(generatedSlug);
-      // Aggiorna anche l'input nel form
-      const slugInput = formRef.current?.querySelector('input[name="newSlug"]') as HTMLInputElement;
-      if (slugInput) {
-        slugInput.value = generatedSlug;
-      }
+      // The useEffect will automatically update the hidden input
     }
   }
 
@@ -171,7 +162,7 @@ export default function ArticleMetaPanel({
               id="newSlug"
               name="newSlug"
               type="text"
-              value={slugValue}
+              value={currentSlug}
               onChange={(e) => {
                 setSlugValue(e.target.value);
               }}
