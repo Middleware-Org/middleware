@@ -25,6 +25,7 @@ import baseStyles from "../../styles";
 import type { User } from "@/lib/github/users";
 import { useUsers } from "@/hooks/swr";
 import { mutate } from "swr";
+import { ItemsPerPageSelector } from "@/components/table/ItemsPerPageSelector";
 
 /* **************************************************
  * Column Configuration
@@ -62,11 +63,13 @@ export default function UserListClient() {
     totalItems,
     totalPages,
     currentPage,
+    itemsPerPage,
     search,
     sort,
     setSearch,
     setSort,
     setPage,
+    setItemsPerPage,
   } = useTableState<User>({
     data: localUsers,
     searchKeys: ["email", "name"],
@@ -190,6 +193,7 @@ export default function UserListClient() {
             visibleColumns={visibleColumns}
             onColumnsChange={setVisibleColumns}
           />
+          <ItemsPerPageSelector value={itemsPerPage} onChange={setItemsPerPage} />
           <div className={baseStyles.textSecondary}>
             {totalItems} {totalItems === 1 ? "utente" : "utenti"}
           </div>
@@ -267,4 +271,3 @@ export default function UserListClient() {
     </div>
   );
 }
-

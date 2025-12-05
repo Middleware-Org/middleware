@@ -40,6 +40,7 @@ export function useTableState<T extends Record<string, unknown>>({
   const [sort, setSort] = useState<TableSort | null>(initialSort || null);
   const [filters, setFilters] = useState<TableFilters>(initialFilters);
   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPageState, setItemsPerPageState] = useState(itemsPerPage);
 
   // Filter and search
   const filteredData = useMemo(() => {
@@ -97,12 +98,12 @@ export function useTableState<T extends Record<string, unknown>>({
   }, [filteredData, sort]);
 
   // Paginate
-  const totalPages = Math.ceil(sortedData.length / itemsPerPage);
+  const totalPages = Math.ceil(sortedData.length / itemsPerPageState);
   const paginatedData = useMemo(() => {
-    const start = (currentPage - 1) * itemsPerPage;
-    const end = start + itemsPerPage;
+    const start = (currentPage - 1) * itemsPerPageState;
+    const end = start + itemsPerPageState;
     return sortedData.slice(start, end);
-  }, [sortedData, currentPage, itemsPerPage]);
+  }, [sortedData, currentPage, itemsPerPageState]);
 
   // Reset page when filters/search change
   const handleSearchChange = (value: string) => {
@@ -132,12 +133,18 @@ export function useTableState<T extends Record<string, unknown>>({
     setCurrentPage(Math.max(1, Math.min(page, totalPages)));
   };
 
+  const handleItemsPerPageChange = (value: number) => {
+    setItemsPerPageState(value);
+    setCurrentPage(1); // Reset to first page when changing items per page
+  };
+
   return {
     // Data
     data: paginatedData,
     totalItems: sortedData.length,
     totalPages,
     currentPage,
+    itemsPerPage: itemsPerPageState,
 
     // State
     search,
@@ -149,10 +156,10 @@ export function useTableState<T extends Record<string, unknown>>({
     setSort: handleSort,
     setFilter: handleFilterChange,
     setPage: handlePageChange,
+    setItemsPerPage: handleItemsPerPageChange,
 
     // Helpers
     hasNextPage: currentPage < totalPages,
     hasPrevPage: currentPage > 1,
   };
 }
-

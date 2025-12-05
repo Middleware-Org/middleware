@@ -28,6 +28,7 @@ import baseStyles from "../../styles";
 import type { Article } from "@/lib/github/types";
 import { useArticles, useIssues, useCategories, useAuthors } from "@/hooks/swr";
 import { mutate } from "swr";
+import { ItemsPerPageSelector } from "@/components/table/ItemsPerPageSelector";
 
 /* **************************************************
  * Column Configuration
@@ -75,6 +76,7 @@ export default function ArticleListClient() {
     totalItems,
     totalPages,
     currentPage,
+    itemsPerPage,
     search,
     sort,
     filters,
@@ -82,6 +84,7 @@ export default function ArticleListClient() {
     setSort,
     setFilter,
     setPage,
+    setItemsPerPage,
   } = useTableState<Article>({
     data: articles,
     searchKeys: ["title", "slug", "excerpt"],
@@ -368,12 +371,18 @@ export default function ArticleListClient() {
               </div>
             )}
           </div>
-          <ColumnSelector
-            columns={columnConfig}
-            visibleColumns={visibleColumns}
-            onColumnsChange={setVisibleColumns}
-          />
-          <div className={baseStyles.textSecondary}>
+        </div>
+        {/* Secondary controls row */}
+        <div className="flex items-center justify-between gap-4 mt-3 pt-3 border-t border-secondary">
+          <div className="flex items-center gap-3">
+            <ColumnSelector
+              columns={columnConfig}
+              visibleColumns={visibleColumns}
+              onColumnsChange={setVisibleColumns}
+            />
+            <ItemsPerPageSelector value={itemsPerPage} onChange={setItemsPerPage} />
+          </div>
+          <div className={cn(baseStyles.textSecondary, "text-xs")}>
             {totalItems} {totalItems === 1 ? "articolo" : "articoli"}
           </div>
         </div>

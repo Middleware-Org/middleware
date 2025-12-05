@@ -15,6 +15,7 @@ import {
   TableCell,
   SortableHeader,
   ColumnSelector,
+  ItemsPerPageSelector,
   type ColumnConfig,
 } from "@/components/table";
 import { SearchInput } from "@/components/search";
@@ -62,11 +63,13 @@ export default function CategoryListClient() {
     totalItems,
     totalPages,
     currentPage,
+    itemsPerPage,
     search,
     sort,
     setSearch,
     setSort,
     setPage,
+    setItemsPerPage,
   } = useTableState<Category>({
     data: localCategories,
     searchKeys: ["name", "slug", "description"],
@@ -186,6 +189,7 @@ export default function CategoryListClient() {
             visibleColumns={visibleColumns}
             onColumnsChange={setVisibleColumns}
           />
+          <ItemsPerPageSelector value={itemsPerPage} onChange={setItemsPerPage} />
           <div className={baseStyles.textSecondary}>
             {totalItems} {totalItems === 1 ? "categoria" : "categorie"}
           </div>

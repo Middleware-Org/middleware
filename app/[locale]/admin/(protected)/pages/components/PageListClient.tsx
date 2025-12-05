@@ -15,6 +15,7 @@ import {
   TableCell,
   SortableHeader,
   ColumnSelector,
+  ItemsPerPageSelector,
   type ColumnConfig,
 } from "@/components/table";
 import { SearchInput } from "@/components/search";
@@ -60,11 +61,13 @@ export default function PageListClient() {
     totalItems,
     totalPages,
     currentPage,
+    itemsPerPage,
     search,
     sort,
     setSearch,
     setSort,
     setPage,
+    setItemsPerPage,
   } = useTableState<Page>({
     data: pages,
     searchKeys: ["slug"],
@@ -182,6 +185,7 @@ export default function PageListClient() {
             visibleColumns={visibleColumns}
             onColumnsChange={setVisibleColumns}
           />
+          <ItemsPerPageSelector value={itemsPerPage} onChange={setItemsPerPage} />
           <div className={baseStyles.textSecondary}>
             {totalItems} {totalItems === 1 ? "pagina" : "pagine"}
           </div>

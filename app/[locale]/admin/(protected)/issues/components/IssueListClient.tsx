@@ -16,6 +16,7 @@ import {
   SortableHeader,
   ColumnSelector,
   type ColumnConfig,
+  ItemsPerPageSelector,
 } from "@/components/table";
 import { SearchInput } from "@/components/search";
 import { Pagination } from "@/components/pagination";
@@ -67,11 +68,13 @@ export default function IssueListClient() {
     totalItems,
     totalPages,
     currentPage,
+    itemsPerPage,
     search,
     sort,
     setSearch,
     setSort,
     setPage,
+    setItemsPerPage,
   } = useTableState<Issue>({
     data: localIssues,
     searchKeys: ["title", "slug", "description"],
@@ -226,6 +229,7 @@ export default function IssueListClient() {
             visibleColumns={visibleColumns}
             onColumnsChange={setVisibleColumns}
           />
+          <ItemsPerPageSelector value={itemsPerPage} onChange={setItemsPerPage} />
           <div className={baseStyles.textSecondary}>
             {totalItems} {totalItems === 1 ? "issue" : "issues"}
           </div>
