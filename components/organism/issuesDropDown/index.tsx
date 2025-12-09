@@ -32,13 +32,19 @@ export default function IssuesDropdown({ issues, className }: IssuesDropdownProp
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const activeIssue = useActiveIssue(issues);
-  const [userHasSelected, setUserHasSelected] = useState(false);
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(() => {
     return activeIssue || (issues.length > 0 ? issues[0] : null);
   });
 
-  // Use selectedIssue if user has manually selected, otherwise use activeIssue
-  const displayIssue = userHasSelected ? selectedIssue : activeIssue || selectedIssue;
+  useEffect(() => {
+    if (activeIssue && activeIssue.slug !== selectedIssue?.slug) {
+      setTimeout(() => {
+        setSelectedIssue(activeIssue);
+      }, 100);
+    }
+  }, [activeIssue, selectedIssue]);
+
+  const displayIssue = selectedIssue || activeIssue;
 
   /* **************************************************
    * Effects
@@ -66,15 +72,12 @@ export default function IssuesDropdown({ issues, className }: IssuesDropdownProp
   const handleIssueSelect = (issue: Issue) => {
     if (typeof window === "undefined") return;
 
-    setUserHasSelected(true);
-    setSelectedIssue(issue);
     setIsOpen(false);
 
     const issueElement = document.getElementById(`issue-${issue.slug}`);
-    console.log(issueElement);
     if (issueElement) {
-      const elementPosition = issueElement.offsetTop - 155;
-      console.log(elementPosition);
+      const stickyOffset = window.innerWidth >= 768 ? 155 : 95;
+      const elementPosition = issueElement.offsetTop - stickyOffset;
       window.scrollTo({
         top: elementPosition,
         behavior: "smooth",

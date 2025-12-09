@@ -35,7 +35,6 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
   const [segments, setSegments] = useState<Segment[]>([]);
   const [currentSegmentIndex, setCurrentSegmentIndex] = useState<number>(-1);
   const [showVolumeControl, setShowVolumeControl] = useState<boolean>(false);
-  const [showSpeedControl, setShowSpeedControl] = useState<boolean>(false);
 
   const author = getAuthorBySlug(article.author);
   const category = getCategoryBySlug(article.category);
@@ -178,7 +177,6 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
           volume={volume}
           playbackRate={playbackRate}
           showVolumeControl={showVolumeControl}
-          showSpeedControl={showSpeedControl}
           hasBookmarkAtCurrentTime={hasBookmarkAtCurrentTime}
           onPlay={play}
           onPause={pause}
@@ -187,7 +185,6 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
           onVolumeChange={handleVolumeChange}
           onPlaybackRateChange={handlePlaybackRateChange}
           onToggleVolumeControl={() => setShowVolumeControl(!showVolumeControl)}
-          onToggleSpeedControl={() => setShowSpeedControl(!showSpeedControl)}
           onToggleBookmark={handleToggleBookmark}
         />
       </div>

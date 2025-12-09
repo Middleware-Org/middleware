@@ -3,16 +3,7 @@
 /* **************************************************
  * Imports
  **************************************************/
-import {
-  Rewind,
-  FastForward,
-  Pause,
-  Play,
-  Volume2,
-  Zap,
-  Bookmark,
-  BookmarkCheck,
-} from "lucide-react";
+import { Rewind, FastForward, Pause, Play, Bookmark, BookmarkCheck } from "lucide-react";
 import Button from "@/components/atoms/button";
 import VerticalRange from "./VerticalRange";
 import styles from "./PodcastPlayerStyles";
@@ -27,7 +18,6 @@ type PlayerControlsProps = {
   volume: number;
   playbackRate: number;
   showVolumeControl: boolean;
-  showSpeedControl: boolean;
   hasBookmarkAtCurrentTime: boolean;
   onPlay: () => void;
   onPause: () => void;
@@ -36,7 +26,6 @@ type PlayerControlsProps = {
   onVolumeChange: (value: number) => void;
   onPlaybackRateChange: (value: number) => void;
   onToggleVolumeControl: () => void;
-  onToggleSpeedControl: () => void;
   onToggleBookmark: () => void;
 };
 
@@ -48,7 +37,6 @@ export default function PlayerControls({
   volume,
   playbackRate,
   showVolumeControl,
-  showSpeedControl,
   hasBookmarkAtCurrentTime,
   onPlay,
   onPause,
@@ -57,13 +45,10 @@ export default function PlayerControls({
   onVolumeChange,
   onPlaybackRateChange,
   onToggleVolumeControl,
-  onToggleSpeedControl,
   onToggleBookmark,
 }: PlayerControlsProps) {
   const volumeControlRef = useRef<HTMLDivElement>(null);
-  const speedControlRef = useRef<HTMLDivElement>(null);
   const volumeButtonWrapperRef = useRef<HTMLDivElement>(null);
-  const speedButtonWrapperRef = useRef<HTMLDivElement>(null);
 
   useClickOutside({
     isOpen: showVolumeControl,
@@ -71,25 +56,20 @@ export default function PlayerControls({
     onClose: onToggleVolumeControl,
   });
 
-  useClickOutside({
-    isOpen: showSpeedControl,
-    refs: [speedControlRef, speedButtonWrapperRef],
-    onClose: onToggleSpeedControl,
-  });
+  // Cycle through playback speeds: 1x -> 1.5x -> 2.0x -> 0.5x -> 1.0x
+  const handleSpeedCycle = () => {
+    const speeds = [1.0, 1.5, 2.0, 0.5];
+    const currentIndex = speeds.findIndex((speed) => Math.abs(speed - playbackRate) < 0.1);
+    // If current speed is not in the list, start from 1.0x
+    const nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % speeds.length;
+    onPlaybackRateChange(speeds[nextIndex]);
+  };
 
   return (
     <div className={styles.playerSection}>
       <div className={styles.buttons}>
         <div className={styles.buttonGroup}>
           <div ref={volumeButtonWrapperRef} className={styles.volumeButtonWrapper}>
-            {/* <Button
-              variants="unstyled"
-              onClick={onToggleVolumeControl}
-              className={styles.controlButton}
-              aria-label="Volume"
-            >
-              <Volume2 className={styles.icon} />
-            </Button> */}
             <Button
               variants="unstyled"
               onClick={onToggleBookmark}
@@ -144,28 +124,15 @@ export default function PlayerControls({
           >
             <FastForward className={styles.icon} />
           </Button>
-          <div ref={speedButtonWrapperRef} className={styles.speedButtonWrapper}>
-            <Button
-              variants="unstyled"
-              onClick={onToggleSpeedControl}
-              className={styles.controlButton}
-              aria-label="Velocità di riproduzione"
-            >
-              <Zap className={styles.icon} />
-            </Button>
-            {showSpeedControl && (
-              <div ref={speedControlRef} className={styles.speedControlContainer}>
-                <VerticalRange
-                  min={0.5}
-                  max={2}
-                  step={0.1}
-                  value={playbackRate}
-                  onChange={onPlaybackRateChange}
-                  formatValue={(val) => `${val.toFixed(1)}x`}
-                />
-              </div>
-            )}
-          </div>
+          <Button
+            variants="unstyled"
+            onClick={handleSpeedCycle}
+            className={styles.controlButton}
+            aria-label={`Velocità di riproduzione: ${playbackRate.toFixed(1)}x`}
+            title={`Velocità: ${playbackRate.toFixed(1)}x`}
+          >
+            <span className={styles.speedText}>{playbackRate.toFixed(1)}x</span>
+          </Button>
         </div>
       </div>
     </div>

@@ -51,7 +51,6 @@ const styles = {
     "hover:border-tertiary hover:shadow-md transition-all duration-150",
     "flex flex-col",
   ),
-  recentCardHeader: cn("flex items-start justify-between gap-2 mb-2"),
   recentCardTitle: cn("text-base font-semibold text-secondary line-clamp-2 flex-1"),
   recentBadge: cn(
     "text-xs bg-tertiary/10 text-tertiary px-2 py-1 font-medium border border-tertiary",
