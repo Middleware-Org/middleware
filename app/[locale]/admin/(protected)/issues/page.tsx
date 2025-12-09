@@ -35,6 +35,15 @@ export default async function IssuesPage() {
           <h1 className={styles.title}>Gestione Issues</h1>
           <div className="flex gap-2">
             <Link
+              href="/archive"
+              className={styles.iconButton}
+              target="_blank"
+              aria-label="Anteprima"
+              title="Anteprima"
+            >
+              <ExternalLink className="w-4 h-4" />
+            </Link>
+            <Link
               href="/admin/issues/new"
               className={styles.iconButton}
               aria-label="Nuova Issue"

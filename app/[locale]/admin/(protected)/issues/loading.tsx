@@ -15,6 +15,7 @@ export default function Loading() {
         <div className="flex gap-2">
           <div className="h-8 w-8 bg-secondary/20 animate-pulse" />
           <div className="h-8 w-8 bg-secondary/20 animate-pulse" />
+          <div className="h-8 w-8 bg-secondary/20 animate-pulse" />
         </div>
       </div>
       <IssueListSkeleton />
