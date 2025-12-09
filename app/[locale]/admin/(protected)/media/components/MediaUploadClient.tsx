@@ -5,6 +5,7 @@
 
 import { useRef, useState } from "react";
 import type { ActionResult } from "../actions";
+import { uploadMediaAction } from "../actions";
 import styles from "../styles";
 import Image from "next/image";
 
@@ -97,12 +98,7 @@ export default function MediaUploadClient() {
         formData.set("filename", filename);
       }
 
-      const response = await fetch("/api/media/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      const result = await response.json();
+      const result = await uploadMediaAction(null, formData);
 
       if (result.success) {
         setState(result);
@@ -118,7 +114,7 @@ export default function MediaUploadClient() {
         setState({
           success: false,
           error: result.error || "Failed to upload file",
-          errorType: "error",
+          errorType: result.errorType || "error",
         });
       }
     } catch (error) {
