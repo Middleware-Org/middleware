@@ -19,7 +19,8 @@ export function useActiveIssue(issues: Issue[]) {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           const issueId = entry.target.id;
-          const foundIssue = issues.find((issue) => issue.slug === issueId);
+          const slug = issueId.replace("issue-", "");
+          const foundIssue = issues.find((issue) => issue.slug === slug);
 
           if (foundIssue) {
             setActiveIssue(foundIssue);
