@@ -5,7 +5,12 @@
 
 import { revalidatePath } from "next/cache";
 import { getUser } from "@/lib/auth/server";
-import { deleteMediaFile, uploadMediaFile, getAllMediaFiles, type MediaFile } from "@/lib/github/media";
+import {
+  deleteMediaFile,
+  uploadMediaFile,
+  getAllMediaFiles,
+  type MediaFile,
+} from "@/lib/github/media";
 
 /* **************************************************
  * Types
@@ -27,11 +32,11 @@ export async function uploadMediaAction(
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
 
-    const fileBase64 = formData.get("file") as string;
+    const fileInput = formData.get("file");
     const filename = formData.get("filename") as string | null;
     const fileType = (formData.get("fileType") as "image" | "audio" | "json") || "image";
 
-    if (!fileBase64) {
+    if (!fileInput) {
       return {
         success: false,
         error: "File is required",
@@ -39,11 +44,20 @@ export async function uploadMediaAction(
       };
     }
 
-    const filePath = await uploadMediaFile(
-      fileBase64,
-      filename?.trim() || undefined,
-      fileType,
-    );
+    // Handle both File objects and base64 strings (for backward compatibility)
+    let fileBase64: string;
+    if (fileInput instanceof File) {
+      // Convert File to base64 on the server (more efficient than sending base64 from client)
+      const arrayBuffer = await fileInput.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      const mimeType = fileInput.type || "image/jpeg";
+      fileBase64 = `data:${mimeType};base64,${buffer.toString("base64")}`;
+    } else {
+      // Already a base64 string (backward compatibility)
+      fileBase64 = fileInput as string;
+    }
+
+    const filePath = await uploadMediaFile(fileBase64, filename?.trim() || undefined, fileType);
 
     revalidatePath("/admin/media");
     return { success: true, data: filePath, message: "File uploaded successfully" };
@@ -100,4 +114,3 @@ export async function getAllMediaAction(): Promise<ActionResult<MediaFile[]>> {
     };
   }
 }
-

@@ -38,6 +38,7 @@ export default function AudioJsonMediaSelector({
   const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [filename, setFilename] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -94,6 +95,10 @@ export default function AudioJsonMediaSelector({
     const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
     setFilename(nameWithoutExt);
 
+    // Save the original file for upload (more efficient than base64)
+    setSelectedFile(file);
+
+    // Create preview as base64 for display only
     const reader = new FileReader();
     reader.onloadend = () => {
       const base64 = reader.result as string;
@@ -108,6 +113,7 @@ export default function AudioJsonMediaSelector({
 
   function handleRemove() {
     setPreview(null);
+    setSelectedFile(null);
     setFilename("");
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -115,7 +121,7 @@ export default function AudioJsonMediaSelector({
   }
 
   async function handleUpload() {
-    if (!preview) {
+    if (!selectedFile) {
       setUploadError(
         `Seleziona un file ${fileType === "audio" ? "audio" : "JSON"} prima di caricare`,
       );
@@ -128,7 +134,8 @@ export default function AudioJsonMediaSelector({
 
     try {
       const formData = new FormData();
-      formData.set("file", preview);
+      // Send the File object directly instead of base64 (more efficient)
+      formData.set("file", selectedFile);
       if (filename) {
         formData.set("filename", filename);
       }
@@ -144,6 +151,7 @@ export default function AudioJsonMediaSelector({
         handleSelect(result.data);
         // Reset form
         setPreview(null);
+        setSelectedFile(null);
         setFilename("");
         if (fileInputRef.current) {
           fileInputRef.current.value = "";

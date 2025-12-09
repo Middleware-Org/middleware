@@ -16,6 +16,7 @@ export default function MediaUploadClient() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [filename, setFilename] = useState<string>("");
   const [fileType, setFileType] = useState<"image" | "audio" | "json">("image");
   const [state, setState] = useState<ActionResult<string> | null>(null);
@@ -57,6 +58,10 @@ export default function MediaUploadClient() {
     const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
     setFilename(nameWithoutExt);
 
+    // Save the original file for upload (more efficient than base64)
+    setSelectedFile(file);
+
+    // Create preview as base64 for display only
     const reader = new FileReader();
     reader.onloadend = () => {
       const base64 = reader.result as string;
@@ -71,6 +76,7 @@ export default function MediaUploadClient() {
 
   function handleRemove() {
     setPreview(null);
+    setSelectedFile(null);
     setFilename("");
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -82,7 +88,7 @@ export default function MediaUploadClient() {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!preview) {
+    if (!selectedFile) {
       alert("Seleziona un file prima di caricare");
       return;
     }
@@ -92,7 +98,8 @@ export default function MediaUploadClient() {
 
     try {
       const formData = new FormData();
-      formData.set("file", preview);
+      // Send the File object directly instead of base64 (more efficient)
+      formData.set("file", selectedFile);
       formData.set("fileType", fileType);
       if (filename) {
         formData.set("filename", filename);
