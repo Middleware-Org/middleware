@@ -8,6 +8,7 @@ import { getUser } from "@/lib/auth/server";
 import {
   deleteMediaFile,
   uploadMediaFile,
+  renameMediaFile,
   getAllMediaFiles,
   type MediaFile,
 } from "@/lib/github/media";
@@ -93,6 +94,36 @@ export async function deleteMediaAction(filename: string): Promise<ActionResult>
       success: false,
       error: errorMessage,
       errorType: isRelationError ? "warning" : "error",
+    };
+  }
+}
+
+export async function renameMediaAction(
+  oldFilename: string,
+  newFilename: string,
+): Promise<ActionResult<string>> {
+  try {
+    const user = await getUser();
+    if (!user) {
+      return { success: false, error: "Unauthorized", errorType: "error" };
+    }
+
+    if (!oldFilename || !newFilename) {
+      return { success: false, error: "Filename is required", errorType: "error" };
+    }
+
+    const newUrl = await renameMediaFile(oldFilename, newFilename);
+    revalidatePath("/admin/media");
+
+    return { success: true, data: newUrl, message: "File renamed successfully" };
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Failed to rename file";
+    const isConflictError = errorMessage.includes("already exists");
+
+    return {
+      success: false,
+      error: errorMessage,
+      errorType: isConflictError ? "warning" : "error",
     };
   }
 }

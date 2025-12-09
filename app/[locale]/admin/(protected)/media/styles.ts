@@ -49,10 +49,6 @@ const styles = {
     "hover:shadow-lg transition-shadow duration-150",
   ),
   imageCardImg: cn("w-full h-48 object-cover"),
-  imageCardOverlay: cn(
-    "absolute inset-0 bg-secondary/50 opacity-0 group-hover:opacity-100",
-    "transition-opacity duration-150 flex items-center justify-center gap-2",
-  ),
   imageCardName: cn(
     "absolute bottom-0 left-0 right-0 bg-secondary/70 text-primary text-xs p-2",
     "truncate",

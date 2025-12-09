@@ -209,3 +209,66 @@ export async function uploadMediaFile(
     throw new Error(error instanceof Error ? error.message : "Failed to upload media file");
   }
 }
+
+export async function renameMediaFile(oldFilename: string, newFilename: string): Promise<string> {
+  try {
+    // Find the old blob
+    const { blobs } = await list({
+      prefix: `${BLOB_PREFIX}/`,
+    });
+
+    const oldBlob = blobs.find((blob) => {
+      const name = blob.pathname.split("/").pop() || "";
+      return name === oldFilename;
+    });
+
+    if (!oldBlob) {
+      throw new Error(`File "${oldFilename}" not found`);
+    }
+
+    // Download the file
+    const response = await fetch(oldBlob.url);
+    if (!response.ok) {
+      throw new Error(`Failed to download file: ${response.statusText}`);
+    }
+
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    // Determine file type from old filename
+    const fileType = getFileTypeFromName(oldFilename);
+
+    // Ensure new filename has correct extension
+    const finalNewFilename = generateFilename(newFilename, fileType);
+
+    // Check if new filename already exists
+    const existingBlob = blobs.find((blob) => {
+      const name = blob.pathname.split("/").pop() || "";
+      return name === finalNewFilename;
+    });
+
+    if (existingBlob && finalNewFilename !== oldFilename) {
+      throw new Error(`File "${finalNewFilename}" already exists`);
+    }
+
+    // Upload with new name
+    const contentType = getContentType(fileType, finalNewFilename);
+    const newBlobPath = `${BLOB_PREFIX}/${finalNewFilename}`;
+
+    const newBlob: PutBlobResult = await put(newBlobPath, buffer, {
+      contentType,
+      access: "public",
+    });
+
+    // Delete old file (only if names are different)
+    if (oldFilename !== finalNewFilename) {
+      await del(oldBlob.url);
+    }
+
+    // Return the new URL
+    return newBlob.url;
+  } catch (error) {
+    console.error("Error renaming media file:", error);
+    throw new Error(error instanceof Error ? error.message : "Failed to rename media file");
+  }
+}
