@@ -34,7 +34,7 @@ const styles = {
   ),
   formActions: cn("flex gap-2"),
   submitButton: cn(
-    "px-4 py-2 bg-tertiary text-white hover:bg-tertiary/90",
+    "px-4 py-2 bg-tertiary text-white hover:bg-tertiary/90 flex items-center gap-2",
     "disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150",
     "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-tertiary",
   ),
@@ -62,6 +62,14 @@ const styles = {
     "transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-tertiary",
     "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent",
   ),
+  iconButton: cn(
+    "p-2 w-8 h-8 flex items-center justify-center",
+    "border border-secondary hover:bg-tertiary hover:text-white hover:border-tertiary",
+    "text-secondary transition-all duration-150",
+    "focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-tertiary",
+    "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:border-secondary",
+  ),
+  iconButtonDanger: cn("border-tertiary text-tertiary hover:bg-tertiary hover:text-white"),
 };
 
 /* **************************************************

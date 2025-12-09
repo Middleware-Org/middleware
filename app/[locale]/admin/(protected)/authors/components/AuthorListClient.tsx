@@ -3,9 +3,10 @@
  **************************************************/
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition, useMemo, useEffect, Fragment } from "react";
-import { Hash } from "lucide-react";
+import { ExternalLink, Hash, Pencil, Trash2 } from "lucide-react";
 import { deleteAuthorAction } from "../actions";
 import { useTableState } from "@/hooks/useTableState";
 import {
@@ -22,6 +23,7 @@ import {
 import { SearchInput } from "@/components/search";
 import { Pagination } from "@/components/pagination";
 import ConfirmDialog from "@/components/molecules/confirmDialog";
+import { cn } from "@/lib/utils/classes";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Author } from "@/lib/github/types";
@@ -136,19 +138,32 @@ export default function AuthorListClient() {
         return (
           <TableCell>
             <div className={baseStyles.buttonGroup}>
+              <Link
+                href={`/authors?author=${author.slug}`}
+                target="_blank"
+                className={styles.iconButton}
+                aria-label="Anteprima"
+                title="Anteprima"
+              >
+                <ExternalLink className="w-4 h-4" />
+              </Link>
               <button
                 onClick={() => handleEdit(author)}
-                className={styles.editButton}
+                className={styles.iconButton}
                 disabled={isPending}
+                aria-label="Modifica"
+                title="Modifica"
               >
-                Modifica
+                <Pencil className="w-4 h-4" />
               </button>
               <button
                 onClick={() => handleDeleteClick(author)}
-                className={styles.deleteButton}
+                className={cn(styles.iconButton, styles.iconButtonDanger)}
                 disabled={isPending}
+                aria-label="Elimina"
+                title="Elimina"
               >
-                Elimina
+                <Trash2 className="w-4 h-4" />
               </button>
             </div>
           </TableCell>

@@ -3,23 +3,22 @@
  **************************************************/
 "use client";
 
-import { useState, useTransition, useMemo } from "react";
-import { deleteMediaAction } from "../actions";
+import { useState, useMemo } from "react";
 import { Music, FileJson, Search, X } from "lucide-react";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import Image from "next/image";
 import { useMedia } from "@/hooks/swr";
-import { mutate } from "swr";
 import { cn } from "@/lib/utils/classes";
 import type { MediaFile } from "@/lib/github/media";
+import MediaDialog from "./MediaDialog";
 
 /* **************************************************
  * Media List Client Component
  **************************************************/
 export default function MediaListClient() {
-  const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
+  const [selectedFile, setSelectedFile] = useState<MediaFile | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState<"all" | "image" | "audio" | "json">("all");
 
@@ -47,27 +46,14 @@ export default function MediaListClient() {
     return filtered;
   }, [mediaFiles, searchQuery, filterType]);
 
-  async function handleDelete(filename: string) {
-    if (!confirm(`Sei sicuro di voler eliminare il file "${filename}"?`)) {
-      return;
-    }
+  function handleFileClick(file: MediaFile) {
+    setSelectedFile(file);
+    setIsDialogOpen(true);
+  }
 
-    setError(null);
-
-    startTransition(async () => {
-      const result = await deleteMediaAction(filename);
-
-      if (!result.success) {
-        setError({
-          message: result.error,
-          type: result.errorType || "error",
-        });
-      } else {
-        // Invalida la cache SWR per forzare il refetch
-        mutate("/api/media");
-        mutate("/api/github/merge/check");
-      }
-    });
+  function handleDialogClose() {
+    setIsDialogOpen(false);
+    setSelectedFile(null);
   }
 
   // Mostra loading solo se non ci sono dati (prima richiesta)
@@ -81,12 +67,6 @@ export default function MediaListClient() {
 
   return (
     <div className={baseStyles.container}>
-      {error && (
-        <div className={error.type === "warning" ? baseStyles.errorWarning : baseStyles.error}>
-          ⚠️ {error.message}
-        </div>
-      )}
-
       {/* Search and Filter Controls */}
       <div className="mb-6 space-y-4">
         {/* Search Bar */}
@@ -179,7 +159,11 @@ export default function MediaListClient() {
       ) : (
         <div className={styles.grid}>
           {filteredFiles.map((file) => (
-            <div key={file.name} className={styles.imageCard}>
+            <div
+              key={file.name}
+              className={cn(styles.imageCard, "cursor-pointer")}
+              onClick={() => handleFileClick(file)}
+            >
               {file.type === "image" ? (
                 <Image
                   width={400}
@@ -199,20 +183,13 @@ export default function MediaListClient() {
                 </div>
               )}
               <div className={styles.imageCardName}>{file.name}</div>
-              <div className={styles.imageCardOverlay}>
-                <button
-                  onClick={() => handleDelete(file.name)}
-                  className={styles.deleteButton}
-                  disabled={isPending}
-                  title={`Elimina ${file.name}`}
-                >
-                  Elimina
-                </button>
-              </div>
             </div>
           ))}
         </div>
       )}
+
+      {/* Media Dialog */}
+      <MediaDialog isOpen={isDialogOpen} onClose={handleDialogClose} file={selectedFile} />
     </div>
   );
 }

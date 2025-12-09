@@ -8,15 +8,7 @@ import { Table, TableHeader, TableBody, TableRow, TableCell } from "@/components
  **************************************************/
 export default function UserListSkeleton() {
   return (
-    <main className="lg:px-10 md:px-4 px-4 py-6 max-w-[1472px] mx-auto">
-      <div className="mb-6 flex items-center justify-between">
-        <div className="h-8 w-64 bg-secondary/20 animate-pulse" />
-        <div className="flex gap-2">
-          <div className="h-10 w-40 bg-secondary/20 animate-pulse" />
-          <div className="h-10 w-24 bg-secondary/20 animate-pulse" />
-        </div>
-      </div>
-
+    <>
       {/* Search and Filters Skeleton */}
       <div className="bg-primary p-4 border border-secondary mb-4">
         <div className="flex items-center gap-4">
@@ -71,8 +63,8 @@ export default function UserListSkeleton() {
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-2">
-                    <div className="h-8 w-20 bg-secondary/20 animate-pulse" />
-                    <div className="h-8 w-20 bg-secondary/20 animate-pulse" />
+                    <div className="h-8 w-8 bg-secondary/20 animate-pulse" />
+                    <div className="h-8 w-8 bg-secondary/20 animate-pulse" />
                   </div>
                 </TableCell>
               </TableRow>
@@ -80,7 +72,6 @@ export default function UserListSkeleton() {
           </TableBody>
         </Table>
       </div>
-    </main>
+    </>
   );
 }
-

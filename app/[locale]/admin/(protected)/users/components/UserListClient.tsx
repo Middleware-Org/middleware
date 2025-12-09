@@ -5,7 +5,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition, useMemo, useEffect, Fragment } from "react";
-import { Hash } from "lucide-react";
+import { Hash, Pencil, Trash2 } from "lucide-react";
 import { deleteUserAction } from "../actions";
 import { useTableState } from "@/hooks/useTableState";
 import {
@@ -21,6 +21,7 @@ import {
 import { SearchInput } from "@/components/search";
 import { Pagination } from "@/components/pagination";
 import ConfirmDialog from "@/components/molecules/confirmDialog";
+import { cn } from "@/lib/utils/classes";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { User } from "@/lib/github/users";
@@ -142,17 +143,21 @@ export default function UserListClient() {
             <div className={baseStyles.buttonGroup}>
               <button
                 onClick={() => handleEdit(user)}
-                className={styles.editButton}
+                className={styles.iconButton}
                 disabled={isPending}
+                aria-label="Modifica"
+                title="Modifica"
               >
-                Modifica
+                <Pencil className="w-4 h-4" />
               </button>
               <button
                 onClick={() => handleDeleteClick(user)}
-                className={styles.deleteButton}
+                className={cn(styles.iconButton, styles.iconButtonDanger)}
                 disabled={isPending}
+                aria-label="Elimina"
+                title="Elimina"
               >
-                Elimina
+                <Trash2 className="w-4 h-4" />
               </button>
             </div>
           </TableCell>

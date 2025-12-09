@@ -6,5 +6,6 @@ export {
   getAllMediaFiles,
   deleteMediaFile,
   uploadMediaFile,
+  renameMediaFile,
   type MediaFile,
 } from "@/lib/blob/media";
