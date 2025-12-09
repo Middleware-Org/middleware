@@ -114,7 +114,7 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
         if (fileInputRef.current) {
           fileInputRef.current.value = "";
         }
-      } else {
+      } else if (!result.success) {
         setUploadError(result.error || "Errore durante il caricamento");
       }
     } catch (err) {

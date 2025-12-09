@@ -110,7 +110,7 @@ export default function MediaUploadClient() {
           handleRemove();
           formRef.current?.reset();
         }, 100);
-      } else {
+      } else if (!result.success) {
         setState({
           success: false,
           error: result.error || "Failed to upload file",
