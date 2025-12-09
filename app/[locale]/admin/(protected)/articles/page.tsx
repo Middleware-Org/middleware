@@ -10,6 +10,7 @@ import ArticleListClient from "./components/ArticleListClient";
 import ArticleListSkeleton from "./components/ArticleListSkeleton";
 import styles from "./styles";
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
+import { Plus, ArrowLeft } from "lucide-react";
 
 /* **************************************************
  * Articles List Page (Server Component)
@@ -33,11 +34,21 @@ export default async function ArticlesPage() {
         <div className={styles.header}>
           <h1 className={styles.title}>Gestione Articoli</h1>
           <div className="flex gap-2">
-            <Link href="/admin/articles/new" className={styles.submitButton}>
-              + Nuovo Articolo
+            <Link
+              href="/admin/articles/new"
+              className={styles.iconButton}
+              aria-label="Nuovo Articolo"
+              title="Nuovo Articolo"
+            >
+              <Plus className="w-4 h-4" />
             </Link>
-            <Link href="/admin" className={styles.backButton}>
-              ← Indietro
+            <Link
+              href="/admin"
+              className={styles.iconButton}
+              aria-label="Indietro"
+              title="Indietro"
+            >
+              <ArrowLeft className="w-4 h-4" />
             </Link>
           </div>
         </div>

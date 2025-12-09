@@ -3,9 +3,10 @@
  **************************************************/
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition, useMemo, Fragment, useRef, useEffect } from "react";
-import { Filter, X, Hash } from "lucide-react";
+import { ExternalLink, Filter, Pencil, Trash2, X, Hash } from "lucide-react";
 import { deleteArticleAction } from "../actions";
 import { useTableState } from "@/hooks/useTableState";
 import {
@@ -244,19 +245,32 @@ export default function ArticleListClient() {
         return (
           <TableCell>
             <div className={baseStyles.buttonGroup}>
+              <Link
+                href={`/articles/${article.slug}`}
+                target="_blank"
+                className={styles.iconButton}
+                aria-label="Anteprima"
+                title="Anteprima"
+              >
+                <ExternalLink className="w-4 h-4" />
+              </Link>
               <button
                 onClick={() => handleEdit(article)}
-                className={styles.editButton}
+                className={styles.iconButton}
                 disabled={isPending}
+                aria-label="Modifica"
+                title="Modifica"
               >
-                Modifica
+                <Pencil className="w-4 h-4" />
               </button>
               <button
                 onClick={() => handleDeleteClick(article)}
-                className={styles.deleteButton}
+                className={cn(styles.iconButton, styles.iconButtonDanger)}
                 disabled={isPending}
+                aria-label="Elimina"
+                title="Elimina"
               >
-                Elimina
+                <Trash2 className="w-4 h-4" />
               </button>
             </div>
           </TableCell>
