@@ -29,6 +29,7 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
   const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [filename, setFilename] = useState<string>("");
 
   // Usa SWR per caricare i media files con cache, filtra solo immagini
@@ -61,6 +62,10 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
     const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
     setFilename(nameWithoutExt);
 
+    // Save the original file for upload (more efficient than base64)
+    setSelectedFile(file);
+
+    // Create preview as base64 for display only
     const reader = new FileReader();
     reader.onloadend = () => {
       const base64 = reader.result as string;
@@ -75,6 +80,7 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
 
   function handleRemove() {
     setPreview(null);
+    setSelectedFile(null);
     setFilename("");
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -82,7 +88,7 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
   }
 
   async function handleUpload() {
-    if (!preview) {
+    if (!selectedFile) {
       setUploadError("Seleziona un'immagine prima di caricare");
       return;
     }
@@ -93,7 +99,8 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
 
     try {
       const formData = new FormData();
-      formData.set("file", preview);
+      // Send the File object directly instead of base64 (more efficient)
+      formData.set("file", selectedFile);
       formData.set("fileType", "image");
       if (filename) {
         formData.set("filename", filename);
@@ -110,6 +117,7 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
         handleSelect(result.data);
         // Reset form
         setPreview(null);
+        setSelectedFile(null);
         setFilename("");
         if (fileInputRef.current) {
           fileInputRef.current.value = "";
