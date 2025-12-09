@@ -33,16 +33,9 @@ export default function ArticleCard({ article, dict, isPodcast = false }: Articl
   return (
     <article className={styles.article}>
       <header className={styles.header}>
-        <div className={styles.titleContainer}>
-          <Link href={articleLink}>
-            <H3 className={styles.title}>{article.title}</H3>
-          </Link>
-          {isPodcast && (
-            <Link href={`/podcast/${article.slug}`} className={styles.playIcon}>
-              <Play className={styles.playIconSvg} />
-            </Link>
-          )}
-        </div>
+        <Link href={articleLink}>
+          <H3 className={styles.title}>{article.title}</H3>
+        </Link>
 
         <div className={styles.authorInfo}>
           <MonoTextLight className={styles.authorLabel}>{dict.articleCard.wordsBy}</MonoTextLight>
