@@ -10,6 +10,7 @@ import UserListClient from "./components/UserListClient";
 import UserListSkeleton from "./components/UserListSkeleton";
 import styles from "./styles";
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
+import { Plus, ArrowLeft } from "lucide-react";
 
 /* **************************************************
  * Users List Page (Server Component)
@@ -33,11 +34,21 @@ export default async function UsersPage() {
         <div className={styles.header}>
           <h1 className={styles.title}>Gestione Utenti</h1>
           <div className="flex gap-2">
-            <Link href="/admin/users/new" className={styles.submitButton}>
-              + Nuovo Utente
+            <Link
+              href="/admin/users/new"
+              className={styles.iconButton}
+              aria-label="Nuovo Utente"
+              title="Nuovo Utente"
+            >
+              <Plus className="w-4 h-4" />
             </Link>
-            <Link href="/admin" className={styles.backButton}>
-              ← Indietro
+            <Link
+              href="/admin"
+              className={styles.iconButton}
+              aria-label="Indietro"
+              title="Indietro"
+            >
+              <ArrowLeft className="w-4 h-4" />
             </Link>
           </div>
         </div>
@@ -49,4 +60,3 @@ export default async function UsersPage() {
     </SWRPageProvider>
   );
 }
-
