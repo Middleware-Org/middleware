@@ -10,6 +10,7 @@ import AuthorListClient from "./components/AuthorListClient";
 import AuthorListSkeleton from "./components/AuthorListSkeleton";
 import styles from "./styles";
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
+import { ExternalLink, Plus, ArrowLeft } from "lucide-react";
 
 /* **************************************************
  * Authors List Page (Server Component)
@@ -33,11 +34,30 @@ export default async function AuthorsPage() {
         <div className={styles.header}>
           <h1 className={styles.title}>Gestione Autori</h1>
           <div className="flex gap-2">
-            <Link href="/admin/authors/new" className={styles.submitButton}>
-              + Nuovo Autore
+            <Link
+              href="/admin/authors/new"
+              className={styles.iconButton}
+              aria-label="Nuovo Autore"
+              title="Nuovo Autore"
+            >
+              <Plus className="w-4 h-4" />
             </Link>
-            <Link href="/admin" className={styles.backButton}>
-              ← Indietro
+            <Link
+              href="/authors"
+              className={styles.iconButton}
+              target="_blank"
+              aria-label="Anteprima"
+              title="Anteprima"
+            >
+              <ExternalLink className="w-4 h-4" />
+            </Link>
+            <Link
+              href="/admin"
+              className={styles.iconButton}
+              aria-label="Indietro"
+              title="Indietro"
+            >
+              <ArrowLeft className="w-4 h-4" />
             </Link>
           </div>
         </div>
