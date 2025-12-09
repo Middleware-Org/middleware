@@ -226,11 +226,14 @@ export default function ArticleListClient() {
       case "date":
         return <TableCell>{new Date(article.date).toLocaleDateString("it-IT")}</TableCell>;
       case "author":
-        return <TableCell>{article.author}</TableCell>;
+        const author = authors.find((a) => a.slug === article.author);
+        return <TableCell>{author?.name || article.author}</TableCell>;
       case "category":
-        return <TableCell>{article.category}</TableCell>;
+        const category = categories.find((c) => c.slug === article.category);
+        return <TableCell>{category?.name || article.category}</TableCell>;
       case "issue":
-        return <TableCell>{article.issue}</TableCell>;
+        const issue = issues.find((i) => i.slug === article.issue);
+        return <TableCell>{issue?.title || article.issue}</TableCell>;
       case "in_evidence":
         return (
           <TableCell>
