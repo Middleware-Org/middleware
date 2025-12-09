@@ -57,15 +57,6 @@ export default function PodcastHeader({ article, issue, author, category }: Podc
             {article.date && (
               <FormattedDate date={article.date} lang={lang} className={styles.textDate} />
             )}
-            {/* <Link
-              href="https://github.com/resemble-ai/chatterbox"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <MonoTextLight className={styles.textTTS}>
-                Podcast powered by Chatterbox-TTS by Resemble AI (2025)
-              </MonoTextLight>
-            </Link> */}
           </div>
         </div>
       </div>

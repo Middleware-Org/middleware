@@ -73,6 +73,7 @@ const styles = {
   ),
   icon: cn("text-base md:text-lg text-secondary"),
   playIcon: cn("text-xl md:text-2xl lg:text-3xl text-secondary ml-0.5"),
+  speedText: cn("text-base md:text-md text-secondary font-mono hover:text-white"),
   progressContainer: cn("flex items-center gap-3 md:gap-4 w-full px-4 py-2"),
   progressBar: cn(
     "flex-1 h-1 md:h-1.5 bg-secondary/20 appearance-none cursor-pointer",
