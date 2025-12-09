@@ -71,10 +71,9 @@ export default function IssuesDropdown({ issues, className }: IssuesDropdownProp
     setIsOpen(false);
 
     const issueElement = document.getElementById(`issue-${issue.slug}`);
-    console.log(issueElement);
     if (issueElement) {
-      const elementPosition = issueElement.offsetTop - 155;
-      console.log(elementPosition);
+      const stickyOffset = window.innerWidth >= 768 ? 155 : 95;
+      const elementPosition = issueElement.offsetTop - stickyOffset;
       window.scrollTo({
         top: elementPosition,
         behavior: "smooth",
