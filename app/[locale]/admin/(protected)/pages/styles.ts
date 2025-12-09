@@ -56,10 +56,17 @@ const styles = {
     "focus:outline-none focus:ring-2 focus:ring-tertiary focus:border-tertiary",
     "disabled:bg-secondary/10 disabled:cursor-not-allowed transition-all duration-150",
   ),
+  iconButton: cn(
+    "p-2 w-8 h-8 flex items-center justify-center",
+    "border border-secondary hover:bg-tertiary hover:text-white hover:border-tertiary",
+    "text-secondary transition-all duration-150",
+    "focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-tertiary",
+    "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:border-secondary",
+  ),
+  iconButtonDanger: cn("border-tertiary text-tertiary hover:bg-tertiary hover:text-white"),
 };
 
 /* **************************************************
  * Export
  ************************************************** */
 export default styles;
-
