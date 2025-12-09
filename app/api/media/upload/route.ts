@@ -7,6 +7,12 @@ import { uploadMediaFile } from "@/lib/github/media";
 
 /* **************************************************
  * Media Upload API Route
+ *
+ * DEPRECATED: This API route has a 4.5MB payload limit on Vercel.
+ * Use the Server Action `uploadMediaAction` from `app/[locale]/admin/(protected)/media/actions.ts`
+ * instead, which supports up to 50MB (configured in next.config.ts).
+ *
+ * This route is kept for backward compatibility but should not be used for new code.
  **************************************************/
 export async function POST(request: NextRequest) {
   try {
@@ -37,13 +43,13 @@ export async function POST(request: NextRequest) {
       fileBase64 = fileInput as string;
     }
 
-    const filePath = await uploadMediaFile(
-      fileBase64,
-      filename?.trim() || undefined,
-      fileType,
-    );
+    const filePath = await uploadMediaFile(fileBase64, filename?.trim() || undefined, fileType);
 
-    return NextResponse.json({ success: true, data: filePath, message: "File uploaded successfully" });
+    return NextResponse.json({
+      success: true,
+      data: filePath,
+      message: "File uploaded successfully",
+    });
   } catch (error) {
     return NextResponse.json(
       {
@@ -56,6 +62,5 @@ export async function POST(request: NextRequest) {
 }
 
 // Note: For Next.js App Router API routes, body size limits are handled by the runtime
-// The default limit is typically 4.5MB, but can be increased via environment variables
-// or by using streaming for very large files
-
+// The default limit is typically 4.5MB on Vercel, and cannot be increased for API routes.
+// For larger files, use Server Actions instead (configured to 50MB in next.config.ts).

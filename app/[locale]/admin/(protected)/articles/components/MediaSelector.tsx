@@ -9,6 +9,7 @@ import baseStyles from "../../styles";
 import styles from "../../media/styles";
 import { useMedia } from "@/hooks/swr";
 import { mutate } from "swr";
+import { uploadMediaAction } from "../../media/actions";
 
 /* **************************************************
  * Types
@@ -98,12 +99,7 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
         formData.set("filename", filename);
       }
 
-      const response = await fetch("/api/media/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      const result = await response.json();
+      const result = await uploadMediaAction(null, formData);
 
       if (result.success && result.data) {
         setUploadSuccess(result.message || "Immagine caricata con successo");
