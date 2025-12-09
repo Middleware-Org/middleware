@@ -4,12 +4,12 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { upload } from "@vercel/blob/client";
 import Image from "next/image";
 import baseStyles from "../../styles";
 import styles from "../../media/styles";
 import { useMedia } from "@/hooks/swr";
 import { mutate } from "swr";
-import { uploadMediaAction } from "../../media/actions";
 
 /* **************************************************
  * Types
@@ -98,32 +98,39 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
     setUploadSuccess(null);
 
     try {
-      const formData = new FormData();
-      // Send the File object directly instead of base64 (more efficient)
-      formData.set("file", selectedFile);
-      formData.set("fileType", "image");
+      // Generate filename
+      let finalFilename: string;
       if (filename) {
-        formData.set("filename", filename);
+        if (!filename.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+          finalFilename = `${filename}.jpg`;
+        } else {
+          finalFilename = filename;
+        }
+      } else {
+        const timestamp = Date.now();
+        const random = Math.random().toString(36).substring(2, 9);
+        finalFilename = `file-${timestamp}-${random}.jpg`;
       }
 
-      const result = await uploadMediaAction(null, formData);
+      // Upload file directly to Vercel Blob Storage using direct client upload
+      const blob = await upload(`media/${finalFilename}`, selectedFile, {
+        access: "public",
+        contentType: selectedFile.type || "image/jpeg",
+        handleUploadUrl: "/api/media/upload-blob",
+      });
 
-      if (result.success && result.data) {
-        setUploadSuccess(result.message || "Immagine caricata con successo");
-        // Invalida la cache SWR per forzare il refetch
-        mutate("/api/media");
-        mutate("/api/github/merge/check");
-        // Seleziona automaticamente il file appena caricato
-        handleSelect(result.data);
-        // Reset form
-        setPreview(null);
-        setSelectedFile(null);
-        setFilename("");
-        if (fileInputRef.current) {
-          fileInputRef.current.value = "";
-        }
-      } else if (!result.success) {
-        setUploadError(result.error || "Errore durante il caricamento");
+      setUploadSuccess("Immagine caricata con successo");
+      // Invalida la cache SWR per forzare il refetch
+      mutate("/api/media");
+      mutate("/api/github/merge/check");
+      // Seleziona automaticamente il file appena caricato
+      handleSelect(blob.url);
+      // Reset form
+      setPreview(null);
+      setSelectedFile(null);
+      setFilename("");
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
       }
     } catch (err) {
       setUploadError(err instanceof Error ? err.message : "Errore durante il caricamento");

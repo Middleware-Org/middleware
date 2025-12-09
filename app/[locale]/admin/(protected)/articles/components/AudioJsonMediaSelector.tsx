@@ -5,7 +5,7 @@
 
 import { useState, useRef, useMemo } from "react";
 import { Search, X } from "lucide-react";
-import { uploadMediaAction } from "../../media/actions";
+import { upload } from "@vercel/blob/client";
 import baseStyles from "../../styles";
 import styles from "../../media/styles";
 import { useMedia } from "@/hooks/swr";
@@ -133,31 +133,52 @@ export default function AudioJsonMediaSelector({
     setUploadSuccess(null);
 
     try {
-      const formData = new FormData();
-      // Send the File object directly instead of base64 (more efficient)
-      formData.set("file", selectedFile);
+      // Generate filename
+      let finalFilename: string;
       if (filename) {
-        formData.set("filename", filename);
-      }
-      formData.set("fileType", fileType);
+        const extensions = {
+          audio: /\.(mp3|wav)$/i,
+          json: /\.json$/i,
+        };
+        const defaultExt = {
+          audio: "mp3",
+          json: "json",
+        };
 
-      const result = await uploadMediaAction(null, formData);
-
-      if (result.success && result.data) {
-        setUploadSuccess(result.message || "File caricato con successo");
-        // Invalida la cache SWR per forzare il refetch
-        mutate("/api/media");
-        // Seleziona automaticamente il file appena caricato
-        handleSelect(result.data);
-        // Reset form
-        setPreview(null);
-        setSelectedFile(null);
-        setFilename("");
-        if (fileInputRef.current) {
-          fileInputRef.current.value = "";
+        if (!filename.match(extensions[fileType])) {
+          finalFilename = `${filename}.${defaultExt[fileType]}`;
+        } else {
+          finalFilename = filename;
         }
-      } else if (!result.success) {
-        setUploadError(result.error || "Errore durante il caricamento");
+      } else {
+        const timestamp = Date.now();
+        const random = Math.random().toString(36).substring(2, 9);
+        const extensions = {
+          audio: "mp3",
+          json: "json",
+        };
+        finalFilename = `file-${timestamp}-${random}.${extensions[fileType]}`;
+      }
+
+      // Upload file directly to Vercel Blob Storage using direct client upload
+      const blob = await upload(`media/${finalFilename}`, selectedFile, {
+        access: "public",
+        contentType:
+          selectedFile.type || (fileType === "audio" ? "audio/mpeg" : "application/json"),
+        handleUploadUrl: "/api/media/upload-blob",
+      });
+
+      setUploadSuccess("File caricato con successo");
+      // Invalida la cache SWR per forzare il refetch
+      mutate("/api/media");
+      // Seleziona automaticamente il file appena caricato
+      handleSelect(blob.url);
+      // Reset form
+      setPreview(null);
+      setSelectedFile(null);
+      setFilename("");
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
       }
     } catch (err) {
       setUploadError(err instanceof Error ? err.message : "Errore durante il caricamento");

@@ -162,14 +162,8 @@ export default function MergeButton() {
       {/* Success Dialog */}
       <ConfirmDialog
         isOpen={showSuccessDialog}
-        onClose={() => {
-          setShowSuccessDialog(false);
-          window.location.reload();
-        }}
-        onConfirm={() => {
-          setShowSuccessDialog(false);
-          window.location.reload();
-        }}
+        onClose={() => setShowSuccessDialog(false)}
+        onConfirm={() => setShowSuccessDialog(false)}
         title="Pubblicazione completata"
         message="Le modifiche sono state pubblicate con successo! La pipeline è stata avviata."
         confirmText="OK"

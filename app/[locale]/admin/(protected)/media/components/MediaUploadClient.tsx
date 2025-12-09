@@ -4,8 +4,8 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { upload } from "@vercel/blob/client";
 import type { ActionResult } from "../actions";
-import { uploadMediaAction } from "../actions";
 import styles from "../styles";
 import Image from "next/image";
 
@@ -97,33 +97,65 @@ export default function MediaUploadClient() {
     setState(null);
 
     try {
-      const formData = new FormData();
-      // Send the File object directly instead of base64 (more efficient)
-      formData.set("file", selectedFile);
-      formData.set("fileType", fileType);
+      // Generate filename
+      let finalFilename: string;
       if (filename) {
-        formData.set("filename", filename);
+        const extensions = {
+          image: /\.(jpg|jpeg|png|gif|webp)$/i,
+          audio: /\.(mp3|wav)$/i,
+          json: /\.json$/i,
+        };
+        const defaultExt = {
+          image: "jpg",
+          audio: "mp3",
+          json: "json",
+        };
+
+        if (!filename.match(extensions[fileType])) {
+          finalFilename = `${filename}.${defaultExt[fileType]}`;
+        } else {
+          finalFilename = filename;
+        }
+      } else {
+        const timestamp = Date.now();
+        const random = Math.random().toString(36).substring(2, 9);
+        const extensions = {
+          image: "jpg",
+          audio: "mp3",
+          json: "json",
+        };
+        finalFilename = `file-${timestamp}-${random}.${extensions[fileType]}`;
       }
 
-      const result = await uploadMediaAction(null, formData);
+      // Upload file directly to Vercel Blob Storage using direct client upload
+      // This bypasses serverless function size limits
+      // The filename will be processed by the server to add the media/ prefix
+      const blob = await upload(`media/${finalFilename}`, selectedFile, {
+        access: "public",
+        contentType:
+          selectedFile.type ||
+          (fileType === "image"
+            ? "image/jpeg"
+            : fileType === "audio"
+              ? "audio/mpeg"
+              : "application/json"),
+        handleUploadUrl: "/api/media/upload-blob",
+      });
 
-      if (result.success) {
-        setState(result);
-        // Invalida la cache SWR per forzare il refetch
-        const { mutate } = await import("swr");
-        mutate("/api/media");
-        mutate("/api/github/merge/check");
-        setTimeout(() => {
-          handleRemove();
-          formRef.current?.reset();
-        }, 100);
-      } else if (!result.success) {
-        setState({
-          success: false,
-          error: result.error || "Failed to upload file",
-          errorType: result.errorType || "error",
-        });
-      }
+      // Success - invalidate cache and reset form
+      setState({
+        success: true,
+        data: blob.url,
+        message: "File uploaded successfully",
+      });
+      // Invalida la cache SWR per forzare il refetch
+      const { mutate } = await import("swr");
+      mutate("/api/media");
+      mutate("/api/github/merge/check");
+      setTimeout(() => {
+        handleRemove();
+        formRef.current?.reset();
+      }, 100);
     } catch (error) {
       setState({
         success: false,
