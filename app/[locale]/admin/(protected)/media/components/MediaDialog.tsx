@@ -74,9 +74,11 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
     if (file) {
       // Remove extension for editing
       const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
-      setNewFilename(nameWithoutExt);
-      setError(null);
-      setJsonContent(null);
+      setTimeout(() => {
+        setNewFilename(nameWithoutExt);
+        setError(null);
+        setJsonContent(null);
+      }, 0);
 
       // Load JSON content if it's a JSON file
       if (file.type === "json") {
@@ -95,6 +97,11 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
   if (!isOpen || !file) return null;
 
   async function handleRename() {
+    if (!file) {
+      setError({ message: "Nessun file selezionato", type: "error" });
+      return;
+    }
+
     if (!newFilename.trim()) {
       setError({ message: "Il nome del file non può essere vuoto", type: "error" });
       return;
@@ -226,7 +233,7 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
                     <audio controls className="w-full">
                       <source src={file.url} type="audio/mpeg" />
                       <source src={file.url} type="audio/wav" />
-                      Il tuo browser non supporta l'elemento audio.
+                      Il tuo browser non supporta l&apos;elemento audio.
                     </audio>
                   </div>
                 ) : (

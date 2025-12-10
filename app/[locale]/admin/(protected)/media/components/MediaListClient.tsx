@@ -3,7 +3,7 @@
  **************************************************/
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { Music, FileJson, Search, X } from "lucide-react";
 import styles from "../styles";
 import baseStyles from "../../styles";
@@ -16,11 +16,15 @@ import MediaDialog from "./MediaDialog";
 /* **************************************************
  * Media List Client Component
  **************************************************/
+const ITEMS_PER_PAGE = 20;
+
 export default function MediaListClient() {
   const [selectedFile, setSelectedFile] = useState<MediaFile | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState<"all" | "image" | "audio" | "json">("all");
+  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   // Usa SWR per ottenere i file media (cache pre-popolata dal server)
   const { mediaFiles = [], isLoading } = useMedia();
@@ -45,6 +49,45 @@ export default function MediaListClient() {
 
     return filtered;
   }, [mediaFiles, searchQuery, filterType]);
+
+  // Reset visible count when filters change
+  useEffect(() => {
+    setTimeout(() => {
+      setVisibleCount(ITEMS_PER_PAGE);
+    }, 0);
+  }, [searchQuery, filterType]);
+
+  // Get visible files
+  const visibleFiles = useMemo(() => {
+    return filteredFiles.slice(0, visibleCount);
+  }, [filteredFiles, visibleCount]);
+
+  const hasMore = visibleCount < filteredFiles.length;
+
+  // Intersection Observer for infinite scroll
+  useEffect(() => {
+    if (!hasMore || !sentinelRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (entry.isIntersecting) {
+          setVisibleCount((prev) => Math.min(prev + ITEMS_PER_PAGE, filteredFiles.length));
+        }
+      },
+      {
+        root: null,
+        rootMargin: "100px", // Start loading 100px before reaching the sentinel
+        threshold: 0.1,
+      },
+    );
+
+    observer.observe(sentinelRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [hasMore, filteredFiles.length]);
 
   function handleFileClick(file: MediaFile) {
     setSelectedFile(file);
@@ -132,14 +175,16 @@ export default function MediaListClient() {
         </div>
 
         {/* Results count */}
-        {(searchQuery || filterType !== "all") && (
-          <div className="text-sm text-secondary/60">
-            {filteredFiles.length === 0
-              ? "Nessun file trovato"
-              : `${filteredFiles.length} file${filteredFiles.length === 1 ? "" : ""} trovati`}
-            {mediaFiles.length !== filteredFiles.length && ` (su ${mediaFiles.length} totali)`}
-          </div>
-        )}
+        <div className="text-sm text-secondary/60">
+          {filteredFiles.length === 0 ? (
+            "Nessun file trovato"
+          ) : (
+            <>
+              Mostrando {visibleFiles.length} di {filteredFiles.length} file
+              {mediaFiles.length !== filteredFiles.length && ` (su ${mediaFiles.length} totali)`}
+            </>
+          )}
+        </div>
       </div>
 
       {mediaFiles.length === 0 ? (
@@ -157,35 +202,37 @@ export default function MediaListClient() {
           </p>
         </div>
       ) : (
-        <div className={styles.grid}>
-          {filteredFiles.map((file) => (
-            <div
-              key={file.name}
-              className={cn(styles.imageCard, "cursor-pointer")}
-              onClick={() => handleFileClick(file)}
-            >
-              {file.type === "image" ? (
-                <Image
-                  width={400}
-                  height={300}
-                  src={file.url}
-                  alt={file.name}
-                  className={styles.imageCardImg}
-                  unoptimized
-                />
-              ) : file.type === "audio" ? (
-                <div className="w-full h-48 bg-secondary/10 flex items-center justify-center">
-                  <Music className="w-16 h-16 text-secondary/60" />
-                </div>
-              ) : (
-                <div className="w-full h-48 bg-secondary/10 flex items-center justify-center">
-                  <FileJson className="w-16 h-16 text-secondary/60" />
-                </div>
-              )}
-              <div className={styles.imageCardName}>{file.name}</div>
-            </div>
-          ))}
-        </div>
+        <>
+          <div className={styles.grid}>
+            {visibleFiles.map((file) => (
+              <div
+                key={file.name}
+                className={cn(styles.imageCard, "cursor-pointer")}
+                onClick={() => handleFileClick(file)}
+              >
+                {file.type === "image" ? (
+                  <Image
+                    width={400}
+                    height={300}
+                    src={file.url}
+                    alt={file.name}
+                    className={styles.imageCardImg}
+                    unoptimized
+                  />
+                ) : file.type === "audio" ? (
+                  <div className="w-full h-48 bg-secondary/10 flex items-center justify-center">
+                    <Music className="w-16 h-16 text-secondary/60" />
+                  </div>
+                ) : (
+                  <div className="w-full h-48 bg-secondary/10 flex items-center justify-center">
+                    <FileJson className="w-16 h-16 text-secondary/60" />
+                  </div>
+                )}
+                <div className={styles.imageCardName}>{file.name}</div>
+              </div>
+            ))}
+          </div>
+        </>
       )}
 
       {/* Media Dialog */}

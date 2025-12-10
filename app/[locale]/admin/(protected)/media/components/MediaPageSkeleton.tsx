@@ -45,11 +45,6 @@ export default function MediaPageSkeleton() {
 
               {/* Filename Skeleton - positioned at bottom like real card */}
               <div className="absolute bottom-0 left-0 right-0 bg-secondary/30 h-8 animate-pulse" />
-
-              {/* Overlay Skeleton (hidden but maintains structure) */}
-              <div className={styles.imageCardOverlay} style={{ opacity: 0 }}>
-                <div className="h-8 w-20 bg-secondary/20 animate-pulse" />
-              </div>
             </div>
           ))}
         </div>

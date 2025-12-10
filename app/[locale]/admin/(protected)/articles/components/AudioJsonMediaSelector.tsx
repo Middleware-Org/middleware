@@ -3,14 +3,16 @@
  **************************************************/
 "use client";
 
-import { useState, useRef, useMemo } from "react";
-import { Search, X } from "lucide-react";
+import { useState, useRef, useMemo, useEffect } from "react";
+import { Search, X, Music, FileJson } from "lucide-react";
 import { upload } from "@vercel/blob/client";
 import baseStyles from "../../styles";
 import styles from "../../media/styles";
 import { useMedia } from "@/hooks/swr";
 import { mutate } from "swr";
 import { cn } from "@/lib/utils/classes";
+import type { MediaFile } from "@/lib/github/media";
+import MediaDialog from "../../media/components/MediaDialog";
 
 /* **************************************************
  * Types
@@ -26,6 +28,8 @@ interface AudioJsonMediaSelectorProps {
 /* **************************************************
  * Audio/JSON Media Selector Component
  **************************************************/
+const ITEMS_PER_PAGE = 20;
+
 export default function AudioJsonMediaSelector({
   isOpen,
   onClose,
@@ -41,6 +45,10 @@ export default function AudioJsonMediaSelector({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [filename, setFilename] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
+  const [selectedFileForDialog, setSelectedFileForDialog] = useState<MediaFile | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   // Usa SWR per caricare i media files con cache
   const { mediaFiles: allMediaFiles = [], isLoading: loading, isError } = useMedia();
@@ -53,18 +61,69 @@ export default function AudioJsonMediaSelector({
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
-        (file) => file.name.toLowerCase().includes(query) || file.url.toLowerCase().includes(query),
+        (file) =>
+          file.name.toLowerCase().includes(query) || file.path.toLowerCase().includes(query),
       );
     }
 
     return filtered;
   }, [allMediaFiles, fileType, searchQuery]);
 
+  // Reset visible count when search changes
+  useEffect(() => {
+    setTimeout(() => {
+      setVisibleCount(ITEMS_PER_PAGE);
+    }, 0);
+  }, [searchQuery]);
+
+  // Get visible files
+  const visibleFiles = useMemo(() => {
+    return filteredMediaFiles.slice(0, visibleCount);
+  }, [filteredMediaFiles, visibleCount]);
+
+  const hasMore = visibleCount < filteredMediaFiles.length;
+
+  // Intersection Observer for infinite scroll
+  useEffect(() => {
+    if (!hasMore || !sentinelRef.current || !isOpen) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (entry.isIntersecting) {
+          setVisibleCount((prev) => Math.min(prev + ITEMS_PER_PAGE, filteredMediaFiles.length));
+        }
+      },
+      {
+        root: null,
+        rootMargin: "100px",
+        threshold: 0.1,
+      },
+    );
+
+    observer.observe(sentinelRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [hasMore, filteredMediaFiles.length, isOpen]);
+
   const error = isError ? "Failed to load media files" : null;
 
   function handleSelect(fileUrl: string) {
     onSelect(fileUrl);
     onClose();
+  }
+
+  function handleFileClick(file: MediaFile, event: React.MouseEvent) {
+    event.stopPropagation();
+    setSelectedFileForDialog(file);
+    setIsDialogOpen(true);
+  }
+
+  function handleDialogClose() {
+    setIsDialogOpen(false);
+    setSelectedFileForDialog(null);
   }
 
   function handleFileSelect(event: React.ChangeEvent<HTMLInputElement>) {
@@ -286,7 +345,7 @@ export default function AudioJsonMediaSelector({
             </h3>
 
             {/* Search Bar */}
-            <div className="mb-4 relative">
+            <div className="relative mb-4">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary/60" />
               <input
                 type="text"
@@ -307,14 +366,28 @@ export default function AudioJsonMediaSelector({
               )}
             </div>
 
-            {loading && (
+            {/* Results count */}
+            <div className="text-sm text-secondary/60 mb-4">
+              {filteredMediaFiles.length === 0 ? (
+                "Nessun file trovato"
+              ) : (
+                <>
+                  Mostrando {visibleFiles.length} di {filteredMediaFiles.length} file
+                  {allMediaFiles.filter((f) => f.type === fileType).length !==
+                    filteredMediaFiles.length &&
+                    ` (su ${allMediaFiles.filter((f) => f.type === fileType).length} totali)`}
+                </>
+              )}
+            </div>
+
+            {loading && filteredMediaFiles.length === 0 && (
               <div className={baseStyles.loadingText}>Caricamento file {fileTypeLabel}...</div>
             )}
 
             {error && <div className={baseStyles.error}>{error}</div>}
 
             {!loading && !error && filteredMediaFiles.length === 0 && (
-              <div className={baseStyles.emptyState}>
+              <div className={styles.empty}>
                 {searchQuery ? (
                   <>
                     <p>Nessun file corrisponde alla ricerca &quot;{searchQuery}&quot;</p>
@@ -334,34 +407,64 @@ export default function AudioJsonMediaSelector({
             )}
 
             {!loading && !error && filteredMediaFiles.length > 0 && (
-              <div className="space-y-2">
-                {searchQuery && (
-                  <div className="text-xs text-secondary/60 mb-2">
-                    {filteredMediaFiles.length} file trovati
-                    {allMediaFiles.filter((f) => f.type === fileType).length !==
-                      filteredMediaFiles.length &&
-                      ` (su ${allMediaFiles.filter((f) => f.type === fileType).length} totali)`}
+              <>
+                <div className={styles.grid}>
+                  {visibleFiles.map((file) => (
+                    <div
+                      key={file.name}
+                      className={cn(styles.imageCard, "cursor-pointer relative group")}
+                    >
+                      <div onClick={() => handleSelect(file.url)}>
+                        {file.type === "audio" ? (
+                          <div className="w-full h-48 bg-secondary/10 flex items-center justify-center">
+                            <Music className="w-16 h-16 text-secondary/60" />
+                          </div>
+                        ) : (
+                          <div className="w-full h-48 bg-secondary/10 flex items-center justify-center">
+                            <FileJson className="w-16 h-16 text-secondary/60" />
+                          </div>
+                        )}
+                        <div className={styles.imageCardName}>{file.name}</div>
+                      </div>
+                      <div
+                        className={cn(
+                          "absolute inset-0 bg-secondary/50 opacity-0 group-hover:opacity-100",
+                          "transition-opacity duration-150 flex items-center justify-center gap-2",
+                        )}
+                        onClick={(e) => handleFileClick(file, e)}
+                      >
+                        <button
+                          type="button"
+                          className={cn(
+                            "px-3 py-1 text-sm bg-primary/90 text-secondary hover:bg-primary",
+                            "border border-secondary transition-all duration-150",
+                          )}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleFileClick(file, e);
+                          }}
+                        >
+                          Gestisci
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Sentinel for infinite scroll */}
+                {hasMore && (
+                  <div
+                    ref={sentinelRef}
+                    className="w-full h-20 flex items-center justify-center"
+                    aria-hidden="true"
+                  >
+                    <div className="flex items-center gap-2 text-sm text-secondary/60">
+                      <div className="w-4 h-4 border-2 border-secondary/30 border-t-secondary/80 rounded-full animate-spin" />
+                      <span>Caricamento altri file...</span>
+                    </div>
                   </div>
                 )}
-                {filteredMediaFiles.map((file) => (
-                  <button
-                    key={file.name}
-                    type="button"
-                    onClick={() => handleSelect(file.url)}
-                    className="w-full p-3 border border-secondary hover:bg-tertiary/10 transition-colors text-left"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-secondary">{file.name}</p>
-                        <p className="text-xs text-secondary/60 mt-1">{file.url}</p>
-                      </div>
-                      <span className="text-xs text-secondary/60">
-                        {fileType === "audio" ? "🎵" : "📄"}
-                      </span>
-                    </div>
-                  </button>
-                ))}
-              </div>
+              </>
             )}
           </div>
         </div>
@@ -373,6 +476,9 @@ export default function AudioJsonMediaSelector({
           </button>
         </div>
       </div>
+
+      {/* Media Dialog */}
+      <MediaDialog isOpen={isDialogOpen} onClose={handleDialogClose} file={selectedFileForDialog} />
     </div>
   );
 }
