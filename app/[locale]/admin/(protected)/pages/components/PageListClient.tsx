@@ -5,10 +5,11 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition, useMemo, Fragment } from "react";
-import { ExternalLink, Hash, Pencil, Trash2 } from "lucide-react";
-import { deletePageAction } from "../actions";
+import { useState, useTransition, useMemo, useEffect, Fragment } from "react";
+import { ExternalLink, Hash, Pencil, Trash2, X } from "lucide-react";
+import { deletePageAction, deletePagesAction } from "../actions";
 import { useTableState } from "@/hooks/useTableState";
+import { useTableSelection } from "@/hooks/useTableSelection";
 import {
   Table,
   TableHeader,
@@ -20,6 +21,7 @@ import {
   ItemsPerPageSelector,
   type ColumnConfig,
 } from "@/components/table";
+import { TableCheckbox } from "@/components/table/TableCheckbox";
 import { SearchInput } from "@/components/search";
 import { Pagination } from "@/components/pagination";
 import ConfirmDialog from "@/components/molecules/confirmDialog";
@@ -50,6 +52,13 @@ export default function PageListClient() {
     isOpen: false,
     page: null,
   });
+  const [deleteMultipleDialog, setDeleteMultipleDialog] = useState<{
+    isOpen: boolean;
+    count: number;
+  }>({
+    isOpen: false,
+    count: 0,
+  });
 
   // Usa SWR per ottenere le pagine (cache pre-popolata dal server)
   const { pages = [], isLoading } = usePages();
@@ -78,10 +87,27 @@ export default function PageListClient() {
     initialSort: { key: "slug", direction: "asc" },
   });
 
+  // Multi-selection
+  const {
+    selectedIds,
+    isAllSelected,
+    isIndeterminate,
+    toggleSelection,
+    toggleSelectAll,
+    clearSelection,
+    isSelected,
+    selectedCount,
+  } = useTableSelection(tableData, (page) => page.slug);
+
   // Get visible column configs
   const visibleColumnConfigs = useMemo(() => {
     return columnConfig.filter((col) => visibleColumns.includes(col.key));
   }, [visibleColumns]);
+
+  // Clear selection when search or page changes
+  useEffect(() => {
+    clearSelection();
+  }, [search, currentPage, clearSelection]);
 
   function handleEdit(page: Page) {
     router.push(`/admin/pages/${page.slug}/edit`);
@@ -111,6 +137,39 @@ export default function PageListClient() {
         mutate("/api/pages");
         mutate(`/api/pages/${slug}`);
         mutate("/api/github/merge/check");
+        clearSelection();
+      }
+    });
+  }
+
+  function handleDeleteMultipleClick() {
+    if (selectedCount === 0) return;
+    setDeleteMultipleDialog({ isOpen: true, count: selectedCount });
+  }
+
+  async function handleDeleteMultipleConfirm() {
+    if (selectedIds.length === 0) return;
+
+    setError(null);
+    setDeleteMultipleDialog({ isOpen: false, count: 0 });
+
+    startTransition(async () => {
+      const result = await deletePagesAction(selectedIds);
+
+      if (!result.success) {
+        setError({
+          message: result.error,
+          type: result.errorType || "error",
+        });
+      } else {
+        // Invalida la cache SWR per forzare il refetch
+        mutate("/api/pages");
+        // Invalida anche le singole pagine
+        selectedIds.forEach((slug) => {
+          mutate(`/api/pages/${slug}`);
+        });
+        mutate("/api/github/merge/check");
+        clearSelection();
       }
     });
   }
@@ -217,6 +276,14 @@ export default function PageListClient() {
         <Table>
           <TableHeader>
             <TableRow>
+              <th className={baseStyles.tableHeaderCell} style={{ width: "40px" }}>
+                <TableCheckbox
+                  checked={isAllSelected}
+                  indeterminate={isIndeterminate}
+                  onChange={toggleSelectAll}
+                  ariaLabel="Seleziona tutti"
+                />
+              </th>
               {visibleColumnConfigs.map((column) => {
                 if (column.key === "actions") {
                   return (
@@ -242,7 +309,7 @@ export default function PageListClient() {
             {tableData.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={visibleColumnConfigs.length}
+                  colSpan={visibleColumnConfigs.length + 1}
                   className={baseStyles.tableEmptyCell}
                 >
                   Nessuna pagina trovata
@@ -251,6 +318,14 @@ export default function PageListClient() {
             ) : (
               tableData.map((page) => (
                 <TableRow key={page.slug}>
+                  <TableCell>
+                    <TableCheckbox
+                      checked={isSelected(page.slug)}
+                      onChange={() => toggleSelection(page.slug)}
+                      disabled={isPending}
+                      ariaLabel={`Seleziona ${page.title || page.slug}`}
+                    />
+                  </TableCell>
                   {visibleColumnConfigs.map((column) => (
                     <Fragment key={column.key}>{renderCell(page, column.key)}</Fragment>
                   ))}
@@ -266,6 +341,33 @@ export default function PageListClient() {
         )}
       </div>
 
+      {/* Bulk Actions */}
+      {selectedCount > 0 && (
+        <div className="mt-4 flex items-center gap-2 p-3 bg-tertiary/10 border border-tertiary rounded">
+          <span className="text-sm text-secondary">
+            {selectedCount} {selectedCount === 1 ? "pagina selezionata" : "pagine selezionate"}
+          </span>
+          <button
+            onClick={handleDeleteMultipleClick}
+            disabled={isPending}
+            className={cn(styles.iconButton, styles.iconButtonDanger, "ml-auto")}
+            aria-label="Elimina selezionate"
+            title="Elimina selezionate"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+          <button
+            onClick={clearSelection}
+            disabled={isPending}
+            className={cn(styles.iconButton)}
+            aria-label="Deseleziona tutto"
+            title="Deseleziona tutto"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       {/* Delete Confirmation Dialog */}
       {deleteDialog.page && (
         <ConfirmDialog
@@ -280,6 +382,19 @@ export default function PageListClient() {
           isLoading={isPending}
         />
       )}
+
+      {/* Delete Multiple Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={deleteMultipleDialog.isOpen}
+        onClose={() => setDeleteMultipleDialog({ isOpen: false, count: 0 })}
+        onConfirm={handleDeleteMultipleConfirm}
+        title="Elimina Pagine"
+        message={`Sei sicuro di voler eliminare ${deleteMultipleDialog.count} pagin${deleteMultipleDialog.count === 1 ? "a" : "e"}? Questa azione non può essere annullata.`}
+        confirmText="Elimina"
+        cancelText="Annulla"
+        confirmButtonClassName={styles.deleteButton}
+        isLoading={isPending}
+      />
     </div>
   );
 }
