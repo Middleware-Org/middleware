@@ -29,6 +29,9 @@ export default function UserListSkeleton() {
         <Table>
           <TableHeader>
             <TableRow>
+              <th className="px-4 py-3" style={{ width: "40px" }}>
+                <div className="h-4 w-4 bg-secondary/20 animate-pulse" />
+              </th>
               <th className="px-4 py-3">
                 <div className="h-4 w-16 bg-secondary/20 animate-pulse" />
               </th>
@@ -49,6 +52,9 @@ export default function UserListSkeleton() {
           <TableBody>
             {[1, 2, 3, 4, 5].map((i) => (
               <TableRow key={i}>
+                <TableCell>
+                  <div className="h-4 w-4 bg-secondary/20 animate-pulse" />
+                </TableCell>
                 <TableCell>
                   <div className="h-4 w-48 bg-secondary/20 animate-pulse" />
                 </TableCell>

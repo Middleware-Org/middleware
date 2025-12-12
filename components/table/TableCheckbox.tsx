@@ -40,9 +40,14 @@ export function TableCheckbox({
       aria-label={ariaLabel}
       className={cn(
         "w-4 h-4 cursor-pointer",
-        "border-secondary text-tertiary",
-        "focus:ring-2 focus:ring-tertiary focus:ring-offset-1",
+        "border border-secondary bg-primary",
+        "text-tertiary",
+        "hover:border-tertiary hover:bg-tertiary/10",
+        "focus:outline-none focus:ring-2 focus:ring-tertiary focus:ring-offset-1",
+        "transition-all duration-150",
         "disabled:opacity-50 disabled:cursor-not-allowed",
+        "disabled:hover:border-secondary disabled:hover:bg-primary",
+        "checked:bg-tertiary checked:border-tertiary",
         className,
       )}
     />

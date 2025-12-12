@@ -269,33 +269,6 @@ export default function AuthorListClient() {
             <span className="text-xs text-secondary/80">{totalItems}</span>
           </div>
         </div>
-
-        {/* Bulk Actions */}
-        {selectedCount > 0 && (
-          <div className="mt-4 flex items-center gap-2 p-3 bg-tertiary/10 border border-tertiary rounded">
-            <span className="text-sm text-secondary">
-              {selectedCount} {selectedCount === 1 ? "autore selezionato" : "autori selezionati"}
-            </span>
-            <button
-              onClick={handleDeleteMultipleClick}
-              disabled={isPending}
-              className={cn(styles.iconButton, styles.iconButtonDanger, "ml-auto")}
-              aria-label="Elimina selezionati"
-              title="Elimina selezionati"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
-            <button
-              onClick={clearSelection}
-              disabled={isPending}
-              className={cn(styles.iconButton)}
-              aria-label="Deseleziona tutto"
-              title="Deseleziona tutto"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        )}
       </div>
 
       {/* Table */}
@@ -367,6 +340,33 @@ export default function AuthorListClient() {
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setPage} />
         )}
       </div>
+
+      {/* Bulk Actions */}
+      {selectedCount > 0 && (
+        <div className="mt-4 flex items-center gap-2 p-3 bg-tertiary/10 border border-tertiary rounded">
+          <span className="text-sm text-secondary">
+            {selectedCount} {selectedCount === 1 ? "autore selezionato" : "autori selezionati"}
+          </span>
+          <button
+            onClick={handleDeleteMultipleClick}
+            disabled={isPending}
+            className={cn(styles.iconButton, styles.iconButtonDanger, "ml-auto")}
+            aria-label="Elimina selezionati"
+            title="Elimina selezionati"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+          <button
+            onClick={clearSelection}
+            disabled={isPending}
+            className={cn(styles.iconButton)}
+            aria-label="Deseleziona tutto"
+            title="Deseleziona tutto"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       {/* Delete Confirmation Dialog */}
       {deleteDialog.author && (
