@@ -1,7 +1,7 @@
 /* **************************************************
  * Imports
  **************************************************/
-import MediaPageSkeleton from "./components/MediaPageSkeleton";
+import MediaPageSkeleton from "./components/MediaListSkeleton";
 
 /* **************************************************
  * Loading Page
@@ -9,4 +9,3 @@ import MediaPageSkeleton from "./components/MediaPageSkeleton";
 export default function Loading() {
   return <MediaPageSkeleton />;
 }
-

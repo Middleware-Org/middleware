@@ -6,9 +6,10 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition, useMemo, useEffect, Fragment } from "react";
-import { ExternalLink, Hash, Pencil, Trash2 } from "lucide-react";
-import { deleteIssueAction } from "../actions";
+import { ExternalLink, Hash, Pencil, Trash2, X } from "lucide-react";
+import { deleteIssueAction, deleteIssuesAction } from "../actions";
 import { useTableState } from "@/hooks/useTableState";
+import { useTableSelection } from "@/hooks/useTableSelection";
 import {
   Table,
   TableHeader,
@@ -20,6 +21,7 @@ import {
   type ColumnConfig,
   ItemsPerPageSelector,
 } from "@/components/table";
+import { TableCheckbox } from "@/components/table/TableCheckbox";
 import { SearchInput } from "@/components/search";
 import { Pagination } from "@/components/pagination";
 import ConfirmDialog from "@/components/molecules/confirmDialog";
@@ -56,6 +58,13 @@ export default function IssueListClient() {
     isOpen: false,
     issue: null,
   });
+  const [deleteMultipleDialog, setDeleteMultipleDialog] = useState<{
+    isOpen: boolean;
+    count: number;
+  }>({
+    isOpen: false,
+    count: 0,
+  });
 
   // Usa SWR per ottenere le issues (cache pre-popolata dal server)
   const { issues = [], isLoading } = useIssues();
@@ -84,6 +93,18 @@ export default function IssueListClient() {
     itemsPerPage: 10,
   });
 
+  // Multi-selection
+  const {
+    selectedIds,
+    isAllSelected,
+    isIndeterminate,
+    toggleSelection,
+    toggleSelectAll,
+    clearSelection,
+    isSelected,
+    selectedCount,
+  } = useTableSelection(tableData, (issue) => issue.slug);
+
   // Get visible column configs
   const visibleColumnConfigs = useMemo(() => {
     return columnConfig.filter((col) => visibleColumns.includes(col.key));
@@ -93,6 +114,11 @@ export default function IssueListClient() {
   useEffect(() => {
     setLocalIssues(issues);
   }, [issues]);
+
+  // Clear selection when search or page changes
+  useEffect(() => {
+    clearSelection();
+  }, [search, currentPage, clearSelection]);
 
   function handleEdit(issue: Issue) {
     router.push(`/admin/issues/${issue.slug}/edit`);
@@ -121,6 +147,35 @@ export default function IssueListClient() {
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/issues");
         mutate("/api/github/merge/check");
+        clearSelection();
+      }
+    });
+  }
+
+  function handleDeleteMultipleClick() {
+    if (selectedCount === 0) return;
+    setDeleteMultipleDialog({ isOpen: true, count: selectedCount });
+  }
+
+  async function handleDeleteMultipleConfirm() {
+    if (selectedIds.length === 0) return;
+
+    setError(null);
+    setDeleteMultipleDialog({ isOpen: false, count: 0 });
+
+    startTransition(async () => {
+      const result = await deleteIssuesAction(selectedIds);
+
+      if (!result.success) {
+        setError({
+          message: result.error,
+          type: result.errorType || "error",
+        });
+      } else {
+        // Invalida la cache SWR per forzare il refetch
+        mutate("/api/issues");
+        mutate("/api/github/merge/check");
+        clearSelection();
       }
     });
   }
@@ -261,6 +316,14 @@ export default function IssueListClient() {
         <Table>
           <TableHeader>
             <TableRow>
+              <th className={baseStyles.tableHeaderCell} style={{ width: "40px" }}>
+                <TableCheckbox
+                  checked={isAllSelected}
+                  indeterminate={isIndeterminate}
+                  onChange={toggleSelectAll}
+                  ariaLabel="Seleziona tutti"
+                />
+              </th>
               {visibleColumnConfigs.map((column) => {
                 if (column.key === "actions") {
                   return (
@@ -286,7 +349,7 @@ export default function IssueListClient() {
             {tableData.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={visibleColumnConfigs.length}
+                  colSpan={visibleColumnConfigs.length + 1}
                   className={baseStyles.tableEmptyCell}
                 >
                   Nessuna issue trovata
@@ -295,6 +358,14 @@ export default function IssueListClient() {
             ) : (
               tableData.map((issue) => (
                 <TableRow key={issue.slug}>
+                  <TableCell>
+                    <TableCheckbox
+                      checked={isSelected(issue.slug)}
+                      onChange={() => toggleSelection(issue.slug)}
+                      disabled={isPending}
+                      ariaLabel={`Seleziona ${issue.title}`}
+                    />
+                  </TableCell>
                   {visibleColumnConfigs.map((column) => (
                     <Fragment key={column.key}>{renderCell(issue, column.key)}</Fragment>
                   ))}
@@ -310,6 +381,33 @@ export default function IssueListClient() {
         )}
       </div>
 
+      {/* Bulk Actions */}
+      {selectedCount > 0 && (
+        <div className="mt-4 flex items-center gap-2 p-3 bg-tertiary/10 border border-tertiary rounded">
+          <span className="text-sm text-secondary">
+            {selectedCount} {selectedCount === 1 ? "issue selezionata" : "issue selezionate"}
+          </span>
+          <button
+            onClick={handleDeleteMultipleClick}
+            disabled={isPending}
+            className={cn(styles.iconButton, styles.iconButtonDanger, "ml-auto")}
+            aria-label="Elimina selezionate"
+            title="Elimina selezionate"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+          <button
+            onClick={clearSelection}
+            disabled={isPending}
+            className={cn(styles.iconButton)}
+            aria-label="Deseleziona tutto"
+            title="Deseleziona tutto"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       {/* Delete Confirmation Dialog */}
       {deleteDialog.issue && (
         <ConfirmDialog
@@ -324,6 +422,19 @@ export default function IssueListClient() {
           isLoading={isPending}
         />
       )}
+
+      {/* Delete Multiple Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={deleteMultipleDialog.isOpen}
+        onClose={() => setDeleteMultipleDialog({ isOpen: false, count: 0 })}
+        onConfirm={handleDeleteMultipleConfirm}
+        title="Elimina Issue"
+        message={`Sei sicuro di voler eliminare ${deleteMultipleDialog.count} issue? Questa azione non può essere annullata.`}
+        confirmText="Elimina"
+        cancelText="Annulla"
+        confirmButtonClassName={styles.deleteButton}
+        isLoading={isPending}
+      />
     </div>
   );
 }
