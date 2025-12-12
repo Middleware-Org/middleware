@@ -98,6 +98,58 @@ export async function deleteMediaAction(filename: string): Promise<ActionResult>
   }
 }
 
+export async function deleteMediaFilesAction(
+  filenames: string[],
+): Promise<ActionResult<{ deleted: number; failed: number }>> {
+  try {
+    const user = await getUser();
+    if (!user) {
+      return { success: false, error: "Unauthorized", errorType: "error" };
+    }
+
+    if (!filenames || filenames.length === 0) {
+      return { success: false, error: "At least one filename is required", errorType: "error" };
+    }
+
+    let deleted = 0;
+    let failed = 0;
+    const errors: string[] = [];
+
+    for (const filename of filenames) {
+      try {
+        await deleteMediaFile(filename);
+        deleted++;
+      } catch (error) {
+        failed++;
+        const errorMessage = error instanceof Error ? error.message : "Failed to delete file";
+        errors.push(`${filename}: ${errorMessage}`);
+      }
+    }
+
+    revalidatePath("/admin/media");
+
+    if (failed > 0) {
+      return {
+        success: false,
+        error: `Eliminati ${deleted} file, ${failed} falliti. ${errors.join("; ")}`,
+        errorType: "warning",
+      };
+    }
+
+    return {
+      success: true,
+      data: { deleted, failed },
+      message: `Eliminati con successo ${deleted} file`,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to delete files",
+      errorType: "error",
+    };
+  }
+}
+
 export async function renameMediaAction(
   oldFilename: string,
   newFilename: string,

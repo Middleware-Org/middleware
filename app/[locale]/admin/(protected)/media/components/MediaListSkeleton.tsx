@@ -13,6 +13,9 @@ export default function MediaListSkeleton() {
       <div className={styles.grid}>
         {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
           <div key={i} className={styles.imageCard}>
+            {/* Checkbox Skeleton */}
+            <div className="absolute top-2 left-2 z-10 h-4 w-4 bg-secondary/20 animate-pulse" />
+
             {/* Image Skeleton - matches h-48 from imageCardImg */}
             <div className="relative w-full h-48 bg-secondary/20 animate-pulse" />
 

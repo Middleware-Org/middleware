@@ -3,8 +3,8 @@
  **************************************************/
 "use client";
 
-import { useState, useMemo, useEffect, useRef } from "react";
-import { Music, FileJson, Search, X } from "lucide-react";
+import { useState, useMemo, useEffect, useRef, useTransition } from "react";
+import { Music, FileJson, Search, X, Trash2 } from "lucide-react";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import Image from "next/image";
@@ -12,6 +12,11 @@ import { useMedia } from "@/hooks/swr";
 import { cn } from "@/lib/utils/classes";
 import type { MediaFile } from "@/lib/github/media";
 import MediaDialog from "./MediaDialog";
+import { useTableSelection } from "@/hooks/useTableSelection";
+import { TableCheckbox } from "@/components/table/TableCheckbox";
+import { deleteMediaFilesAction } from "../actions";
+import { mutate } from "swr";
+import ConfirmDialog from "@/components/molecules/confirmDialog";
 
 /* **************************************************
  * Media List Client Component
@@ -25,6 +30,15 @@ export default function MediaListClient() {
   const [filterType, setFilterType] = useState<"all" | "image" | "audio" | "json">("all");
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
+  const [deleteMultipleDialog, setDeleteMultipleDialog] = useState<{
+    isOpen: boolean;
+    count: number;
+  }>({
+    isOpen: false,
+    count: 0,
+  });
 
   // Usa SWR per ottenere i file media (cache pre-popolata dal server)
   const { mediaFiles = [], isLoading } = useMedia();
@@ -64,6 +78,23 @@ export default function MediaListClient() {
 
   const hasMore = visibleCount < filteredFiles.length;
 
+  // Multi-selection
+  const {
+    selectedIds,
+    isAllSelected,
+    isIndeterminate,
+    toggleSelection,
+    toggleSelectAll,
+    clearSelection,
+    isSelected,
+    selectedCount,
+  } = useTableSelection(visibleFiles, (file) => file.name);
+
+  // Clear selection when filters change
+  useEffect(() => {
+    clearSelection();
+  }, [searchQuery, filterType, clearSelection]);
+
   // Intersection Observer for infinite scroll
   useEffect(() => {
     if (!hasMore || !sentinelRef.current) return;
@@ -89,7 +120,11 @@ export default function MediaListClient() {
     };
   }, [hasMore, filteredFiles.length]);
 
-  function handleFileClick(file: MediaFile) {
+  function handleFileClick(file: MediaFile, event?: React.MouseEvent) {
+    // If clicking on checkbox, don't open dialog
+    if (event && (event.target as HTMLElement).closest('input[type="checkbox"]')) {
+      return;
+    }
     setSelectedFile(file);
     setIsDialogOpen(true);
   }
@@ -97,6 +132,34 @@ export default function MediaListClient() {
   function handleDialogClose() {
     setIsDialogOpen(false);
     setSelectedFile(null);
+  }
+
+  function handleDeleteMultipleClick() {
+    if (selectedCount === 0) return;
+    setDeleteMultipleDialog({ isOpen: true, count: selectedCount });
+  }
+
+  async function handleDeleteMultipleConfirm() {
+    if (selectedIds.length === 0) return;
+
+    setError(null);
+    setDeleteMultipleDialog({ isOpen: false, count: 0 });
+
+    startTransition(async () => {
+      const result = await deleteMediaFilesAction(selectedIds);
+
+      if (!result.success) {
+        setError({
+          message: result.error,
+          type: result.errorType || "error",
+        });
+      } else {
+        // Invalida la cache SWR per forzare il refetch
+        mutate("/api/media");
+        mutate("/api/github/merge/check");
+        clearSelection();
+      }
+    });
   }
 
   // Mostra loading solo se non ci sono dati (prima richiesta)
@@ -110,27 +173,46 @@ export default function MediaListClient() {
 
   return (
     <div className={baseStyles.container}>
+      {error && (
+        <div className={error.type === "warning" ? baseStyles.errorWarning : baseStyles.error}>
+          ⚠️ {error.message}
+        </div>
+      )}
+
       {/* Search and Filter Controls */}
       <div className="mb-6 space-y-4">
-        {/* Search Bar */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary/60" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Cerca file per nome..."
-            className={cn(styles.input, "pl-10 pr-10")}
-          />
-          {searchQuery && (
-            <button
-              type="button"
-              onClick={() => setSearchQuery("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-secondary/10 transition-colors"
-              title="Pulisci ricerca"
-            >
-              <X className="w-4 h-4 text-secondary" />
-            </button>
+        {/* Search Bar and Select All */}
+        <div className="flex items-center gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary/60" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Cerca file per nome..."
+              className={cn(styles.input, "pl-10 pr-10")}
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-secondary/10 transition-colors"
+                title="Pulisci ricerca"
+              >
+                <X className="w-4 h-4 text-secondary" />
+              </button>
+            )}
+          </div>
+          {filteredFiles.length > 0 && (
+            <div className="flex items-center gap-2">
+              <TableCheckbox
+                checked={isAllSelected}
+                indeterminate={isIndeterminate}
+                onChange={toggleSelectAll}
+                ariaLabel="Seleziona tutti"
+              />
+              <span className="text-sm text-secondary/60">Seleziona tutti</span>
+            </div>
           )}
         </div>
 
@@ -203,40 +285,107 @@ export default function MediaListClient() {
         </div>
       ) : (
         <>
-          <div className={styles.grid}>
-            {visibleFiles.map((file) => (
-              <div
-                key={file.name}
-                className={cn(styles.imageCard, "cursor-pointer")}
-                onClick={() => handleFileClick(file)}
-              >
-                {file.type === "image" ? (
-                  <Image
-                    width={400}
-                    height={300}
-                    src={file.url}
-                    alt={file.name}
-                    className={styles.imageCardImg}
-                    unoptimized
-                  />
-                ) : file.type === "audio" ? (
-                  <div className="w-full h-48 bg-secondary/10 flex items-center justify-center">
-                    <Music className="w-16 h-16 text-secondary/60" />
-                  </div>
-                ) : (
-                  <div className="w-full h-48 bg-secondary/10 flex items-center justify-center">
-                    <FileJson className="w-16 h-16 text-secondary/60" />
-                  </div>
+          {/* Bulk Actions */}
+          {selectedCount > 0 && (
+            <div className="mb-4 flex items-center gap-2 p-3 bg-tertiary/10 border border-tertiary rounded">
+              <span className="text-sm text-secondary">
+                {selectedCount} {selectedCount === 1 ? "file selezionato" : "file selezionati"}
+              </span>
+              <button
+                onClick={handleDeleteMultipleClick}
+                disabled={isPending}
+                className={cn(
+                  "ml-auto px-3 py-1 text-sm bg-tertiary text-white hover:bg-tertiary/90",
+                  "focus:outline-none focus:ring-2 focus:ring-tertiary transition-all duration-150",
+                  "disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2",
                 )}
-                <div className={styles.imageCardName}>{file.name}</div>
-              </div>
-            ))}
+                aria-label="Elimina selezionati"
+                title="Elimina selezionati"
+              >
+                <Trash2 className="w-4 h-4" />
+                Elimina
+              </button>
+              <button
+                onClick={clearSelection}
+                disabled={isPending}
+                className={cn(
+                  "px-3 py-1 text-sm border border-secondary hover:bg-tertiary hover:text-white",
+                  "transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-tertiary",
+                  "disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2",
+                )}
+                aria-label="Deseleziona tutto"
+                title="Deseleziona tutto"
+              >
+                <X className="w-4 h-4" />
+                Annulla
+              </button>
+            </div>
+          )}
+
+          <div className={styles.grid}>
+            {visibleFiles.map((file) => {
+              const isFileSelected = isSelected(file.name);
+              return (
+                <div
+                  key={file.name}
+                  className={cn(
+                    styles.imageCard,
+                    "cursor-pointer relative",
+                    isFileSelected && "ring-2 ring-tertiary",
+                  )}
+                  onClick={(e) => handleFileClick(file, e)}
+                >
+                  {/* Checkbox overlay */}
+                  <div className="absolute top-2 left-2 z-10" onClick={(e) => e.stopPropagation()}>
+                    <TableCheckbox
+                      checked={isFileSelected}
+                      onChange={() => toggleSelection(file.name)}
+                      disabled={isPending}
+                      ariaLabel={`Seleziona ${file.name}`}
+                    />
+                  </div>
+
+                  {file.type === "image" ? (
+                    <Image
+                      width={400}
+                      height={300}
+                      src={file.url}
+                      alt={file.name}
+                      className={styles.imageCardImg}
+                      unoptimized
+                    />
+                  ) : file.type === "audio" ? (
+                    <div className="w-full h-48 bg-secondary/10 flex items-center justify-center">
+                      <Music className="w-16 h-16 text-secondary/60" />
+                    </div>
+                  ) : (
+                    <div className="w-full h-48 bg-secondary/10 flex items-center justify-center">
+                      <FileJson className="w-16 h-16 text-secondary/60" />
+                    </div>
+                  )}
+                  <div className={styles.imageCardName}>{file.name}</div>
+                </div>
+              );
+            })}
           </div>
         </>
       )}
 
       {/* Media Dialog */}
       <MediaDialog isOpen={isDialogOpen} onClose={handleDialogClose} file={selectedFile} />
+
+      {/* Delete Multiple Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={deleteMultipleDialog.isOpen}
+        onClose={() => setDeleteMultipleDialog({ isOpen: false, count: 0 })}
+        onConfirm={handleDeleteMultipleConfirm}
+        title="Elimina File"
+        message={`Sei sicuro di voler eliminare ${deleteMultipleDialog.count} file? Questa azione non può essere annullata.`}
+        confirmText="Elimina"
+        cancelText="Annulla"
+        confirmButtonClassName={styles.deleteButton}
+        isLoading={isPending}
+      />
     </div>
   );
 }
