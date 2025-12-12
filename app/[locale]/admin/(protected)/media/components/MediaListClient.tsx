@@ -331,7 +331,7 @@ export default function MediaListClient() {
                   className={cn(
                     styles.imageCard,
                     "cursor-pointer relative",
-                    isFileSelected && "ring-2 ring-tertiary",
+                    isFileSelected ? "ring-2 ring-tertiary" : "",
                   )}
                   onClick={(e) => handleFileClick(file, e)}
                 >

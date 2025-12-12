@@ -3,7 +3,7 @@
  **************************************************/
 "use client";
 
-import { useState, useTransition, useEffect } from "react";
+import { useState, useTransition, useEffect, useCallback } from "react";
 import { X, Trash2, Save } from "lucide-react";
 import Image from "next/image";
 import { Music, FileJson } from "lucide-react";
@@ -34,13 +34,13 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [jsonContent, setJsonContent] = useState<string | null>(null);
 
-  function handleClose() {
+  const handleClose = useCallback(() => {
     if (!isPending) {
       setError(null);
       setNewFilename("");
       onClose();
     }
-  }
+  }, [isPending, onClose]);
 
   // Handle ESC key to close
   useEffect(() => {
@@ -54,7 +54,7 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
 
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
-  }, [isOpen, isPending, showDeleteConfirm, onClose]);
+  }, [isOpen, isPending, showDeleteConfirm, onClose, handleClose]);
 
   // Prevent body scroll when dialog is open
   useEffect(() => {
