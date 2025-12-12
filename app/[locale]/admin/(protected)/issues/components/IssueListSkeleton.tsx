@@ -10,8 +10,6 @@ export default function IssueListSkeleton() {
   return (
     <>
       {/* Search and Filters Skeleton */}
-
-      {/* Search and Filters Skeleton */}
       <div className="bg-primary p-4 border border-secondary mb-4">
         <div className="flex items-center gap-4">
           <div className="flex-1">
@@ -31,6 +29,9 @@ export default function IssueListSkeleton() {
         <Table>
           <TableHeader>
             <TableRow>
+              <th className="px-4 py-3" style={{ width: "40px" }}>
+                <div className="h-4 w-4 bg-secondary/20 animate-pulse" />
+              </th>
               <th className="px-4 py-3">
                 <div className="h-4 w-16 bg-secondary/20 animate-pulse" />
               </th>
@@ -51,6 +52,9 @@ export default function IssueListSkeleton() {
           <TableBody>
             {[1, 2, 3, 4, 5].map((i) => (
               <TableRow key={i}>
+                <TableCell>
+                  <div className="h-4 w-4 bg-secondary/20 animate-pulse" />
+                </TableCell>
                 <TableCell>
                   <div className="w-16 h-16 bg-secondary/20 animate-pulse" />
                 </TableCell>
