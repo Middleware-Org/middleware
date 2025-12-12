@@ -123,3 +123,55 @@ export async function deleteAuthorAction(slug: string): Promise<ActionResult> {
     };
   }
 }
+
+export async function deleteAuthorsAction(
+  slugs: string[],
+): Promise<ActionResult<{ deleted: number; failed: number }>> {
+  try {
+    const user = await getUser();
+    if (!user) {
+      return { success: false, error: "Unauthorized", errorType: "error" };
+    }
+
+    if (!slugs || slugs.length === 0) {
+      return { success: false, error: "At least one slug is required", errorType: "error" };
+    }
+
+    let deleted = 0;
+    let failed = 0;
+    const errors: string[] = [];
+
+    for (const slug of slugs) {
+      try {
+        await deleteAuthor(slug);
+        deleted++;
+      } catch (error) {
+        failed++;
+        const errorMessage = error instanceof Error ? error.message : "Failed to delete author";
+        errors.push(`${slug}: ${errorMessage}`);
+      }
+    }
+
+    revalidatePath("/admin/authors");
+
+    if (failed > 0) {
+      return {
+        success: false,
+        error: `Eliminati ${deleted} autori, ${failed} falliti. ${errors.join("; ")}`,
+        errorType: "warning",
+      };
+    }
+
+    return {
+      success: true,
+      data: { deleted, failed },
+      message: `Eliminati con successo ${deleted} autor${deleted === 1 ? "e" : "i"}`,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to delete authors",
+      errorType: "error",
+    };
+  }
+}

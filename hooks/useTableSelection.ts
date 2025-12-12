@@ -6,12 +6,16 @@ import { useState, useCallback, useMemo } from "react";
 /* **************************************************
  * Hook for Table Multi-Selection
  **************************************************/
-export function useTableSelection<T extends { id: string }>(items: T[]) {
+export function useTableSelection<T>(
+  items: T[],
+  getId: (item: T) => string = (item) =>
+    (item as { id?: string; slug?: string }).id || (item as { slug: string }).slug || "",
+) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const selectedItems = useMemo(() => {
-    return items.filter((item) => selectedIds.has(item.id));
-  }, [items, selectedIds]);
+    return items.filter((item) => selectedIds.has(getId(item)));
+  }, [items, selectedIds, getId]);
 
   const isAllSelected = useMemo(() => {
     return items.length > 0 && selectedIds.size === items.length;
@@ -37,9 +41,9 @@ export function useTableSelection<T extends { id: string }>(items: T[]) {
     if (isAllSelected) {
       setSelectedIds(new Set());
     } else {
-      setSelectedIds(new Set(items.map((item) => item.id)));
+      setSelectedIds(new Set(items.map((item) => getId(item))));
     }
-  }, [isAllSelected, items]);
+  }, [isAllSelected, items, getId]);
 
   const clearSelection = useCallback(() => {
     setSelectedIds(new Set());
