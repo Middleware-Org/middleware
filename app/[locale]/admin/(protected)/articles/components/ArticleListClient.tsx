@@ -7,8 +7,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition, useMemo, Fragment, useRef, useEffect } from "react";
 import { ExternalLink, Filter, Pencil, Trash2, X, Hash } from "lucide-react";
-import { deleteArticleAction } from "../actions";
+import { deleteArticleAction, deleteArticlesAction } from "../actions";
 import { useTableState } from "@/hooks/useTableState";
+import { useTableSelection } from "@/hooks/useTableSelection";
 import {
   Table,
   TableHeader,
@@ -19,6 +20,7 @@ import {
   ColumnSelector,
   type ColumnConfig,
 } from "@/components/table";
+import { TableCheckbox } from "@/components/table/TableCheckbox";
 import { SearchInput } from "@/components/search";
 import { Pagination } from "@/components/pagination";
 import ConfirmDialog from "@/components/molecules/confirmDialog";
@@ -55,6 +57,13 @@ export default function ArticleListClient() {
   const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; article: Article | null }>({
     isOpen: false,
     article: null,
+  });
+  const [deleteMultipleDialog, setDeleteMultipleDialog] = useState<{
+    isOpen: boolean;
+    count: number;
+  }>({
+    isOpen: false,
+    count: 0,
   });
 
   // Usa SWR per ottenere gli articoli (cache pre-popolata dal server)
@@ -93,6 +102,18 @@ export default function ArticleListClient() {
     initialSort: { key: "date", direction: "desc" },
   });
 
+  // Multi-selection
+  const {
+    selectedIds,
+    isAllSelected,
+    isIndeterminate,
+    toggleSelection,
+    toggleSelectAll,
+    clearSelection,
+    isSelected,
+    selectedCount,
+  } = useTableSelection(tableData, (article) => article.slug);
+
   // Close filters modal when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -109,6 +130,11 @@ export default function ArticleListClient() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isFiltersOpen]);
+
+  // Clear selection when search, page, or filters change
+  useEffect(() => {
+    clearSelection();
+  }, [search, currentPage, filters, clearSelection]);
 
   // Get visible column configs
   const visibleColumnConfigs = useMemo(() => {
@@ -207,6 +233,35 @@ export default function ArticleListClient() {
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/articles");
         mutate("/api/github/merge/check");
+        clearSelection();
+      }
+    });
+  }
+
+  function handleDeleteMultipleClick() {
+    if (selectedCount === 0) return;
+    setDeleteMultipleDialog({ isOpen: true, count: selectedCount });
+  }
+
+  async function handleDeleteMultipleConfirm() {
+    if (selectedIds.length === 0) return;
+
+    setError(null);
+    setDeleteMultipleDialog({ isOpen: false, count: 0 });
+
+    startTransition(async () => {
+      const result = await deleteArticlesAction(selectedIds);
+
+      if (!result.success) {
+        setError({
+          message: result.error,
+          type: result.errorType || "error",
+        });
+      } else {
+        // Invalida la cache SWR per forzare il refetch
+        mutate("/api/articles");
+        mutate("/api/github/merge/check");
+        clearSelection();
       }
     });
   }
@@ -434,6 +489,14 @@ export default function ArticleListClient() {
         <Table>
           <TableHeader>
             <TableRow>
+              <th className={baseStyles.tableHeaderCell} style={{ width: "40px" }}>
+                <TableCheckbox
+                  checked={isAllSelected}
+                  indeterminate={isIndeterminate}
+                  onChange={toggleSelectAll}
+                  ariaLabel="Seleziona tutti"
+                />
+              </th>
               {visibleColumnConfigs.map((column) => {
                 if (column.key === "actions") {
                   return (
@@ -459,7 +522,7 @@ export default function ArticleListClient() {
             {tableData.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={visibleColumnConfigs.length}
+                  colSpan={visibleColumnConfigs.length + 1}
                   className={baseStyles.tableEmptyCell}
                 >
                   Nessun articolo trovato
@@ -468,6 +531,14 @@ export default function ArticleListClient() {
             ) : (
               tableData.map((article) => (
                 <TableRow key={article.slug}>
+                  <TableCell>
+                    <TableCheckbox
+                      checked={isSelected(article.slug)}
+                      onChange={() => toggleSelection(article.slug)}
+                      disabled={isPending}
+                      ariaLabel={`Seleziona ${article.title}`}
+                    />
+                  </TableCell>
                   {visibleColumnConfigs.map((column) => (
                     <Fragment key={column.key}>{renderCell(article, column.key)}</Fragment>
                   ))}
@@ -483,6 +554,33 @@ export default function ArticleListClient() {
         )}
       </div>
 
+      {/* Bulk Actions */}
+      {selectedCount > 0 && (
+        <div className="mt-4 flex items-center gap-2 p-3 bg-tertiary/10 border border-tertiary rounded">
+          <span className="text-sm text-secondary">
+            {selectedCount} {selectedCount === 1 ? "articolo selezionato" : "articoli selezionati"}
+          </span>
+          <button
+            onClick={handleDeleteMultipleClick}
+            disabled={isPending}
+            className={cn(styles.iconButton, styles.iconButtonDanger, "ml-auto")}
+            aria-label="Elimina selezionati"
+            title="Elimina selezionati"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+          <button
+            onClick={clearSelection}
+            disabled={isPending}
+            className={cn(styles.iconButton)}
+            aria-label="Deseleziona tutto"
+            title="Deseleziona tutto"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       {/* Delete Confirmation Dialog */}
       {deleteDialog.article && (
         <ConfirmDialog
@@ -497,6 +595,19 @@ export default function ArticleListClient() {
           isLoading={isPending}
         />
       )}
+
+      {/* Delete Multiple Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={deleteMultipleDialog.isOpen}
+        onClose={() => setDeleteMultipleDialog({ isOpen: false, count: 0 })}
+        onConfirm={handleDeleteMultipleConfirm}
+        title="Elimina Articoli"
+        message={`Sei sicuro di voler eliminare ${deleteMultipleDialog.count} articoli? Questa azione non può essere annullata.`}
+        confirmText="Elimina"
+        cancelText="Annulla"
+        confirmButtonClassName={styles.deleteButton}
+        isLoading={isPending}
+      />
     </div>
   );
 }
