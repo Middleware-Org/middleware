@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "slug": "esperimento-formazione",
+    "date": "2025-11-20T00:00:00.000Z",
+    "last_update": "2025-12-04T09:49:09.704Z",
+    "title": "Esperimento Formazione",
+    "description": "Questo raccolta di articoli, prodotte da diverse realtà, vuole essere un primo esperimento di utilizzo di strumenti collettivi per la costruzione di un ciclo di formazione.",
+    "cover": "https://mdmdfxzts3o3uer1.public.blob.vercel-storage.com/media/modena.jpg",
+    "color": "#f4d06f",
+    "published": true
+  },
+  {
+    "slug": "l-enigma-dell-organizzazione",
+    "date": "2025-12-03T00:00:00.000Z",
+    "last_update": "2025-12-04T10:40:39.564Z",
+    "title": "L’enigma dell’organizzazione",
+    "description": "Primo numero della rivista di Teiko",
+    "cover": "https://mdmdfxzts3o3uer1.public.blob.vercel-storage.com/media/l-enigma-dell-organizzazione.jpg",
+    "color": "#000000",
+    "published": true
+  }
+]
