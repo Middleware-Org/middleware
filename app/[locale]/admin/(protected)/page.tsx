@@ -11,6 +11,7 @@ import {
   getAllPages,
 } from "@/lib/github";
 import { getAllMediaFiles } from "@/lib/github/media";
+import TokenExpirationBanner from "./components/TokenExpirationBanner";
 import styles from "./styles";
 
 /* **************************************************
@@ -93,6 +94,8 @@ export default async function AdminProtectedPage() {
           </p>
         </div>
       </div>
+
+      <TokenExpirationBanner />
 
       <div className={styles.statsGrid}>
         {stats.map((stat) => (
