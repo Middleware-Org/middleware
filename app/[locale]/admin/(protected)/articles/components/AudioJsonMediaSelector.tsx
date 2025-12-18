@@ -398,30 +398,19 @@ export default function AudioJsonMediaSelector({
                     <div
                       key={file.name}
                       onClick={() => handleSelect(file.url)}
-                      className={cn(
-                        "relative bg-primary border border-secondary/30 rounded-lg",
-                        "overflow-hidden shadow-sm hover:shadow-md transition-all duration-200",
-                        "flex flex-col cursor-pointer",
-                      )}
+                      className={cn(styles.imageCard, "cursor-pointer flex flex-col")}
                     >
                       {/* Icon Area */}
-                      <div className="w-full h-40 bg-gradient-to-br from-secondary/5 to-secondary/10 flex items-center justify-center">
+                      <div className="w-full h-48 bg-secondary/10 flex items-center justify-center">
                         {file.type === "audio" ? (
-                          <Music className="w-20 h-20 text-secondary/70" />
+                          <Music className="w-16 h-16 text-secondary/60" />
                         ) : (
-                          <FileJson className="w-20 h-20 text-secondary/70" />
+                          <FileJson className="w-16 h-16 text-secondary/60" />
                         )}
                       </div>
 
                       {/* File Name */}
-                      <div className="px-3 py-2.5 border-t border-secondary/20 bg-primary">
-                        <p
-                          className="text-sm font-medium text-secondary truncate"
-                          title={file.name}
-                        >
-                          {file.name}
-                        </p>
-                      </div>
+                      <div className={styles.imageCardName}>{file.name}</div>
                     </div>
                   ))}
                 </div>
@@ -434,7 +423,7 @@ export default function AudioJsonMediaSelector({
                     aria-hidden="true"
                   >
                     <div className="flex items-center gap-2 text-sm text-secondary/60">
-                      <div className="w-4 h-4 border-2 border-secondary/30 border-t-secondary/80 rounded-full animate-spin" />
+                      <div className="w-4 h-4 border-2 border-secondary/30 border-t-secondary/80 animate-spin" />
                       <span>Caricamento altri file...</span>
                     </div>
                   </div>
