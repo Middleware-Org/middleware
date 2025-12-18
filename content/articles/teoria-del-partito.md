@@ -2,11 +2,11 @@
 slug: teoria-del-partito
 title: Teoria del partito
 date: '2025-11-19'
-last_update: '2025-12-04T09:51:17.522Z'
+last_update: '2025-12-18T08:48:57.842Z'
 author: infoaut
 category: organizzazione
 issue: esperimento-formazione
-in_evidence: true
+in_evidence: false
 published: true
 excerpt: >-
   Abbiamo tradotto questo importante articolo di Phil A. Neel apparso su Ill
