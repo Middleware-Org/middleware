@@ -43,7 +43,7 @@ export default async function RootPage({ params }: RootPageProps) {
       {issues.map((issue) => {
         const articles = getArticlesByIssue(issue.slug);
 
-        const { articleInEvidence, otherArticles } = articles.reduce(
+        let { articleInEvidence, otherArticles } = articles.reduce(
           (acc, article) => {
             if (article.in_evidence && !acc.articleInEvidence) {
               acc.articleInEvidence = article;
@@ -55,7 +55,10 @@ export default async function RootPage({ params }: RootPageProps) {
           { articleInEvidence: undefined as Article | undefined, otherArticles: [] as Article[] },
         );
 
-        if (!articleInEvidence) return null;
+        if (!articleInEvidence) {
+          articleInEvidence = otherArticles[0];
+          otherArticles = otherArticles.slice(1);
+        }
 
         return (
           <div key={issue.slug} id={`issue-${issue.slug}`} className={styles.issueContainer}>
