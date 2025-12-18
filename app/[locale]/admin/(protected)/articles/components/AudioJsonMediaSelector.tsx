@@ -11,8 +11,6 @@ import styles from "../../media/styles";
 import { useMedia } from "@/hooks/swr";
 import { mutate } from "swr";
 import { cn } from "@/lib/utils/classes";
-import type { MediaFile } from "@/lib/github/media";
-import MediaDialog from "../../media/components/MediaDialog";
 
 /* **************************************************
  * Types
@@ -46,8 +44,6 @@ export default function AudioJsonMediaSelector({
   const [filename, setFilename] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
-  const [selectedFileForDialog, setSelectedFileForDialog] = useState<MediaFile | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   // Usa SWR per caricare i media files con cache
@@ -113,17 +109,6 @@ export default function AudioJsonMediaSelector({
   function handleSelect(fileUrl: string) {
     onSelect(fileUrl);
     onClose();
-  }
-
-  function handleFileClick(file: MediaFile, event: React.MouseEvent) {
-    event.stopPropagation();
-    setSelectedFileForDialog(file);
-    setIsDialogOpen(true);
-  }
-
-  function handleDialogClose() {
-    setIsDialogOpen(false);
-    setSelectedFileForDialog(null);
   }
 
   function handleFileSelect(event: React.ChangeEvent<HTMLInputElement>) {
@@ -412,10 +397,11 @@ export default function AudioJsonMediaSelector({
                   {visibleFiles.map((file) => (
                     <div
                       key={file.name}
+                      onClick={() => handleSelect(file.url)}
                       className={cn(
                         "relative bg-primary border border-secondary/30 rounded-lg",
                         "overflow-hidden shadow-sm hover:shadow-md transition-all duration-200",
-                        "flex flex-col",
+                        "flex flex-col cursor-pointer",
                       )}
                     >
                       {/* Icon Area */}
@@ -435,36 +421,6 @@ export default function AudioJsonMediaSelector({
                         >
                           {file.name}
                         </p>
-                      </div>
-
-                      {/* Action Buttons */}
-                      <div className="px-3 pb-3 pt-2 flex gap-2">
-                        <button
-                          type="button"
-                          onClick={() => handleSelect(file.url)}
-                          className={cn(
-                            "flex-1 px-4 py-2 text-sm font-medium",
-                            "bg-secondary text-primary hover:bg-secondary/90",
-                            "rounded-md transition-all duration-200",
-                            "shadow-sm hover:shadow",
-                            "active:scale-[0.98]",
-                          )}
-                        >
-                          Seleziona
-                        </button>
-                        <button
-                          type="button"
-                          onClick={(e) => handleFileClick(file, e)}
-                          className={cn(
-                            "flex-1 px-4 py-2 text-sm font-medium",
-                            "bg-primary text-secondary border border-secondary/30",
-                            "hover:bg-secondary/5 hover:border-secondary/50",
-                            "rounded-md transition-all duration-200",
-                            "active:scale-[0.98]",
-                          )}
-                        >
-                          Gestisci
-                        </button>
                       </div>
                     </div>
                   ))}
@@ -495,9 +451,6 @@ export default function AudioJsonMediaSelector({
           </button>
         </div>
       </div>
-
-      {/* Media Dialog */}
-      <MediaDialog isOpen={isDialogOpen} onClose={handleDialogClose} file={selectedFileForDialog} />
     </div>
   );
 }
