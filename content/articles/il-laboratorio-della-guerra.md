@@ -2,10 +2,10 @@
 slug: il-laboratorio-della-guerra
 title: Il laboratorio della guerra
 date: '2025-11-21'
-last_update: '2025-12-04T09:50:59.198Z'
+last_update: '2025-12-18T08:48:46.144Z'
 author: kamo-modena
 category: universita-della-guerra
-issue: esperimento-formazione
+issue: raccolta
 in_evidence: false
 published: true
 excerpt: >-
