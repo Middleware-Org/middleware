@@ -410,27 +410,44 @@ export default function AudioJsonMediaSelector({
               <>
                 <div className={styles.grid}>
                   {visibleFiles.map((file) => (
-                    <div key={file.name} className={cn(styles.imageCard, "relative")}>
-                      <div>
+                    <div
+                      key={file.name}
+                      className={cn(
+                        "relative bg-primary border border-secondary/30 rounded-lg",
+                        "overflow-hidden shadow-sm hover:shadow-md transition-all duration-200",
+                        "flex flex-col",
+                      )}
+                    >
+                      {/* Icon Area */}
+                      <div className="w-full h-40 bg-gradient-to-br from-secondary/5 to-secondary/10 flex items-center justify-center">
                         {file.type === "audio" ? (
-                          <div className="w-full h-48 bg-secondary/10 flex items-center justify-center">
-                            <Music className="w-16 h-16 text-secondary/60" />
-                          </div>
+                          <Music className="w-20 h-20 text-secondary/70" />
                         ) : (
-                          <div className="w-full h-48 bg-secondary/10 flex items-center justify-center">
-                            <FileJson className="w-16 h-16 text-secondary/60" />
-                          </div>
+                          <FileJson className="w-20 h-20 text-secondary/70" />
                         )}
-                        <div className={styles.imageCardName}>{file.name}</div>
                       </div>
-                      <div className="mt-2 flex gap-2">
+
+                      {/* File Name */}
+                      <div className="px-3 py-2.5 border-t border-secondary/20 bg-primary">
+                        <p
+                          className="text-sm font-medium text-secondary truncate"
+                          title={file.name}
+                        >
+                          {file.name}
+                        </p>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="px-3 pb-3 pt-2 flex gap-2">
                         <button
                           type="button"
                           onClick={() => handleSelect(file.url)}
                           className={cn(
-                            "flex-1 px-3 py-2 text-sm bg-primary text-secondary hover:bg-primary/90",
-                            "border border-secondary transition-all duration-150",
-                            "font-medium",
+                            "flex-1 px-4 py-2 text-sm font-medium",
+                            "bg-secondary text-primary hover:bg-secondary/90",
+                            "rounded-md transition-all duration-200",
+                            "shadow-sm hover:shadow",
+                            "active:scale-[0.98]",
                           )}
                         >
                           Seleziona
@@ -439,9 +456,11 @@ export default function AudioJsonMediaSelector({
                           type="button"
                           onClick={(e) => handleFileClick(file, e)}
                           className={cn(
-                            "flex-1 px-3 py-2 text-sm bg-secondary/10 text-secondary hover:bg-secondary/20",
-                            "border border-secondary transition-all duration-150",
-                            "font-medium",
+                            "flex-1 px-4 py-2 text-sm font-medium",
+                            "bg-primary text-secondary border border-secondary/30",
+                            "hover:bg-secondary/5 hover:border-secondary/50",
+                            "rounded-md transition-all duration-200",
+                            "active:scale-[0.98]",
                           )}
                         >
                           Gestisci
