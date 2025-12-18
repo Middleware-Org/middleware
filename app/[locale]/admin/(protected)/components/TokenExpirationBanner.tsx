@@ -57,21 +57,16 @@ export default function TokenExpirationBanner() {
 
   const { expirationDate, daysUntilExpiration, isExpiringSoon } = bannerContent;
 
+  if (!isExpiringSoon) {
+    return null;
+  }
+
   return (
-    <div
-      className={cn(
-        "mb-6 p-4 border",
-        isExpiringSoon
-          ? "bg-red-50/80 border-red-200 text-red-800"
-          : "bg-primary border-secondary text-secondary",
-      )}
-    >
+    <div className={cn("mb-6 p-4 border bg-red-50/80 border-red-200 text-red-800")}>
       <div className="flex items-start gap-3">
-        {isExpiringSoon && <AlertTriangle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />}
+        <AlertTriangle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
         <div className="flex-1">
-          <p className="text-sm font-medium">
-            {isExpiringSoon ? "Token GitHub in scadenza" : "Token GitHub - Scadenza"}
-          </p>
+          <p className="text-sm font-medium">Token GitHub in scadenza</p>
           <p className="text-sm mt-1">
             Il token GitHub scadrà il <span className="font-semibold">{expirationDate}</span>
             {daysUntilExpiration !== null && (
