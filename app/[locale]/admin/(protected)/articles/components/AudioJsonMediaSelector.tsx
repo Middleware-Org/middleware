@@ -410,11 +410,8 @@ export default function AudioJsonMediaSelector({
               <>
                 <div className={styles.grid}>
                   {visibleFiles.map((file) => (
-                    <div
-                      key={file.name}
-                      className={cn(styles.imageCard, "cursor-pointer relative group")}
-                    >
-                      <div onClick={() => handleSelect(file.url)}>
+                    <div key={file.name} className={cn(styles.imageCard, "relative")}>
+                      <div>
                         {file.type === "audio" ? (
                           <div className="w-full h-48 bg-secondary/10 flex items-center justify-center">
                             <Music className="w-16 h-16 text-secondary/60" />
@@ -426,23 +423,26 @@ export default function AudioJsonMediaSelector({
                         )}
                         <div className={styles.imageCardName}>{file.name}</div>
                       </div>
-                      <div
-                        className={cn(
-                          "absolute inset-0 bg-secondary/50 opacity-0 group-hover:opacity-100",
-                          "transition-opacity duration-150 flex items-center justify-center gap-2",
-                        )}
-                        onClick={(e) => handleFileClick(file, e)}
-                      >
+                      <div className="mt-2 flex gap-2">
                         <button
                           type="button"
+                          onClick={() => handleSelect(file.url)}
                           className={cn(
-                            "px-3 py-1 text-sm bg-primary/90 text-secondary hover:bg-primary",
+                            "flex-1 px-3 py-2 text-sm bg-primary text-secondary hover:bg-primary/90",
                             "border border-secondary transition-all duration-150",
+                            "font-medium",
                           )}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleFileClick(file, e);
-                          }}
+                        >
+                          Seleziona
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => handleFileClick(file, e)}
+                          className={cn(
+                            "flex-1 px-3 py-2 text-sm bg-secondary/10 text-secondary hover:bg-secondary/20",
+                            "border border-secondary transition-all duration-150",
+                            "font-medium",
+                          )}
                         >
                           Gestisci
                         </button>
