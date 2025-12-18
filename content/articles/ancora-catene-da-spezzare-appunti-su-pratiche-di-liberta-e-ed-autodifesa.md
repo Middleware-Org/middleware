@@ -2,11 +2,11 @@
 slug: ancora-catene-da-spezzare-appunti-su-pratiche-di-liberta-e-ed-autodifesa
 title: Ancora catene da spezzare – Appunti su pratiche di libertà e ed autodifesa
 date: '2025-12-18'
-last_update: '2025-12-18T08:59:33.642Z'
+last_update: '2025-12-18T09:04:31.046Z'
 author: associazione-a-resistere-pisa
 category: transfemminismo
 issue: raccolta
-in_evidence: false
+in_evidence: true
 published: true
 excerpt: >-
   Negli ultimi anni, all’interno dei movimenti transfemministi italiani ed
