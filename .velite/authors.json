@@ -1,5 +1,10 @@
 [
   {
+    "slug": "associazione-a-resistere-pisa",
+    "name": "Associazione a Resistere – Pisa",
+    "description": "Associazione a Resistere – Pisa"
+  },
+  {
     "slug": "infoaut",
     "name": "Infoaut",
     "description": "InfoAut: informazione di parte. \r\nDella parte che vive nelle lotte quotidiane e nei conflitti metropolitani."
@@ -8,10 +13,5 @@
     "slug": "kamo-modena",
     "name": "Kamo Modena",
     "description": "Kamo Modena, o tutto o niente. Casualbolscevichi. Noi siamo qua. Sapete dove trovarci."
-  },
-  {
-    "slug": "teiko",
-    "name": "Teiko",
-    "description": "Soggetti, movimenti, conflitti"
   }
 ]

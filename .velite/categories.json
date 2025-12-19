@@ -10,6 +10,11 @@
     "description": "Raccolta degli articoli che trattano il tema dell'organizzazione."
   },
   {
+    "slug": "transfemminismo",
+    "name": "Transfemminismo",
+    "description": "Raccolta degli articoli che trattano il tema del transfemminismo."
+  },
+  {
     "slug": "universita-della-guerra",
     "name": "Università della guerra",
     "description": "Inchiesta sull'università della guerra."
