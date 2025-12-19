@@ -6,6 +6,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition, useMemo, Fragment, useRef, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { ExternalLink, Filter, Pencil, Trash2, X, Hash } from "lucide-react";
 import { deleteArticleAction, deleteArticlesAction } from "../actions";
 import { useTableState } from "@/hooks/useTableState";
@@ -24,7 +25,7 @@ import { TableCheckbox } from "@/components/table/TableCheckbox";
 import { SearchInput } from "@/components/search";
 import { Pagination } from "@/components/pagination";
 import ConfirmDialog from "@/components/molecules/confirmDialog";
-import SelectSearch, { type SelectSearchOption } from "./SelectSearch";
+import type { SelectSearchOption } from "./SelectSearch";
 import { cn } from "@/lib/utils/classes";
 import styles from "../styles";
 import baseStyles from "../../styles";
@@ -32,6 +33,14 @@ import type { Article } from "@/lib/github/types";
 import { useArticles, useIssues, useCategories, useAuthors } from "@/hooks/swr";
 import { mutate } from "swr";
 import { ItemsPerPageSelector } from "@/components/table/ItemsPerPageSelector";
+
+/* **************************************************
+ * Dynamic Imports - Code Splitting
+ **************************************************/
+const SelectSearch = dynamic(() => import("./SelectSearch"), {
+  ssr: false,
+  loading: () => <div className="h-10 w-full bg-secondary/20 animate-pulse" />,
+});
 
 /* **************************************************
  * Column Configuration

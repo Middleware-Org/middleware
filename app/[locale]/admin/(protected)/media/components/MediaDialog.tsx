@@ -71,26 +71,36 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
 
   // Initialize filename when file changes
   useEffect(() => {
-    if (file) {
-      // Remove extension for editing
-      const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
-      setTimeout(() => {
-        setNewFilename(nameWithoutExt);
-        setError(null);
-        setJsonContent(null);
-      }, 0);
+    if (!file) return;
 
-      // Load JSON content if it's a JSON file
-      if (file.type === "json") {
-        fetch(file.url)
-          .then((res) => res.json())
-          .then((data) => {
-            setJsonContent(JSON.stringify(data, null, 2));
-          })
-          .catch(() => {
-            setJsonContent("Errore nel caricamento del contenuto JSON");
-          });
-      }
+    // Remove extension for editing
+    const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
+    setNewFilename(nameWithoutExt);
+    setError(null);
+    setJsonContent(null);
+
+    // Load JSON content if it's a JSON file
+    if (file.type === "json") {
+      const abortController = new AbortController();
+
+      fetch(file.url, { signal: abortController.signal })
+        .then((res) => {
+          if (!res.ok) throw new Error("Failed to fetch JSON");
+          return res.json();
+        })
+        .then((data) => {
+          setJsonContent(JSON.stringify(data, null, 2));
+        })
+        .catch((error) => {
+          // Ignore abort errors
+          if (error.name === "AbortError") return;
+          setJsonContent("Errore nel caricamento del contenuto JSON");
+        });
+
+      // Cleanup: abort fetch if component unmounts or file changes
+      return () => {
+        abortController.abort();
+      };
     }
   }, [file]);
 

@@ -6,6 +6,7 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { Search, X, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils/classes";
+import { useDebounce } from "@/hooks/useDebounce";
 import baseStyles from "../../styles";
 import styles from "../styles";
 
@@ -48,19 +49,22 @@ export default function SelectSearch({
   const modalRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
+  // Debounce search query for better performance
+  const debouncedSearchQuery = useDebounce(searchQuery, 200);
+
   // Find selected option
   const selectedOption = options.find((opt) => opt.value === value);
 
-  // Filter options based on search query
+  // Filter options based on debounced search query
   const filteredOptions = useMemo(() => {
-    if (!searchQuery.trim()) {
+    if (!debouncedSearchQuery.trim()) {
       return options;
     }
-    const query = searchQuery.toLowerCase();
+    const query = debouncedSearchQuery.toLowerCase();
     return options.filter(
       (opt) => opt.label.toLowerCase().includes(query) || opt.value.toLowerCase().includes(query),
     );
-  }, [options, searchQuery]);
+  }, [options, debouncedSearchQuery]);
 
   // Close modal when clicking outside
   useEffect(() => {

@@ -7,6 +7,7 @@ import { useEffect, useRef, useState, useMemo, useTransition } from "react";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import { Sparkles } from "lucide-react";
 import {
   createIssueAction,
@@ -20,29 +21,22 @@ import styles from "../styles";
 import type { Issue } from "@/lib/github/types";
 import Image from "next/image";
 import { useIssue } from "@/hooks/swr";
-import MediaSelector from "../../articles/components/MediaSelector";
 import { mutate } from "swr";
+import { generateSlug } from "@/lib/utils/slug";
+
+/* **************************************************
+ * Dynamic Imports - Code Splitting
+ **************************************************/
+const MediaSelector = dynamic(() => import("../../articles/components/MediaSelector"), {
+  ssr: false,
+  loading: () => <div className="text-sm text-secondary/60">Caricamento...</div>,
+});
 
 /* **************************************************
  * Types
  **************************************************/
 interface IssueFormClientProps {
   issueSlug?: string; // Slug per edit mode
-}
-
-/* **************************************************
- * Slug Generation Utility (Client-side)
- **************************************************/
-function generateSlug(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .normalize("NFD") // Normalize to decomposed form for handling accents
-    .replace(/[\u0300-\u036f]/g, "") // Remove diacritics
-    .replace(/[^a-z0-9\s-]/g, "") // Remove special characters except spaces and hyphens
-    .replace(/\s+/g, "-") // Replace spaces with hyphens
-    .replace(/-+/g, "-") // Replace multiple hyphens with single hyphen
-    .replace(/^-|-$/g, ""); // Remove leading/trailing hyphens
 }
 
 /* **************************************************

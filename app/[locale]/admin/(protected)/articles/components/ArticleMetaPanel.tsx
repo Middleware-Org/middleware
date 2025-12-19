@@ -5,6 +5,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { Sparkles } from "lucide-react";
 import { deleteArticleAction } from "../actions";
 import ConfirmDialog from "@/components/molecules/confirmDialog";
@@ -14,10 +15,22 @@ import type { Article } from "@/lib/github/types";
 import type { Category } from "@/lib/github/types";
 import type { Author } from "@/lib/github/types";
 import type { Issue } from "@/lib/github/types";
-import AudioJsonMediaSelector from "./AudioJsonMediaSelector";
-import SelectSearch from "./SelectSearch";
 import { mutate } from "swr";
 import { cn } from "@/lib/utils/classes";
+import { generateSlug } from "@/lib/utils/slug";
+
+/* **************************************************
+ * Dynamic Imports - Code Splitting
+ **************************************************/
+const AudioJsonMediaSelector = dynamic(() => import("./AudioJsonMediaSelector"), {
+  ssr: false,
+  loading: () => <div className="text-sm text-secondary/60">Caricamento...</div>,
+});
+
+const SelectSearch = dynamic(() => import("./SelectSearch"), {
+  ssr: false,
+  loading: () => <div className="h-10 w-full bg-secondary/20 animate-pulse" />,
+});
 
 /* **************************************************
  * Types
@@ -47,21 +60,6 @@ interface ArticleMetaPanelProps {
 /* **************************************************
  * Article Meta Panel Component
  **************************************************/
-/* **************************************************
- * Slug Generation Utility (Client-side)
- **************************************************/
-function generateSlug(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .normalize("NFD") // Normalize to decomposed form for handling accents
-    .replace(/[\u0300-\u036f]/g, "") // Remove diacritics
-    .replace(/[^a-z0-9\s-]/g, "") // Remove special characters except spaces and hyphens
-    .replace(/\s+/g, "-") // Replace spaces with hyphens
-    .replace(/-+/g, "-") // Replace multiple hyphens with single hyphen
-    .replace(/^-|-$/g, ""); // Remove leading/trailing hyphens
-}
-
 export default function ArticleMetaPanel({
   article,
   categories,

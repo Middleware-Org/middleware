@@ -2,6 +2,7 @@
  * Imports
  **************************************************/
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { getUser } from "@/lib/auth/server";
 import {
   getAllIssues,
@@ -11,8 +12,15 @@ import {
   getAllPages,
 } from "@/lib/github";
 import { getAllMediaFiles } from "@/lib/github/media";
-import TokenExpirationBanner from "./components/TokenExpirationBanner";
 import styles from "./styles";
+
+/* **************************************************
+ * Dynamic Imports - Lazy Loading
+ **************************************************/
+const TokenExpirationBanner = dynamic(() => import("./components/TokenExpirationBanner"), {
+  ssr: false,
+  loading: () => <div className="h-6 mb-6" />,
+});
 
 /* **************************************************
  * Admin Protected Page

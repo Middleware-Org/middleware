@@ -8,14 +8,22 @@ import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import Image from "@tiptap/extension-image";
 import { useEffect, useCallback, useState } from "react";
+import dynamic from "next/dynamic";
 import { marked } from "marked";
 import TurndownService from "turndown";
 import { Link as LinkIcon, Image as ImageIcon, Quote } from "lucide-react";
-import MediaSelector from "./MediaSelector";
 import LinkModal from "./LinkModal";
 import CitationModal from "./CitationModal";
 import { Citation } from "./CitationExtension";
 import { getGitHubImageUrl } from "@/lib/github/images";
+
+/* **************************************************
+ * Dynamic Imports - Code Splitting
+ **************************************************/
+const MediaSelector = dynamic(() => import("./MediaSelector"), {
+  ssr: false,
+  loading: () => <div className="text-sm text-secondary/60">Caricamento...</div>,
+});
 
 /* **************************************************
  * Types

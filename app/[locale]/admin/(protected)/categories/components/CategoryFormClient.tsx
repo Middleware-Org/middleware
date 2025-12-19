@@ -20,27 +20,13 @@ import baseStyles from "../../styles";
 import type { Category } from "@/lib/github/types";
 import { useCategory } from "@/hooks/swr";
 import { mutate } from "swr";
+import { generateSlug } from "@/lib/utils/slug";
 
 /* **************************************************
  * Types
  **************************************************/
 interface CategoryFormClientProps {
   categorySlug?: string; // Slug per edit mode
-}
-
-/* **************************************************
- * Slug Generation Utility (Client-side)
- **************************************************/
-function generateSlug(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .normalize("NFD") // Normalize to decomposed form for handling accents
-    .replace(/[\u0300-\u036f]/g, "") // Remove diacritics
-    .replace(/[^a-z0-9\s-]/g, "") // Remove special characters except spaces and hyphens
-    .replace(/\s+/g, "-") // Replace spaces with hyphens
-    .replace(/-+/g, "-") // Replace multiple hyphens with single hyphen
-    .replace(/^-|-$/g, ""); // Remove leading/trailing hyphens
 }
 
 /* **************************************************
