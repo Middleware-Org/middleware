@@ -21,9 +21,12 @@ export default function Footer({ dict }: FooterProps) {
         <H2 className="text-2xl font-bold pt-[30px]">{dict.footer.contact}</H2>
         <button
           onClick={() => scrollToTop()}
-          className="flex flex-col items-end lg:border-none md:border-none border-secondary border-l lg:px-0 px-2.5"
+          aria-label={dict.footer.backToTop}
+          className="flex flex-col items-end lg:border-none md:border-none border-secondary border-l lg:px-0 px-2.5 hover:opacity-80 transition-opacity"
         >
-          <span className="lg:text-sm text-[42px]">↑</span>
+          <span className="lg:text-sm text-[42px]" aria-hidden="true">
+            ↑
+          </span>
           <MonoTextLight className="text-sm lg:flex md:flex hidden">
             {dict.footer.backToTop}
           </MonoTextLight>
@@ -44,13 +47,18 @@ export default function Footer({ dict }: FooterProps) {
               <Link
                 key={link.href}
                 href={link.href}
-                className="flex items-center lg:text-left md:text-center text-center lg:text-[14px] md:text-[12px] text-[12px] lg:gap-2 md:gap-2 gap-0"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${dict.footer[link.label as keyof typeof dict.footer]} (si apre in una nuova finestra)`}
+                className="flex items-center lg:text-left md:text-center text-center lg:text-[14px] md:text-[12px] text-[12px] lg:gap-2 md:gap-2 gap-0 hover:opacity-80 transition-opacity"
               >
                 <MonoTextBold className="text-sm font-bold">
                   {dict.footer[link.label as keyof typeof dict.footer]}
                 </MonoTextBold>
                 {index < footerLinks.length - 1 && (
-                  <span className="text-secondary text-[14px] hidden md:block lg:block">|</span>
+                  <span className="text-secondary text-[14px] hidden md:block lg:block" aria-hidden="true">
+                    |
+                  </span>
                 )}
               </Link>
             ))}

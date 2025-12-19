@@ -41,7 +41,7 @@ export default function Cover({ issue, articleInEvidence, dict }: CoverProps) {
         <div className={styles.imageWrapper} style={{ backgroundColor: issue.color }}>
           <Image
             src={getGitHubImageUrl(issue.cover)}
-            alt={issue.title}
+            alt={`Copertina del numero ${issue.title} di Middleware${issue.description ? ` - ${issue.description}` : ""}`}
             width={IMAGE_WIDTH}
             height={IMAGE_HEIGHT}
             className={styles.image}
@@ -56,7 +56,7 @@ export default function Cover({ issue, articleInEvidence, dict }: CoverProps) {
               />
             </div>
             <div className={styles.badgeTitle}>
-              <Link href={`/issues/${issue.slug}`}>
+              <Link href={`/issues/${issue.slug}`} aria-label={`Leggi il numero ${issue.title}`}>
                 <MonoTextLight className={styles.badgeTextTitle}>{issue.title}</MonoTextLight>
               </Link>
             </div>

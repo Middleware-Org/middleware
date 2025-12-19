@@ -4,9 +4,10 @@
 import { Article } from "@/.velite";
 import ArticleInEvidenceCard from "@/components/molecules/articleInEvidenceCard";
 import Articles from "@/components/molecules/articles";
-import { getArticlesByIssue, getIssueBySlug } from "@/lib/content";
+import { getArticlesByIssue, getIssueBySlug, getAllIssues } from "@/lib/content";
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import { getDictionary } from "@/lib/i18n/utils";
+import { i18nSettings } from "@/lib/i18n/settings";
 import { cn } from "@/lib/utils/classes";
 import IssueCover from "./components/IssueCover";
 
@@ -16,6 +17,21 @@ import IssueCover from "./components/IssueCover";
 type IssuePageProps = {
   params: Promise<{ locale: string; slug: string }>;
 };
+
+/* **************************************************
+ * Generate Static Params
+ **************************************************/
+export async function generateStaticParams() {
+  const issues = getAllIssues();
+  const locales = i18nSettings.locales;
+
+  return issues.flatMap((issue) =>
+    locales.map((locale) => ({
+      locale,
+      slug: issue.slug,
+    }))
+  );
+}
 
 /* **************************************************
  * Styles

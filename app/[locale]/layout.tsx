@@ -3,8 +3,7 @@
  **************************************************/
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import { getDictionary } from "@/lib/i18n/utils";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
+import Analytics from "@/components/Analytics";
 import PolicyBanner from "@/components/organism/banner";
 import {
   getBaseUrl,
@@ -88,7 +87,6 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
       {children}
       <PolicyBanner dict={dict} />
       <Analytics />
-      <SpeedInsights />
     </>
   );
 }

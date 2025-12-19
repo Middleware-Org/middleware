@@ -51,18 +51,13 @@ input[type="radio"] {
   }
 }
 
-@font-face {
-  font-family: "Editor Regular";
-  src: url("/fonts/EditorRegular.otf") format("opentype");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
+/* Font faces are now managed by next/font in lib/fonts.ts */
 
 @layer base {
   body {
     background-color: var(--primary);
     color: var(--secondary);
+    font-family: var(--font-editor), Georgia, serif;
   }
 
   h1,
@@ -105,7 +100,7 @@ p {
   font-size: 1.125rem !important; /* Base font size - prose-lg equivalent */
   line-height: 1.75 !important;
   color: var(--secondary) !important;
-  font-family: "Editor Regular", serif !important;
+  font-family: var(--font-editor), Georgia, serif !important;
 }
 
 .ProseMirror h1,
@@ -305,4 +300,29 @@ p {
 /* Smooth scroll */
 html {
   scroll-behavior: smooth;
+}
+
+/* Focus visible styles for keyboard accessibility */
+*:focus-visible {
+  outline: 2px solid var(--tertiary);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Remove outline when focus via mouse (but keep for keyboard) */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Screen reader only utility class */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
