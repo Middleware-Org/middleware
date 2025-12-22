@@ -3,10 +3,9 @@
  **************************************************/
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition, useMemo, useEffect, Fragment } from "react";
-import { ExternalLink, Hash, Pencil, Trash2, X } from "lucide-react";
+import { Hash, Pencil, Trash2, X } from "lucide-react";
 import { deleteIssueAction, deleteIssuesAction } from "../actions";
 import { useTableState } from "@/hooks/useTableState";
 import { useTableSelection } from "@/hooks/useTableSelection";
@@ -233,15 +232,6 @@ export default function IssueListClient() {
         return (
           <TableCell>
             <div className={baseStyles.buttonGroup}>
-              <Link
-                href={`/issues/${issue.slug}`}
-                target="_blank"
-                className={styles.iconButton}
-                aria-label="Anteprima"
-                title="Anteprima"
-              >
-                <ExternalLink className="w-4 h-4" />
-              </Link>
               <button
                 onClick={() => handleEdit(issue)}
                 className={styles.iconButton}

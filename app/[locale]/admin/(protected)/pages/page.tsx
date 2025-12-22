@@ -9,7 +9,7 @@ import { getAllPages } from "@/lib/github/pages";
 import PageListClient from "./components/PageListClient";
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
 import styles from "./styles";
-import { ExternalLink, Plus, ArrowLeft } from "lucide-react";
+import { Plus, ArrowLeft } from "lucide-react";
 
 /* **************************************************
  * Pages List Page (Server Component)

@@ -3,10 +3,9 @@
  **************************************************/
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition, useMemo, useEffect, Fragment } from "react";
-import { ExternalLink, Hash, Pencil, Trash2, X } from "lucide-react";
+import { Hash, Pencil, Trash2, X } from "lucide-react";
 import { deleteAuthorAction, deleteAuthorsAction } from "../actions";
 import { useTableState } from "@/hooks/useTableState";
 import { useTableSelection } from "@/hooks/useTableSelection";
@@ -193,15 +192,6 @@ export default function AuthorListClient() {
         return (
           <TableCell>
             <div className={baseStyles.buttonGroup}>
-              <Link
-                href={`/authors?author=${author.slug}`}
-                target="_blank"
-                className={styles.iconButton}
-                aria-label="Anteprima"
-                title="Anteprima"
-              >
-                <ExternalLink className="w-4 h-4" />
-              </Link>
               <button
                 onClick={() => handleEdit(author)}
                 className={styles.iconButton}

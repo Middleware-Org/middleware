@@ -10,7 +10,7 @@ import CategoryListClient from "./components/CategoryListClient";
 import CategoryListSkeleton from "./components/CategoryListSkeleton";
 import styles from "./styles";
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
-import { ExternalLink, Plus, ArrowLeft } from "lucide-react";
+import { Plus, ArrowLeft } from "lucide-react";
 
 /* **************************************************
  * Categories List Page (Server Component)
@@ -41,15 +41,6 @@ export default async function CategoriesPage() {
               title="Nuova Categoria"
             >
               <Plus className="w-4 h-4" />
-            </Link>
-            <Link
-              href="/categories"
-              className={styles.iconButton}
-              target="_blank"
-              aria-label="Anteprima"
-              title="Anteprima"
-            >
-              <ExternalLink className="w-4 h-4" />
             </Link>
             <Link
               href="/admin"

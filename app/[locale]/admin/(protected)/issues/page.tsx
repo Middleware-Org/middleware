@@ -10,7 +10,7 @@ import IssueListClient from "./components/IssueListClient";
 import IssueListSkeleton from "./components/IssueListSkeleton";
 import styles from "./styles";
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
-import { ExternalLink, Plus, ArrowLeft } from "lucide-react";
+import { Plus, ArrowLeft } from "lucide-react";
 
 /* **************************************************
  * Issues List Page (Server Component)
@@ -34,15 +34,6 @@ export default async function IssuesPage() {
         <div className={styles.header}>
           <h1 className={styles.title}>Gestione Issues</h1>
           <div className="flex gap-2">
-            <Link
-              href="/archive"
-              className={styles.iconButton}
-              target="_blank"
-              aria-label="Anteprima"
-              title="Anteprima"
-            >
-              <ExternalLink className="w-4 h-4" />
-            </Link>
             <Link
               href="/admin/issues/new"
               className={styles.iconButton}
