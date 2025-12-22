@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getUser } from "@/lib/auth/server";
+import { getAllIssues } from "@/lib/github/issues";
 import { cn } from "@/lib/utils/classes";
 import PodcastFormClient from "../components/PodcastFormClient";
 import PodcastFormSkeleton from "../components/PodcastFormSkeleton";
@@ -20,8 +21,15 @@ export default async function NewPodcastPage() {
     redirect("/admin/login");
   }
 
+  const issues = await getAllIssues();
+
+  // Pre-popolazione cache SWR con dati SSR
+  const swrFallback = {
+    "/api/issues": issues,
+  };
+
   return (
-    <SWRPageProvider fallback={{}}>
+    <SWRPageProvider fallback={swrFallback}>
       <div className={cn("h-full flex flex-col", styles.main)}>
         <div className={styles.header}>
           <h1 className={styles.title}>Nuovo Podcast</h1>

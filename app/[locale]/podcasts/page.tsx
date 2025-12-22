@@ -3,7 +3,7 @@
  **************************************************/
 import IssuesList from "@/components/organism/issuesList";
 import MobileIssuesToggle from "@/components/organism/mobileIssuesToggle";
-import { getAllIssues } from "@/lib/content";
+import { getAllIssues, getPodcastsByIssue } from "@/lib/content";
 import { getDictionary } from "@/lib/i18n/utils";
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import Issue from "@/components/organism/issue";
@@ -54,14 +54,19 @@ export default async function PodcastsPage({ params }: PodcastsPageProps) {
         </div>
 
         <div className={styles.content}>
-          {issues.map((issue, index) => (
-            <Issue
-              key={issue.slug}
-              issue={issue}
-              dictCommon={dictCommon}
-              isLastIssue={index === issues.length - 1}
-            />
-          ))}
+          {issues.map((issue, index) => {
+            const podcasts = getPodcastsByIssue(issue.slug);
+            // Mostra la sezione solo se ci sono podcasts per questa issue
+            if (podcasts.length === 0) return null;
+            return (
+              <Issue
+                key={issue.slug}
+                issue={issue}
+                dictCommon={dictCommon}
+                isLastIssue={index === issues.length - 1}
+              />
+            );
+          })}
         </div>
       </div>
     </div>

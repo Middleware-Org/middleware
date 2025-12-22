@@ -4,10 +4,8 @@
  * Imports
  **************************************************/
 import Image from "next/image";
-import { MonoTextLight, SerifText } from "@/components/atoms/typography";
+import { SerifText } from "@/components/atoms/typography";
 import { Podcast } from "@/.velite";
-import FormattedDate from "@/components/atoms/date";
-import { useParams } from "next/navigation";
 import styles from "./PodcastPlayerStyles";
 import { getGitHubImageUrl } from "@/lib/github/images";
 
@@ -22,8 +20,6 @@ type PodcastHeaderProps = {
  * PodcastHeader
  **************************************************/
 export default function PodcastHeader({ podcast }: PodcastHeaderProps) {
-  const { lang = "it" } = useParams() as { lang: "it" };
-
   return (
     <div className={styles.headerSection}>
       {podcast.cover && (
@@ -42,16 +38,6 @@ export default function PodcastHeader({ podcast }: PodcastHeaderProps) {
         <div className={styles.infoContainer}>
           <div className={styles.textContainer}>
             <SerifText className={styles.textTitle}>{podcast.title}</SerifText>
-            {podcast.description && (
-              <MonoTextLight className={styles.textAuthor}>
-                {podcast.description.length > 100
-                  ? podcast.description.slice(0, 100) + "..."
-                  : podcast.description}
-              </MonoTextLight>
-            )}
-            {podcast.date && (
-              <FormattedDate date={podcast.date} lang={lang} className={styles.textDate} />
-            )}
           </div>
         </div>
       </div>

@@ -11,15 +11,18 @@ import ConfirmDialog from "@/components/molecules/confirmDialog";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Podcast } from "@/lib/github/types";
+import type { Issue } from "@/lib/github/types";
 import AudioJsonMediaSelector from "../../articles/components/AudioJsonMediaSelector";
 import { mutate } from "swr";
 import { cn } from "@/lib/utils/classes";
+import SelectSearch from "../../articles/components/SelectSearch";
 
 /* **************************************************
  * Types
  **************************************************/
 interface PodcastMetaPanelProps {
   podcast?: Podcast | null;
+  issues: Issue[];
   formData: {
     title: string;
     description: string;
@@ -27,6 +30,7 @@ interface PodcastMetaPanelProps {
     audio: string;
     audio_chunks: string;
     cover?: string;
+    issue?: string;
     published: boolean;
   };
   onFormDataChange: (field: string, value: string | boolean) => void;
@@ -51,6 +55,7 @@ function generateSlug(text: string): string {
 
 export default function PodcastMetaPanel({
   podcast,
+  issues,
   formData,
   onFormDataChange,
   editing,
@@ -274,6 +279,21 @@ export default function PodcastMetaPanel({
             )}
           </div>
         </div>
+
+        <SelectSearch
+          id="issue"
+          label="Issue (opzionale)"
+          value={formData.issue || ""}
+          options={[
+            { value: "", label: "Nessuna issue" },
+            ...issues.map((issue) => ({
+              value: issue.slug,
+              label: issue.title,
+            })),
+          ]}
+          onChange={(value) => onFormDataChange("issue", value || "")}
+          placeholder="Seleziona un'issue"
+        />
 
         <div className={styles.field}>
           <label className={`${baseStyles.buttonGroup} cursor-pointer`}>
