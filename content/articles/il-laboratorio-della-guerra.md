@@ -2,7 +2,7 @@
 slug: il-laboratorio-della-guerra
 title: Il laboratorio della guerra
 date: '2025-11-21'
-last_update: '2025-12-18T16:17:43.955Z'
+last_update: '2025-12-22T10:09:13.637Z'
 author: kamo-modena
 category: universita-della-guerra
 issue: raccolta
@@ -11,10 +11,7 @@ published: true
 excerpt: >-
   Tracce per un’inchiesta sull’università dentro la "fabbrica della guerra" di
   Modena
-audio: >-
-  https://mdmdfxzts3o3uer1.public.blob.vercel-storage.com/media/il-laboratorio-della-guerra.mp3
-audio_chunks: >-
-  https://mdmdfxzts3o3uer1.public.blob.vercel-storage.com/media/il-laboratorio-della-guerra.json
+podcast: il-laboratorio-della-guerra
 ---
 **Un’ipotesi a premessa.**
 
