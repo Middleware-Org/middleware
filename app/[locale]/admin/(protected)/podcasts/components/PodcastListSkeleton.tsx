@@ -1,16 +1,84 @@
 /* **************************************************
  * Imports
  **************************************************/
-import baseStyles from "../../styles";
+import { Table, TableHeader, TableBody, TableRow, TableCell } from "@/components/table";
 
 /* **************************************************
- * Podcast List Skeleton Component
+ * Podcast List Skeleton
  **************************************************/
 export default function PodcastListSkeleton() {
   return (
-    <div className={baseStyles.container}>
-      <div className={baseStyles.loadingText}>Caricamento podcasts...</div>
-    </div>
+    <>
+      {/* Search and Filters Skeleton */}
+      <div className="bg-primary p-4 border border-secondary mb-4">
+        <div className="flex items-center gap-4">
+          <div className="flex-1">
+            <div className="h-10 w-full bg-secondary/20 animate-pulse" />
+          </div>
+          {/* ColumnSelector (icon only) */}
+          <div className="h-[34px] w-[34px] bg-secondary/20 animate-pulse" />
+          {/* ItemsPerPageSelector (select only) */}
+          <div className="h-[34px] w-14 bg-secondary/20 animate-pulse" />
+          {/* Counter (icon + number) */}
+          <div className="h-[34px] w-16 bg-secondary/20 animate-pulse" />
+        </div>
+      </div>
+
+      {/* Table Skeleton */}
+      <div className="bg-primary border border-secondary overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <th className="px-4 py-3" style={{ width: "40px" }}>
+                <div className="h-4 w-4 bg-secondary/20 animate-pulse" />
+              </th>
+              <th className="px-4 py-3">
+                <div className="h-4 w-20 bg-secondary/20 animate-pulse" />
+              </th>
+              <th className="px-4 py-3">
+                <div className="h-4 w-16 bg-secondary/20 animate-pulse" />
+              </th>
+              <th className="px-4 py-3">
+                <div className="h-4 w-16 bg-secondary/20 animate-pulse" />
+              </th>
+              <th className="px-4 py-3">
+                <div className="h-4 w-20 bg-secondary/20 animate-pulse" />
+              </th>
+              <th className="px-4 py-3">
+                <div className="h-4 w-20 bg-secondary/20 animate-pulse" />
+              </th>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {[1, 2, 3, 4, 5].map((i) => (
+              <TableRow key={i}>
+                <TableCell>
+                  <div className="h-4 w-4 bg-secondary/20 animate-pulse" />
+                </TableCell>
+                <TableCell>
+                  <div className="h-4 w-48 bg-secondary/20 animate-pulse" />
+                </TableCell>
+                <TableCell>
+                  <div className="h-4 w-32 bg-secondary/20 animate-pulse" />
+                </TableCell>
+                <TableCell>
+                  <div className="h-4 w-24 bg-secondary/20 animate-pulse" />
+                </TableCell>
+                <TableCell>
+                  <div className="h-4 w-20 bg-secondary/20 animate-pulse" />
+                </TableCell>
+                <TableCell>
+                  <div className="flex gap-2">
+                    <div className="h-8 w-8 bg-secondary/20 animate-pulse" />
+                    <div className="h-8 w-8 bg-secondary/20 animate-pulse" />
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </>
   );
 }
 

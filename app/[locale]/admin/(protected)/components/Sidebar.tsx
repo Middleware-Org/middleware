@@ -15,6 +15,7 @@ import {
   FileCode,
   LogOut,
   Headphones,
+  User,
 } from "lucide-react";
 import { cn } from "@/lib/utils/classes";
 import { authClient } from "@/lib/auth/client";
@@ -32,6 +33,57 @@ interface SidebarProps {
   dict: Pick<CommonDictionary, "title">;
   locale: string;
 }
+
+/* **************************************************
+ * Navigation Items (Static - Outside Component)
+ **************************************************/
+const navItems = [
+  {
+    href: "/admin",
+    label: "Dashboard",
+    icon: LayoutDashboard,
+  },
+  {
+    href: "/admin/articles",
+    label: "Articoli",
+    icon: FileText,
+  },
+  {
+    href: "/admin/podcasts",
+    label: "Podcasts",
+    icon: Headphones,
+  },
+  {
+    href: "/admin/media",
+    label: "Media",
+    icon: ImageIcon,
+  },
+  {
+    href: "/admin/issues",
+    label: "Issues",
+    icon: BookOpen,
+  },
+  {
+    href: "/admin/pages",
+    label: "Pagine",
+    icon: FileCode,
+  },
+  {
+    href: "/admin/categories",
+    label: "Categorie",
+    icon: FolderTree,
+  },
+  {
+    href: "/admin/authors",
+    label: "Autori",
+    icon: User,
+  },
+  {
+    href: "/admin/users",
+    label: "Utenti",
+    icon: Users,
+  },
+] as const;
 
 /* **************************************************
  * Sidebar Component
@@ -57,54 +109,6 @@ export default function Sidebar({ dict, locale }: SidebarProps) {
 
   const pathnameWithoutLocale = getPathnameWithoutLocale(pathname);
 
-  const navItems = [
-    {
-      href: "/admin",
-      label: "Dashboard",
-      icon: LayoutDashboard,
-    },
-    {
-      href: "/admin/articles",
-      label: "Articoli",
-      icon: FileText,
-    },
-    {
-      href: "/admin/podcasts",
-      label: "Podcasts",
-      icon: Headphones,
-    },
-    {
-      href: "/admin/media",
-      label: "Media",
-      icon: ImageIcon,
-    },
-    {
-      href: "/admin/issues",
-      label: "Issues",
-      icon: BookOpen,
-    },
-    {
-      href: "/admin/pages",
-      label: "Pagine",
-      icon: FileCode,
-    },
-    {
-      href: "/admin/categories",
-      label: "Categorie",
-      icon: FolderTree,
-    },
-    {
-      href: "/admin/authors",
-      label: "Autori",
-      icon: Users,
-    },
-    {
-      href: "/admin/users",
-      label: "Utenti",
-      icon: Users,
-    },
-  ];
-
   return (
     <aside className={styles.sidebar}>
       <div className={styles.header}>
@@ -119,6 +123,7 @@ export default function Sidebar({ dict, locale }: SidebarProps) {
       <nav className={styles.nav}>
         <ul className={styles.navList}>
           {navItems.map((item) => {
+            console.log("item", item);
             const Icon = item.icon;
             const isActive =
               item.href === "/admin"

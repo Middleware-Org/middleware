@@ -17,7 +17,7 @@ export default function DashboardSkeleton() {
       </div>
 
       <div className={styles.statsGrid}>
-        {[1, 2, 3, 4, 5, 6].map((i) => (
+        {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
           <div key={i} className={styles.statCard}>
             <div className={styles.statCardHeader}>
               <div className="h-12 w-12 bg-secondary/20 animate-pulse" />
