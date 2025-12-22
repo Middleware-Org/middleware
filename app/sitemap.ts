@@ -2,7 +2,7 @@
  * Imports
  **************************************************/
 import { MetadataRoute } from "next";
-import { getAllArticles, getAllIssues, getAllPages } from "@/lib/content";
+import { getAllArticles, getAllIssues, getAllPages, getAllPodcasts } from "@/lib/content";
 import { i18nSettings } from "@/lib/i18n/settings";
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 
@@ -14,10 +14,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const locale = i18nSettings.defaultLocale;
 
   // Ottieni tutti i contenuti
-  const [articles, issues, pages] = await Promise.all([
+  const [articles, issues, pages, podcasts] = await Promise.all([
     getAllArticles(),
     getAllIssues(),
     getAllPages(),
+    getAllPodcasts(),
   ]);
 
   // Route statiche
@@ -62,15 +63,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.9,
   }));
 
-  // Route dei podcast (articoli con audio)
-  const podcastRoutes: MetadataRoute.Sitemap = articles
-    .filter((article) => article.audio)
-    .map((article) => ({
-      url: `${baseUrl}/${locale}/${TRANSLATION_NAMESPACES.PODCAST}/${article.slug}`,
-      lastModified: new Date(article.date),
-      changeFrequency: "monthly" as const,
-      priority: 0.9,
-    }));
+  // Route dei podcast
+  const podcastRoutes: MetadataRoute.Sitemap = podcasts.map((podcast) => ({
+    url: `${baseUrl}/${locale}/${TRANSLATION_NAMESPACES.PODCAST}/${podcast.slug}`,
+    lastModified: new Date(podcast.last_update || podcast.date),
+    changeFrequency: "monthly" as const,
+    priority: 0.9,
+  }));
 
   // Route delle issues
   const issueRoutes: MetadataRoute.Sitemap = issues.map((issue) => ({

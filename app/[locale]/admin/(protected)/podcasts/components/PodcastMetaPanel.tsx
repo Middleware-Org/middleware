@@ -6,37 +6,28 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition, useEffect } from "react";
 import { Sparkles } from "lucide-react";
-import { deleteArticleAction } from "../actions";
+import { deletePodcastAction } from "../actions";
 import ConfirmDialog from "@/components/molecules/confirmDialog";
 import styles from "../styles";
 import baseStyles from "../../styles";
-import type { Article } from "@/lib/github/types";
-import type { Category } from "@/lib/github/types";
-import type { Author } from "@/lib/github/types";
-import type { Issue } from "@/lib/github/types";
-import SelectSearch from "./SelectSearch";
+import type { Podcast } from "@/lib/github/types";
+import AudioJsonMediaSelector from "../../articles/components/AudioJsonMediaSelector";
 import { mutate } from "swr";
 import { cn } from "@/lib/utils/classes";
-import { usePodcasts } from "@/hooks/swr";
 
 /* **************************************************
  * Types
  **************************************************/
-interface ArticleMetaPanelProps {
-  article?: Article | null;
-  categories: Category[];
-  authors: Author[];
-  issues: Issue[];
+interface PodcastMetaPanelProps {
+  podcast?: Podcast | null;
   formData: {
     title: string;
+    description: string;
     date: string;
-    author: string;
-    category: string;
-    issue: string;
-    in_evidence: boolean;
+    audio: string;
+    audio_chunks: string;
+    cover?: string;
     published: boolean;
-    excerpt: string;
-    podcast?: string;
   };
   onFormDataChange: (field: string, value: string | boolean) => void;
   editing: boolean;
@@ -44,46 +35,39 @@ interface ArticleMetaPanelProps {
 }
 
 /* **************************************************
- * Article Meta Panel Component
- **************************************************/
-/* **************************************************
  * Slug Generation Utility (Client-side)
  **************************************************/
 function generateSlug(text: string): string {
   return text
     .toLowerCase()
     .trim()
-    .normalize("NFD") // Normalize to decomposed form for handling accents
-    .replace(/[\u0300-\u036f]/g, "") // Remove diacritics
-    .replace(/[^a-z0-9\s-]/g, "") // Remove special characters except spaces and hyphens
-    .replace(/\s+/g, "-") // Replace spaces with hyphens
-    .replace(/-+/g, "-") // Replace multiple hyphens with single hyphen
-    .replace(/^-|-$/g, ""); // Remove leading/trailing hyphens
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
 }
 
-export default function ArticleMetaPanel({
-  article,
-  categories,
-  authors,
-  issues,
+export default function PodcastMetaPanel({
+  podcast,
   formData,
   onFormDataChange,
   editing,
   formRef,
-}: ArticleMetaPanelProps) {
+}: PodcastMetaPanelProps) {
   const router = useRouter();
   const [isPending] = useTransition();
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
+  const [isAudioSelectorOpen, setIsAudioSelectorOpen] = useState(false);
+  const [isAudioChunksSelectorOpen, setIsAudioChunksSelectorOpen] = useState(false);
+  const [isCoverSelectorOpen, setIsCoverSelectorOpen] = useState(false);
   const [isDeleting, startDeleteTransition] = useTransition();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  // Use null to indicate "not modified by user", otherwise use the user's custom value
   const [slugValue, setSlugValue] = useState<string | null>(null);
-  const { podcasts = [] } = usePodcasts();
 
-  // Derive current slug: use modified value if exists, otherwise fall back to article slug
-  const currentSlug = slugValue ?? article?.slug ?? "";
+  const currentSlug = slugValue ?? podcast?.slug ?? "";
 
-  // Update hidden input when currentSlug changes
   useEffect(() => {
     const slugInput = formRef.current?.querySelector('input[name="newSlug"]') as HTMLInputElement;
     if (slugInput) {
@@ -91,31 +75,27 @@ export default function ArticleMetaPanel({
     }
   }, [currentSlug, formRef]);
 
-  // Handler per generare lo slug dal titolo
   function handleGenerateSlug() {
     if (formData.title) {
       const generatedSlug = generateSlug(formData.title);
       setSlugValue(generatedSlug);
-      // The useEffect will automatically update the hidden input
     }
   }
 
-  // Handler per aprire il dialog di conferma eliminazione
   function handleDeleteClick() {
-    if (article) {
+    if (podcast) {
       setIsDeleteDialogOpen(true);
     }
   }
 
-  // Handler per confermare l'eliminazione
   async function handleDeleteConfirm() {
-    if (!article) return;
+    if (!podcast) return;
 
     setError(null);
     setIsDeleteDialogOpen(false);
 
     startDeleteTransition(async () => {
-      const result = await deleteArticleAction(article.slug);
+      const result = await deletePodcastAction(podcast.slug);
 
       if (!result.success) {
         setError({
@@ -123,10 +103,9 @@ export default function ArticleMetaPanel({
           type: result.errorType || "error",
         });
       } else {
-        // Invalida la cache SWR per forzare il refetch
-        mutate("/api/articles");
-        mutate(`/api/articles/${article.slug}`);
-        router.push("/admin/articles");
+        mutate("/api/podcasts");
+        mutate(`/api/podcasts/${podcast.slug}`);
+        router.push("/admin/podcasts");
       }
     });
   }
@@ -165,7 +144,7 @@ export default function ArticleMetaPanel({
                 setSlugValue(e.target.value);
               }}
               placeholder={
-                editing ? article?.slug || "auto-generato se vuoto" : "auto-generato se vuoto"
+                editing ? podcast?.slug || "auto-generato se vuoto" : "auto-generato se vuoto"
               }
               className={styles.input}
             />
@@ -178,7 +157,7 @@ export default function ArticleMetaPanel({
               <Sparkles className="w-4 h-4 text-secondary" />
             </button>
           </div>
-          {editing && <input type="hidden" name="slug" value={article?.slug || ""} />}
+          {editing && <input type="hidden" name="slug" value={podcast?.slug || ""} />}
         </div>
 
         <div className={styles.field}>
@@ -195,56 +174,105 @@ export default function ArticleMetaPanel({
           />
         </div>
 
-        <SelectSearch
-          id="author"
-          label="Autore"
-          value={formData.author}
-          options={authors.map((author) => ({
-            value: author.slug,
-            label: author.name,
-          }))}
-          onChange={(value) => onFormDataChange("author", value)}
-          placeholder="Seleziona un autore"
-          required
-        />
-
-        <SelectSearch
-          id="category"
-          label="Categoria"
-          value={formData.category}
-          options={categories.map((category) => ({
-            value: category.slug,
-            label: category.name,
-          }))}
-          onChange={(value) => onFormDataChange("category", value)}
-          placeholder="Seleziona una categoria"
-          required
-        />
-
-        <SelectSearch
-          id="issue"
-          label="Issue"
-          value={formData.issue}
-          options={issues.map((issue) => ({
-            value: issue.slug,
-            label: issue.title,
-          }))}
-          onChange={(value) => onFormDataChange("issue", value)}
-          placeholder="Seleziona un'issue"
-          required
-        />
+        <div className={styles.field}>
+          <label htmlFor="audio" className={styles.label}>
+            Audio *
+          </label>
+          <div className={baseStyles.buttonGroup}>
+            <input
+              id="audio"
+              type="text"
+              value={formData.audio || ""}
+              onChange={(e) => onFormDataChange("audio", e.target.value)}
+              placeholder="Nessun file audio selezionato"
+              className={styles.input}
+              readOnly
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setIsAudioSelectorOpen(true)}
+              className={styles.submitButton}
+            >
+              Seleziona
+            </button>
+            {formData.audio && (
+              <button
+                type="button"
+                onClick={() => onFormDataChange("audio", "")}
+                className={styles.cancelButton}
+              >
+                Rimuovi
+              </button>
+            )}
+          </div>
+        </div>
 
         <div className={styles.field}>
-          <label htmlFor="excerpt" className={styles.label}>
-            Excerpt
+          <label htmlFor="audio_chunks" className={styles.label}>
+            JSON Chunk Audio *
           </label>
-          <textarea
-            id="excerpt"
-            value={formData.excerpt}
-            onChange={(e) => onFormDataChange("excerpt", e.target.value)}
-            className={styles.textarea}
-            rows={3}
-          />
+          <div className={baseStyles.buttonGroup}>
+            <input
+              id="audio_chunks"
+              type="text"
+              value={formData.audio_chunks || ""}
+              onChange={(e) => onFormDataChange("audio_chunks", e.target.value)}
+              placeholder="Nessun file JSON selezionato"
+              className={styles.input}
+              readOnly
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setIsAudioChunksSelectorOpen(true)}
+              className={styles.submitButton}
+            >
+              Seleziona
+            </button>
+            {formData.audio_chunks && (
+              <button
+                type="button"
+                onClick={() => onFormDataChange("audio_chunks", "")}
+                className={styles.cancelButton}
+              >
+                Rimuovi
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className={styles.field}>
+          <label htmlFor="cover" className={styles.label}>
+            Immagine di copertina (opzionale)
+          </label>
+          <div className={baseStyles.buttonGroup}>
+            <input
+              id="cover"
+              type="text"
+              value={formData.cover || ""}
+              onChange={(e) => onFormDataChange("cover", e.target.value)}
+              placeholder="Nessuna immagine selezionata"
+              className={styles.input}
+              readOnly
+            />
+            <button
+              type="button"
+              onClick={() => setIsCoverSelectorOpen(true)}
+              className={styles.submitButton}
+            >
+              Seleziona
+            </button>
+            {formData.cover && (
+              <button
+                type="button"
+                onClick={() => onFormDataChange("cover", "")}
+                className={styles.cancelButton}
+              >
+                Rimuovi
+              </button>
+            )}
+          </div>
         </div>
 
         <div className={styles.field}>
@@ -258,34 +286,40 @@ export default function ArticleMetaPanel({
             <span className={styles.label}>Pubblicato</span>
           </label>
         </div>
-
-        <div className={styles.field}>
-          <label className={`${baseStyles.buttonGroup} cursor-pointer`}>
-            <input
-              type="checkbox"
-              checked={formData.in_evidence}
-              onChange={(e) => onFormDataChange("in_evidence", e.target.checked)}
-              className={styles.checkbox}
-            />
-            <span className={styles.label}>In evidenza</span>
-          </label>
-        </div>
-
-        <SelectSearch
-          id="podcast"
-          label="Podcast (opzionale)"
-          value={formData.podcast || ""}
-          options={[
-            { value: "", label: "Nessun podcast" },
-            ...podcasts.map((podcast) => ({
-              value: podcast.slug,
-              label: podcast.title,
-            })),
-          ]}
-          onChange={(value) => onFormDataChange("podcast", value || "")}
-          placeholder="Seleziona un podcast"
-        />
       </div>
+
+      {/* Audio Selector Modal */}
+      <AudioJsonMediaSelector
+        isOpen={isAudioSelectorOpen}
+        onClose={() => setIsAudioSelectorOpen(false)}
+        onSelect={(fileUrl) => {
+          onFormDataChange("audio", fileUrl);
+        }}
+        fileType="audio"
+        title="Seleziona Audio"
+      />
+
+      {/* Audio Chunks JSON Selector Modal */}
+      <AudioJsonMediaSelector
+        isOpen={isAudioChunksSelectorOpen}
+        onClose={() => setIsAudioChunksSelectorOpen(false)}
+        onSelect={(fileUrl) => {
+          onFormDataChange("audio_chunks", fileUrl);
+        }}
+        fileType="json"
+        title="Seleziona JSON Chunk Audio"
+      />
+
+      {/* Cover Image Selector Modal */}
+      <AudioJsonMediaSelector
+        isOpen={isCoverSelectorOpen}
+        onClose={() => setIsCoverSelectorOpen(false)}
+        onSelect={(fileUrl) => {
+          onFormDataChange("cover", fileUrl);
+        }}
+        fileType="image"
+        title="Seleziona Immagine di Copertina"
+      />
 
       {/* Fixed Actions Section - Always Visible */}
       <div className={cn(styles.metaCard, "shrink-0")}>
@@ -303,7 +337,7 @@ export default function ArticleMetaPanel({
           </button>
           <button
             type="button"
-            onClick={() => router.push("/admin/articles")}
+            onClick={() => router.push("/admin/podcasts")}
             className={styles.cancelButton}
             disabled={isPending}
           >
@@ -323,7 +357,7 @@ export default function ArticleMetaPanel({
           )}
         </div>
 
-        {editing && article && error && (
+        {editing && podcast && error && (
           <div className={`mt-4 ${error.type === "warning" ? styles.errorWarning : styles.error}`}>
             ⚠️ {error.message}
           </div>
@@ -331,13 +365,13 @@ export default function ArticleMetaPanel({
       </div>
 
       {/* Delete Confirmation Dialog */}
-      {editing && article && (
+      {editing && podcast && (
         <ConfirmDialog
           isOpen={isDeleteDialogOpen}
           onClose={() => setIsDeleteDialogOpen(false)}
           onConfirm={handleDeleteConfirm}
-          title="Elimina Articolo"
-          message={`Sei sicuro di voler eliminare l'articolo "${article.title}"? Questa azione non può essere annullata.`}
+          title="Elimina Podcast"
+          message={`Sei sicuro di voler eliminare il podcast "${podcast.title}"? Questa azione non può essere annullata.`}
           confirmText="Elimina"
           cancelText="Annulla"
           confirmButtonClassName={styles.deleteButton}
@@ -347,3 +381,4 @@ export default function ArticleMetaPanel({
     </div>
   );
 }
+

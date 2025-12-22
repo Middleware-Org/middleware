@@ -59,8 +59,7 @@ export default function ArticleFormClient({ articleSlug }: ArticleFormClientProp
     in_evidence: false,
     published: false,
     excerpt: "",
-    audio: "",
-    audio_chunks: "",
+    podcast: "",
   };
 
   // Inizializza lo stato con i valori dell'articolo se disponibile
@@ -76,8 +75,7 @@ export default function ArticleFormClient({ articleSlug }: ArticleFormClientProp
           in_evidence: article.in_evidence || false,
           published: article.published ?? false,
           excerpt: article.excerpt || "",
-          audio: article.audio || "",
-          audio_chunks: article.audio_chunks || "",
+          podcast: article.podcast || "",
         }
       : defaultFormData,
   );
@@ -117,11 +115,8 @@ export default function ArticleFormClient({ articleSlug }: ArticleFormClientProp
     preparedFormData.set("excerpt", formData.excerpt);
     preparedFormData.set("content", content);
 
-    if (formData.audio) {
-      preparedFormData.set("audio", formData.audio);
-    }
-    if (formData.audio_chunks) {
-      preparedFormData.set("audio_chunks", formData.audio_chunks);
+    if (formData.podcast) {
+      preparedFormData.set("podcast", formData.podcast);
     }
 
     if (editing && articleSlug) {

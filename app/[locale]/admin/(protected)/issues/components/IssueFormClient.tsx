@@ -20,7 +20,7 @@ import styles from "../styles";
 import type { Issue } from "@/lib/github/types";
 import Image from "next/image";
 import { useIssue } from "@/hooks/swr";
-import MediaSelector from "../../articles/components/MediaSelector";
+import AudioJsonMediaSelector from "../../articles/components/AudioJsonMediaSelector";
 import { mutate } from "swr";
 
 /* **************************************************
@@ -79,7 +79,7 @@ function ImageUpload({
     return getGitHubImageUrl(image);
   };
 
-  const [isMediaSelectorOpen, setIsMediaSelectorOpen] = useState(false);
+  const [isImageSelectorOpen, setIsImageSelectorOpen] = useState(false);
 
   // Compute preview URL from currentImage
   const preview = useMemo(() => {
@@ -87,7 +87,7 @@ function ImageUpload({
   }, [currentImage]);
 
   function handleClick() {
-    setIsMediaSelectorOpen(true);
+    setIsImageSelectorOpen(true);
   }
 
   function handleRemove(e: React.MouseEvent) {
@@ -144,11 +144,13 @@ function ImageUpload({
         )}
       </div>
 
-      {/* Media Selector Modal */}
-      <MediaSelector
-        isOpen={isMediaSelectorOpen}
-        onClose={() => setIsMediaSelectorOpen(false)}
+      {/* Image Selector Modal */}
+      <AudioJsonMediaSelector
+        isOpen={isImageSelectorOpen}
+        onClose={() => setIsImageSelectorOpen(false)}
         onSelect={handleSelectFromMedia}
+        fileType="image"
+        title="Seleziona Immagine di Copertina"
       />
     </div>
   );

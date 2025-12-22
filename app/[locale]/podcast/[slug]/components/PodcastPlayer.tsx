@@ -4,8 +4,7 @@
  * Imports
  **************************************************/
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Article } from "@/.velite";
-import { getAuthorBySlug, getCategoryBySlug, getIssueBySlug } from "@/lib/content";
+import { Podcast } from "@/.velite";
 import { useAudioPlayer } from "./hooks/useAudioPlayer";
 import { useTranscriptScroll } from "./hooks/useTranscriptScroll";
 import PodcastHeader from "./PodcastHeader";
@@ -21,13 +20,13 @@ import { getGitHubMediaUrl } from "@/lib/github/images";
  * Types
  **************************************************/
 type PodcastPlayerProps = {
-  article: Article;
+  podcast: Podcast;
 };
 
 /* **************************************************
  * PodcastPlayer
  **************************************************/
-export default function PodcastPlayer({ article }: PodcastPlayerProps) {
+export default function PodcastPlayer({ podcast }: PodcastPlayerProps) {
   const transcriptContainerRef = useRef<HTMLDivElement | null>(null);
   const transcriptContentInnerRef = useRef<HTMLDivElement | null>(null);
   const activeSegmentRef = useRef<HTMLDivElement | null>(null);
@@ -36,11 +35,7 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
   const [currentSegmentIndex, setCurrentSegmentIndex] = useState<number>(-1);
   const [showVolumeControl, setShowVolumeControl] = useState<boolean>(false);
 
-  const author = getAuthorBySlug(article.author);
-  const category = getCategoryBySlug(article.category);
-  const issue = getIssueBySlug(article.issue);
-
-  const podcastId = article.slug;
+  const podcastId = podcast.slug;
   const totalPositions = 1000;
 
   // Audio player hook
@@ -63,7 +58,7 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
     backward,
     seek,
   } = useAudioPlayer({
-    audioSrc: article.audio ? getGitHubMediaUrl(article.audio) : "",
+    audioSrc: podcast.audio ? getGitHubMediaUrl(podcast.audio) : "",
     podcastId,
     totalPositions,
     onTimeUpdate: (newTime) => {
@@ -89,8 +84,8 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
 
   // Load segments JSON
   useEffect(() => {
-    if (article.audio_chunks) {
-      const chunksUrl = getGitHubMediaUrl(article.audio_chunks);
+    if (podcast.audio_chunks) {
+      const chunksUrl = getGitHubMediaUrl(podcast.audio_chunks);
       fetch(chunksUrl)
         .then((res) => res.json())
         .then((data: Segment[]) => {
@@ -100,7 +95,7 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
           console.error("Failed to load audio segments:", err);
         });
     }
-  }, [article.audio_chunks]);
+  }, [podcast.audio_chunks]);
 
   // Usa il custom hook per gestire i bookmarks
   const { bookmarks, addBookmark, hasBookmarkInChunk, refreshBookmarks } = usePodcastBookmarks({
@@ -147,11 +142,11 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
     setPlaybackRate(value);
   };
 
-  if (!article.audio) {
+  if (!podcast.audio) {
     return null;
   }
 
-  const audioUrl = article.audio ? getGitHubMediaUrl(article.audio) : "";
+  const audioUrl = podcast.audio ? getGitHubMediaUrl(podcast.audio) : "";
 
   return (
     <div className={styles.container}>
@@ -159,7 +154,7 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
 
       {/* Top Grid: Header + Player */}
       <div className={styles.topGrid}>
-        <PodcastHeader article={article} issue={issue} author={author} category={category} />
+        <PodcastHeader podcast={podcast} />
 
         <ProgressBar
           currentTime={currentTime}
@@ -196,7 +191,7 @@ export default function PodcastPlayer({ article }: PodcastPlayerProps) {
         transcriptContainerRef={transcriptContainerRef}
         transcriptContentInnerRef={transcriptContentInnerRef}
         activeSegmentRef={activeSegmentRef}
-        podcastSlug={article.slug}
+        podcastSlug={podcast.slug}
         bookmarks={bookmarks}
       />
     </div>
