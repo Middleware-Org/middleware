@@ -2,7 +2,7 @@
 slug: ancora-catene-da-spezzare-appunti-su-pratiche-di-liberta-e-ed-autodifesa
 title: Ancora catene da spezzare – Appunti su pratiche di libertà e ed autodifesa
 date: '2025-12-18'
-last_update: '2025-12-18T09:04:31.046Z'
+last_update: '2025-12-22T10:07:30.059Z'
 author: associazione-a-resistere-pisa
 category: transfemminismo
 issue: raccolta
@@ -15,10 +15,7 @@ excerpt: >-
   controllo. Questa non è una questione marginale o accidentale, ma la
   manifestazione di processi che le teoriche femministe radicali, nere,
   postcoloniali e transnazionali hanno analizzato per decenni.
-audio: >-
-  https://mdmdfxzts3o3uer1.public.blob.vercel-storage.com/media/ancora-catene-da-spezzare.mp3
-audio_chunks: >-
-  https://mdmdfxzts3o3uer1.public.blob.vercel-storage.com/media/ancora-catene-da-spezzare.json
+podcast: ancora-catene-da-spezzare-appunti-su-pratiche-di-liberta-e-ed-autodifesa
 ---
 _Quando assemblee transfemministe vengono attaccate dopo grandi mobilitazioni, quando la contestazione al potere viene ribaltata in ”aggressione”, quando l’_**_autodifesa_** _viene narrata come ”violenza”, non assistiamo semplicemente a conflitti interni. Assistiamo al funzionamento di quella che Nancy Fraser chiamerebbe la_ **_cattura neoliberale_** _del femminismo, un processo attraverso cui linguaggi e pratiche liberatorie vengono riconvertiti in dispositivi di neutralizzazione politica.  
   
