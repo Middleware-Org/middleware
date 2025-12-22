@@ -12,7 +12,7 @@ import PodcastMetaPanel from "./PodcastMetaPanel";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Podcast } from "@/lib/github/types";
-import { usePodcast, useIssues } from "@/hooks/swr";
+import { usePodcast } from "@/hooks/swr";
 import { mutate } from "swr";
 
 /* **************************************************
@@ -31,7 +31,6 @@ export default function PodcastFormClient({ podcastSlug }: PodcastFormClientProp
 
   // Usa SWR per ottenere i dati (cache pre-popolata dal server)
   const { podcast } = usePodcast(podcastSlug || null);
-  const { issues = [] } = useIssues();
 
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -43,7 +42,6 @@ export default function PodcastFormClient({ podcastSlug }: PodcastFormClientProp
     audio: "",
     audio_chunks: "",
     cover: "",
-    issue: "",
     published: false,
   };
 
@@ -57,7 +55,6 @@ export default function PodcastFormClient({ podcastSlug }: PodcastFormClientProp
           audio: podcast.audio || "",
           audio_chunks: podcast.audio_chunks || "",
           cover: podcast.cover || "",
-          issue: podcast.issue || "",
           published: podcast.published ?? false,
         }
       : defaultFormData,
@@ -101,9 +98,6 @@ export default function PodcastFormClient({ podcastSlug }: PodcastFormClientProp
     }
     if (formData.cover) {
       preparedFormData.set("cover", formData.cover);
-    }
-    if (formData.issue) {
-      preparedFormData.set("issue", formData.issue);
     }
 
     if (editing && podcastSlug) {
@@ -164,7 +158,6 @@ export default function PodcastFormClient({ podcastSlug }: PodcastFormClientProp
         {/* Meta Panel - 1/4 width */}
         <PodcastMetaPanel
           podcast={podcast || null}
-          issues={issues}
           formData={formData}
           onFormDataChange={handleFormDataChange}
           editing={editing}

@@ -17,5 +17,7 @@ export const getPodcastBySlug = (slug: string) => {
 };
 
 export const getPodcastsByIssue = (issueSlug: string) => {
-  return getAllPodcasts().filter((podcast) => podcast.issue === issueSlug);
+  // I podcasts non hanno issue direttamente, ma possiamo filtrare per data se necessario
+  // Per ora restituiamo tutti i podcasts pubblicati
+  return getAllPodcasts();
 };

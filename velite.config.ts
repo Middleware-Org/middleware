@@ -31,7 +31,6 @@ export default defineConfig({
         audio: s.string(),
         audio_chunks: s.string(),
         cover: s.string().optional(),
-        issue: s.string().optional(),
         published: s.boolean().default(false),
       }),
     },

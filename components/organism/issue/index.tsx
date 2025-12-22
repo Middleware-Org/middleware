@@ -6,7 +6,7 @@ import Separator from "@/components/atoms/separetor";
 import { SerifTextBold } from "@/components/atoms/typography";
 import type { Issue } from "@/.velite";
 import { CommonDictionary } from "@/lib/i18n/types";
-import { getPodcastsByIssue } from "@/lib/content";
+import { getArticlesByIssue, getAllPodcasts, getPodcastBySlug } from "@/lib/content";
 import IssuePodcasts from "../issuePodcasts";
 import styles from "./styles";
 
@@ -23,8 +23,14 @@ type IssueProps = {
  * Issue Component
  **************************************************/
 export default async function Issue({ issue, dictCommon, isLastIssue }: IssueProps) {
-  // Get podcasts directly related to this issue
-  const podcasts = getPodcastsByIssue(issue.slug);
+  const articles = getArticlesByIssue(issue.slug);
+
+  // Find podcasts related to articles in this issue
+  const allPodcasts = getAllPodcasts();
+  const relatedPodcastSlugs = new Set(
+    articles.filter((article) => article.podcast).map((article) => article.podcast),
+  );
+  const podcasts = allPodcasts.filter((podcast) => relatedPodcastSlugs.has(podcast.slug));
 
   if (!podcasts || podcasts.length === 0) return null;
 

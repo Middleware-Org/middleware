@@ -6,7 +6,6 @@ import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 import { getUser } from "@/lib/auth/server";
 import { getPodcastBySlug } from "@/lib/github/podcasts";
-import { getAllIssues } from "@/lib/github/issues";
 import { cn } from "@/lib/utils/classes";
 import PodcastFormClient from "../../components/PodcastFormClient";
 import PodcastEditSkeleton from "../../components/PodcastEditSkeleton";
@@ -30,10 +29,7 @@ export default async function EditPodcastPage({ params }: EditPodcastPageProps) 
   }
 
   const { slug } = await params;
-  const [podcast, issues] = await Promise.all([
-    getPodcastBySlug(slug),
-    getAllIssues(),
-  ]);
+  const podcast = await getPodcastBySlug(slug);
 
   if (!podcast) {
     notFound();
@@ -42,7 +38,6 @@ export default async function EditPodcastPage({ params }: EditPodcastPageProps) 
   // Pre-popolazione cache SWR con dati SSR
   const swrFallback = {
     [`/api/podcasts/${slug}`]: podcast,
-    "/api/issues": issues,
   };
 
   return (

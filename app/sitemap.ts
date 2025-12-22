@@ -67,9 +67,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const podcastRoutes: MetadataRoute.Sitemap = podcasts.map((podcast) => ({
     url: `${baseUrl}/${locale}/${TRANSLATION_NAMESPACES.PODCAST}/${podcast.slug}`,
     lastModified: new Date(podcast.last_update || podcast.date),
-    changeFrequency: "monthly" as const,
-    priority: 0.9,
-  }));
+      changeFrequency: "monthly" as const,
+      priority: 0.9,
+    }));
 
   // Route delle issues
   const issueRoutes: MetadataRoute.Sitemap = issues.map((issue) => ({
