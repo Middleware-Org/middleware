@@ -37,8 +37,7 @@ export async function createArticleAction(
     const published = formData.get("published") === "true";
     const excerpt = formData.get("excerpt") as string;
     const content = formData.get("content") as string;
-    const audio = formData.get("audio") as string | null;
-    const audio_chunks = formData.get("audio_chunks") as string | null;
+    const podcast = formData.get("podcast") as string | null;
     const slug = formData.get("slug") as string | null;
 
     if (!title || !date || !author || !category || !issue || !content) {
@@ -61,8 +60,7 @@ export async function createArticleAction(
       published,
       excerpt: excerpt?.trim() || "",
       content: content.trim(),
-      audio: audio?.trim() || undefined,
-      audio_chunks: audio_chunks?.trim() || undefined,
+      podcast: podcast?.trim() || undefined,
       slug: slug?.trim() || undefined,
     });
 
@@ -98,8 +96,7 @@ export async function updateArticleAction(
     const published = formData.get("published") === "true";
     const excerpt = formData.get("excerpt") as string;
     const content = formData.get("content") as string;
-    const audio = formData.get("audio") as string | null;
-    const audio_chunks = formData.get("audio_chunks") as string | null;
+    const podcast = formData.get("podcast") as string | null;
 
     if (!slug || !title || !date || !author || !category || !issue || !content) {
       return {
@@ -119,8 +116,7 @@ export async function updateArticleAction(
       published,
       excerpt: excerpt?.trim() || "",
       content: content.trim(),
-      audio: audio?.trim() || undefined,
-      audio_chunks: audio_chunks?.trim() || undefined,
+      podcast: podcast?.trim() || undefined,
       newSlug: newSlug?.trim() || undefined,
     });
 

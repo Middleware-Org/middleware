@@ -11,10 +11,7 @@ published: true
 excerpt: >-
   Abbiamo tradotto questo importante articolo di Phil A. Neel apparso su Ill
   Will che tratta della teoria del partito.
-audio: >-
-  https://mdmdfxzts3o3uer1.public.blob.vercel-storage.com/media/teoria-del-partito.mp3
-audio_chunks: >-
-  https://mdmdfxzts3o3uer1.public.blob.vercel-storage.com/media/teoria-del-partito.json
+podcast: teoria-del-partito
 ---
 _Ci sembra che questo testo risuoni con alcuni dei problemi teorico-pratici che, su una scala certamente differente, si sono imposti nella riflessione militante dopo le incredibili settimane di piena del movimento “Blocchiamo Tutto”. Ora che la marea si è abbassata due sentimenti si sono fatti spazio tra le realtà politiche: da un lato il ritorno ad una certa disillusione dettata dall’andamento del movimento in relazione alla fase oggettiva imposta dalla “tregua” nella Striscia di Gaza, dall’altro una tensione a capitalizzare “politicamente” questo movimento. Avevamo avvertito che la traduzione e l’esondazione di questo fenomeno sociale su altri terreni non sarebbe stata né scontata, né facile, e che avrebbe richiesto una certa presa di responsabilità collettiva da parte delle realtà politiche. In questi giorni si sono moltiplicati generici appelli ad organizzarsi, appelli che condividiamo, ma ciò che non è chiaro è per quale scopo e con quale prospettiva. Per quanto ci riguarda abbiamo avanzato l’ipotesi che questo movimento sia un epifenomeno italiano dell’assemblaggio generale di un “nuovo” iper-proletariato dopo il lungo inverno neoliberale e che procedere con gli schemi organizzativi tipici della fase precedente è un lavoro inutile e dannoso. Utilizzando le parole di Phil A. Neel ci pare che ancora una volta ci si concentri sul tentativo di prendere “il comando” dei processi in corso, piuttosto che sullo sviluppo della “soggettività collettiva”, rischiando di rimanere ancora una volta con un pugno di mosche in mano. Ma non c’è da deprimersi, come sottolinea l’autore questi sono passaggi necessari e per certi versi inevitabili._
 

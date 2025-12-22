@@ -21,8 +21,7 @@ export type Article = {
   published: boolean;
   excerpt: string;
   content: string;
-  audio?: string;
-  audio_chunks?: string;
+  podcast?: string;
 };
 
 export type Issue = {
@@ -53,4 +52,15 @@ export type Page = {
   title: string;
   excerpt: string;
   content: string;
+};
+
+export type Podcast = {
+  slug: string;
+  title: string;
+  description: string;
+  audio: string;
+  audio_chunks: string;
+  duration?: number;
+  published: boolean;
+  date: string;
 };

@@ -14,7 +14,7 @@ import type { Article } from "@/lib/github/types";
 import type { Category } from "@/lib/github/types";
 import type { Author } from "@/lib/github/types";
 import type { Issue } from "@/lib/github/types";
-import AudioJsonMediaSelector from "./AudioJsonMediaSelector";
+import PodcastSelector from "./PodcastSelector";
 import SelectSearch from "./SelectSearch";
 import { mutate } from "swr";
 import { cn } from "@/lib/utils/classes";
@@ -36,8 +36,7 @@ interface ArticleMetaPanelProps {
     in_evidence: boolean;
     published: boolean;
     excerpt: string;
-    audio?: string;
-    audio_chunks?: string;
+    podcast?: string;
   };
   onFormDataChange: (field: string, value: string | boolean) => void;
   editing: boolean;
@@ -75,8 +74,6 @@ export default function ArticleMetaPanel({
   const router = useRouter();
   const [isPending] = useTransition();
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
-  const [isAudioSelectorOpen, setIsAudioSelectorOpen] = useState(false);
-  const [isAudioChunksSelectorOpen, setIsAudioChunksSelectorOpen] = useState(false);
   const [isDeleting, startDeleteTransition] = useTransition();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   // Use null to indicate "not modified by user", otherwise use the user's custom value
@@ -273,94 +270,11 @@ export default function ArticleMetaPanel({
           </label>
         </div>
 
-        <div className={styles.field}>
-          <label htmlFor="audio" className={styles.label}>
-            Audio
-          </label>
-          <div className={baseStyles.buttonGroup}>
-            <input
-              id="audio"
-              type="text"
-              value={formData.audio || ""}
-              onChange={(e) => onFormDataChange("audio", e.target.value)}
-              placeholder="Nessun file audio selezionato"
-              className={styles.input}
-              readOnly
-            />
-            <button
-              type="button"
-              onClick={() => setIsAudioSelectorOpen(true)}
-              className={styles.submitButton}
-            >
-              Seleziona
-            </button>
-            {formData.audio && (
-              <button
-                type="button"
-                onClick={() => onFormDataChange("audio", "")}
-                className={styles.cancelButton}
-              >
-                Rimuovi
-              </button>
-            )}
-          </div>
-        </div>
-
-        <div className={styles.field}>
-          <label htmlFor="audio_chunks" className={styles.label}>
-            JSON Chunk Audio
-          </label>
-          <div className={baseStyles.buttonGroup}>
-            <input
-              id="audio_chunks"
-              type="text"
-              value={formData.audio_chunks || ""}
-              onChange={(e) => onFormDataChange("audio_chunks", e.target.value)}
-              placeholder="Nessun file JSON selezionato"
-              className={styles.input}
-              readOnly
-            />
-            <button
-              type="button"
-              onClick={() => setIsAudioChunksSelectorOpen(true)}
-              className={styles.submitButton}
-            >
-              Seleziona
-            </button>
-            {formData.audio_chunks && (
-              <button
-                type="button"
-                onClick={() => onFormDataChange("audio_chunks", "")}
-                className={styles.cancelButton}
-              >
-                Rimuovi
-              </button>
-            )}
-          </div>
-        </div>
+        <PodcastSelector
+          value={formData.podcast || ""}
+          onChange={(value) => onFormDataChange("podcast", value)}
+        />
       </div>
-
-      {/* Audio Selector Modal */}
-      <AudioJsonMediaSelector
-        isOpen={isAudioSelectorOpen}
-        onClose={() => setIsAudioSelectorOpen(false)}
-        onSelect={(fileUrl) => {
-          onFormDataChange("audio", fileUrl);
-        }}
-        fileType="audio"
-        title="Seleziona Audio"
-      />
-
-      {/* Audio Chunks JSON Selector Modal */}
-      <AudioJsonMediaSelector
-        isOpen={isAudioChunksSelectorOpen}
-        onClose={() => setIsAudioChunksSelectorOpen(false)}
-        onSelect={(fileUrl) => {
-          onFormDataChange("audio_chunks", fileUrl);
-        }}
-        fileType="json"
-        title="Seleziona JSON Chunk Audio"
-      />
 
       {/* Fixed Actions Section - Always Visible */}
       <div className={cn(styles.metaCard, "shrink-0")}>
