@@ -45,8 +45,7 @@ export async function getAllArticles(): Promise<Article[]> {
           published: data.published ?? false,
           excerpt: data.excerpt || "",
           content: markdownContent,
-          audio: data.audio,
-          audio_chunks: data.audio_chunks,
+          podcast: data.podcast,
         } as Article;
       } catch {
         return null;
@@ -111,8 +110,7 @@ export async function getArticleBySlug(slug: string): Promise<Article | undefine
         published: (data.published as boolean) ?? false,
         excerpt: (data.excerpt as string) || "",
         content: markdownContent || "",
-        audio: (data.audio as string) || undefined,
-        audio_chunks: (data.audio_chunks as string) || undefined,
+        podcast: (data.podcast as string) || undefined,
       } as Article;
     } catch {
       return undefined;
@@ -149,11 +147,8 @@ export async function createArticle(article: Omit<Article, "slug"> & { slug?: st
     excerpt: article.excerpt || "",
   };
 
-  if (article.audio) {
-    frontmatter.audio = article.audio;
-  }
-  if (article.audio_chunks) {
-    frontmatter.audio_chunks = article.audio_chunks;
+  if (article.podcast) {
+    frontmatter.podcast = article.podcast;
   }
 
   // Combina frontmatter e contenuto
@@ -227,8 +222,7 @@ export async function updateArticle(
     published: article.published !== undefined ? article.published : existing.published,
     excerpt: article.excerpt ?? existing.excerpt,
     content: article.content ?? existing.content,
-    audio: article.audio !== undefined ? article.audio : existing.audio,
-    audio_chunks: article.audio_chunks !== undefined ? article.audio_chunks : existing.audio_chunks,
+    podcast: article.podcast !== undefined ? article.podcast : existing.podcast,
   };
 
   const frontmatter: Record<string, any> = {
@@ -244,11 +238,8 @@ export async function updateArticle(
     excerpt: updated.excerpt,
   };
 
-  if (updated.audio) {
-    frontmatter.audio = updated.audio;
-  }
-  if (updated.audio_chunks) {
-    frontmatter.audio_chunks = updated.audio_chunks;
+  if (updated.podcast) {
+    frontmatter.podcast = updated.podcast;
   }
 
   const fileContent = matter.stringify(updated.content, frontmatter);

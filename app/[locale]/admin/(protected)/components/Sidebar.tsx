@@ -14,6 +14,7 @@ import {
   FileText,
   FileCode,
   LogOut,
+  Headphones,
 } from "lucide-react";
 import { cn } from "@/lib/utils/classes";
 import { authClient } from "@/lib/auth/client";
@@ -66,6 +67,11 @@ export default function Sidebar({ dict, locale }: SidebarProps) {
       href: "/admin/articles",
       label: "Articoli",
       icon: FileText,
+    },
+    {
+      href: "/admin/podcasts",
+      label: "Podcasts",
+      icon: Headphones,
     },
     {
       href: "/admin/media",

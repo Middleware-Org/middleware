@@ -9,6 +9,8 @@ import {
   getAllCategories,
   getAllAuthors,
   getAllPages,
+  getAllPodcasts,
+  getAllUsers,
 } from "@/lib/github";
 import { getAllMediaFiles } from "@/lib/github/media";
 import TokenExpirationBanner from "./components/TokenExpirationBanner";
@@ -24,13 +26,15 @@ export default async function AdminProtectedPage() {
     return null;
   }
 
-  const [issues, articles, categories, authors, pages, media] = await Promise.all([
+  const [issues, articles, categories, authors, pages, media, podcasts, users] = await Promise.all([
     getAllIssues(),
     getAllArticles(),
     getAllCategories(),
     getAllAuthors(),
     getAllPages(),
     getAllMediaFiles(),
+    getAllPodcasts(),
+    getAllUsers(),
   ]);
 
   const stats = [
@@ -80,6 +84,22 @@ export default async function AdminProtectedPage() {
       href: "/admin/media",
       icon: "🖼️",
       description: "File caricati",
+      color: "tertiary",
+    },
+    {
+      title: "Podcasts",
+      count: podcasts.length,
+      href: "/admin/podcasts",
+      icon: "🎙️",
+      description: "Numero totale",
+      color: "tertiary",
+    },
+    {
+      title: "Utenti",
+      count: users.length,
+      href: "/admin/users",
+      icon: "👤",
+      description: "Numero totale",
       color: "tertiary",
     },
   ];
