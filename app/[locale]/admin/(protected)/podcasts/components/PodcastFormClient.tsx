@@ -41,6 +41,7 @@ export default function PodcastFormClient({ podcastSlug }: PodcastFormClientProp
     date: new Date().toISOString().split("T")[0],
     audio: "",
     audio_chunks: "",
+    cover: "",
     published: false,
   };
 
@@ -53,6 +54,7 @@ export default function PodcastFormClient({ podcastSlug }: PodcastFormClientProp
           date: podcast.date || new Date().toISOString().split("T")[0],
           audio: podcast.audio || "",
           audio_chunks: podcast.audio_chunks || "",
+          cover: podcast.cover || "",
           published: podcast.published ?? false,
         }
       : defaultFormData,
@@ -93,6 +95,9 @@ export default function PodcastFormClient({ podcastSlug }: PodcastFormClientProp
     }
     if (formData.audio_chunks) {
       preparedFormData.set("audio_chunks", formData.audio_chunks);
+    }
+    if (formData.cover) {
+      preparedFormData.set("cover", formData.cover);
     }
 
     if (editing && podcastSlug) {

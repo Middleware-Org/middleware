@@ -39,6 +39,7 @@ export async function getAllPodcasts(): Promise<Podcast[]> {
           last_update: lastUpdate,
           audio: podcast.audio || "",
           audio_chunks: podcast.audio_chunks || "",
+          cover: podcast.cover,
           published: podcast.published ?? false,
         } as Podcast;
       } catch {
@@ -99,6 +100,7 @@ export async function getPodcastBySlug(slug: string): Promise<Podcast | undefine
         last_update: lastUpdate,
         audio: (podcast.audio as string) || "",
         audio_chunks: (podcast.audio_chunks as string) || "",
+        cover: podcast.cover,
         published: (podcast.published as boolean) ?? false,
       } as Podcast;
     } catch {
@@ -127,6 +129,7 @@ export async function createPodcast(podcast: Omit<Podcast, "slug"> & { slug?: st
     last_update: lastUpdate,
     audio: podcast.audio || "",
     audio_chunks: podcast.audio_chunks || "",
+    cover: podcast.cover,
     published: podcast.published ?? false,
   };
 
@@ -196,6 +199,7 @@ export async function updatePodcast(
     last_update: currentDateTime,
     audio: podcast.audio !== undefined ? podcast.audio : existing.audio,
     audio_chunks: podcast.audio_chunks !== undefined ? podcast.audio_chunks : existing.audio_chunks,
+    cover: podcast.cover !== undefined ? podcast.cover : existing.cover,
     published: podcast.published !== undefined ? podcast.published : existing.published,
   };
 

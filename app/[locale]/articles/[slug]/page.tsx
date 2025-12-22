@@ -5,7 +5,6 @@ import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import { getDictionary } from "@/lib/i18n/utils";
 import { i18nSettings } from "@/lib/i18n/settings";
 import { getBaseUrl } from "@/lib/utils/metadata";
-import { getGitHubImageUrl } from "@/lib/github/images";
 import { notFound } from "next/navigation";
 import Article from "./components/Article";
 import type { Metadata } from "next";
@@ -15,9 +14,7 @@ interface ArticlePageProps {
 }
 
 // Generate metadata for SEO
-export async function generateMetadata({
-  params,
-}: ArticlePageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
   const { locale, slug } = await params;
   const article = getArticleBySlug(slug);
 
@@ -61,13 +58,6 @@ export async function generateMetadata({
     },
     articleSection: category?.name || "Tecnologia",
     keywords: "tecnologia, innovazione, digitale",
-    ...(article.audio && {
-      audio: {
-        "@type": "AudioObject",
-        contentUrl: getGitHubImageUrl(article.audio),
-        description: `Podcast di ${article.title}`,
-      },
-    }),
   };
 
   const breadcrumbSchema = {
@@ -145,7 +135,7 @@ export async function generateStaticParams() {
     locales.map((locale) => ({
       locale,
       slug: article.slug,
-    }))
+    })),
   );
 }
 

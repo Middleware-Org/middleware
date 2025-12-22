@@ -3,10 +3,9 @@
  **************************************************/
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition, useMemo, Fragment, useRef, useEffect } from "react";
-import { ExternalLink, Pencil, Trash2, X, Hash } from "lucide-react";
+import { useState, useTransition, useMemo, Fragment, useEffect } from "react";
+import { Pencil, Trash2, X, Hash } from "lucide-react";
 import { deletePodcastAction, deletePodcastsAction } from "../actions";
 import { useTableState } from "@/hooks/useTableState";
 import { useTableSelection } from "@/hooks/useTableSelection";
@@ -31,15 +30,18 @@ import type { Podcast } from "@/lib/github/types";
 import { usePodcasts } from "@/hooks/swr";
 import { mutate } from "swr";
 import { ItemsPerPageSelector } from "@/components/table/ItemsPerPageSelector";
+import Image from "next/image";
+import { getGitHubImageUrl } from "@/lib/github/images";
 
 /* **************************************************
  * Column Configuration
  **************************************************/
 const columnConfig: ColumnConfig[] = [
+  { key: "cover", label: "Cover", defaultVisible: true },
   { key: "title", label: "Titolo", defaultVisible: true },
   { key: "slug", label: "Slug", defaultVisible: true },
   { key: "date", label: "Data", defaultVisible: true },
-  { key: "published", label: "Pubblicato", defaultVisible: true },
+  { key: "published", label: "Pubblicato", defaultVisible: false },
   { key: "actions", label: "Azioni", defaultVisible: true },
 ];
 
@@ -171,6 +173,25 @@ export default function PodcastListClient() {
 
   function renderCell(podcast: Podcast, columnKey: string) {
     switch (columnKey) {
+      case "cover":
+        return (
+          <TableCell>
+            {podcast.cover ? (
+              <Image
+                src={getGitHubImageUrl(podcast.cover)}
+                width={64}
+                height={64}
+                alt={podcast.title}
+                className="w-16 h-16 object-cover border border-secondary"
+                unoptimized
+              />
+            ) : (
+              <div className="w-16 h-16 bg-secondary/20 border border-secondary flex items-center justify-center text-xs text-secondary/60">
+                No image
+              </div>
+            )}
+          </TableCell>
+        );
       case "title":
         return <TableCell className="font-medium">{podcast.title}</TableCell>;
       case "slug":
@@ -393,4 +414,3 @@ export default function PodcastListClient() {
     </div>
   );
 }
-

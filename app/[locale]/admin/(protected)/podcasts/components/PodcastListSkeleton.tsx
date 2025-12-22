@@ -33,6 +33,9 @@ export default function PodcastListSkeleton() {
                 <div className="h-4 w-4 bg-secondary/20 animate-pulse" />
               </th>
               <th className="px-4 py-3">
+                <div className="h-4 w-16 bg-secondary/20 animate-pulse" />
+              </th>
+              <th className="px-4 py-3">
                 <div className="h-4 w-20 bg-secondary/20 animate-pulse" />
               </th>
               <th className="px-4 py-3">
@@ -54,6 +57,9 @@ export default function PodcastListSkeleton() {
               <TableRow key={i}>
                 <TableCell>
                   <div className="h-4 w-4 bg-secondary/20 animate-pulse" />
+                </TableCell>
+                <TableCell>
+                  <div className="w-16 h-16 bg-secondary/20 animate-pulse border border-secondary" />
                 </TableCell>
                 <TableCell>
                   <div className="h-4 w-48 bg-secondary/20 animate-pulse" />

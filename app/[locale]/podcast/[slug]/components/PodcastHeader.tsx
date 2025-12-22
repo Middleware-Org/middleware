@@ -4,9 +4,8 @@
  * Imports
  **************************************************/
 import Image from "next/image";
-import Link from "next/link";
 import { MonoTextLight, SerifText } from "@/components/atoms/typography";
-import { Article } from "@/.velite";
+import { Podcast } from "@/.velite";
 import FormattedDate from "@/components/atoms/date";
 import { useParams } from "next/navigation";
 import styles from "./PodcastPlayerStyles";
@@ -16,25 +15,22 @@ import { getGitHubImageUrl } from "@/lib/github/images";
  * Types
  **************************************************/
 type PodcastHeaderProps = {
-  article: Article;
-  issue?: { cover?: string; title: string } | null;
-  author?: { slug: string; name: string } | null;
-  category?: { slug: string; name: string } | null;
+  podcast: Podcast;
 };
 
 /* **************************************************
  * PodcastHeader
  **************************************************/
-export default function PodcastHeader({ article, issue, author, category }: PodcastHeaderProps) {
+export default function PodcastHeader({ podcast }: PodcastHeaderProps) {
   const { lang = "it" } = useParams() as { lang: "it" };
 
   return (
     <div className={styles.headerSection}>
-      {issue?.cover && (
+      {podcast.cover && (
         <div className={styles.coverWrapper}>
           <Image
-            src={getGitHubImageUrl(issue.cover)}
-            alt={issue.title}
+            src={getGitHubImageUrl(podcast.cover)}
+            alt={podcast.title}
             fill
             className={styles.coverImage}
             priority
@@ -45,17 +41,16 @@ export default function PodcastHeader({ article, issue, author, category }: Podc
       <div className={styles.infoSection}>
         <div className={styles.infoContainer}>
           <div className={styles.textContainer}>
-            <SerifText className={styles.textTitle}>{article.title}</SerifText>
-            <Link href={`/authors?author=${author?.slug}`}>
-              <MonoTextLight className={styles.textAuthor}>{author?.name}</MonoTextLight>
-            </Link>
-            {category && (
-              <Link href={`/categories?category=${category.slug}`}>
-                <MonoTextLight className={styles.textAuthor}>{category.name}</MonoTextLight>
-              </Link>
+            <SerifText className={styles.textTitle}>{podcast.title}</SerifText>
+            {podcast.description && (
+              <MonoTextLight className={styles.textAuthor}>
+                {podcast.description.length > 100
+                  ? podcast.description.slice(0, 100) + "..."
+                  : podcast.description}
+              </MonoTextLight>
             )}
-            {article.date && (
-              <FormattedDate date={article.date} lang={lang} className={styles.textDate} />
+            {podcast.date && (
+              <FormattedDate date={podcast.date} lang={lang} className={styles.textDate} />
             )}
           </div>
         </div>

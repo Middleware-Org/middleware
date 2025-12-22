@@ -7,6 +7,9 @@ type Collections = typeof __vc.collections
 export type Article = Collections['articles']['schema']['_output']
 export declare const articles: Article[]
 
+export type Podcast = Collections['podcasts']['schema']['_output']
+export declare const podcasts: Podcast[]
+
 export type Author = Collections['authors']['schema']['_output']
 export declare const authors: Author[]
 

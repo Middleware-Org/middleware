@@ -6,6 +6,7 @@
 import { useState, useRef, useMemo, useEffect } from "react";
 import { Search, X, Music, FileJson } from "lucide-react";
 import { upload } from "@vercel/blob/client";
+import Image from "next/image";
 import baseStyles from "../../styles";
 import styles from "../../media/styles";
 import { useMedia } from "@/hooks/swr";
@@ -19,7 +20,7 @@ interface AudioJsonMediaSelectorProps {
   isOpen: boolean;
   onClose: () => void;
   onSelect: (fileUrl: string) => void;
-  fileType: "audio" | "json";
+  fileType: "audio" | "json" | "image";
   title: string;
 }
 
@@ -126,10 +127,20 @@ export default function AudioJsonMediaSelector({
         alert("Seleziona un file JSON");
         return;
       }
+    } else if (fileType === "image") {
+      if (!file.type.startsWith("image/") && !file.name.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)) {
+        alert("Seleziona un file immagine (JPG, PNG, GIF, WEBP, SVG)");
+        return;
+      }
     }
 
-    // Validate file size (max 50MB for audio, 10MB for JSON)
-    const maxSize = fileType === "audio" ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
+    // Validate file size (max 50MB for audio, 10MB for JSON, 20MB for images)
+    const maxSize =
+      fileType === "audio"
+        ? 50 * 1024 * 1024
+        : fileType === "json"
+          ? 10 * 1024 * 1024
+          : 20 * 1024 * 1024;
     if (file.size > maxSize) {
       alert(`La dimensione del file deve essere inferiore a ${maxSize / 1024 / 1024}MB`);
       return;
@@ -183,10 +194,12 @@ export default function AudioJsonMediaSelector({
         const extensions = {
           audio: /\.(mp3|wav)$/i,
           json: /\.json$/i,
+          image: /\.(jpg|jpeg|png|gif|webp|svg)$/i,
         };
         const defaultExt = {
           audio: "mp3",
           json: "json",
+          image: "jpg",
         };
 
         if (!filename.match(extensions[fileType])) {
@@ -200,15 +213,20 @@ export default function AudioJsonMediaSelector({
         const extensions = {
           audio: "mp3",
           json: "json",
+          image: "jpg",
         };
         finalFilename = `file-${timestamp}-${random}.${extensions[fileType]}`;
       }
 
       // Upload file directly to Vercel Blob Storage using direct client upload
+      const contentTypeMap = {
+        audio: "audio/mpeg",
+        json: "application/json",
+        image: "image/jpeg",
+      };
       const blob = await upload(`media/${finalFilename}`, selectedFile, {
         access: "public",
-        contentType:
-          selectedFile.type || (fileType === "audio" ? "audio/mpeg" : "application/json"),
+        contentType: selectedFile.type || contentTypeMap[fileType],
         handleUploadUrl: "/api/media/upload-blob",
       });
 
@@ -233,8 +251,13 @@ export default function AudioJsonMediaSelector({
 
   if (!isOpen) return null;
 
-  const acceptTypes = fileType === "audio" ? "audio/*,.mp3,.wav" : ".json,application/json";
-  const fileTypeLabel = fileType === "audio" ? "audio" : "JSON";
+  const acceptTypes =
+    fileType === "audio"
+      ? "audio/*,.mp3,.wav"
+      : fileType === "json"
+        ? ".json,application/json"
+        : "image/*,.jpg,.jpeg,.png,.gif,.webp,.svg";
+  const fileTypeLabel = fileType === "audio" ? "audio" : fileType === "json" ? "JSON" : "immagine";
 
   return (
     <div className={baseStyles.modalOverlay}>
@@ -309,7 +332,11 @@ export default function AudioJsonMediaSelector({
                       Clicca per selezionare un file {fileTypeLabel}
                     </p>
                     <p className="text-sm text-secondary/60 mt-2">
-                      {fileType === "audio" ? "Audio (MP3, WAV)" : "JSON"}
+                      {fileType === "audio"
+                        ? "Audio (MP3, WAV)"
+                        : fileType === "json"
+                          ? "JSON"
+                          : "Immagine (JPG, PNG, GIF, WEBP, SVG)"}
                     </p>
                   </div>
                 </div>
@@ -400,9 +427,18 @@ export default function AudioJsonMediaSelector({
                       onClick={() => handleSelect(file.url)}
                       className={cn(styles.imageCard, "cursor-pointer flex flex-col")}
                     >
-                      {/* Icon Area */}
-                      <div className="w-full h-48 bg-secondary/10 flex items-center justify-center">
-                        {file.type === "audio" ? (
+                      {/* Icon/Image Area */}
+                      <div className="w-full h-48 bg-secondary/10 flex items-center justify-center overflow-hidden">
+                        {file.type === "image" ? (
+                          <Image
+                            src={file.url}
+                            alt={file.name}
+                            width={192}
+                            height={192}
+                            className="w-full h-full object-cover"
+                            unoptimized
+                          />
+                        ) : file.type === "audio" ? (
                           <Music className="w-16 h-16 text-secondary/60" />
                         ) : (
                           <FileJson className="w-16 h-16 text-secondary/60" />

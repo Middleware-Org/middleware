@@ -7,6 +7,7 @@ import FormattedDate from "@/components/atoms/date";
 import { ArticleDictionary } from "@/lib/i18n/types";
 import { getCategoryBySlug } from "@/lib/content/categories";
 import { getAuthorBySlug } from "@/lib/content/authors";
+import { getPodcastBySlug } from "@/lib/content/podcasts";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getMinText } from "@/lib/utils/text";
@@ -117,6 +118,9 @@ export default function Article({ article, dict }: ArticleProps) {
 
   const { processedHtml, citations } = processCitations(article.content);
 
+  // Check if there's a related podcast
+  const relatedPodcast = article.podcast ? getPodcastBySlug(article.podcast) : null;
+
   return (
     <article>
       <header className="lg:px-10 md:px-4 px-4 lg:pt-10 py-[25px] w-full max-w-[1472px] mx-auto">
@@ -138,9 +142,9 @@ export default function Article({ article, dict }: ArticleProps) {
           <span className="lg:text-[16px] text-[14px] flex items-center gap-2.5">
             <FormattedDate date={article.date} lang="it" />
           </span>
-          {article.audio && (
+          {relatedPodcast && (
             <Link
-              href={`/podcast/${article.slug}`}
+              href={`/podcast/${relatedPodcast.slug}`}
               className="flex items-center gap-2 hover:underline"
             >
               <Play className="w-4 h-4" />
