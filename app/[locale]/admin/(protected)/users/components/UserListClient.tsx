@@ -27,8 +27,6 @@ import { cn } from "@/lib/utils/classes";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { User } from "@/lib/github/users";
-import { useUsers } from "@/hooks/swr";
-import { mutate } from "swr";
 import { ItemsPerPageSelector } from "@/components/table/ItemsPerPageSelector";
 
 /* **************************************************
@@ -44,7 +42,7 @@ const columnConfig: ColumnConfig[] = [
 /* **************************************************
  * User List Client Component
  **************************************************/
-export default function UserListClient() {
+export default function UserListClient({ initialUsers }: UserListClientProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
@@ -60,9 +58,8 @@ export default function UserListClient() {
     count: 0,
   });
 
-  // Usa SWR per ottenere gli utenti (cache pre-popolata dal server)
-  const { users = [], isLoading } = useUsers();
-  const [localUsers, setLocalUsers] = useState<User[]>(users);
+  // Use data from props
+  const users = initialUsers;
 
   // Initialize visible columns from defaultVisible
   const [visibleColumns, setVisibleColumns] = useState<string[]>(() =>
@@ -82,7 +79,7 @@ export default function UserListClient() {
     setPage,
     setItemsPerPage,
   } = useTableState<User>({
-    data: localUsers,
+    data: users,
     searchKeys: ["email", "name"],
     itemsPerPage: 10,
   });
@@ -103,11 +100,6 @@ export default function UserListClient() {
   const visibleColumnConfigs = useMemo(() => {
     return columnConfig.filter((col) => visibleColumns.includes(col.key));
   }, [visibleColumns]);
-
-  // Sync local users with SWR data when they change
-  useEffect(() => {
-    setLocalUsers(users);
-  }, [users]);
 
   // Clear selection when search or page changes
   useEffect(() => {
@@ -219,15 +211,6 @@ export default function UserListClient() {
       default:
         return null;
     }
-  }
-
-  // Mostra loading solo se non ci sono dati (prima richiesta)
-  if (isLoading && users.length === 0) {
-    return (
-      <div className={baseStyles.container}>
-        <div className={baseStyles.loadingText}>Caricamento utenti...</div>
-      </div>
-    );
   }
 
   return (

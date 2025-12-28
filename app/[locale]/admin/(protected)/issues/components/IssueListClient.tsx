@@ -29,8 +29,8 @@ import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Issue } from "@/lib/github/types";
 import Image from "next/image";
-import { useIssues } from "@/hooks/swr";
-import { mutate } from "swr";
+
+
 import { getGitHubImageUrl } from "@/lib/github/images";
 
 /* **************************************************
@@ -49,7 +49,7 @@ const columnConfig: ColumnConfig[] = [
 /* **************************************************
  * Issue List Client Component
  **************************************************/
-export default function IssueListClient() {
+export default function IssueListClient({ initialIssues }: IssueListClientProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
@@ -65,9 +65,9 @@ export default function IssueListClient() {
     count: 0,
   });
 
-  // Usa SWR per ottenere le issues (cache pre-popolata dal server)
-  const { issues = [], isLoading } = useIssues();
-  const [localIssues, setLocalIssues] = useState<Issue[]>(issues);
+  // Use data from props
+  const issues = initialIssues;
+
 
   // Initialize visible columns from defaultVisible
   const [visibleColumns, setVisibleColumns] = useState<string[]>(() =>
@@ -87,7 +87,7 @@ export default function IssueListClient() {
     setPage,
     setItemsPerPage,
   } = useTableState<Issue>({
-    data: localIssues,
+    data: issues,
     searchKeys: ["title", "slug", "description"],
     itemsPerPage: 10,
   });
@@ -109,23 +109,23 @@ export default function IssueListClient() {
     return columnConfig.filter((col) => visibleColumns.includes(col.key));
   }, [visibleColumns]);
 
-  // Sync local issues with SWR data when they change
-  useEffect(() => {
-    setLocalIssues(issues);
-  }, [issues]);
+
+
+
+
 
   // Clear selection when search or page changes
-  useEffect(() => {
+
     clearSelection();
   }, [search, currentPage, clearSelection]);
 
   function handleEdit(issue: Issue) {
     router.push(`/admin/issues/${issue.slug}/edit`);
-  }
+
 
   function handleDeleteClick(issue: Issue) {
     setDeleteDialog({ isOpen: true, issue });
-  }
+
 
   async function handleDeleteConfirm() {
     if (!deleteDialog.issue) return;
@@ -143,18 +143,18 @@ export default function IssueListClient() {
           type: result.errorType || "error",
         });
       } else {
-        // Invalida la cache SWR per forzare il refetch
-        mutate("/api/issues");
-        mutate("/api/github/merge/check");
+        // Refresh the page to get updated data
+        router.refresh();
+
         clearSelection();
-      }
+    
     });
-  }
+
 
   function handleDeleteMultipleClick() {
     if (selectedCount === 0) return;
     setDeleteMultipleDialog({ isOpen: true, count: selectedCount });
-  }
+
 
   async function handleDeleteMultipleConfirm() {
     if (selectedIds.length === 0) return;
@@ -171,18 +171,18 @@ export default function IssueListClient() {
           type: result.errorType || "error",
         });
       } else {
-        // Invalida la cache SWR per forzare il refetch
-        mutate("/api/issues");
-        mutate("/api/github/merge/check");
+        // Refresh the page to get updated data
+        router.refresh();
+
         clearSelection();
-      }
+    
     });
-  }
+
 
   function renderCell(issue: Issue, columnKey: string) {
     switch (columnKey) {
       case "cover":
-        return (
+    
           <TableCell>
             {issue.cover ? (
               <Image
@@ -196,24 +196,24 @@ export default function IssueListClient() {
             ) : (
               <div className="w-16 h-16 bg-secondary/20 border border-secondary flex items-center justify-center text-xs text-secondary/60">
                 No image
-              </div>
+        
             )}
           </TableCell>
-        );
+    
       case "title":
         return <TableCell className="font-medium">{issue.title}</TableCell>;
       case "slug":
-        return (
+    
           <TableCell>
             <span className="text-xs text-secondary/60 font-mono bg-secondary/10 px-2 py-1">
               {issue.slug}
             </span>
           </TableCell>
-        );
+    
       case "date":
         return <TableCell>{new Date(issue.date).toLocaleDateString("it-IT")}</TableCell>;
       case "color":
-        return (
+    
           <TableCell>
             <div className={baseStyles.buttonGroup}>
               <div
@@ -221,15 +221,15 @@ export default function IssueListClient() {
                 style={{ backgroundColor: issue.color }}
               />
               <span className="text-xs text-secondary/80 font-mono">{issue.color}</span>
-            </div>
+      
           </TableCell>
-        );
+    
       case "description":
-        return (
+    
           <TableCell className="text-secondary/80 max-w-md truncate">{issue.description}</TableCell>
-        );
+    
       case "actions":
-        return (
+    
           <TableCell>
             <div className={baseStyles.buttonGroup}>
               <button
@@ -250,29 +250,29 @@ export default function IssueListClient() {
               >
                 <Trash2 className="w-4 h-4" />
               </button>
-            </div>
+      
           </TableCell>
-        );
+    
       default:
         return null;
-    }
-  }
+  
 
-  // Mostra loading solo se non ci sono dati (prima richiesta)
-  if (isLoading && issues.length === 0) {
-    return (
-      <div className={baseStyles.container}>
-        <div className={baseStyles.loadingText}>Caricamento issues...</div>
-      </div>
-    );
-  }
+
+
+
+
+
+
+
+
+
 
   return (
     <div className={baseStyles.container}>
       {error && (
         <div className={error.type === "warning" ? baseStyles.errorWarning : baseStyles.error}>
           ⚠️ {error.message}
-        </div>
+  
       )}
 
       {/* Search and Filters */}
@@ -284,7 +284,7 @@ export default function IssueListClient() {
               onChange={setSearch}
               placeholder="Cerca per titolo, slug o descrizione..."
             />
-          </div>
+    
           <ColumnSelector
             columns={columnConfig}
             visibleColumns={visibleColumns}
@@ -297,9 +297,9 @@ export default function IssueListClient() {
           >
             <Hash className="h-4 w-4 text-secondary/60" />
             <span className="text-xs text-secondary/80">{totalItems}</span>
-          </div>
-        </div>
-      </div>
+    
+  
+
 
       {/* Table */}
       <div className={baseStyles.tableContainer}>
@@ -316,13 +316,13 @@ export default function IssueListClient() {
               </th>
               {visibleColumnConfigs.map((column) => {
                 if (column.key === "actions") {
-                  return (
+              
                     <th key={column.key} className={baseStyles.tableHeaderCell}>
                       {column.label}
                     </th>
-                  );
-                }
-                return (
+              
+              
+            
                   <SortableHeader
                     key={column.key}
                     sortKey={column.key}
@@ -331,7 +331,7 @@ export default function IssueListClient() {
                   >
                     {column.label}
                   </SortableHeader>
-                );
+            
               })}
             </TableRow>
           </TableHeader>
@@ -369,7 +369,7 @@ export default function IssueListClient() {
         {totalPages > 1 && (
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setPage} />
         )}
-      </div>
+
 
       {/* Bulk Actions */}
       {selectedCount > 0 && (
@@ -395,7 +395,7 @@ export default function IssueListClient() {
           >
             <X className="w-4 h-4" />
           </button>
-        </div>
+  
       )}
 
       {/* Delete Confirmation Dialog */}

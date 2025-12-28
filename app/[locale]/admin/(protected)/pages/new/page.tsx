@@ -8,7 +8,6 @@ import { getUser } from "@/lib/auth/server";
 import { cn } from "@/lib/utils/classes";
 import PageFormClient from "../components/PageFormClient";
 import PageFormSkeleton from "../components/PageFormSkeleton";
-import SWRPageProvider from "@/components/providers/SWRPageProvider";
 import styles from "../styles";
 
 /* **************************************************
@@ -21,7 +20,6 @@ export default async function NewPagePage() {
   }
 
   return (
-    <SWRPageProvider fallback={{}}>
       <div className={cn("h-full flex flex-col", styles.main)}>
         <div className={styles.header}>
           <h1 className={styles.title}>Nuova Pagina</h1>
@@ -36,6 +34,5 @@ export default async function NewPagePage() {
           </Suspense>
         </div>
       </div>
-    </SWRPageProvider>
   );
 }

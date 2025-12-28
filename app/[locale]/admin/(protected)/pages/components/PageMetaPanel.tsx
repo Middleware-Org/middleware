@@ -12,7 +12,6 @@ import ConfirmDialog from "@/components/molecules/confirmDialog";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Page } from "@/lib/github/types";
-import { mutate } from "swr";
 
 /* **************************************************
  * Types
@@ -105,10 +104,8 @@ export default function PageMetaPanel({
           type: result.errorType || "error",
         });
       } else {
-        // Invalida la cache SWR per forzare il refetch
-        mutate("/api/pages");
-        mutate(`/api/pages/${page.slug}`);
         router.push("/admin/pages");
+        router.refresh();
       }
     });
   }

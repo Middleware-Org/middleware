@@ -19,15 +19,13 @@ import ConfirmDialog from "@/components/molecules/confirmDialog";
 import styles from "../styles";
 import type { Issue } from "@/lib/github/types";
 import Image from "next/image";
-import { useIssue } from "@/hooks/swr";
 import AudioJsonMediaSelector from "../../articles/components/AudioJsonMediaSelector";
-import { mutate } from "swr";
 
 /* **************************************************
  * Types
  **************************************************/
 interface IssueFormClientProps {
-  issueSlug?: string; // Slug per edit mode
+  issue?: Issue; // Issue for edit mode
 }
 
 /* **************************************************
@@ -159,12 +157,9 @@ function ImageUpload({
 /* **************************************************
  * Issue Form Client Component
  **************************************************/
-export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
+export default function IssueFormClient({ issue }: IssueFormClientProps) {
   const router = useRouter();
-  const editing = !!issueSlug;
-
-  // Usa SWR per ottenere l'issue (cache pre-popolata dal server)
-  const { issue } = useIssue(issueSlug || null);
+  const editing = !!issue;
 
   const formRef = useRef<HTMLFormElement>(null);
   // Initialize with existing cover if editing, or empty if creating
@@ -197,17 +192,13 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
   useEffect(() => {
     if (state?.success) {
       formRef.current?.reset();
-      // Invalida la cache SWR per forzare il refetch della lista
-      mutate("/api/issues");
-      if (editing && issueSlug) {
-        mutate(`/api/issues/${issueSlug}`);
-      }
-      mutate("/api/github/merge/check");
       // Reset coverImage before navigation (component will unmount anyway)
       setCoverImage("");
+      // Refresh and navigate to issues list
       router.push("/admin/issues");
+      router.refresh();
     }
-  }, [state, router, editing, issueSlug]);
+  }, [state, router]);
 
   // Update hidden input when coverImage changes
   useEffect(() => {
@@ -237,13 +228,13 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
 
   // Handler per confermare l'eliminazione
   async function handleDeleteConfirm() {
-    if (!issueSlug || !issue) return;
+    if (!issue) return;
 
     setDeleteError(null);
     setIsDeleteDialogOpen(false);
 
     startDeleteTransition(async () => {
-      const result = await deleteIssueAction(issueSlug);
+      const result = await deleteIssueAction(issue.slug);
 
       if (!result.success) {
         setDeleteError({
@@ -251,11 +242,9 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
           type: result.errorType || "error",
         });
       } else {
-        // Invalida la cache SWR per forzare il refetch
-        mutate("/api/issues");
-        mutate(`/api/issues/${issueSlug}`);
-        mutate("/api/github/merge/check");
+        // Refresh and navigate to issues list
         router.push("/admin/issues");
+        router.refresh();
       }
     });
   }
@@ -283,7 +272,7 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
       <form ref={formRef} action={formAction} className={styles.form}>
         <h2 className={styles.formTitle}>{editing ? "Modifica Issue" : "Nuova Issue"}</h2>
 
-        {editing && issueSlug && <input type="hidden" name="slug" value={issueSlug} />}
+        {editing && issue && <input type="hidden" name="slug" value={issue.slug} />}
         <input type="hidden" name="cover" value={coverImage} />
 
         <div className={styles.field}>

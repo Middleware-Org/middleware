@@ -12,25 +12,20 @@ import PodcastMetaPanel from "./PodcastMetaPanel";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Podcast } from "@/lib/github/types";
-import { usePodcast } from "@/hooks/swr";
-import { mutate } from "swr";
 
 /* **************************************************
  * Types
  **************************************************/
 interface PodcastFormClientProps {
-  podcastSlug?: string; // Slug per edit mode
+  podcast?: Podcast; // Podcast for edit mode
 }
 
 /* **************************************************
  * Podcast Form Client Component
  **************************************************/
-export default function PodcastFormClient({ podcastSlug }: PodcastFormClientProps) {
+export default function PodcastFormClient({ podcast }: PodcastFormClientProps) {
   const router = useRouter();
-  const editing = !!podcastSlug;
-
-  // Usa SWR per ottenere i dati (cache pre-popolata dal server)
-  const { podcast } = usePodcast(podcastSlug || null);
+  const editing = !!podcast;
 
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -69,15 +64,11 @@ export default function PodcastFormClient({ podcastSlug }: PodcastFormClientProp
   useEffect(() => {
     if (state?.success) {
       formRef.current?.reset();
-      // Invalida la cache SWR per forzare il refetch della lista
-      mutate("/api/podcasts");
-      if (editing && podcastSlug) {
-        mutate(`/api/podcasts/${podcastSlug}`);
-      }
-      mutate("/api/github/merge/check");
+      // Refresh and navigate to podcasts list
       router.push("/admin/podcasts");
+      router.refresh();
     }
-  }, [state, router, editing, podcastSlug]);
+  }, [state, router]);
 
   function handleFormDataChange(field: string, value: string | boolean) {
     setFormData((prev) => ({ ...prev, [field]: value }));

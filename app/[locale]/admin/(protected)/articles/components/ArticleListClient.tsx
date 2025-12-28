@@ -27,9 +27,7 @@ import SelectSearch, { type SelectSearchOption } from "./SelectSearch";
 import { cn } from "@/lib/utils/classes";
 import styles from "../styles";
 import baseStyles from "../../styles";
-import type { Article } from "@/lib/github/types";
-import { useArticles, useIssues, useCategories, useAuthors } from "@/hooks/swr";
-import { mutate } from "swr";
+import type { Article, Author, Category, Issue } from "@/lib/github/types";
 import { ItemsPerPageSelector } from "@/components/table/ItemsPerPageSelector";
 
 /* **************************************************
@@ -47,9 +45,24 @@ const columnConfig: ColumnConfig[] = [
 ];
 
 /* **************************************************
+ * Props Interface
+ **************************************************/
+interface ArticleListClientProps {
+  initialArticles: Article[];
+  initialAuthors: Author[];
+  initialCategories: Category[];
+  initialIssues: Issue[];
+}
+
+/* **************************************************
  * Article List Client Component
  **************************************************/
-export default function ArticleListClient() {
+export default function ArticleListClient({
+  initialArticles,
+  initialAuthors,
+  initialCategories,
+  initialIssues,
+}: ArticleListClientProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
@@ -65,11 +78,11 @@ export default function ArticleListClient() {
     count: 0,
   });
 
-  // Usa SWR per ottenere gli articoli (cache pre-popolata dal server)
-  const { articles = [], isLoading } = useArticles();
-  const { issues = [] } = useIssues();
-  const { categories = [] } = useCategories();
-  const { authors = [] } = useAuthors();
+  // Use data from props
+  const articles = initialArticles;
+  const issues = initialIssues;
+  const categories = initialCategories;
+  const authors = initialAuthors;
 
   // Initialize visible columns from defaultVisible
   const [visibleColumns, setVisibleColumns] = useState<string[]>(() =>
@@ -229,9 +242,8 @@ export default function ArticleListClient() {
           type: result.errorType || "error",
         });
       } else {
-        // Invalida la cache SWR per forzare il refetch
-        mutate("/api/articles");
-        mutate("/api/github/merge/check");
+        // Refresh the page to get updated data
+        router.refresh();
         clearSelection();
       }
     });
@@ -257,9 +269,8 @@ export default function ArticleListClient() {
           type: result.errorType || "error",
         });
       } else {
-        // Invalida la cache SWR per forzare il refetch
-        mutate("/api/articles");
-        mutate("/api/github/merge/check");
+        // Refresh the page to get updated data
+        router.refresh();
         clearSelection();
       }
     });
@@ -326,15 +337,6 @@ export default function ArticleListClient() {
       default:
         return null;
     }
-  }
-
-  // Mostra loading solo se non ci sono dati (prima richiesta)
-  if (isLoading && articles.length === 0) {
-    return (
-      <div className={baseStyles.container}>
-        <div className={baseStyles.loadingText}>Caricamento articoli...</div>
-      </div>
-    );
   }
 
   return (

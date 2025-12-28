@@ -8,7 +8,6 @@ import { getUser } from "@/lib/auth/server";
 import UserFormClient from "../components/UserFormClient";
 import UserFormSkeleton from "../components/UserFormSkeleton";
 import styles from "../styles";
-import SWRPageProvider from "@/components/providers/SWRPageProvider";
 
 /* **************************************************
  * New User Page (Server Component)
@@ -20,7 +19,6 @@ export default async function NewUserPage() {
   }
 
   return (
-    <SWRPageProvider fallback={{}}>
       <main className={styles.main}>
         <div className={styles.header}>
           <h1 className={styles.title}>Nuovo Utente</h1>
@@ -33,7 +31,6 @@ export default async function NewUserPage() {
           <UserFormClient />
         </Suspense>
       </main>
-    </SWRPageProvider>
   );
 }
 

@@ -4,6 +4,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { upload } from "@vercel/blob/client";
 import type { ActionResult } from "../actions";
 import styles from "../styles";
@@ -13,6 +14,7 @@ import Image from "next/image";
  * Media Upload Client Component
  **************************************************/
 export default function MediaUploadClient() {
+  const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -148,10 +150,8 @@ export default function MediaUploadClient() {
         data: blob.url,
         message: "File uploaded successfully",
       });
-      // Invalida la cache SWR per forzare il refetch
-      const { mutate } = await import("swr");
-      mutate("/api/media");
-      mutate("/api/github/merge/check");
+      // Refresh the page to get updated data
+      router.refresh();
       setTimeout(() => {
         handleRemove();
         formRef.current?.reset();

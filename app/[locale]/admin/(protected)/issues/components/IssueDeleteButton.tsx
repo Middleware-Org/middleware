@@ -7,30 +7,24 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { deleteIssueAction } from "../actions";
 import styles from "../styles";
-import { useIssue } from "@/hooks/swr";
-import { mutate } from "swr";
+import type { Issue } from "@/lib/github/types";
 
 /* **************************************************
  * Types
  **************************************************/
 interface IssueDeleteButtonProps {
-  issueSlug: string;
+  issue: Issue;
 }
 
 /* **************************************************
  * Issue Delete Button Component
  **************************************************/
-export default function IssueDeleteButton({ issueSlug }: IssueDeleteButtonProps) {
+export default function IssueDeleteButton({ issue }: IssueDeleteButtonProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
 
-  // Usa SWR per ottenere l'issue (cache pre-popolata dal server)
-  const { issue } = useIssue(issueSlug);
-
   async function handleDelete() {
-    if (!issue) return;
-
     if (!confirm(`Sei sicuro di voler eliminare l'issue "${issue.title}"?`)) {
       return;
     }
@@ -38,7 +32,7 @@ export default function IssueDeleteButton({ issueSlug }: IssueDeleteButtonProps)
     setError(null);
 
     startTransition(async () => {
-      const result = await deleteIssueAction(issueSlug);
+      const result = await deleteIssueAction(issue.slug);
 
       if (!result.success) {
         setError({
@@ -46,10 +40,8 @@ export default function IssueDeleteButton({ issueSlug }: IssueDeleteButtonProps)
           type: result.errorType || "error",
         });
       } else {
-        // Invalida la cache SWR per forzare il refetch
-        mutate("/api/issues");
-        mutate(`/api/issues/${issueSlug}`);
         router.push("/admin/issues");
+        router.refresh();
       }
     });
   }

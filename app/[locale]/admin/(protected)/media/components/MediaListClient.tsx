@@ -8,22 +8,29 @@ import { Music, FileJson, Search, X, Trash2 } from "lucide-react";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import Image from "next/image";
-import { useMedia } from "@/hooks/swr";
 import { cn } from "@/lib/utils/classes";
 import type { MediaFile } from "@/lib/github/media";
 import MediaDialog from "./MediaDialog";
 import { useTableSelection } from "@/hooks/useTableSelection";
 import { TableCheckbox } from "@/components/table/TableCheckbox";
 import { deleteMediaFilesAction } from "../actions";
-import { mutate } from "swr";
 import ConfirmDialog from "@/components/molecules/confirmDialog";
+import { useRouter } from "next/navigation";
+
+/* **************************************************
+ * Props Interface
+ **************************************************/
+interface MediaListClientProps {
+  initialMediaFiles: MediaFile[];
+}
 
 /* **************************************************
  * Media List Client Component
  **************************************************/
 const ITEMS_PER_PAGE = 20;
 
-export default function MediaListClient() {
+export default function MediaListClient({ initialMediaFiles }: MediaListClientProps) {
+  const router = useRouter();
   const [selectedFile, setSelectedFile] = useState<MediaFile | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -40,8 +47,8 @@ export default function MediaListClient() {
     count: 0,
   });
 
-  // Usa SWR per ottenere i file media (cache pre-popolata dal server)
-  const { mediaFiles = [], isLoading } = useMedia();
+  // Use data from props
+  const mediaFiles = initialMediaFiles;
 
   // Filtra i file in base alla ricerca e al tipo
   const filteredFiles = useMemo(() => {
@@ -154,9 +161,8 @@ export default function MediaListClient() {
           type: result.errorType || "error",
         });
       } else {
-        // Invalida la cache SWR per forzare il refetch
-        mutate("/api/media");
-        mutate("/api/github/merge/check");
+        // Refresh the page to get updated data
+        router.refresh();
         clearSelection();
       }
     });

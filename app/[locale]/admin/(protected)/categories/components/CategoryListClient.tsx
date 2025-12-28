@@ -28,8 +28,6 @@ import { cn } from "@/lib/utils/classes";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Category } from "@/lib/github/types";
-import { useCategories } from "@/hooks/swr";
-import { mutate } from "swr";
 
 /* **************************************************
  * Column Configuration
@@ -42,9 +40,16 @@ const columnConfig: ColumnConfig[] = [
 ];
 
 /* **************************************************
+ * Props Interface
+ **************************************************/
+interface CategoryListClientProps {
+  initialCategories: Category[];
+}
+
+/* **************************************************
  * Category List Client Component
  **************************************************/
-export default function CategoryListClient() {
+export default function CategoryListClient({ initialCategories }: CategoryListClientProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
@@ -60,9 +65,8 @@ export default function CategoryListClient() {
     count: 0,
   });
 
-  // Usa SWR per ottenere le categorie (cache pre-popolata dal server)
-  const { categories = [], isLoading } = useCategories();
-  const [localCategories, setLocalCategories] = useState<Category[]>(categories);
+  // Use data from props
+  const categories = initialCategories;
 
   // Initialize visible columns from defaultVisible
   const [visibleColumns, setVisibleColumns] = useState<string[]>(() =>
@@ -82,7 +86,7 @@ export default function CategoryListClient() {
     setPage,
     setItemsPerPage,
   } = useTableState<Category>({
-    data: localCategories,
+    data: categories,
     searchKeys: ["name", "slug", "description"],
     itemsPerPage: 10,
   });
@@ -103,11 +107,6 @@ export default function CategoryListClient() {
   const visibleColumnConfigs = useMemo(() => {
     return columnConfig.filter((col) => visibleColumns.includes(col.key));
   }, [visibleColumns]);
-
-  // Sync local categories with SWR data when they change
-  useEffect(() => {
-    setLocalCategories(categories);
-  }, [categories]);
 
   // Clear selection when search or page changes
   useEffect(() => {
@@ -138,9 +137,8 @@ export default function CategoryListClient() {
           type: result.errorType || "error",
         });
       } else {
-        // Invalida la cache SWR per forzare il refetch
-        mutate("/api/categories");
-        mutate("/api/github/merge/check");
+        // Refresh the page to get updated data
+        router.refresh();
         clearSelection();
       }
     });
@@ -166,9 +164,8 @@ export default function CategoryListClient() {
           type: result.errorType || "error",
         });
       } else {
-        // Invalida la cache SWR per forzare il refetch
-        mutate("/api/categories");
-        mutate("/api/github/merge/check");
+        // Refresh the page to get updated data
+        router.refresh();
         clearSelection();
       }
     });
@@ -216,15 +213,6 @@ export default function CategoryListClient() {
       default:
         return null;
     }
-  }
-
-  // Mostra loading solo se non ci sono dati (prima richiesta)
-  if (isLoading && categories.length === 0) {
-    return (
-      <div className={baseStyles.container}>
-        <div className={baseStyles.loadingText}>Caricamento categorie...</div>
-      </div>
-    );
   }
 
   return (

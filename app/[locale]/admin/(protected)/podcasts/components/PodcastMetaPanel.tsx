@@ -12,7 +12,6 @@ import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Podcast } from "@/lib/github/types";
 import AudioJsonMediaSelector from "../../articles/components/AudioJsonMediaSelector";
-import { mutate } from "swr";
 import { cn } from "@/lib/utils/classes";
 
 /* **************************************************
@@ -103,9 +102,8 @@ export default function PodcastMetaPanel({
           type: result.errorType || "error",
         });
       } else {
-        mutate("/api/podcasts");
-        mutate(`/api/podcasts/${podcast.slug}`);
         router.push("/admin/podcasts");
+        router.refresh();
       }
     });
   }

@@ -8,7 +8,6 @@ import { getAllMediaFiles } from "@/lib/github/media";
 import MediaListClient from "./components/MediaListClient";
 import MediaUploadClient from "./components/MediaUploadClient";
 import styles from "./styles";
-import SWRPageProvider from "@/components/providers/SWRPageProvider";
 
 /* **************************************************
  * Media Page (Server Component)
@@ -21,29 +20,22 @@ export default async function MediaPage() {
 
   const mediaFiles = await getAllMediaFiles();
 
-  // Pre-popolazione cache SWR con dati SSR
-  const swrFallback = {
-    "/api/media": mediaFiles,
-  };
-
   return (
-    <SWRPageProvider fallback={swrFallback}>
-      <main className={styles.main}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>Gestione Media</h1>
-          <Link href="/admin" className={styles.backButton}>
-            ← Indietro
-          </Link>
-        </div>
+    <main className={styles.main}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>Gestione Media</h1>
+        <Link href="/admin" className={styles.backButton}>
+          ← Indietro
+        </Link>
+      </div>
 
-        <MediaUploadClient />
+      <MediaUploadClient />
 
-        <div className="mt-8">
-          <h2 className="text-xl font-semibold mb-4">File Caricati</h2>
-          <MediaListClient />
-        </div>
-      </main>
-    </SWRPageProvider>
+      <div className="mt-8">
+        <h2 className="text-xl font-semibold mb-4">File Caricati</h2>
+        <MediaListClient initialMediaFiles={mediaFiles} />
+      </div>
+    </main>
   );
 }
 

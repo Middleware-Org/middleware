@@ -7,30 +7,24 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { deleteAuthorAction } from "../actions";
 import styles from "../styles";
-import { useAuthor } from "@/hooks/swr";
-import { mutate } from "swr";
+import type { Author } from "@/lib/github/types";
 
 /* **************************************************
  * Types
  **************************************************/
 interface AuthorDeleteButtonProps {
-  authorSlug: string;
+  author: Author;
 }
 
 /* **************************************************
  * Author Delete Button Component
  **************************************************/
-export default function AuthorDeleteButton({ authorSlug }: AuthorDeleteButtonProps) {
+export default function AuthorDeleteButton({ author }: AuthorDeleteButtonProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
-  
-  // Usa SWR per ottenere l'autore (cache pre-popolata dal server)
-  const { author } = useAuthor(authorSlug);
 
   async function handleDelete() {
-    if (!author) return;
-    
     if (!confirm(`Sei sicuro di voler eliminare l'autore "${author.name}"?`)) {
       return;
     }
@@ -38,7 +32,7 @@ export default function AuthorDeleteButton({ authorSlug }: AuthorDeleteButtonPro
     setError(null);
 
     startTransition(async () => {
-      const result = await deleteAuthorAction(authorSlug);
+      const result = await deleteAuthorAction(author.slug);
 
       if (!result.success) {
         setError({
@@ -46,10 +40,8 @@ export default function AuthorDeleteButton({ authorSlug }: AuthorDeleteButtonPro
           type: result.errorType || "error",
         });
       } else {
-        // Invalida la cache SWR per forzare il refetch
-        mutate("/api/authors");
-        mutate(`/api/authors/${authorSlug}`);
         router.push("/admin/authors");
+        router.refresh();
       }
     });
   }

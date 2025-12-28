@@ -10,7 +10,6 @@ import { cn } from "@/lib/utils/classes";
 import PodcastFormClient from "../../components/PodcastFormClient";
 import PodcastEditSkeleton from "../../components/PodcastEditSkeleton";
 import styles from "../../styles";
-import SWRPageProvider from "@/components/providers/SWRPageProvider";
 
 /* **************************************************
  * Types
@@ -35,28 +34,21 @@ export default async function EditPodcastPage({ params }: EditPodcastPageProps) 
     notFound();
   }
 
-  // Pre-popolazione cache SWR con dati SSR
-  const swrFallback = {
-    [`/api/podcasts/${slug}`]: podcast,
-  };
-
   return (
-    <SWRPageProvider fallback={swrFallback}>
-      <div className={cn("h-full flex flex-col", styles.main)}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>Modifica Podcast: {podcast.title}</h1>
-          <Link href="/admin/podcasts" className={styles.backButton}>
-            ← Indietro
-          </Link>
-        </div>
-
-        <div className="flex-1 min-h-0">
-          <Suspense fallback={<PodcastEditSkeleton />}>
-            <PodcastFormClient podcastSlug={slug} />
-          </Suspense>
-        </div>
+    <div className={cn("h-full flex flex-col", styles.main)}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>Modifica Podcast: {podcast.title}</h1>
+        <Link href="/admin/podcasts" className={styles.backButton}>
+          ← Indietro
+        </Link>
       </div>
-    </SWRPageProvider>
+
+      <div className="flex-1 min-h-0">
+        <Suspense fallback={<PodcastEditSkeleton />}>
+          <PodcastFormClient podcast={podcast} />
+        </Suspense>
+      </div>
+    </div>
   );
 }
 

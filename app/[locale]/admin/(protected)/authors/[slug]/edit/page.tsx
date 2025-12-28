@@ -9,7 +9,6 @@ import { getAuthorBySlug } from "@/lib/github/authors";
 import AuthorFormClient from "../../components/AuthorFormClient";
 import AuthorEditSkeleton from "../../components/AuthorEditSkeleton";
 import styles from "../../styles";
-import SWRPageProvider from "@/components/providers/SWRPageProvider";
 
 /* **************************************************
  * Types
@@ -34,25 +33,18 @@ export default async function EditAuthorPage({ params }: EditAuthorPageProps) {
     notFound();
   }
 
-  // Pre-popolazione cache SWR con dati SSR
-  const swrFallback = {
-    [`/api/authors/${slug}`]: author,
-  };
-
   return (
-    <SWRPageProvider fallback={swrFallback}>
-      <main className={styles.main}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>Modifica Autore: {author.name}</h1>
-          <Link href="/admin/authors" className={styles.backButton}>
-            ← Indietro
-          </Link>
-        </div>
+    <main className={styles.main}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>Modifica Autore: {author.name}</h1>
+        <Link href="/admin/authors" className={styles.backButton}>
+          ← Indietro
+        </Link>
+      </div>
 
-        <Suspense fallback={<AuthorEditSkeleton />}>
-          <AuthorFormClient authorSlug={slug} />
-        </Suspense>
-      </main>
-    </SWRPageProvider>
+      <Suspense fallback={<AuthorEditSkeleton />}>
+        <AuthorFormClient author={author} />
+      </Suspense>
+    </main>
   );
 }

@@ -18,8 +18,6 @@ import PasswordInput, { isPasswordStrongEnough } from "./PasswordInput";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { User } from "@/lib/github/users";
-import { useUser } from "@/hooks/swr";
-import { mutate } from "swr";
 
 /* **************************************************
  * Types

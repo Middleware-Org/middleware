@@ -9,7 +9,6 @@ import { getAllUsers } from "@/lib/github/users";
 import UserListClient from "./components/UserListClient";
 import UserListSkeleton from "./components/UserListSkeleton";
 import styles from "./styles";
-import SWRPageProvider from "@/components/providers/SWRPageProvider";
 import { Plus, ArrowLeft } from "lucide-react";
 
 /* **************************************************
@@ -23,13 +22,7 @@ export default async function UsersPage() {
 
   const users = await getAllUsers();
 
-  // Pre-popolazione cache SWR con dati SSR
-  const swrFallback = {
-    "/api/users": users,
-  };
-
   return (
-    <SWRPageProvider fallback={swrFallback}>
       <main className={styles.main}>
         <div className={styles.header}>
           <h1 className={styles.title}>Gestione Utenti</h1>
@@ -54,9 +47,8 @@ export default async function UsersPage() {
         </div>
 
         <Suspense fallback={<UserListSkeleton />}>
-          <UserListClient />
+          <UserListClient initialUsers={users} />
         </Suspense>
       </main>
-    </SWRPageProvider>
   );
 }

@@ -4,11 +4,11 @@
 "use client";
 
 import { useState, useTransition, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { X, Trash2, Save } from "lucide-react";
 import Image from "next/image";
 import { Music, FileJson } from "lucide-react";
 import { deleteMediaAction, renameMediaAction } from "../actions";
-import { mutate } from "swr";
 import { cn } from "@/lib/utils/classes";
 import ConfirmDialog from "@/components/molecules/confirmDialog";
 import styles from "../styles";
@@ -28,6 +28,7 @@ interface MediaDialogProps {
  * Media Dialog Component
  **************************************************/
 export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps) {
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
   const [newFilename, setNewFilename] = useState("");
@@ -128,9 +129,7 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
           type: result.errorType || "error",
         });
       } else {
-        // Invalida la cache SWR per forzare il refetch
-        mutate("/api/media");
-        mutate("/api/github/merge/check");
+        router.refresh();
         onClose();
       }
     });
@@ -151,9 +150,7 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
           type: result.errorType || "error",
         });
       } else {
-        // Invalida la cache SWR per forzare il refetch
-        mutate("/api/media");
-        mutate("/api/github/merge/check");
+        router.refresh();
         onClose();
       }
     });

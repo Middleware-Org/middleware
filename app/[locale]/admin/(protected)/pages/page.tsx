@@ -7,7 +7,6 @@ import { redirect } from "next/navigation";
 import { getUser } from "@/lib/auth/server";
 import { getAllPages } from "@/lib/github/pages";
 import PageListClient from "./components/PageListClient";
-import SWRPageProvider from "@/components/providers/SWRPageProvider";
 import styles from "./styles";
 import { Plus, ArrowLeft } from "lucide-react";
 
@@ -22,13 +21,7 @@ export default async function PagesPage() {
 
   const pages = await getAllPages();
 
-  // Pre-popolazione cache SWR con dati SSR
-  const swrFallback = {
-    "/api/pages": pages,
-  };
-
   return (
-    <SWRPageProvider fallback={swrFallback}>
       <main className={styles.main}>
         <div className={styles.header}>
           <h1 className={styles.title}>Gestione Pagine</h1>
@@ -53,9 +46,8 @@ export default async function PagesPage() {
         </div>
 
         <Suspense fallback={<div className={styles.loading}>Caricamento pagine...</div>}>
-          <PageListClient />
+          <PageListClient initialPages={pages} />
         </Suspense>
       </main>
-    </SWRPageProvider>
   );
 }

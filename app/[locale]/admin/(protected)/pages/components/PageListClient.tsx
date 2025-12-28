@@ -28,8 +28,6 @@ import { cn } from "@/lib/utils/classes";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Page } from "@/lib/github/types";
-import { usePages } from "@/hooks/swr";
-import { mutate } from "swr";
 
 /* **************************************************
  * Column Configuration
@@ -43,7 +41,7 @@ const columnConfig: ColumnConfig[] = [
 /* **************************************************
  * Page List Client Component
  **************************************************/
-export default function PageListClient() {
+export default function PageListClient({ initialPages }: PageListClientProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
@@ -220,15 +218,6 @@ export default function PageListClient() {
       default:
         return null;
     }
-  }
-
-  // Mostra loading solo se non ci sono dati (prima richiesta)
-  if (isLoading && pages.length === 0) {
-    return (
-      <div className={baseStyles.container}>
-        <div className={baseStyles.loadingText}>Caricamento pagine...</div>
-      </div>
-    );
   }
 
   return (

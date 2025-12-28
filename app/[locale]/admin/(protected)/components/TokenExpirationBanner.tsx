@@ -3,30 +3,53 @@
  **************************************************/
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils/classes";
-import useSWR from "swr";
-import { createFetcher } from "@/hooks/swr/fetcher";
-
-/* **************************************************
- * Fetcher
- **************************************************/
-const fetcher = createFetcher<{
-  expirationDate: string | null;
-  daysUntilExpiration: number | null;
-  isExpiringSoon: boolean;
-}>("token-expiration");
 
 /* **************************************************
  * Token Expiration Banner Component
  **************************************************/
 export default function TokenExpirationBanner() {
-  const { data, error, isLoading } = useSWR("/api/github/token-expiration", fetcher, {
-    refreshInterval: 0,
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-  });
+  const [data, setData] = useState<{
+    expirationDate: string | null;
+    daysUntilExpiration: number | null;
+    isExpiringSoon: boolean;
+  } | null>(null);
+  const [error, setError] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch token expiration on component mount
+  useEffect(() => {
+    let cancelled = false;
+
+    async function fetchTokenExpiration() {
+      try {
+        setIsLoading(true);
+        setError(false);
+        const response = await fetch("/api/github/token-expiration");
+        if (!response.ok) throw new Error("Failed to fetch token expiration");
+        const result = await response.json();
+        if (!cancelled) {
+          setData(result);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setError(true);
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    fetchTokenExpiration();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const bannerContent = useMemo(() => {
     if (isLoading || error || !data) {

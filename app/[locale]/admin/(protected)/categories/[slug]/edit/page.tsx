@@ -9,7 +9,6 @@ import { getCategoryBySlug } from "@/lib/github/categories";
 import CategoryFormClient from "../../components/CategoryFormClient";
 import CategoryEditSkeleton from "../../components/CategoryEditSkeleton";
 import styles from "../../styles";
-import SWRPageProvider from "@/components/providers/SWRPageProvider";
 
 /* **************************************************
  * Types
@@ -34,13 +33,7 @@ export default async function EditCategoryPage({ params }: EditCategoryPageProps
     notFound();
   }
 
-  // Pre-popolazione cache SWR con dati SSR
-  const swrFallback = {
-    [`/api/categories/${slug}`]: category,
-  };
-
   return (
-    <SWRPageProvider fallback={swrFallback}>
     <main className={styles.main}>
       <div className={styles.header}>
         <h1 className={styles.title}>Modifica Categoria: {category.name}</h1>
@@ -50,9 +43,8 @@ export default async function EditCategoryPage({ params }: EditCategoryPageProps
       </div>
 
       <Suspense fallback={<CategoryEditSkeleton />}>
-          <CategoryFormClient categorySlug={slug} />
+        <CategoryFormClient category={category} />
       </Suspense>
     </main>
-    </SWRPageProvider>
   );
 }

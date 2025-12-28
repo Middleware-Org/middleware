@@ -28,8 +28,6 @@ import { cn } from "@/lib/utils/classes";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Author } from "@/lib/github/types";
-import { useAuthors } from "@/hooks/swr";
-import { mutate } from "swr";
 
 /* **************************************************
  * Column Configuration
@@ -42,9 +40,16 @@ const columnConfig: ColumnConfig[] = [
 ];
 
 /* **************************************************
+ * Props Interface
+ **************************************************/
+interface AuthorListClientProps {
+  initialAuthors: Author[];
+}
+
+/* **************************************************
  * Author List Client Component
  **************************************************/
-export default function AuthorListClient() {
+export default function AuthorListClient({ initialAuthors }: AuthorListClientProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
@@ -60,9 +65,8 @@ export default function AuthorListClient() {
     count: 0,
   });
 
-  // Usa SWR per ottenere gli autori (cache pre-popolata dal server)
-  const { authors = [], isLoading } = useAuthors();
-  const [localAuthors, setLocalAuthors] = useState<Author[]>(authors);
+  // Use data from props
+  const authors = initialAuthors;
 
   // Initialize visible columns from defaultVisible
   const [visibleColumns, setVisibleColumns] = useState<string[]>(() =>
@@ -82,7 +86,7 @@ export default function AuthorListClient() {
     setPage,
     setItemsPerPage,
   } = useTableState<Author>({
-    data: localAuthors,
+    data: authors,
     searchKeys: ["name", "slug", "description"],
     itemsPerPage: 10,
   });
@@ -103,11 +107,6 @@ export default function AuthorListClient() {
   const visibleColumnConfigs = useMemo(() => {
     return columnConfig.filter((col) => visibleColumns.includes(col.key));
   }, [visibleColumns]);
-
-  // Sync local authors with SWR data when they change
-  useEffect(() => {
-    setLocalAuthors(authors);
-  }, [authors]);
 
   // Clear selection when search or page changes
   useEffect(() => {
@@ -138,9 +137,8 @@ export default function AuthorListClient() {
           type: result.errorType || "error",
         });
       } else {
-        // Invalida la cache SWR per forzare il refetch
-        mutate("/api/authors");
-        mutate("/api/github/merge/check");
+        // Refresh the page to get updated data
+        router.refresh();
         clearSelection();
       }
     });
@@ -166,9 +164,8 @@ export default function AuthorListClient() {
           type: result.errorType || "error",
         });
       } else {
-        // Invalida la cache SWR per forzare il refetch
-        mutate("/api/authors");
-        mutate("/api/github/merge/check");
+        // Refresh the page to get updated data
+        router.refresh();
         clearSelection();
       }
     });
@@ -216,15 +213,6 @@ export default function AuthorListClient() {
       default:
         return null;
     }
-  }
-
-  // Mostra loading solo se non ci sono dati (prima richiesta)
-  if (isLoading && authors.length === 0) {
-    return (
-      <div className={baseStyles.container}>
-        <div className={baseStyles.loadingText}>Caricamento autori...</div>
-      </div>
-    );
   }
 
   return (

@@ -9,7 +9,6 @@ import { cn } from "@/lib/utils/classes";
 import PodcastFormClient from "../components/PodcastFormClient";
 import PodcastFormSkeleton from "../components/PodcastFormSkeleton";
 import styles from "../styles";
-import SWRPageProvider from "@/components/providers/SWRPageProvider";
 
 /* **************************************************
  * New Podcast Page (Server Component)
@@ -21,7 +20,6 @@ export default async function NewPodcastPage() {
   }
 
   return (
-    <SWRPageProvider fallback={{}}>
       <div className={cn("h-full flex flex-col", styles.main)}>
         <div className={styles.header}>
           <h1 className={styles.title}>Nuovo Podcast</h1>
@@ -36,7 +34,6 @@ export default async function NewPodcastPage() {
           </Suspense>
         </div>
       </div>
-    </SWRPageProvider>
   );
 }
 

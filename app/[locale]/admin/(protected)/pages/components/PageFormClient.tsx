@@ -13,8 +13,6 @@ import PageMetaPanel from "./PageMetaPanel";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Page } from "@/lib/github/types";
-import { usePage } from "@/hooks/swr";
-import { mutate } from "swr";
 
 // Import dinamico per evitare problemi SSR con Tiptap
 const MarkdownEditor = dynamic(() => import("../../articles/components/MarkdownEditor"), {
@@ -32,18 +30,15 @@ const MarkdownEditor = dynamic(() => import("../../articles/components/MarkdownE
  * Types
  **************************************************/
 interface PageFormClientProps {
-  pageSlug?: string; // Slug per edit mode
+  page?: Page; // Page for edit mode
 }
 
 /* **************************************************
  * Page Form Client Component
  **************************************************/
-export default function PageFormClient({ pageSlug }: PageFormClientProps) {
+export default function PageFormClient({ page }: PageFormClientProps) {
   const router = useRouter();
-  const editing = !!pageSlug;
-
-  // Usa SWR per ottenere i dati (cache pre-popolata dal server)
-  const { page } = usePage(pageSlug || null);
+  const editing = !!page;
 
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -72,15 +67,11 @@ export default function PageFormClient({ pageSlug }: PageFormClientProps) {
   useEffect(() => {
     if (state?.success) {
       formRef.current?.reset();
-      // Invalida la cache SWR per forzare il refetch della lista
-      mutate("/api/pages");
-      if (editing && pageSlug) {
-        mutate(`/api/pages/${pageSlug}`);
-      }
-      mutate("/api/github/merge/check");
+      // Refresh and navigate to pages list
       router.push("/admin/pages");
+      router.refresh();
     }
-  }, [state, router, editing, pageSlug]);
+  }, [state, router]);
 
   // Aggiorna lo stato quando la pagina viene caricata
   useEffect(() => {

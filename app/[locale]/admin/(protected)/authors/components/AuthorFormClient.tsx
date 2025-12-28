@@ -18,14 +18,12 @@ import ConfirmDialog from "@/components/molecules/confirmDialog";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Author } from "@/lib/github/types";
-import { useAuthor } from "@/hooks/swr";
-import { mutate } from "swr";
 
 /* **************************************************
  * Types
  **************************************************/
 interface AuthorFormClientProps {
-  authorSlug?: string; // Slug per edit mode
+  author?: Author; // Author for edit mode
 }
 
 /* **************************************************
@@ -59,12 +57,9 @@ function SubmitButton({ editing }: { editing: boolean }) {
 /* **************************************************
  * Author Form Client Component
  **************************************************/
-export default function AuthorFormClient({ authorSlug }: AuthorFormClientProps) {
+export default function AuthorFormClient({ author }: AuthorFormClientProps) {
   const router = useRouter();
-  const editing = !!authorSlug;
-
-  // Usa SWR per ottenere l'autore (cache pre-popolata dal server)
-  const { author } = useAuthor(authorSlug || null);
+  const editing = !!author;
 
   const formRef = useRef<HTMLFormElement>(null);
   const [state, formAction] = useActionState<ActionResult<Author> | null, FormData>(
@@ -85,15 +80,11 @@ export default function AuthorFormClient({ authorSlug }: AuthorFormClientProps) 
   useEffect(() => {
     if (state?.success) {
       formRef.current?.reset();
-      // Invalida la cache SWR per forzare il refetch della lista
-      mutate("/api/authors");
-      if (editing && authorSlug) {
-        mutate(`/api/authors/${authorSlug}`);
-      }
-      mutate("/api/github/merge/check");
+      // Refresh and navigate to authors list
       router.push("/admin/authors");
+      router.refresh();
     }
-  }, [state, router, editing, authorSlug]);
+  }, [state, router]);
 
   // Handler per generare lo slug dal nome
   function handleGenerateSlug() {
@@ -115,13 +106,13 @@ export default function AuthorFormClient({ authorSlug }: AuthorFormClientProps) 
 
   // Handler per confermare l'eliminazione
   async function handleDeleteConfirm() {
-    if (!authorSlug || !author) return;
+    if (!author) return;
 
     setDeleteError(null);
     setIsDeleteDialogOpen(false);
 
     startDeleteTransition(async () => {
-      const result = await deleteAuthorAction(authorSlug);
+      const result = await deleteAuthorAction(author.slug);
 
       if (!result.success) {
         setDeleteError({
@@ -129,11 +120,9 @@ export default function AuthorFormClient({ authorSlug }: AuthorFormClientProps) 
           type: result.errorType || "error",
         });
       } else {
-        // Invalida la cache SWR per forzare il refetch
-        mutate("/api/authors");
-        mutate(`/api/authors/${authorSlug}`);
-        mutate("/api/github/merge/check");
+        // Refresh and navigate to authors list
         router.push("/admin/authors");
+        router.refresh();
       }
     });
   }
@@ -159,7 +148,7 @@ export default function AuthorFormClient({ authorSlug }: AuthorFormClientProps) 
       <form ref={formRef} action={formAction} className={styles.form}>
         <h2 className={styles.formTitle}>{editing ? "Modifica Autore" : "Nuovo Autore"}</h2>
 
-        {editing && authorSlug && <input type="hidden" name="slug" value={authorSlug} />}
+        {editing && author && <input type="hidden" name="slug" value={author.slug} />}
 
         <div className={styles.field}>
           <label htmlFor="name" className={styles.label}>

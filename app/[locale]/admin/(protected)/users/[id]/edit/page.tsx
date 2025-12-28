@@ -9,7 +9,6 @@ import { getUserById } from "@/lib/github/users";
 import UserFormClient from "../../components/UserFormClient";
 import UserEditSkeleton from "../../components/UserEditSkeleton";
 import styles from "../../styles";
-import SWRPageProvider from "@/components/providers/SWRPageProvider";
 
 /* **************************************************
  * Types
@@ -34,26 +33,19 @@ export default async function EditUserPage({ params }: EditUserPageProps) {
     notFound();
   }
 
-  // Pre-popolazione cache SWR con dati SSR
-  const swrFallback = {
-    [`/api/users/${id}`]: userData,
-  };
-
   return (
-    <SWRPageProvider fallback={swrFallback}>
-      <main className={styles.main}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>Modifica Utente: {userData.email}</h1>
-          <Link href="/admin/users" className={styles.backButton}>
-            ← Indietro
-          </Link>
-        </div>
+    <main className={styles.main}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>Modifica Utente: {userData.email}</h1>
+        <Link href="/admin/users" className={styles.backButton}>
+          ← Indietro
+        </Link>
+      </div>
 
-        <Suspense fallback={<UserEditSkeleton />}>
-          <UserFormClient userId={id} />
-        </Suspense>
-      </main>
-    </SWRPageProvider>
+      <Suspense fallback={<UserEditSkeleton />}>
+        <UserFormClient userId={id} />
+      </Suspense>
+    </main>
   );
 }
 

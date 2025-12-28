@@ -12,9 +12,7 @@ import { createArticleAction, updateArticleAction, type ActionResult } from "../
 import ArticleMetaPanel from "./ArticleMetaPanel";
 import styles from "../styles";
 import baseStyles from "../../styles";
-import type { Article } from "@/lib/github/types";
-import { useArticle, useAuthors, useCategories, useIssues } from "@/hooks/swr";
-import { mutate } from "swr";
+import type { Article, Author, Category, Issue } from "@/lib/github/types";
 // Import dinamico per evitare problemi SSR con Tiptap
 const MarkdownEditor = dynamic(() => import("./MarkdownEditor"), {
   ssr: false,
@@ -31,21 +29,25 @@ const MarkdownEditor = dynamic(() => import("./MarkdownEditor"), {
  * Types
  **************************************************/
 interface ArticleFormClientProps {
-  articleSlug?: string; // Slug per edit mode
+  article?: Article; // Article for edit mode
+  categories: Category[];
+  authors: Author[];
+  issues: Issue[];
+  podcasts: Array<{ slug: string; title: string; published: boolean }>;
 }
 
 /* **************************************************
  * Article Form Client Component
  **************************************************/
-export default function ArticleFormClient({ articleSlug }: ArticleFormClientProps) {
+export default function ArticleFormClient({
+  article,
+  categories,
+  authors,
+  issues,
+  podcasts,
+}: ArticleFormClientProps) {
   const router = useRouter();
-  const editing = !!articleSlug;
-
-  // Usa SWR per ottenere i dati (cache pre-popolata dal server)
-  const { article } = useArticle(articleSlug || null);
-  const { authors = [] } = useAuthors();
-  const { categories = [] } = useCategories();
-  const { issues = [] } = useIssues();
+  const editing = !!article;
 
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -89,15 +91,11 @@ export default function ArticleFormClient({ articleSlug }: ArticleFormClientProp
   useEffect(() => {
     if (state?.success) {
       formRef.current?.reset();
-      // Invalida la cache SWR per forzare il refetch della lista
-      mutate("/api/articles");
-      if (editing && articleSlug) {
-        mutate(`/api/articles/${articleSlug}`);
-      }
-      mutate("/api/github/merge/check");
+      // Refresh and navigate to articles list
       router.push("/admin/articles");
+      router.refresh();
     }
-  }, [state, router, editing, articleSlug]);
+  }, [state, router]);
 
   function handleFormDataChange(field: string, value: string | boolean) {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -119,8 +117,8 @@ export default function ArticleFormClient({ articleSlug }: ArticleFormClientProp
       preparedFormData.set("podcast", formData.podcast);
     }
 
-    if (editing && articleSlug) {
-      preparedFormData.set("slug", articleSlug);
+    if (editing && article) {
+      preparedFormData.set("slug", article.slug);
       // Aggiungi nuovo slug se presente nel form
       const newSlugInput = formRef.current?.querySelector(
         'input[name="newSlug"]',
@@ -170,6 +168,7 @@ export default function ArticleFormClient({ articleSlug }: ArticleFormClientProp
             categories={categories}
             authors={authors}
             issues={issues}
+            podcasts={podcasts}
             formData={formData}
             onFormDataChange={handleFormDataChange}
             editing={editing}

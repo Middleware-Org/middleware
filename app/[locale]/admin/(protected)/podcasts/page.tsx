@@ -9,7 +9,6 @@ import { getAllPodcasts } from "@/lib/github/podcasts";
 import PodcastListClient from "./components/PodcastListClient";
 import PodcastListSkeleton from "./components/PodcastListSkeleton";
 import styles from "./styles";
-import SWRPageProvider from "@/components/providers/SWRPageProvider";
 import { Plus, ArrowLeft } from "lucide-react";
 
 /* **************************************************
@@ -23,13 +22,7 @@ export default async function PodcastsPage() {
 
   const podcasts = await getAllPodcasts();
 
-  // Pre-popolazione cache SWR con dati SSR
-  const swrFallback = {
-    "/api/podcasts": podcasts,
-  };
-
   return (
-    <SWRPageProvider fallback={swrFallback}>
       <main className={styles.main}>
         <div className={styles.header}>
           <h1 className={styles.title}>Gestione Podcasts</h1>
@@ -54,10 +47,9 @@ export default async function PodcastsPage() {
         </div>
 
         <Suspense fallback={<PodcastListSkeleton />}>
-          <PodcastListClient />
+          <PodcastListClient initialPodcasts={podcasts} />
         </Suspense>
       </main>
-    </SWRPageProvider>
   );
 }
 

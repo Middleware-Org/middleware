@@ -15,9 +15,7 @@ import type { Category } from "@/lib/github/types";
 import type { Author } from "@/lib/github/types";
 import type { Issue } from "@/lib/github/types";
 import SelectSearch from "./SelectSearch";
-import { mutate } from "swr";
 import { cn } from "@/lib/utils/classes";
-import { usePodcasts } from "@/hooks/swr";
 
 /* **************************************************
  * Types
@@ -27,6 +25,7 @@ interface ArticleMetaPanelProps {
   categories: Category[];
   authors: Author[];
   issues: Issue[];
+  podcasts: Array<{ slug: string; title: string; published: boolean }>;
   formData: {
     title: string;
     date: string;
@@ -66,6 +65,7 @@ export default function ArticleMetaPanel({
   categories,
   authors,
   issues,
+  podcasts,
   formData,
   onFormDataChange,
   editing,
@@ -78,7 +78,6 @@ export default function ArticleMetaPanel({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   // Use null to indicate "not modified by user", otherwise use the user's custom value
   const [slugValue, setSlugValue] = useState<string | null>(null);
-  const { podcasts = [] } = usePodcasts();
 
   // Derive current slug: use modified value if exists, otherwise fall back to article slug
   const currentSlug = slugValue ?? article?.slug ?? "";
@@ -123,10 +122,8 @@ export default function ArticleMetaPanel({
           type: result.errorType || "error",
         });
       } else {
-        // Invalida la cache SWR per forzare il refetch
-        mutate("/api/articles");
-        mutate(`/api/articles/${article.slug}`);
         router.push("/admin/articles");
+        router.refresh();
       }
     });
   }

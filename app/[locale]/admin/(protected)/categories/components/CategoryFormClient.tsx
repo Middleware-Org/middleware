@@ -18,14 +18,12 @@ import ConfirmDialog from "@/components/molecules/confirmDialog";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Category } from "@/lib/github/types";
-import { useCategory } from "@/hooks/swr";
-import { mutate } from "swr";
 
 /* **************************************************
  * Types
  **************************************************/
 interface CategoryFormClientProps {
-  categorySlug?: string; // Slug per edit mode
+  category?: Category; // Category for edit mode
 }
 
 /* **************************************************
@@ -59,12 +57,9 @@ function SubmitButton({ editing }: { editing: boolean }) {
 /* **************************************************
  * Category Form Client Component
  **************************************************/
-export default function CategoryFormClient({ categorySlug }: CategoryFormClientProps) {
+export default function CategoryFormClient({ category }: CategoryFormClientProps) {
   const router = useRouter();
-  const editing = !!categorySlug;
-
-  // Usa SWR per ottenere la categoria (cache pre-popolata dal server)
-  const { category } = useCategory(categorySlug || null);
+  const editing = !!category;
 
   const formRef = useRef<HTMLFormElement>(null);
   const [state, formAction] = useActionState<ActionResult<Category> | null, FormData>(
@@ -86,15 +81,11 @@ export default function CategoryFormClient({ categorySlug }: CategoryFormClientP
   useEffect(() => {
     if (state?.success) {
       formRef.current?.reset();
-      // Invalida la cache SWR per forzare il refetch della lista
-      mutate("/api/categories");
-      if (editing && categorySlug) {
-        mutate(`/api/categories/${categorySlug}`);
-      }
-      mutate("/api/github/merge/check");
+      // Refresh and navigate to categories list
       router.push("/admin/categories");
+      router.refresh();
     }
-  }, [state, router, editing, categorySlug]);
+  }, [state, router]);
 
   // Handler per generare lo slug dal nome
   function handleGenerateSlug() {
@@ -116,13 +107,13 @@ export default function CategoryFormClient({ categorySlug }: CategoryFormClientP
 
   // Handler per confermare l'eliminazione
   async function handleDeleteConfirm() {
-    if (!categorySlug || !category) return;
+    if (!category) return;
 
     setDeleteError(null);
     setIsDeleteDialogOpen(false);
 
     startDeleteTransition(async () => {
-      const result = await deleteCategoryAction(categorySlug);
+      const result = await deleteCategoryAction(category.slug);
 
       if (!result.success) {
         setDeleteError({
@@ -130,11 +121,9 @@ export default function CategoryFormClient({ categorySlug }: CategoryFormClientP
           type: result.errorType || "error",
         });
       } else {
-        // Invalida la cache SWR per forzare il refetch
-        mutate("/api/categories");
-        mutate(`/api/categories/${categorySlug}`);
-        mutate("/api/github/merge/check");
+        // Refresh and navigate to categories list
         router.push("/admin/categories");
+        router.refresh();
       }
     });
   }
@@ -160,7 +149,7 @@ export default function CategoryFormClient({ categorySlug }: CategoryFormClientP
       <form ref={formRef} action={formAction} className={styles.form}>
         <h2 className={styles.formTitle}>{editing ? "Modifica Categoria" : "Nuova Categoria"}</h2>
 
-        {editing && categorySlug && <input type="hidden" name="slug" value={categorySlug} />}
+        {editing && category && <input type="hidden" name="slug" value={category.slug} />}
 
         <div className={styles.field}>
           <label htmlFor="name" className={styles.label}>

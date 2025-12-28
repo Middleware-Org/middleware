@@ -8,7 +8,6 @@ import { getUser } from "@/lib/auth/server";
 import AuthorFormClient from "../components/AuthorFormClient";
 import AuthorFormSkeleton from "../components/AuthorFormSkeleton";
 import styles from "../styles";
-import SWRPageProvider from "@/components/providers/SWRPageProvider";
 
 /* **************************************************
  * New Author Page (Server Component)
@@ -20,20 +19,18 @@ export default async function NewAuthorPage() {
   }
 
   return (
-    <SWRPageProvider fallback={{}}>
-      <main className={styles.main}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>Nuovo Autore</h1>
-          <Link href="/admin/authors" className={styles.backButton}>
-            ← Indietro
-          </Link>
-        </div>
+    <main className={styles.main}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>Nuovo Autore</h1>
+        <Link href="/admin/authors" className={styles.backButton}>
+          ← Indietro
+        </Link>
+      </div>
 
-        <Suspense fallback={<AuthorFormSkeleton />}>
-          <AuthorFormClient />
-        </Suspense>
-      </main>
-    </SWRPageProvider>
+      <Suspense fallback={<AuthorFormSkeleton />}>
+        <AuthorFormClient />
+      </Suspense>
+    </main>
   );
 }
 

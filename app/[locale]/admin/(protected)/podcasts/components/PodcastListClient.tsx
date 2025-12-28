@@ -27,8 +27,6 @@ import { cn } from "@/lib/utils/classes";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Podcast } from "@/lib/github/types";
-import { usePodcasts } from "@/hooks/swr";
-import { mutate } from "swr";
 import { ItemsPerPageSelector } from "@/components/table/ItemsPerPageSelector";
 import Image from "next/image";
 import { getGitHubImageUrl } from "@/lib/github/images";
@@ -48,7 +46,7 @@ const columnConfig: ColumnConfig[] = [
 /* **************************************************
  * Podcast List Client Component
  **************************************************/
-export default function PodcastListClient() {
+export default function PodcastListClient({ initialPodcasts }: PodcastListClientProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
@@ -242,15 +240,6 @@ export default function PodcastListClient() {
       default:
         return null;
     }
-  }
-
-  // Mostra loading solo se non ci sono dati (prima richiesta)
-  if (isLoading && podcasts.length === 0) {
-    return (
-      <div className={baseStyles.container}>
-        <div className={baseStyles.loadingText}>Caricamento podcasts...</div>
-      </div>
-    );
   }
 
   return (

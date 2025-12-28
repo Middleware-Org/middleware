@@ -4,13 +4,12 @@
 "use client";
 
 import { useState, useRef, useMemo, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { upload } from "@vercel/blob/client";
 import { Search, X } from "lucide-react";
 import Image from "next/image";
 import baseStyles from "../../styles";
 import styles from "../../media/styles";
-import { useMedia } from "@/hooks/swr";
-import { mutate } from "swr";
 import { cn } from "@/lib/utils/classes";
 import type { MediaFile } from "@/lib/github/media";
 import MediaDialog from "../../media/components/MediaDialog";
@@ -30,6 +29,7 @@ interface MediaSelectorProps {
 const ITEMS_PER_PAGE = 20;
 
 export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelectorProps) {
+  const router = useRouter();
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
@@ -42,9 +42,43 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
   const [selectedFileForDialog, setSelectedFileForDialog] = useState<MediaFile | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const [allMediaFiles, setAllMediaFiles] = useState<MediaFile[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
 
-  // Usa SWR per caricare i media files con cache, filtra solo immagini
-  const { mediaFiles: allMediaFiles = [], isLoading: loading, isError } = useMedia();
+  // Fetch media files when component opens
+  useEffect(() => {
+    if (!isOpen) return;
+
+    let cancelled = false;
+
+    async function fetchMedia() {
+      try {
+        setLoading(true);
+        setIsError(false);
+        const response = await fetch("/api/media");
+        if (!response.ok) throw new Error("Failed to fetch media");
+        const data = await response.json();
+        if (!cancelled) {
+          setAllMediaFiles(data.mediaFiles || []);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setIsError(true);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    }
+
+    fetchMedia();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen]);
 
   // Filtra solo immagini e per ricerca
   const filteredFiles = useMemo(() => {
@@ -197,9 +231,13 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
       });
 
       setUploadSuccess("Immagine caricata con successo");
-      // Invalida la cache SWR per forzare il refetch
-      mutate("/api/media");
-      mutate("/api/github/merge/check");
+      router.refresh();
+      // Refresh media files
+      const response = await fetch("/api/media");
+      if (response.ok) {
+        const data = await response.json();
+        setAllMediaFiles(data.mediaFiles || []);
+      }
       // Seleziona automaticamente il file appena caricato
       handleSelect(blob.url);
       // Reset form

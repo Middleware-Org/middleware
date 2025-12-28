@@ -8,7 +8,6 @@ import { getUser } from "@/lib/auth/server";
 import CategoryFormClient from "../components/CategoryFormClient";
 import CategoryFormSkeleton from "../components/CategoryFormSkeleton";
 import styles from "../styles";
-import SWRPageProvider from "@/components/providers/SWRPageProvider";
 
 /* **************************************************
  * New Category Page (Server Component)
@@ -20,19 +19,17 @@ export default async function NewCategoryPage() {
   }
 
   return (
-    <SWRPageProvider fallback={{}}>
-      <main className={styles.main}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>Nuova Categoria</h1>
-          <Link href="/admin/categories" className={styles.backButton}>
-            ← Indietro
-          </Link>
-        </div>
+    <main className={styles.main}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>Nuova Categoria</h1>
+        <Link href="/admin/categories" className={styles.backButton}>
+          ← Indietro
+        </Link>
+      </div>
 
-        <Suspense fallback={<CategoryFormSkeleton />}>
-          <CategoryFormClient />
-        </Suspense>
-      </main>
-    </SWRPageProvider>
+      <Suspense fallback={<CategoryFormSkeleton />}>
+        <CategoryFormClient />
+      </Suspense>
+    </main>
   );
 }

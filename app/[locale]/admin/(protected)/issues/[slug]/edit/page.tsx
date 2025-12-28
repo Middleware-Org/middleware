@@ -9,7 +9,6 @@ import { getIssueBySlug } from "@/lib/github/issues";
 import IssueFormClient from "../../components/IssueFormClient";
 import IssueEditSkeleton from "../../components/IssueEditSkeleton";
 import styles from "../../styles";
-import SWRPageProvider from "@/components/providers/SWRPageProvider";
 
 /* **************************************************
  * Types
@@ -34,25 +33,18 @@ export default async function EditIssuePage({ params }: EditIssuePageProps) {
     notFound();
   }
 
-  // Pre-popolazione cache SWR con dati SSR
-  const swrFallback = {
-    [`/api/issues/${slug}`]: issue,
-  };
-
   return (
-    <SWRPageProvider fallback={swrFallback}>
-      <main className={styles.main}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>Modifica Issue: {issue.title}</h1>
-          <Link href="/admin/issues" className={styles.backButton}>
-            ← Indietro
-          </Link>
-        </div>
+    <main className={styles.main}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>Modifica Issue: {issue.title}</h1>
+        <Link href="/admin/issues" className={styles.backButton}>
+          ← Indietro
+        </Link>
+      </div>
 
-        <Suspense fallback={<IssueEditSkeleton />}>
-          <IssueFormClient issueSlug={slug} />
-        </Suspense>
-      </main>
-    </SWRPageProvider>
+      <Suspense fallback={<IssueEditSkeleton />}>
+        <IssueFormClient issue={issue} />
+      </Suspense>
+    </main>
   );
 }

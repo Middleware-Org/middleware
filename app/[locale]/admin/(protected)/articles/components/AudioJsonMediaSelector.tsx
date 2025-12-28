@@ -4,14 +4,14 @@
 "use client";
 
 import { useState, useRef, useMemo, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Search, X, Music, FileJson } from "lucide-react";
 import { upload } from "@vercel/blob/client";
 import Image from "next/image";
 import baseStyles from "../../styles";
 import styles from "../../media/styles";
-import { useMedia } from "@/hooks/swr";
-import { mutate } from "swr";
 import { cn } from "@/lib/utils/classes";
+import type { MediaFile } from "@/lib/github/media";
 
 /* **************************************************
  * Types
@@ -36,6 +36,7 @@ export default function AudioJsonMediaSelector({
   fileType,
   title,
 }: AudioJsonMediaSelectorProps) {
+  const router = useRouter();
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
@@ -46,9 +47,43 @@ export default function AudioJsonMediaSelector({
   const [searchQuery, setSearchQuery] = useState("");
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const [allMediaFiles, setAllMediaFiles] = useState<MediaFile[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
 
-  // Usa SWR per caricare i media files con cache
-  const { mediaFiles: allMediaFiles = [], isLoading: loading, isError } = useMedia();
+  // Fetch media files when component opens
+  useEffect(() => {
+    if (!isOpen) return;
+
+    let cancelled = false;
+
+    async function fetchMedia() {
+      try {
+        setLoading(true);
+        setIsError(false);
+        const response = await fetch("/api/media");
+        if (!response.ok) throw new Error("Failed to fetch media");
+        const data = await response.json();
+        if (!cancelled) {
+          setAllMediaFiles(data.mediaFiles || []);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setIsError(true);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    }
+
+    fetchMedia();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen]);
 
   // Filtra i file per tipo e ricerca
   const filteredMediaFiles = useMemo(() => {
@@ -231,8 +266,13 @@ export default function AudioJsonMediaSelector({
       });
 
       setUploadSuccess("File caricato con successo");
-      // Invalida la cache SWR per forzare il refetch
-      mutate("/api/media");
+      router.refresh();
+      // Refresh media files
+      const response = await fetch("/api/media");
+      if (response.ok) {
+        const data = await response.json();
+        setAllMediaFiles(data.mediaFiles || []);
+      }
       // Seleziona automaticamente il file appena caricato
       handleSelect(blob.url);
       // Reset form
