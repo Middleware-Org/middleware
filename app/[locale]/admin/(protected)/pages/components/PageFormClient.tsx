@@ -13,8 +13,6 @@ import PageMetaPanel from "./PageMetaPanel";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Page } from "@/lib/github/types";
-import { usePage } from "@/hooks/swr";
-import { mutate } from "swr";
 
 // Import dinamico per evitare problemi SSR con Tiptap
 const MarkdownEditor = dynamic(() => import("../../articles/components/MarkdownEditor"), {
@@ -73,11 +71,11 @@ export default function PageFormClient({ pageSlug }: PageFormClientProps) {
     if (state?.success) {
       formRef.current?.reset();
       // Invalida la cache SWR per forzare il refetch della lista
-      mutate("/api/pages");
+      // mutate("/api/pages");
       if (editing && pageSlug) {
-        mutate(`/api/pages/${pageSlug}`);
+        // mutate(`/api/pages/${pageSlug}`);
       }
-      mutate("/api/github/merge/check");
+      // mutate("/api/github/merge/check");
       router.push("/admin/pages");
     }
   }, [state, router, editing, pageSlug]);

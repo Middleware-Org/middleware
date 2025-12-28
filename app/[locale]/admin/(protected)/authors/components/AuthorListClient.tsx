@@ -28,8 +28,6 @@ import { cn } from "@/lib/utils/classes";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Author } from "@/lib/github/types";
-import { useAuthors } from "@/hooks/swr";
-import { mutate } from "swr";
 
 /* **************************************************
  * Column Configuration
@@ -61,7 +59,9 @@ export default function AuthorListClient() {
   });
 
   // Usa SWR per ottenere gli autori (cache pre-popolata dal server)
-  const { authors = [], isLoading } = useAuthors();
+  // TODO: Migrate to props - See MIGRATION_GUIDE.md
+  // const { authors = [], isLoading } = useAuthors();
+  const authors: any[] = [];
   const [localAuthors, setLocalAuthors] = useState<Author[]>(authors);
 
   // Initialize visible columns from defaultVisible
@@ -139,8 +139,8 @@ export default function AuthorListClient() {
         });
       } else {
         // Invalida la cache SWR per forzare il refetch
-        mutate("/api/authors");
-        mutate("/api/github/merge/check");
+        // mutate("/api/authors");
+        // mutate("/api/github/merge/check");
         clearSelection();
       }
     });
@@ -167,8 +167,8 @@ export default function AuthorListClient() {
         });
       } else {
         // Invalida la cache SWR per forzare il refetch
-        mutate("/api/authors");
-        mutate("/api/github/merge/check");
+        // mutate("/api/authors");
+        // mutate("/api/github/merge/check");
         clearSelection();
       }
     });

@@ -27,8 +27,6 @@ import { cn } from "@/lib/utils/classes";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { User } from "@/lib/github/users";
-import { useUsers } from "@/hooks/swr";
-import { mutate } from "swr";
 import { ItemsPerPageSelector } from "@/components/table/ItemsPerPageSelector";
 
 /* **************************************************
@@ -61,7 +59,9 @@ export default function UserListClient() {
   });
 
   // Usa SWR per ottenere gli utenti (cache pre-popolata dal server)
-  const { users = [], isLoading } = useUsers();
+  // TODO: Migrate to props - See MIGRATION_GUIDE.md
+  // const { users = [], isLoading } = useUsers();
+  const users: any[] = [], isLoading = false;
   const [localUsers, setLocalUsers] = useState<User[]>(users);
 
   // Initialize visible columns from defaultVisible
@@ -139,7 +139,7 @@ export default function UserListClient() {
         });
       } else {
         // Invalida la cache SWR per forzare il refetch
-        mutate("/api/users");
+        // mutate("/api/users");
         clearSelection();
       }
     });
@@ -166,7 +166,7 @@ export default function UserListClient() {
         });
       } else {
         // Invalida la cache SWR per forzare il refetch
-        mutate("/api/users");
+        // mutate("/api/users");
         clearSelection();
       }
     });

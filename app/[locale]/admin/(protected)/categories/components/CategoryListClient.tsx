@@ -28,8 +28,6 @@ import { cn } from "@/lib/utils/classes";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Category } from "@/lib/github/types";
-import { useCategories } from "@/hooks/swr";
-import { mutate } from "swr";
 
 /* **************************************************
  * Column Configuration
@@ -61,7 +59,9 @@ export default function CategoryListClient() {
   });
 
   // Usa SWR per ottenere le categorie (cache pre-popolata dal server)
-  const { categories = [], isLoading } = useCategories();
+  // TODO: Migrate to props - See MIGRATION_GUIDE.md
+  // const { categories = [], isLoading } = useCategories();
+  const categories: any[] = [];
   const [localCategories, setLocalCategories] = useState<Category[]>(categories);
 
   // Initialize visible columns from defaultVisible
@@ -139,8 +139,8 @@ export default function CategoryListClient() {
         });
       } else {
         // Invalida la cache SWR per forzare il refetch
-        mutate("/api/categories");
-        mutate("/api/github/merge/check");
+        // mutate("/api/categories");
+        // mutate("/api/github/merge/check");
         clearSelection();
       }
     });
@@ -167,8 +167,8 @@ export default function CategoryListClient() {
         });
       } else {
         // Invalida la cache SWR per forzare il refetch
-        mutate("/api/categories");
-        mutate("/api/github/merge/check");
+        // mutate("/api/categories");
+        // mutate("/api/github/merge/check");
         clearSelection();
       }
     });

@@ -7,8 +7,6 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { deleteIssueAction } from "../actions";
 import styles from "../styles";
-import { useIssue } from "@/hooks/swr";
-import { mutate } from "swr";
 
 /* **************************************************
  * Types
@@ -47,8 +45,8 @@ export default function IssueDeleteButton({ issueSlug }: IssueDeleteButtonProps)
         });
       } else {
         // Invalida la cache SWR per forzare il refetch
-        mutate("/api/issues");
-        mutate(`/api/issues/${issueSlug}`);
+        // mutate("/api/issues");
+        // mutate(`/api/issues/${issueSlug}`);
         router.push("/admin/issues");
       }
     });

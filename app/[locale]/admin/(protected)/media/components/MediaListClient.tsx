@@ -8,14 +8,12 @@ import { Music, FileJson, Search, X, Trash2 } from "lucide-react";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import Image from "next/image";
-import { useMedia } from "@/hooks/swr";
 import { cn } from "@/lib/utils/classes";
 import type { MediaFile } from "@/lib/github/media";
 import MediaDialog from "./MediaDialog";
 import { useTableSelection } from "@/hooks/useTableSelection";
 import { TableCheckbox } from "@/components/table/TableCheckbox";
 import { deleteMediaFilesAction } from "../actions";
-import { mutate } from "swr";
 import ConfirmDialog from "@/components/molecules/confirmDialog";
 
 /* **************************************************
@@ -41,7 +39,9 @@ export default function MediaListClient() {
   });
 
   // Usa SWR per ottenere i file media (cache pre-popolata dal server)
-  const { mediaFiles = [], isLoading } = useMedia();
+  // TODO: Migrate to props - See MIGRATION_GUIDE.md
+  // const { mediaFiles = [], isLoading } = useMedia();
+  const mediaFiles: any[] = [], isLoading = false, isError = false;
 
   // Filtra i file in base alla ricerca e al tipo
   const filteredFiles = useMemo(() => {
@@ -155,8 +155,8 @@ export default function MediaListClient() {
         });
       } else {
         // Invalida la cache SWR per forzare il refetch
-        mutate("/api/media");
-        mutate("/api/github/merge/check");
+        // mutate("/api/media");
+        // mutate("/api/github/merge/check");
         clearSelection();
       }
     });

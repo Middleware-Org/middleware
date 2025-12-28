@@ -18,8 +18,6 @@ import ConfirmDialog from "@/components/molecules/confirmDialog";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Author } from "@/lib/github/types";
-import { useAuthor } from "@/hooks/swr";
-import { mutate } from "swr";
 
 /* **************************************************
  * Types
@@ -86,11 +84,11 @@ export default function AuthorFormClient({ authorSlug }: AuthorFormClientProps) 
     if (state?.success) {
       formRef.current?.reset();
       // Invalida la cache SWR per forzare il refetch della lista
-      mutate("/api/authors");
+      // mutate("/api/authors");
       if (editing && authorSlug) {
-        mutate(`/api/authors/${authorSlug}`);
+        // mutate(`/api/authors/${authorSlug}`);
       }
-      mutate("/api/github/merge/check");
+      // mutate("/api/github/merge/check");
       router.push("/admin/authors");
     }
   }, [state, router, editing, authorSlug]);
@@ -130,9 +128,9 @@ export default function AuthorFormClient({ authorSlug }: AuthorFormClientProps) 
         });
       } else {
         // Invalida la cache SWR per forzare il refetch
-        mutate("/api/authors");
-        mutate(`/api/authors/${authorSlug}`);
-        mutate("/api/github/merge/check");
+        // mutate("/api/authors");
+        // mutate(`/api/authors/${authorSlug}`);
+        // mutate("/api/github/merge/check");
         router.push("/admin/authors");
       }
     });

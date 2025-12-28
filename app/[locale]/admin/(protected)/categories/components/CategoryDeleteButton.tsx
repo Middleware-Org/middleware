@@ -7,8 +7,6 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { deleteCategoryAction } from "../actions";
 import styles from "../styles";
-import { useCategory } from "@/hooks/swr";
-import { mutate } from "swr";
 
 /* **************************************************
  * Types
@@ -47,8 +45,8 @@ export default function CategoryDeleteButton({ categorySlug }: CategoryDeleteBut
         });
       } else {
         // Invalida la cache SWR per forzare il refetch
-        mutate("/api/categories");
-        mutate(`/api/categories/${categorySlug}`);
+        // mutate("/api/categories");
+        // mutate(`/api/categories/${categorySlug}`);
         router.push("/admin/categories");
       }
     });

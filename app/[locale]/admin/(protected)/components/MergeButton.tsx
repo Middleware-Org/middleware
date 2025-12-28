@@ -3,23 +3,11 @@
  **************************************************/
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Rocket, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils/classes";
 import ConfirmDialog from "@/components/molecules/confirmDialog";
 import styles from "./Sidebar/styles";
-import useSWR from "swr";
-import { createFetcher } from "@/hooks/swr/fetcher";
-import { mutate } from "swr";
-
-/* **************************************************
- * Fetcher
- **************************************************/
-const fetcher = createFetcher<{
-  hasChanges: boolean;
-  aheadBy: number;
-  status: string;
-}>("merge-check");
 
 /* **************************************************
  * Publish Button Component
@@ -29,25 +17,37 @@ export default function MergeButton() {
   const [publishError, setPublishError] = useState<string | null>(null);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
-
-  // Use SWR to fetch merge status (automatically refetches when cache is invalidated via mutate)
-  const {
-    data,
-    isLoading: isChecking,
-    error: checkError,
-  } = useSWR<{
+  const [isChecking, setIsChecking] = useState(true);
+  const [checkError, setCheckError] = useState<string | null>(null);
+  const [data, setData] = useState<{
     hasChanges: boolean;
     aheadBy: number;
     status: string;
-  }>("/api/github/merge/check", fetcher, {
-    refreshInterval: 0, // Don't auto-refresh, only on cache invalidation
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-  });
+  } | null>(null);
+
+  // Fetch merge status
+  const fetchMergeStatus = async () => {
+    try {
+      setIsChecking(true);
+      const res = await fetch("/api/github/merge/check");
+      if (!res.ok) throw new Error("Failed to check merge status");
+      const result = await res.json();
+      setData(result);
+      setCheckError(null);
+    } catch (err) {
+      setCheckError("Error checking merge status");
+    } finally {
+      setIsChecking(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMergeStatus();
+  }, []);
 
   const hasChanges = data?.hasChanges || false;
   const aheadBy = data?.aheadBy || 0;
-  const error = checkError ? "Error checking merge status" : publishError;
+  const error = checkError || publishError;
 
   function handlePublishClick() {
     if (!hasChanges || isLoading) return;
@@ -67,15 +67,15 @@ export default function MergeButton() {
       const data = await res.json();
 
       if (res.ok && data.success) {
-        // Invalidate the merge check cache to refresh the status
-        mutate("/api/github/merge/check");
+        // Refresh merge status
+        await fetchMergeStatus();
         setShowSuccessDialog(true);
       } else {
         if (data.conflict) {
           setPublishError("Conflitto di merge rilevato. Risolvi manualmente.");
         } else if (data.alreadyMerged) {
-          // Invalidate cache to refresh status
-          mutate("/api/github/merge/check");
+          // Refresh merge status
+          await fetchMergeStatus();
           setPublishError(null);
         } else {
           setPublishError(data.error || "Errore durante la pubblicazione");

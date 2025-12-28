@@ -9,8 +9,6 @@ import { Search, X } from "lucide-react";
 import Image from "next/image";
 import baseStyles from "../../styles";
 import styles from "../../media/styles";
-import { useMedia } from "@/hooks/swr";
-import { mutate } from "swr";
 import { cn } from "@/lib/utils/classes";
 import type { MediaFile } from "@/lib/github/media";
 import MediaDialog from "../../media/components/MediaDialog";
@@ -44,7 +42,9 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   // Usa SWR per caricare i media files con cache, filtra solo immagini
-  const { mediaFiles: allMediaFiles = [], isLoading: loading, isError } = useMedia();
+  // TODO: Migrate to props - See MIGRATION_GUIDE.md
+  // const { mediaFiles: allMediaFiles = [], isLoading: loading, isError } = useMedia();
+  const mediaFiles: any[] = [], isLoading = false, isError = false;
 
   // Filtra solo immagini e per ricerca
   const filteredFiles = useMemo(() => {
@@ -198,8 +198,8 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
 
       setUploadSuccess("Immagine caricata con successo");
       // Invalida la cache SWR per forzare il refetch
-      mutate("/api/media");
-      mutate("/api/github/merge/check");
+      // mutate("/api/media");
+      // mutate("/api/github/merge/check");
       // Seleziona automaticamente il file appena caricato
       handleSelect(blob.url);
       // Reset form

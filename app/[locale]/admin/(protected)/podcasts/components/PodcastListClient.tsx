@@ -27,8 +27,6 @@ import { cn } from "@/lib/utils/classes";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Podcast } from "@/lib/github/types";
-import { usePodcasts } from "@/hooks/swr";
-import { mutate } from "swr";
 import { ItemsPerPageSelector } from "@/components/table/ItemsPerPageSelector";
 import Image from "next/image";
 import { getGitHubImageUrl } from "@/lib/github/images";
@@ -65,7 +63,9 @@ export default function PodcastListClient() {
   });
 
   // Usa SWR per ottenere i podcasts (cache pre-popolata dal server)
-  const { podcasts = [], isLoading } = usePodcasts();
+  // TODO: Migrate to props - See MIGRATION_GUIDE.md
+  // const { podcasts = [], isLoading } = usePodcasts();
+  const podcasts: any[] = [], isLoading = false;
 
   // Initialize visible columns from defaultVisible
   const [visibleColumns, setVisibleColumns] = useState<string[]>(() =>
@@ -137,8 +137,8 @@ export default function PodcastListClient() {
           type: result.errorType || "error",
         });
       } else {
-        mutate("/api/podcasts");
-        mutate("/api/github/merge/check");
+        // mutate("/api/podcasts");
+        // mutate("/api/github/merge/check");
         clearSelection();
       }
     });
@@ -164,8 +164,8 @@ export default function PodcastListClient() {
           type: result.errorType || "error",
         });
       } else {
-        mutate("/api/podcasts");
-        mutate("/api/github/merge/check");
+        // mutate("/api/podcasts");
+        // mutate("/api/github/merge/check");
         clearSelection();
       }
     });

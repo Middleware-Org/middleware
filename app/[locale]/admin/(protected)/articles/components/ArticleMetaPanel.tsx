@@ -15,9 +15,7 @@ import type { Category } from "@/lib/github/types";
 import type { Author } from "@/lib/github/types";
 import type { Issue } from "@/lib/github/types";
 import SelectSearch from "./SelectSearch";
-import { mutate } from "swr";
 import { cn } from "@/lib/utils/classes";
-import { usePodcasts } from "@/hooks/swr";
 
 /* **************************************************
  * Types
@@ -78,7 +76,9 @@ export default function ArticleMetaPanel({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   // Use null to indicate "not modified by user", otherwise use the user's custom value
   const [slugValue, setSlugValue] = useState<string | null>(null);
-  const { podcasts = [] } = usePodcasts();
+  // TODO: Migrate to props - See MIGRATION_GUIDE.md
+  // const { podcasts = [] } = usePodcasts();
+  const podcasts: any[] = [], isLoading = false;
 
   // Derive current slug: use modified value if exists, otherwise fall back to article slug
   const currentSlug = slugValue ?? article?.slug ?? "";
@@ -124,8 +124,8 @@ export default function ArticleMetaPanel({
         });
       } else {
         // Invalida la cache SWR per forzare il refetch
-        mutate("/api/articles");
-        mutate(`/api/articles/${article.slug}`);
+        // mutate("/api/articles");
+        // mutate(`/api/articles/${article.slug}`);
         router.push("/admin/articles");
       }
     });

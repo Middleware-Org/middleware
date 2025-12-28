@@ -8,7 +8,6 @@ import { X, Trash2, Save } from "lucide-react";
 import Image from "next/image";
 import { Music, FileJson } from "lucide-react";
 import { deleteMediaAction, renameMediaAction } from "../actions";
-import { mutate } from "swr";
 import { cn } from "@/lib/utils/classes";
 import ConfirmDialog from "@/components/molecules/confirmDialog";
 import styles from "../styles";
@@ -129,8 +128,8 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
         });
       } else {
         // Invalida la cache SWR per forzare il refetch
-        mutate("/api/media");
-        mutate("/api/github/merge/check");
+        // mutate("/api/media");
+        // mutate("/api/github/merge/check");
         onClose();
       }
     });
@@ -152,8 +151,8 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
         });
       } else {
         // Invalida la cache SWR per forzare il refetch
-        mutate("/api/media");
-        mutate("/api/github/merge/check");
+        // mutate("/api/media");
+        // mutate("/api/github/merge/check");
         onClose();
       }
     });

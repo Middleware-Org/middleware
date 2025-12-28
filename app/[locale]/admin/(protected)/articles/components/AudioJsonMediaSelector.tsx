@@ -9,8 +9,6 @@ import { upload } from "@vercel/blob/client";
 import Image from "next/image";
 import baseStyles from "../../styles";
 import styles from "../../media/styles";
-import { useMedia } from "@/hooks/swr";
-import { mutate } from "swr";
 import { cn } from "@/lib/utils/classes";
 
 /* **************************************************
@@ -48,7 +46,9 @@ export default function AudioJsonMediaSelector({
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   // Usa SWR per caricare i media files con cache
-  const { mediaFiles: allMediaFiles = [], isLoading: loading, isError } = useMedia();
+  // TODO: Migrate to props - See MIGRATION_GUIDE.md
+  // const { mediaFiles: allMediaFiles = [], isLoading: loading, isError } = useMedia();
+  const mediaFiles: any[] = [], isLoading = false, isError = false;
 
   // Filtra i file per tipo e ricerca
   const filteredMediaFiles = useMemo(() => {
@@ -232,7 +232,7 @@ export default function AudioJsonMediaSelector({
 
       setUploadSuccess("File caricato con successo");
       // Invalida la cache SWR per forzare il refetch
-      mutate("/api/media");
+      // mutate("/api/media");
       // Seleziona automaticamente il file appena caricato
       handleSelect(blob.url);
       // Reset form

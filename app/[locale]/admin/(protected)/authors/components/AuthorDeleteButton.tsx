@@ -7,8 +7,6 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { deleteAuthorAction } from "../actions";
 import styles from "../styles";
-import { useAuthor } from "@/hooks/swr";
-import { mutate } from "swr";
 
 /* **************************************************
  * Types
@@ -47,8 +45,8 @@ export default function AuthorDeleteButton({ authorSlug }: AuthorDeleteButtonPro
         });
       } else {
         // Invalida la cache SWR per forzare il refetch
-        mutate("/api/authors");
-        mutate(`/api/authors/${authorSlug}`);
+        // mutate("/api/authors");
+        // mutate(`/api/authors/${authorSlug}`);
         router.push("/admin/authors");
       }
     });

@@ -29,8 +29,6 @@ import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Issue } from "@/lib/github/types";
 import Image from "next/image";
-import { useIssues } from "@/hooks/swr";
-import { mutate } from "swr";
 import { getGitHubImageUrl } from "@/lib/github/images";
 
 /* **************************************************
@@ -66,7 +64,9 @@ export default function IssueListClient() {
   });
 
   // Usa SWR per ottenere le issues (cache pre-popolata dal server)
-  const { issues = [], isLoading } = useIssues();
+  // TODO: Migrate to props - See MIGRATION_GUIDE.md
+  // const { issues = [], isLoading } = useIssues();
+  const issues: any[] = [], isLoading = false;
   const [localIssues, setLocalIssues] = useState<Issue[]>(issues);
 
   // Initialize visible columns from defaultVisible
@@ -144,8 +144,8 @@ export default function IssueListClient() {
         });
       } else {
         // Invalida la cache SWR per forzare il refetch
-        mutate("/api/issues");
-        mutate("/api/github/merge/check");
+        // mutate("/api/issues");
+        // mutate("/api/github/merge/check");
         clearSelection();
       }
     });
@@ -172,8 +172,8 @@ export default function IssueListClient() {
         });
       } else {
         // Invalida la cache SWR per forzare il refetch
-        mutate("/api/issues");
-        mutate("/api/github/merge/check");
+        // mutate("/api/issues");
+        // mutate("/api/github/merge/check");
         clearSelection();
       }
     });

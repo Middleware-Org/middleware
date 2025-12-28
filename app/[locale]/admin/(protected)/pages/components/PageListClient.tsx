@@ -28,8 +28,6 @@ import { cn } from "@/lib/utils/classes";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Page } from "@/lib/github/types";
-import { usePages } from "@/hooks/swr";
-import { mutate } from "swr";
 
 /* **************************************************
  * Column Configuration
@@ -60,7 +58,9 @@ export default function PageListClient() {
   });
 
   // Usa SWR per ottenere le pagine (cache pre-popolata dal server)
-  const { pages = [], isLoading } = usePages();
+  // TODO: Migrate to props - See MIGRATION_GUIDE.md
+  // const { pages = [], isLoading } = usePages();
+  const pages: any[] = [], isLoading = false;
 
   // Initialize visible columns from defaultVisible
   const [visibleColumns, setVisibleColumns] = useState<string[]>(() =>
@@ -133,9 +133,9 @@ export default function PageListClient() {
         });
       } else {
         // Invalida la cache SWR per forzare il refetch
-        mutate("/api/pages");
-        mutate(`/api/pages/${slug}`);
-        mutate("/api/github/merge/check");
+        // mutate("/api/pages");
+        // mutate(`/api/pages/${slug}`);
+        // mutate("/api/github/merge/check");
         clearSelection();
       }
     });
@@ -162,12 +162,12 @@ export default function PageListClient() {
         });
       } else {
         // Invalida la cache SWR per forzare il refetch
-        mutate("/api/pages");
+        // mutate("/api/pages");
         // Invalida anche le singole pagine
         selectedIds.forEach((slug) => {
-          mutate(`/api/pages/${slug}`);
+          // mutate(`/api/pages/${slug}`);
         });
-        mutate("/api/github/merge/check");
+        // mutate("/api/github/merge/check");
         clearSelection();
       }
     });

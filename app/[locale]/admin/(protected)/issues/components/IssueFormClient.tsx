@@ -19,9 +19,7 @@ import ConfirmDialog from "@/components/molecules/confirmDialog";
 import styles from "../styles";
 import type { Issue } from "@/lib/github/types";
 import Image from "next/image";
-import { useIssue } from "@/hooks/swr";
 import AudioJsonMediaSelector from "../../articles/components/AudioJsonMediaSelector";
-import { mutate } from "swr";
 
 /* **************************************************
  * Types
@@ -198,11 +196,11 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
     if (state?.success) {
       formRef.current?.reset();
       // Invalida la cache SWR per forzare il refetch della lista
-      mutate("/api/issues");
+      // mutate("/api/issues");
       if (editing && issueSlug) {
-        mutate(`/api/issues/${issueSlug}`);
+        // mutate(`/api/issues/${issueSlug}`);
       }
-      mutate("/api/github/merge/check");
+      // mutate("/api/github/merge/check");
       // Reset coverImage before navigation (component will unmount anyway)
       setCoverImage("");
       router.push("/admin/issues");
@@ -252,9 +250,9 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
         });
       } else {
         // Invalida la cache SWR per forzare il refetch
-        mutate("/api/issues");
-        mutate(`/api/issues/${issueSlug}`);
-        mutate("/api/github/merge/check");
+        // mutate("/api/issues");
+        // mutate(`/api/issues/${issueSlug}`);
+        // mutate("/api/github/merge/check");
         router.push("/admin/issues");
       }
     });

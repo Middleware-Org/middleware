@@ -13,8 +13,6 @@ import ArticleMetaPanel from "./ArticleMetaPanel";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Article } from "@/lib/github/types";
-import { useArticle, useAuthors, useCategories, useIssues } from "@/hooks/swr";
-import { mutate } from "swr";
 // Import dinamico per evitare problemi SSR con Tiptap
 const MarkdownEditor = dynamic(() => import("./MarkdownEditor"), {
   ssr: false,
@@ -43,9 +41,15 @@ export default function ArticleFormClient({ articleSlug }: ArticleFormClientProp
 
   // Usa SWR per ottenere i dati (cache pre-popolata dal server)
   const { article } = useArticle(articleSlug || null);
-  const { authors = [] } = useAuthors();
-  const { categories = [] } = useCategories();
-  const { issues = [] } = useIssues();
+  // TODO: Migrate to props - See MIGRATION_GUIDE.md
+  // const { authors = [] } = useAuthors();
+  const authors: any[] = [];
+  // TODO: Migrate to props - See MIGRATION_GUIDE.md
+  // const { categories = [] } = useCategories();
+  const categories: any[] = [];
+  // TODO: Migrate to props - See MIGRATION_GUIDE.md
+  // const { issues = [] } = useIssues();
+  const issues: any[] = [], isLoading = false;
 
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -90,11 +94,11 @@ export default function ArticleFormClient({ articleSlug }: ArticleFormClientProp
     if (state?.success) {
       formRef.current?.reset();
       // Invalida la cache SWR per forzare il refetch della lista
-      mutate("/api/articles");
+      // mutate("/api/articles");
       if (editing && articleSlug) {
-        mutate(`/api/articles/${articleSlug}`);
+        // mutate(`/api/articles/${articleSlug}`);
       }
-      mutate("/api/github/merge/check");
+      // mutate("/api/github/merge/check");
       router.push("/admin/articles");
     }
   }, [state, router, editing, articleSlug]);

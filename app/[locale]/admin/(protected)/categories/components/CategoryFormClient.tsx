@@ -18,8 +18,6 @@ import ConfirmDialog from "@/components/molecules/confirmDialog";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Category } from "@/lib/github/types";
-import { useCategory } from "@/hooks/swr";
-import { mutate } from "swr";
 
 /* **************************************************
  * Types
@@ -87,11 +85,11 @@ export default function CategoryFormClient({ categorySlug }: CategoryFormClientP
     if (state?.success) {
       formRef.current?.reset();
       // Invalida la cache SWR per forzare il refetch della lista
-      mutate("/api/categories");
+      // mutate("/api/categories");
       if (editing && categorySlug) {
-        mutate(`/api/categories/${categorySlug}`);
+        // mutate(`/api/categories/${categorySlug}`);
       }
-      mutate("/api/github/merge/check");
+      // mutate("/api/github/merge/check");
       router.push("/admin/categories");
     }
   }, [state, router, editing, categorySlug]);
@@ -131,9 +129,9 @@ export default function CategoryFormClient({ categorySlug }: CategoryFormClientP
         });
       } else {
         // Invalida la cache SWR per forzare il refetch
-        mutate("/api/categories");
-        mutate(`/api/categories/${categorySlug}`);
-        mutate("/api/github/merge/check");
+        // mutate("/api/categories");
+        // mutate(`/api/categories/${categorySlug}`);
+        // mutate("/api/github/merge/check");
         router.push("/admin/categories");
       }
     });

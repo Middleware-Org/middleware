@@ -3,30 +3,38 @@
  **************************************************/
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils/classes";
-import useSWR from "swr";
-import { createFetcher } from "@/hooks/swr/fetcher";
-
-/* **************************************************
- * Fetcher
- **************************************************/
-const fetcher = createFetcher<{
-  expirationDate: string | null;
-  daysUntilExpiration: number | null;
-  isExpiringSoon: boolean;
-}>("token-expiration");
 
 /* **************************************************
  * Token Expiration Banner Component
  **************************************************/
 export default function TokenExpirationBanner() {
-  const { data, error, isLoading } = useSWR("/api/github/token-expiration", fetcher, {
-    refreshInterval: 0,
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-  });
+  const [data, setData] = useState<{
+    expirationDate: string | null;
+    daysUntilExpiration: number | null;
+    isExpiringSoon: boolean;
+  } | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    const fetchTokenExpiration = async () => {
+      try {
+        const res = await fetch("/api/github/token-expiration");
+        if (!res.ok) throw new Error("Failed to fetch token expiration");
+        const result = await res.json();
+        setData(result);
+      } catch (err) {
+        setError(err as Error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTokenExpiration();
+  }, []);
 
   const bannerContent = useMemo(() => {
     if (isLoading || error || !data) {

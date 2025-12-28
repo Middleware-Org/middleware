@@ -12,8 +12,6 @@ import PodcastMetaPanel from "./PodcastMetaPanel";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Podcast } from "@/lib/github/types";
-import { usePodcast } from "@/hooks/swr";
-import { mutate } from "swr";
 
 /* **************************************************
  * Types
@@ -70,11 +68,11 @@ export default function PodcastFormClient({ podcastSlug }: PodcastFormClientProp
     if (state?.success) {
       formRef.current?.reset();
       // Invalida la cache SWR per forzare il refetch della lista
-      mutate("/api/podcasts");
+      // mutate("/api/podcasts");
       if (editing && podcastSlug) {
-        mutate(`/api/podcasts/${podcastSlug}`);
+        // mutate(`/api/podcasts/${podcastSlug}`);
       }
-      mutate("/api/github/merge/check");
+      // mutate("/api/github/merge/check");
       router.push("/admin/podcasts");
     }
   }, [state, router, editing, podcastSlug]);

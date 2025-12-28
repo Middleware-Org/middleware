@@ -18,8 +18,6 @@ import PasswordInput, { isPasswordStrongEnough } from "./PasswordInput";
 import styles from "../styles";
 import baseStyles from "../../styles";
 import type { User } from "@/lib/github/users";
-import { useUser } from "@/hooks/swr";
-import { mutate } from "swr";
 
 /* **************************************************
  * Types
@@ -75,9 +73,9 @@ export default function UserFormClient({ userId }: UserFormClientProps) {
       setPassword("");
       setPasswordError(null);
       // Invalida la cache SWR per forzare il refetch della lista
-      mutate("/api/users");
+      // mutate("/api/users");
       if (editing && userId) {
-        mutate(`/api/users/${userId}`);
+        // mutate(`/api/users/${userId}`);
       }
       router.push("/admin/users");
     }
@@ -144,8 +142,8 @@ export default function UserFormClient({ userId }: UserFormClientProps) {
         });
       } else {
         // Invalida la cache SWR per forzare il refetch
-        mutate("/api/users");
-        mutate(`/api/users/${userId}`);
+        // mutate("/api/users");
+        // mutate(`/api/users/${userId}`);
         router.push("/admin/users");
       }
     });
