@@ -5,11 +5,10 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getUser } from "@/lib/auth/server";
-import { getAllArticles } from "@/lib/github/articles";
+import { ArticleService, IssueService, CategoryService, AuthorService } from "@/lib/services";
 import ArticleListClient from "./components/ArticleListClient";
 import ArticleListSkeleton from "./components/ArticleListSkeleton";
 import styles from "./styles";
-import SWRPageProvider from "@/components/providers/SWRPageProvider";
 import { Plus, ArrowLeft } from "lucide-react";
 
 /* **************************************************
@@ -21,42 +20,46 @@ export default async function ArticlesPage() {
     redirect("/admin/login");
   }
 
-  const articles = await getAllArticles();
-
-  // Pre-popolazione cache SWR con dati SSR
-  const swrFallback = {
-    "/api/articles": articles,
-  };
+  // Fetch dei dati con cache Next.js tramite Services
+  const [articles, issues, categories, authors] = await Promise.all([
+    ArticleService.getAll(),
+    IssueService.getAll(),
+    CategoryService.getAll(),
+    AuthorService.getAll(),
+  ]);
 
   return (
-    <SWRPageProvider fallback={swrFallback}>
-      <main className={styles.main}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>Gestione Articoli</h1>
-          <div className="flex gap-2">
-            <Link
-              href="/admin/articles/new"
-              className={styles.iconButton}
-              aria-label="Nuovo Articolo"
-              title="Nuovo Articolo"
-            >
-              <Plus className="w-4 h-4" />
-            </Link>
-            <Link
-              href="/admin"
-              className={styles.iconButton}
-              aria-label="Indietro"
-              title="Indietro"
-            >
-              <ArrowLeft className="w-4 h-4" />
-            </Link>
-          </div>
+    <main className={styles.main}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>Gestione Articoli</h1>
+        <div className="flex gap-2">
+          <Link
+            href="/admin/articles/new"
+            className={styles.iconButton}
+            aria-label="Nuovo Articolo"
+            title="Nuovo Articolo"
+          >
+            <Plus className="w-4 h-4" />
+          </Link>
+          <Link
+            href="/admin"
+            className={styles.iconButton}
+            aria-label="Indietro"
+            title="Indietro"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </Link>
         </div>
+      </div>
 
-        <Suspense fallback={<ArticleListSkeleton />}>
-          <ArticleListClient />
-        </Suspense>
-      </main>
-    </SWRPageProvider>
+      <Suspense fallback={<ArticleListSkeleton />}>
+        <ArticleListClient
+          initialArticles={articles}
+          initialIssues={issues}
+          initialCategories={categories}
+          initialAuthors={authors}
+        />
+      </Suspense>
+    </main>
   );
 }
