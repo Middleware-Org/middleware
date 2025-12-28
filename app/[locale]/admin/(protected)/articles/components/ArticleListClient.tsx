@@ -4,9 +4,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition, useMemo, Fragment, useRef, useEffect } from "react";
+import { useState, useMemo, Fragment, useRef, useEffect } from "react";
 import { Filter, Pencil, Trash2, X, Hash } from "lucide-react";
-import { deleteArticleAction, deleteArticlesAction } from "../actions";
+import { useArticleMutations } from "@/hooks/mutations";
 import { useTableState } from "@/hooks/useTableState";
 import { useTableSelection } from "@/hooks/useTableSelection";
 import {
@@ -27,10 +27,18 @@ import SelectSearch, { type SelectSearchOption } from "./SelectSearch";
 import { cn } from "@/lib/utils/classes";
 import styles from "../styles";
 import baseStyles from "../../styles";
-import type { Article } from "@/lib/github/types";
-import { useArticles, useIssues, useCategories, useAuthors } from "@/hooks/swr";
-import { mutate } from "swr";
+import type { Article, Issue, Category, Author } from "@/lib/github/types";
 import { ItemsPerPageSelector } from "@/components/table/ItemsPerPageSelector";
+
+/* **************************************************
+ * Props
+ **************************************************/
+interface ArticleListClientProps {
+  initialArticles: Article[];
+  initialIssues: Issue[];
+  initialCategories: Category[];
+  initialAuthors: Author[];
+}
 
 /* **************************************************
  * Column Configuration
@@ -49,9 +57,14 @@ const columnConfig: ColumnConfig[] = [
 /* **************************************************
  * Article List Client Component
  **************************************************/
-export default function ArticleListClient() {
+export default function ArticleListClient({
+  initialArticles,
+  initialIssues,
+  initialCategories,
+  initialAuthors,
+}: ArticleListClientProps) {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const { remove, removeMultiple, isPending, error: mutationError, clearError } = useArticleMutations();
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
   const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; article: Article | null }>({
     isOpen: false,
@@ -65,11 +78,11 @@ export default function ArticleListClient() {
     count: 0,
   });
 
-  // Usa SWR per ottenere gli articoli (cache pre-popolata dal server)
-  const { articles = [], isLoading } = useArticles();
-  const { issues = [] } = useIssues();
-  const { categories = [] } = useCategories();
-  const { authors = [] } = useAuthors();
+  // Usa i dati passati come props (già cachati dal server)
+  const articles = initialArticles;
+  const issues = initialIssues;
+  const categories = initialCategories;
+  const authors = initialAuthors;
 
   // Initialize visible columns from defaultVisible
   const [visibleColumns, setVisibleColumns] = useState<string[]>(() =>
@@ -218,23 +231,18 @@ export default function ArticleListClient() {
 
     const { slug } = deleteDialog.article;
     setError(null);
+    clearError();
     setDeleteDialog({ isOpen: false, article: null });
 
-    startTransition(async () => {
-      const result = await deleteArticleAction(slug);
-
-      if (!result.success) {
-        setError({
-          message: result.error,
-          type: result.errorType || "error",
-        });
-      } else {
-        // Invalida la cache SWR per forzare il refetch
-        mutate("/api/articles");
-        mutate("/api/github/merge/check");
-        clearSelection();
-      }
-    });
+    const success = await remove(slug);
+    if (!success && mutationError) {
+      setError({
+        message: mutationError,
+        type: "error",
+      });
+    } else {
+      clearSelection();
+    }
   }
 
   function handleDeleteMultipleClick() {
@@ -246,23 +254,18 @@ export default function ArticleListClient() {
     if (selectedIds.length === 0) return;
 
     setError(null);
+    clearError();
     setDeleteMultipleDialog({ isOpen: false, count: 0 });
 
-    startTransition(async () => {
-      const result = await deleteArticlesAction(selectedIds);
-
-      if (!result.success) {
-        setError({
-          message: result.error,
-          type: result.errorType || "error",
-        });
-      } else {
-        // Invalida la cache SWR per forzare il refetch
-        mutate("/api/articles");
-        mutate("/api/github/merge/check");
-        clearSelection();
-      }
-    });
+    const result = await removeMultiple(selectedIds);
+    if (!result.success) {
+      setError({
+        message: result.error,
+        type: result.errorType || "error",
+      });
+    } else {
+      clearSelection();
+    }
   }
 
   function renderCell(article: Article, columnKey: string) {
