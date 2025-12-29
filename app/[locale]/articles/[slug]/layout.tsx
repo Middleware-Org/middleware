@@ -105,6 +105,13 @@ export default async function ArticleLayout({ children, params }: ArticleLayoutP
   return (
     <>
       <StructuredData data={articleSchema} />
+      {/* Skip to main content link for keyboard accessibility */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-secondary focus:text-primary focus:px-4 focus:py-2 focus:rounded focus:outline-none focus:ring-2 focus:ring-tertiary"
+      >
+        Salta al contenuto principale
+      </a>
       <ReadingProgress />
       <Header dict={dict}>
         <AutoScrollText once={true}>
@@ -112,7 +119,9 @@ export default async function ArticleLayout({ children, params }: ArticleLayoutP
         </AutoScrollText>
       </Header>
       <Menu dict={dict} />
-      <main className="w-full">{children}</main>
+      <main id="main-content" className="w-full" tabIndex={-1}>
+        {children}
+      </main>
       <Footer dict={dict} />
     </>
   );

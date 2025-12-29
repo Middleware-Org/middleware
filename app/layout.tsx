@@ -43,6 +43,11 @@ export async function generateMetadata() {
       languages: {
         it: `/it/`,
       },
+      types: {
+        "application/rss+xml": [
+          { url: "/rss.xml", title: "Middleware RSS Feed" },
+        ],
+      },
     },
     openGraph: createOpenGraphMetadata({
       title: "Middleware - Rivista di cultura digitale e innovazione",
