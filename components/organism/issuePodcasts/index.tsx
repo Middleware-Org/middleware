@@ -22,19 +22,21 @@ const INITIAL_PODCASTS_COUNT = 3;
 type IssuePodcastsProps = {
   podcasts: Podcast[];
   dictCommon: Pick<CommonDictionary, "articleCard">;
-  issue: Issue;
+  issue?: Issue;
+  sectionTitle?: string;
 };
 
 /* **************************************************
  * IssuePodcasts Component
  **************************************************/
-export default function IssuePodcasts({ podcasts, dictCommon, issue }: IssuePodcastsProps) {
+export default function IssuePodcasts({ podcasts, dictCommon, issue, sectionTitle }: IssuePodcastsProps) {
   const [showAllPodcasts, setShowAllPodcasts] = useState(false);
 
   const visiblePodcasts = showAllPodcasts ? podcasts : podcasts.slice(0, INITIAL_PODCASTS_COUNT);
   const hasMorePodcasts = podcasts.length > INITIAL_PODCASTS_COUNT;
 
   const toggleText = showAllPodcasts ? "Nascondi tutti" : "Mostra tutti";
+  const title = issue?.title || sectionTitle || "";
 
   return (
     <>
@@ -55,7 +57,7 @@ export default function IssuePodcasts({ podcasts, dictCommon, issue }: IssuePodc
               onClick={() => setShowAllPodcasts(!showAllPodcasts)}
             >
               <MonoTextLight className={styles.buttonText}>
-                {toggleText} {issue.title}
+                {toggleText} {title}
               </MonoTextLight>
             </Button>
           </div>
