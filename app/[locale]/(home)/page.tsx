@@ -43,6 +43,8 @@ export default async function RootPage({ params }: RootPageProps) {
       {issues.map((issue) => {
         const articles = getArticlesByIssue(issue.slug);
 
+        if (articles.length === 0) return null;
+
         let { articleInEvidence, otherArticles } = articles.reduce(
           (acc, article) => {
             if (article.in_evidence && !acc.articleInEvidence) {
