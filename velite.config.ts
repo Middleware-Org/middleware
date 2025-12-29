@@ -30,7 +30,6 @@ export default defineConfig({
         last_update: s.isodate(),
         audio: s.string(),
         audio_chunks: s.string(),
-        cover: s.string().optional(),
         issue: s.string().optional(),
         published: s.boolean().default(false),
       }),
