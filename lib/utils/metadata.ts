@@ -59,6 +59,26 @@ export function createTwitterMetadata({
   };
 }
 
+/* **************************************************
+ * Podcast Schema
+ **************************************************/
+export function createPodcastSchema({
+  title,
+  description,
+  url,
+}: {
+  title: string;
+  description: string;
+  url: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "PodcastEpisode",
+    name: title,
+    description,
+    url,
+  };
+}
 export function createArticleSchema({
   headline,
   datePublished,
