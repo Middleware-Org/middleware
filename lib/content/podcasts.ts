@@ -2,7 +2,6 @@
  * Imports
  **************************************************/
 import { podcasts } from "@/.velite";
-import { getAllArticles } from "./articles";
 
 /* **************************************************
  * Podcasts
@@ -17,13 +16,6 @@ export const getPodcastBySlug = (slug: string) => {
   return podcast && podcast.published ? podcast : undefined;
 };
 
-export const getUnassignedPodcasts = () => {
-  const allPodcasts = getAllPodcasts();
-  const allArticles = getAllArticles();
-
-  const assignedPodcastSlugs = new Set(
-    allArticles.filter((article) => article.podcast).map((article) => article.podcast),
-  );
-
-  return allPodcasts.filter((podcast) => !assignedPodcastSlugs.has(podcast.slug));
+export const getPodcastsByIssue = (issueSlug: string) => {
+  return getAllPodcasts().filter((podcast) => podcast.issue === issueSlug);
 };
