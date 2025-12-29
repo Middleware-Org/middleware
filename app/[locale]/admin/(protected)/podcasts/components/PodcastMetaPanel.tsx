@@ -12,8 +12,10 @@ import styles from "../styles";
 import baseStyles from "../../styles";
 import type { Podcast } from "@/lib/github/types";
 import AudioJsonMediaSelector from "../../articles/components/AudioJsonMediaSelector";
+import SelectSearch from "../../articles/components/SelectSearch";
 import { mutate } from "swr";
 import { cn } from "@/lib/utils/classes";
+import { useIssues } from "@/hooks/swr";
 
 /* **************************************************
  * Types
@@ -27,6 +29,7 @@ interface PodcastMetaPanelProps {
     audio: string;
     audio_chunks: string;
     cover?: string;
+    issue?: string;
     published: boolean;
   };
   onFormDataChange: (field: string, value: string | boolean) => void;
@@ -65,6 +68,7 @@ export default function PodcastMetaPanel({
   const [isDeleting, startDeleteTransition] = useTransition();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [slugValue, setSlugValue] = useState<string | null>(null);
+  const { issues = [] } = useIssues();
 
   const currentSlug = slugValue ?? podcast?.slug ?? "";
 
@@ -286,6 +290,21 @@ export default function PodcastMetaPanel({
             <span className={styles.label}>Pubblicato</span>
           </label>
         </div>
+
+        <SelectSearch
+          id="issue"
+          label="Numero (opzionale)"
+          value={formData.issue || ""}
+          options={[
+            { value: "", label: "Nessun numero" },
+            ...issues.map((issue) => ({
+              value: issue.slug,
+              label: issue.title,
+            })),
+          ]}
+          onChange={(value) => onFormDataChange("issue", value || "")}
+          placeholder="Seleziona un numero"
+        />
       </div>
 
       {/* Audio Selector Modal */}

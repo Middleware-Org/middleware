@@ -42,6 +42,7 @@ export default function PodcastFormClient({ podcastSlug }: PodcastFormClientProp
     audio: "",
     audio_chunks: "",
     cover: "",
+    issue: "",
     published: false,
   };
 
@@ -55,6 +56,7 @@ export default function PodcastFormClient({ podcastSlug }: PodcastFormClientProp
           audio: podcast.audio || "",
           audio_chunks: podcast.audio_chunks || "",
           cover: podcast.cover || "",
+          issue: podcast.issue || "",
           published: podcast.published ?? false,
         }
       : defaultFormData,
@@ -98,6 +100,9 @@ export default function PodcastFormClient({ podcastSlug }: PodcastFormClientProp
     }
     if (formData.cover) {
       preparedFormData.set("cover", formData.cover);
+    }
+    if (formData.issue) {
+      preparedFormData.set("issue", formData.issue);
     }
 
     if (editing && podcastSlug) {

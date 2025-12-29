@@ -65,5 +65,6 @@ export type Podcast = {
   audio: string;
   audio_chunks: string;
   cover?: string;
+  issue?: string;
   published: boolean;
 };

@@ -18,13 +18,12 @@ import { useIssuesList } from "@/lib/store/issuesList";
  **************************************************/
 type MobileIssuesToggleProps = {
   issues: Issue[];
-  showVarie?: boolean;
 };
 
 /* **************************************************
  * MobileIssuesToggle Component
  **************************************************/
-export default function MobileIssuesToggle({ issues, showVarie = false }: MobileIssuesToggleProps) {
+export default function MobileIssuesToggle({ issues }: MobileIssuesToggleProps) {
   const { isOpen, toggleOpen } = useIssuesList();
   const searchParams = useSearchParams();
   const activeIssue = searchParams.get("issue");
@@ -64,22 +63,6 @@ export default function MobileIssuesToggle({ issues, showVarie = false }: Mobile
               </div>
             );
           })}
-
-          {/* Link Varie */}
-          {showVarie && (
-            <div className={styles.item}>
-              <Link
-                href="?issue=varie"
-                onClick={handleIssueClick}
-                className={styles.link}
-              >
-                <MonoTextLight className={cn(styles.linkText, activeIssue === "varie" ? "text-tertiary" : "")}>
-                  Varie
-                </MonoTextLight>
-              </Link>
-              <Separator />
-            </div>
-          )}
         </div>
       )}
     </div>
