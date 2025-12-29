@@ -3,7 +3,7 @@
  **************************************************/
 import IssuesList from "@/components/organism/issuesList";
 import MobileIssuesToggle from "@/components/organism/mobileIssuesToggle";
-import { getAllIssues, getPodcastsByIssue, getUnassignedPodcasts } from "@/lib/content";
+import { getAllIssues, getAllPodcasts, getUnassignedPodcasts } from "@/lib/content";
 import { getDictionary } from "@/lib/i18n/utils";
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import Issue from "@/components/organism/issue";
@@ -63,35 +63,25 @@ export default async function PodcastsPage({ params }: PodcastsPageProps) {
         </div>
 
         <div className={styles.content}>
-          {issues.map((issue, index) => {
-            const podcasts = getPodcastsByIssue(issue.slug);
-            // Mostra la sezione solo se ci sono podcasts per questa issue
+          {issues.map((issue) => {
+            const podcasts = getAllPodcasts();
             if (podcasts.length === 0) return null;
             return (
-              <Issue
-                key={issue.slug}
-                issue={issue}
-                dictCommon={dictCommon}
-                isLastIssue={false}
-              />
+              <Issue key={issue.slug} issue={issue} dictCommon={dictCommon} isLastIssue={false} />
             );
           })}
 
-          {/* Sezione Varie - Podcasts non assegnati */}
           {unassignedPodcasts.length > 0 && (
             <section id="varie" className={styles.varieSection}>
-              {/* Header con titolo e separatore */}
               <div className={styles.varieHeader}>
                 <SerifTextBold className={styles.varieTitle}>Varie</SerifTextBold>
                 <Separator className={styles.varieSeparator} />
               </div>
 
-              {/* Descrizione */}
               <MonoTextLight className={styles.varieDescription}>
                 Podcast non assegnati a un numero specifico
               </MonoTextLight>
 
-              {/* Lista podcasts */}
               <IssuePodcasts
                 podcasts={unassignedPodcasts}
                 dictCommon={dictCommon}

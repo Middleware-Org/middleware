@@ -6,14 +6,14 @@ import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import { getDictionary } from "@/lib/i18n/utils";
 import Menu from "@/components/organism/menu";
 import { MonoTextLight } from "@/components/atoms/typography";
-import { getArticleBySlug, getIssueBySlug, getAuthorBySlug } from "@/lib/content";
+import { getPodcastBySlug } from "@/lib/content";
 import { notFound } from "next/navigation";
 import Footer from "@/components/organism/footer";
 import {
   getBaseUrl,
   createOpenGraphMetadata,
   createTwitterMetadata,
-  createArticleSchema,
+  createPodcastSchema,
 } from "@/lib/utils/metadata";
 import StructuredData from "@/components/StructuredData";
 import AutoScrollText from "@/components/organism/autoScrollText";
@@ -40,20 +40,19 @@ export async function generateMetadata({ params }: PodcastsLayoutProps) {
 
   const dictCommon = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
 
-  const article = getArticleBySlug(slug);
+  const podcast = getPodcastBySlug(slug);
 
-  if (!article) {
+  if (!podcast) {
     return null;
   }
 
-  const issue = article.issue ? getIssueBySlug(article.issue) : null;
-  const ogImage = issue?.cover ? `${getBaseUrl()}${issue.cover}` : undefined;
-  const url = `${getBaseUrl()}/${locale}/${TRANSLATION_NAMESPACES.PODCAST}/${article.slug}`;
-  const title = `${dictCommon.meta.title} - ${article.title}`;
+  const ogImage = podcast.cover ? `${getBaseUrl()}${podcast.cover}` : undefined;
+  const url = `${getBaseUrl()}/${locale}/${TRANSLATION_NAMESPACES.PODCAST}/${podcast.slug}`;
+  const title = `${dictCommon.meta.title} - ${podcast.title}`;
 
   return {
     title,
-    description: article.excerpt,
+    description: podcast.description,
     alternates: {
       canonical: url,
       languages: {
@@ -61,15 +60,15 @@ export async function generateMetadata({ params }: PodcastsLayoutProps) {
       },
     },
     openGraph: createOpenGraphMetadata({
-      title: article.title,
-      description: article.excerpt,
+      title: podcast.title,
+      description: podcast.description,
       url,
-      type: "article",
+      type: "website",
       image: ogImage,
     }),
     twitter: createTwitterMetadata({
-      title: article.title,
-      description: article.excerpt,
+      title: podcast.title,
+      description: podcast.description,
       image: ogImage,
     }),
   };
@@ -89,33 +88,24 @@ export default async function PodcastsLayout({ children, params }: PodcastsLayou
 
   const dict = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
 
-  const article = getArticleBySlug(slug);
+  const podcast = getPodcastBySlug(slug);
 
-  if (!article) {
+  if (!podcast) {
     notFound();
   }
 
-  const author = getAuthorBySlug(article.author);
-  const issue = article.issue ? getIssueBySlug(article.issue) : null;
-  const url = `${getBaseUrl()}/${locale}/${TRANSLATION_NAMESPACES.PODCAST}/${article.slug}`;
-  const ogImage = issue?.cover ? `${getBaseUrl()}${issue.cover}` : undefined;
-
-  const articleSchema = createArticleSchema({
-    headline: article.title,
-    datePublished: article.date,
-    dateModified: article.date,
-    authorName: author?.name || "Middleware",
-    url,
-    description: article.excerpt,
-    image: ogImage,
+  const podcastSchema = createPodcastSchema({
+    title: podcast.title,
+    description: podcast.description,
+    url: `${getBaseUrl()}/${locale}/${TRANSLATION_NAMESPACES.PODCAST}/${podcast.slug}`,
   });
 
   return (
     <>
-      <StructuredData data={articleSchema} />
+      <StructuredData data={podcastSchema} />
       <Header dict={dict}>
         <AutoScrollText once={true}>
-          <MonoTextLight className="text-xs! md:text-base!">{article.title}</MonoTextLight>
+          <MonoTextLight className="text-xs! md:text-base!">{podcast.title}</MonoTextLight>
         </AutoScrollText>
       </Header>
       <Menu dict={dict} />
