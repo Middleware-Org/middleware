@@ -6,7 +6,7 @@ import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import { getDictionary } from "@/lib/i18n/utils";
 import Menu from "@/components/organism/menu";
 import { MonoTextLight } from "@/components/atoms/typography";
-import { getPodcastBySlug } from "@/lib/content";
+import { getIssueBySlug, getPodcastBySlug } from "@/lib/content";
 import { notFound } from "next/navigation";
 import Footer from "@/components/organism/footer";
 import {
@@ -46,7 +46,9 @@ export async function generateMetadata({ params }: PodcastsLayoutProps) {
     return null;
   }
 
-  const ogImage = podcast.cover ? `${getBaseUrl()}${podcast.cover}` : undefined;
+  const issue = podcast.issue ? getIssueBySlug(podcast.issue) : null;
+  const ogImage = issue?.cover ? `${getBaseUrl()}${issue.cover}` : undefined;
+
   const url = `${getBaseUrl()}/${locale}/${TRANSLATION_NAMESPACES.PODCAST}/${podcast.slug}`;
   const title = `${dictCommon.meta.title} - ${podcast.title}`;
 

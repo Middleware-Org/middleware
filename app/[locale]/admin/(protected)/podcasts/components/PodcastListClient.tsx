@@ -30,8 +30,6 @@ import type { Podcast } from "@/lib/github/types";
 import { usePodcasts } from "@/hooks/swr";
 import { mutate } from "swr";
 import { ItemsPerPageSelector } from "@/components/table/ItemsPerPageSelector";
-import Image from "next/image";
-import { getGitHubImageUrl } from "@/lib/github/images";
 
 /* **************************************************
  * Column Configuration
@@ -173,25 +171,6 @@ export default function PodcastListClient() {
 
   function renderCell(podcast: Podcast, columnKey: string) {
     switch (columnKey) {
-      case "cover":
-        return (
-          <TableCell>
-            {podcast.cover ? (
-              <Image
-                src={getGitHubImageUrl(podcast.cover)}
-                width={64}
-                height={64}
-                alt={podcast.title}
-                className="w-16 h-16 object-cover border border-secondary"
-                unoptimized
-              />
-            ) : (
-              <div className="w-16 h-16 bg-secondary/20 border border-secondary flex items-center justify-center text-xs text-secondary/60">
-                No image
-              </div>
-            )}
-          </TableCell>
-        );
       case "title":
         return <TableCell className="font-medium">{podcast.title}</TableCell>;
       case "slug":
