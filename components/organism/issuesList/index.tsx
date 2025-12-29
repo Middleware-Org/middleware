@@ -17,13 +17,12 @@ import styles from "./styles";
  **************************************************/
 type IssuesListProps = {
   issues: Issue[];
-  showVarie?: boolean;
 };
 
 /* **************************************************
  * IssuesList Component
  **************************************************/
-export default function IssuesList({ issues, showVarie = false }: IssuesListProps) {
+export default function IssuesList({ issues }: IssuesListProps) {
   const { isOpen, toggleOpen } = useIssuesList();
   const searchParams = useSearchParams();
   const activeIssue = searchParams.get("issue");
@@ -61,22 +60,6 @@ export default function IssuesList({ issues, showVarie = false }: IssuesListProp
           </div>
         );
       })}
-
-      {/* Link Varie */}
-      {showVarie && (
-        <div className={styles.item}>
-          <Link
-            href="?issue=varie"
-            onClick={handleIssueClick}
-            className={styles.button}
-          >
-            <MonoTextLight className={cn(styles.buttonText, activeIssue === "varie" ? "text-tertiary" : "")}>
-              Varie
-            </MonoTextLight>
-          </Link>
-          <Separator />
-        </div>
-      )}
     </div>
   );
 }

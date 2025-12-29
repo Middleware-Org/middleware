@@ -40,6 +40,7 @@ export async function getAllPodcasts(): Promise<Podcast[]> {
           audio: podcast.audio || "",
           audio_chunks: podcast.audio_chunks || "",
           cover: podcast.cover,
+          issue: podcast.issue,
           published: podcast.published ?? false,
         } as Podcast;
       } catch {
@@ -101,6 +102,7 @@ export async function getPodcastBySlug(slug: string): Promise<Podcast | undefine
         audio: (podcast.audio as string) || "",
         audio_chunks: (podcast.audio_chunks as string) || "",
         cover: podcast.cover,
+        issue: podcast.issue,
         published: (podcast.published as boolean) ?? false,
       } as Podcast;
     } catch {
@@ -130,6 +132,7 @@ export async function createPodcast(podcast: Omit<Podcast, "slug"> & { slug?: st
     audio: podcast.audio || "",
     audio_chunks: podcast.audio_chunks || "",
     cover: podcast.cover,
+    issue: podcast.issue,
     published: podcast.published ?? false,
   };
 
@@ -200,6 +203,7 @@ export async function updatePodcast(
     audio: podcast.audio !== undefined ? podcast.audio : existing.audio,
     audio_chunks: podcast.audio_chunks !== undefined ? podcast.audio_chunks : existing.audio_chunks,
     cover: podcast.cover !== undefined ? podcast.cover : existing.cover,
+    issue: podcast.issue !== undefined ? podcast.issue : existing.issue,
     published: podcast.published !== undefined ? podcast.published : existing.published,
   };
 
