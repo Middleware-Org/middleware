@@ -98,18 +98,29 @@ export default async function PodcastsLayout({ children, params }: PodcastsLayou
     title: podcast.title,
     description: podcast.description,
     url: `${getBaseUrl()}/${locale}/${TRANSLATION_NAMESPACES.PODCAST}/${podcast.slug}`,
+    datePublished: podcast.date,
+    audioUrl: podcast.audio,
   });
 
   return (
     <>
       <StructuredData data={podcastSchema} />
+      {/* Skip to main content link for keyboard accessibility */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-secondary focus:text-primary focus:px-4 focus:py-2 focus:rounded focus:outline-none focus:ring-2 focus:ring-tertiary"
+      >
+        Salta al contenuto principale
+      </a>
       <Header dict={dict}>
         <AutoScrollText once={true}>
           <MonoTextLight className="text-xs! md:text-base!">{podcast.title}</MonoTextLight>
         </AutoScrollText>
       </Header>
       <Menu dict={dict} />
-      <main className="w-full">{children}</main>
+      <main id="main-content" className="w-full" tabIndex={-1}>
+        {children}
+      </main>
       <Footer dict={dict} />
     </>
   );

@@ -1,4 +1,14 @@
 import type { NextConfig } from "next";
+import withPWA from "next-pwa";
+
+const pwaConfig = withPWA({
+  dest: "public",
+  disable: process.env.NODE_ENV === "development",
+  register: true,
+  skipWaiting: true,
+  sw: "service-worker.js",
+  publicExcludes: ["!robots.txt", "!sitemap.xml"],
+});
 
 const nextConfig: NextConfig = {
   images: {
@@ -67,6 +77,26 @@ const nextConfig: NextConfig = {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=()",
           },
+          {
+            key: "Content-Security-Policy",
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' va.vercel-scripts.com vitals.vercel-insights.com",
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' data: https: blob:",
+              "font-src 'self' data:",
+              "connect-src 'self' va.vercel-scripts.com vitals.vercel-insights.com mdmdfxzts3o3uer1.public.blob.vercel-storage.com raw.githubusercontent.com",
+              "media-src 'self' https: blob:",
+              "object-src 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+              "frame-ancestors 'self'",
+              "upgrade-insecure-requests",
+            ]
+              .join("; ")
+              .replace(/\s{2,}/g, " ")
+              .trim(),
+          },
         ],
       },
       // Cache static assets aggressively
@@ -116,4 +146,4 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
 };
 
-export default nextConfig;
+export default pwaConfig(nextConfig);

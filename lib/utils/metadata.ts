@@ -66,10 +66,16 @@ export function createPodcastSchema({
   title,
   description,
   url,
+  datePublished,
+  duration,
+  audioUrl,
 }: {
   title: string;
   description: string;
   url: string;
+  datePublished?: string;
+  duration?: string;
+  audioUrl?: string;
 }) {
   return {
     "@context": "https://schema.org",
@@ -77,6 +83,19 @@ export function createPodcastSchema({
     name: title,
     description,
     url,
+    ...(datePublished && { datePublished }),
+    ...(duration && { duration }),
+    ...(audioUrl && {
+      associatedMedia: {
+        "@type": "MediaObject",
+        contentUrl: audioUrl,
+      },
+    }),
+    partOfSeries: {
+      "@type": "PodcastSeries",
+      name: "Middleware",
+      url: baseUrl,
+    },
   };
 }
 export function createArticleSchema({

@@ -6,6 +6,7 @@
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import Link from "next/link";
+import FocusLock from "react-focus-lock";
 import { CommonDictionary } from "@/lib/i18n/types";
 import { cn } from "@/lib/utils/classes";
 import { useMenu } from "@/lib/store";
@@ -44,6 +45,18 @@ export default function Menu({ dict }: MenuProps) {
     };
   }, [isOpen]);
 
+  // Close menu on ESC key press
+  useEffect(() => {
+    const handleEscKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && isOpen) {
+        closeMenu();
+      }
+    };
+
+    document.addEventListener("keydown", handleEscKey);
+    return () => document.removeEventListener("keydown", handleEscKey);
+  }, [isOpen, closeMenu]);
+
   /* **************************************************
    * Helpers
    **************************************************/
@@ -66,14 +79,15 @@ export default function Menu({ dict }: MenuProps) {
         onClick={closeMenu}
         aria-hidden="true"
       />
-      {/* Menu */}
-      <div
-        className={cn(styles.container, isOpen ? styles.containerOpen : styles.containerClosed)}
-        id="app-menu"
-        role="dialog"
-        aria-label={dict.aria.menu.middleware}
-        aria-modal="true"
-      >
+      {/* Menu with Focus Lock */}
+      <FocusLock disabled={!isOpen} returnFocus>
+        <div
+          className={cn(styles.container, isOpen ? styles.containerOpen : styles.containerClosed)}
+          id="app-menu"
+          role="dialog"
+          aria-label={dict.aria.menu.middleware}
+          aria-modal="true"
+        >
         <nav className={styles.navMain} role="navigation">
           {menuItems.map((item) => {
             const pathnameWithoutLang = getPathnameWithoutLang(pathname);
@@ -120,7 +134,8 @@ export default function Menu({ dict }: MenuProps) {
             {dict.aria.menu.footer_quote}
           </MonoTextLight>
         </div>
-      </div>
+        </div>
+      </FocusLock>
     </>
   );
 }
