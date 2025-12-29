@@ -1,14 +1,4 @@
 import type { NextConfig } from "next";
-import withPWA from "next-pwa";
-
-const pwaConfig = withPWA({
-  dest: "public",
-  disable: process.env.NODE_ENV === "development",
-  register: true,
-  skipWaiting: true,
-  sw: "service-worker.js",
-  publicExcludes: ["!robots.txt", "!sitemap.xml"],
-});
 
 const nextConfig: NextConfig = {
   images: {
@@ -146,4 +136,4 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
 };
 
-export default pwaConfig(nextConfig);
+export default nextConfig;

@@ -8,6 +8,7 @@
     "audio": "https://mdmdfxzts3o3uer1.public.blob.vercel-storage.com/media/ancora-catene-da-spezzare.mp3",
     "audio_chunks": "https://mdmdfxzts3o3uer1.public.blob.vercel-storage.com/media/ancora-catene-da-spezzare.json",
     "cover": "https://mdmdfxzts3o3uer1.public.blob.vercel-storage.com/media/ChatGPT%20Image%2018%20dic%202025%2C%2009_47_21.jpg",
+    "issue": "raccolta",
     "published": true
   },
   {
@@ -30,6 +31,7 @@
     "audio": "https://mdmdfxzts3o3uer1.public.blob.vercel-storage.com/media/il-laboratorio-della-guerra.mp3",
     "audio_chunks": "https://mdmdfxzts3o3uer1.public.blob.vercel-storage.com/media/il-laboratorio-della-guerra.json",
     "cover": "https://mdmdfxzts3o3uer1.public.blob.vercel-storage.com/media/ChatGPT%20Image%2018%20dic%202025%2C%2009_47_21.jpg",
+    "issue": "raccolta",
     "published": true
   }
 ]
