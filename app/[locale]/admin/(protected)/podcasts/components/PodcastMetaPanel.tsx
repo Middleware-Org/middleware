@@ -28,7 +28,6 @@ interface PodcastMetaPanelProps {
     date: string;
     audio: string;
     audio_chunks: string;
-    cover?: string;
     issue?: string;
     published: boolean;
   };
@@ -64,7 +63,6 @@ export default function PodcastMetaPanel({
   const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
   const [isAudioSelectorOpen, setIsAudioSelectorOpen] = useState(false);
   const [isAudioChunksSelectorOpen, setIsAudioChunksSelectorOpen] = useState(false);
-  const [isCoverSelectorOpen, setIsCoverSelectorOpen] = useState(false);
   const [isDeleting, startDeleteTransition] = useTransition();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [slugValue, setSlugValue] = useState<string | null>(null);
@@ -247,39 +245,6 @@ export default function PodcastMetaPanel({
         </div>
 
         <div className={styles.field}>
-          <label htmlFor="cover" className={styles.label}>
-            Immagine di copertina (opzionale)
-          </label>
-          <div className={baseStyles.buttonGroup}>
-            <input
-              id="cover"
-              type="text"
-              value={formData.cover || ""}
-              onChange={(e) => onFormDataChange("cover", e.target.value)}
-              placeholder="Nessuna immagine selezionata"
-              className={styles.input}
-              readOnly
-            />
-            <button
-              type="button"
-              onClick={() => setIsCoverSelectorOpen(true)}
-              className={styles.submitButton}
-            >
-              Seleziona
-            </button>
-            {formData.cover && (
-              <button
-                type="button"
-                onClick={() => onFormDataChange("cover", "")}
-                className={styles.cancelButton}
-              >
-                Rimuovi
-              </button>
-            )}
-          </div>
-        </div>
-
-        <div className={styles.field}>
           <label className={`${baseStyles.buttonGroup} cursor-pointer`}>
             <input
               type="checkbox"
@@ -327,17 +292,6 @@ export default function PodcastMetaPanel({
         }}
         fileType="json"
         title="Seleziona JSON Chunk Audio"
-      />
-
-      {/* Cover Image Selector Modal */}
-      <AudioJsonMediaSelector
-        isOpen={isCoverSelectorOpen}
-        onClose={() => setIsCoverSelectorOpen(false)}
-        onSelect={(fileUrl) => {
-          onFormDataChange("cover", fileUrl);
-        }}
-        fileType="image"
-        title="Seleziona Immagine di Copertina"
       />
 
       {/* Fixed Actions Section - Always Visible */}

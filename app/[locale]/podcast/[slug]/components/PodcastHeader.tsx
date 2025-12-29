@@ -5,7 +5,7 @@
  **************************************************/
 import Image from "next/image";
 import { SerifText } from "@/components/atoms/typography";
-import { Podcast } from "@/.velite";
+import { Podcast, Issue } from "@/.velite";
 import styles from "./PodcastPlayerStyles";
 import { getGitHubImageUrl } from "@/lib/github/images";
 
@@ -14,18 +14,22 @@ import { getGitHubImageUrl } from "@/lib/github/images";
  **************************************************/
 type PodcastHeaderProps = {
   podcast: Podcast;
+  issue?: Issue;
 };
 
 /* **************************************************
  * PodcastHeader
  **************************************************/
-export default function PodcastHeader({ podcast }: PodcastHeaderProps) {
+export default function PodcastHeader({ podcast, issue }: PodcastHeaderProps) {
+  // Use issue cover if available, otherwise no cover
+  const coverImage = issue?.cover;
+
   return (
     <div className={styles.headerSection}>
-      {podcast.cover && (
+      {coverImage && (
         <div className={styles.coverWrapper}>
           <Image
-            src={getGitHubImageUrl(podcast.cover)}
+            src={getGitHubImageUrl(coverImage)}
             alt={podcast.title}
             fill
             className={styles.coverImage}

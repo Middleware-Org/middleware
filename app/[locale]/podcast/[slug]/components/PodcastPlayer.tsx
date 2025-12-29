@@ -4,7 +4,7 @@
  * Imports
  **************************************************/
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Podcast } from "@/.velite";
+import { Podcast, Issue } from "@/.velite";
 import { useAudioPlayer } from "./hooks/useAudioPlayer";
 import { useTranscriptScroll } from "./hooks/useTranscriptScroll";
 import PodcastHeader from "./PodcastHeader";
@@ -21,12 +21,13 @@ import { getGitHubMediaUrl } from "@/lib/github/images";
  **************************************************/
 type PodcastPlayerProps = {
   podcast: Podcast;
+  issue?: Issue;
 };
 
 /* **************************************************
  * PodcastPlayer
  **************************************************/
-export default function PodcastPlayer({ podcast }: PodcastPlayerProps) {
+export default function PodcastPlayer({ podcast, issue }: PodcastPlayerProps) {
   const transcriptContainerRef = useRef<HTMLDivElement | null>(null);
   const transcriptContentInnerRef = useRef<HTMLDivElement | null>(null);
   const activeSegmentRef = useRef<HTMLDivElement | null>(null);
@@ -154,7 +155,7 @@ export default function PodcastPlayer({ podcast }: PodcastPlayerProps) {
 
       {/* Top Grid: Header + Player */}
       <div className={styles.topGrid}>
-        <PodcastHeader podcast={podcast} />
+        <PodcastHeader podcast={podcast} issue={issue} />
 
         <ProgressBar
           currentTime={currentTime}

@@ -33,7 +33,6 @@ export async function createPodcastAction(
     const date = formData.get("date") as string;
     const audio = formData.get("audio") as string | null;
     const audio_chunks = formData.get("audio_chunks") as string | null;
-    const cover = formData.get("cover") as string | null;
     const issue = formData.get("issue") as string | null;
     const published = formData.get("published") === "true";
     const slug = formData.get("slug") as string | null;
@@ -54,7 +53,6 @@ export async function createPodcastAction(
       last_update: podcastDate,
       audio: audio.trim(),
       audio_chunks: audio_chunks.trim(),
-      cover: cover?.trim() || undefined,
       issue: issue?.trim() || undefined,
       published,
       slug: slug?.trim() || undefined,
@@ -88,7 +86,6 @@ export async function updatePodcastAction(
     const date = formData.get("date") as string;
     const audio = formData.get("audio") as string | null;
     const audio_chunks = formData.get("audio_chunks") as string | null;
-    const cover = formData.get("cover") as string | null;
     const issue = formData.get("issue") as string | null;
     const published = formData.get("published") === "true";
 
@@ -106,7 +103,6 @@ export async function updatePodcastAction(
       date: date.trim(),
       audio: audio.trim(),
       audio_chunks: audio_chunks.trim(),
-      cover: cover?.trim() || undefined,
       issue: issue?.trim() || undefined,
       published,
       newSlug: newSlug?.trim() || undefined,
