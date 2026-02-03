@@ -1,5 +1,38 @@
 [
   {
+    "slug": "1-contesto-e-specificita",
+    "title": "#1 Contesto e specificità",
+    "description": "Futuro anteriore - #1 Contesto e specificità - corso sull'operaismo di Gigi Roggero",
+    "date": "2025-12-29T00:00:00.000Z",
+    "last_update": "2025-12-29T16:45:42.438Z",
+    "audio": "https://mdmdfxzts3o3uer1.public.blob.vercel-storage.com/media/futuro-anteriore-1-contesto-e-specificit%C3%A0-corso-sull-operaismo-di-gigi-roggero.mp3",
+    "audio_chunks": "https://mdmdfxzts3o3uer1.public.blob.vercel-storage.com/media/futuro-anteriore-1-contesto-e-specificit%C3%A0-corso-sull-operaismo-di-gigi-roggero.json",
+    "issue": "futuro-anteriore-corso-sulloperaismo-di-gigi-roggero",
+    "published": true
+  },
+  {
+    "slug": "2-dai-quaderni-rossi-a-piazza-statuto",
+    "title": "#2 Dai “Quaderni Rossi” a Piazza Statuto",
+    "description": "Futuro anteriore -#2 Dai “Quaderni Rossi” a Piazza Statuto - corso sull'operaismo di Gigi Roggero",
+    "date": "2025-12-29T00:00:00.000Z",
+    "last_update": "2025-12-30T08:33:34.874Z",
+    "audio": "https://mdmdfxzts3o3uer1.public.blob.vercel-storage.com/media/futuro-anteriore-2-dai-quaderni-rossi-a-piazza-statuto-corso-sulloperaismo-di-gigi-roggero.mp3",
+    "audio_chunks": "https://mdmdfxzts3o3uer1.public.blob.vercel-storage.com/media/futuro-anteriore-2-dai-quaderni-rossi-a-piazza-statuto-corso-sulloperaismo-di-gigi-roggero.json",
+    "issue": "futuro-anteriore-corso-sulloperaismo-di-gigi-roggero",
+    "published": true
+  },
+  {
+    "slug": "3-la-parabola-di-classe-operaia",
+    "title": "#3 La parabola di “Classe Operaia”",
+    "description": "",
+    "date": "2025-12-30T00:00:00.000Z",
+    "last_update": "2025-12-30T00:00:00.000Z",
+    "audio": "https://mdmdfxzts3o3uer1.public.blob.vercel-storage.com/media/futuro-anteriore-3-la-parabola-di-classe-operaia-corso-sulloperaismo-di-gigi-roggero.mp3",
+    "audio_chunks": "https://mdmdfxzts3o3uer1.public.blob.vercel-storage.com/media/futuro-anteriore-3-la-parabola-di-classe-operaia-corso-sulloperaismo-di-gigi-roggero.json",
+    "issue": "futuro-anteriore-corso-sulloperaismo-di-gigi-roggero",
+    "published": true
+  },
+  {
     "slug": "ancora-catene-da-spezzare-appunti-su-pratiche-di-liberta-e-ed-autodifesa",
     "title": "Ancora catene da spezzare – Appunti su pratiche di libertà e ed autodifesa",
     "description": "Negli ultimi anni, all’interno dei movimenti transfemministi italiani ed europei, si è manifestata una dinamica preoccupante: l’uso di linguaggi e strumenti nati per la liberazione come dispositivi di delegittimazione e controllo. Questa non è una questione marginale o accidentale, ma la manifestazione di processi che le teoriche femministe radicali, nere, postcoloniali e transnazionali hanno analizzato per decenni.",
@@ -7,19 +40,7 @@
     "last_update": "2025-12-22T14:05:10.088Z",
     "audio": "https://mdmdfxzts3o3uer1.public.blob.vercel-storage.com/media/ancora-catene-da-spezzare.mp3",
     "audio_chunks": "https://mdmdfxzts3o3uer1.public.blob.vercel-storage.com/media/ancora-catene-da-spezzare.json",
-    "cover": "https://mdmdfxzts3o3uer1.public.blob.vercel-storage.com/media/ChatGPT%20Image%2018%20dic%202025%2C%2009_47_21.jpg",
     "issue": "raccolta",
-    "published": true
-  },
-  {
-    "slug": "futuro-anteriore-1-contesto-e-specificita-corso-sull-operaismo-di-gigi-roggero",
-    "title": "Futuro anteriore - #1 Contesto e specificità - corso sull'operaismo di Gigi Roggero",
-    "description": "Futuro anteriore - #1 Contesto e specificità - corso sull'operaismo di Gigi Roggero",
-    "date": "2025-12-29T00:00:00.000Z",
-    "last_update": "2025-12-29T00:00:00.000Z",
-    "audio": "https://mdmdfxzts3o3uer1.public.blob.vercel-storage.com/media/futuro-anteriore-1-contesto-e-specificit%C3%A0-corso-sull-operaismo-di-gigi-roggero.mp3",
-    "audio_chunks": "https://mdmdfxzts3o3uer1.public.blob.vercel-storage.com/media/futuro-anteriore-1-contesto-e-specificit%C3%A0-corso-sull-operaismo-di-gigi-roggero.json",
-    "cover": "https://mdmdfxzts3o3uer1.public.blob.vercel-storage.com/media/ChatGPT%20Image%2018%20dic%202025%2C%2009_47_21.jpg",
     "published": true
   },
   {
@@ -30,7 +51,6 @@
     "last_update": "2025-12-22T14:05:00.708Z",
     "audio": "https://mdmdfxzts3o3uer1.public.blob.vercel-storage.com/media/il-laboratorio-della-guerra.mp3",
     "audio_chunks": "https://mdmdfxzts3o3uer1.public.blob.vercel-storage.com/media/il-laboratorio-della-guerra.json",
-    "cover": "https://mdmdfxzts3o3uer1.public.blob.vercel-storage.com/media/ChatGPT%20Image%2018%20dic%202025%2C%2009_47_21.jpg",
     "issue": "raccolta",
     "published": true
   }
