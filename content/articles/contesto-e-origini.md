@@ -2,7 +2,7 @@
 slug: contesto-e-origini
 title: Contesto e Origini
 date: '2026-02-23'
-last_update: '2026-02-23T11:13:02.268Z'
+last_update: '2026-02-23T17:06:41.120Z'
 author: middleware
 category: operaismo
 issue: operaismo-politico-italiano
@@ -13,6 +13,7 @@ excerpt: >-
   contro-formazione dedicati all'operaismo politico italiano. Il ciclo è
   strutturato in tre parti: il contesto e le origini, la genealogia e il
   lessico, e infine la conricerca e lo stile della militanza.
+podcast: contesto-e-origini-2
 ---
 Questa formazione è un esperimento: non ci troviamo di fronte a lezioni frontali in senso assoluto, ma al frutto di un lavoro collettivo in corso d'opera, fatto di letture, riflessioni, dibattito e tentativo di sintesi. Un gruppo di lavoro si è occupato della preparazione dei contenuti con l'intento di aprire momenti di discussione collettiva sui temi affrontati.
 
