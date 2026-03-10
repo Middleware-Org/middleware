@@ -37,9 +37,20 @@ export function MonoTextBold({ children, className = "", style }: TypographyProp
   );
 }
 
-export function MonoTextLight({ children, className = "", onClick, style }: TypographyProps) {
+export function MonoTextLight({
+  children,
+  className = "",
+  onClick,
+  style,
+  dangerouslySetInnerHTML,
+}: TypographyProps) {
   return (
-    <p style={style} className={cn(gtAmericaMonoLight.className, className)} onClick={onClick}>
+    <p
+      dangerouslySetInnerHTML={dangerouslySetInnerHTML}
+      style={style}
+      className={cn(gtAmericaMonoLight.className, className)}
+      onClick={onClick}
+    >
       {children}
     </p>
   );
