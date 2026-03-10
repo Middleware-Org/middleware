@@ -2,7 +2,7 @@
 slug: contesto-e-origini
 title: Contesto e Origini
 date: '2026-02-23'
-last_update: '2026-02-23T17:06:41.120Z'
+last_update: '2026-03-10T10:37:05.977Z'
 author: middleware
 category: operaismo
 issue: operaismo-politico-italiano
@@ -15,9 +15,11 @@ excerpt: >-
   lessico, e infine la conricerca e lo stile della militanza.
 podcast: contesto-e-origini-2
 ---
+Questo testo raccoglie i contenuti del primo di quattro incontri di contro-formazione dedicati all'operaismo politico italiano. Il ciclo è strutturato in quattro parti: contesto e origini, genealogia e lessico, conricerca e stile della militanza, e infine tracce e ipotesi.
+
 Questa formazione è un esperimento: non ci troviamo di fronte a lezioni frontali in senso assoluto, ma al frutto di un lavoro collettivo in corso d'opera, fatto di letture, riflessioni, dibattito e tentativo di sintesi. Un gruppo di lavoro si è occupato della preparazione dei contenuti con l'intento di aprire momenti di discussione collettiva sui temi affrontati.
 
-L'obiettivo di questo incontro non è offrire una lezione completa sulla storia dell'operaismo, ma capire il contesto in cui nasce: le condizioni materiali e politiche che lo hanno reso possibile, le rotture da cui ha preso forma e le ragioni per cui i militanti di allora hanno formulato determinate ipotesi. Invece di ricostruire ogni dettaglio storiografico, operazione che richiederebbe molto tempo e risulterebbe poco utile ai nostri fini, vogliamo forzare la lettura di concetti ed eventi per costruire una cassetta degli attrezzi. Vogliamo dotarci di strumenti da rimettere al lavoro oggi, da criticare, trasformare e mettere al servizio delle lotte attuali. Non studiamo questa esperienza per ripeterla, essendo quella storia ormai conclusa, ma per estrarne un metodo che sentiamo ancora vivo e utile per il presente. 
+L'obiettivo di questo incontro non è offrire una lezione completa sulla storia dell'operaismo[citation:citation-1773139017572-nqg85ze3f:Per un'introduzione sistematica consigliamo Gigi Roggero, L'operaismo politico italiano. Genealogia, storia, metodo, DeriveApprodi — da cui questa formazione ha tratto molto. Disponibile su\: https\://deriveapprodi.com/libro/loperaismo-politico-italiano/], ma capire il contesto in cui nasce: le condizioni materiali e politiche che lo hanno reso possibile, le rotture da cui ha preso forma e le ragioni per cui i militanti di allora hanno formulato determinate ipotesi. Invece di ricostruire ogni dettaglio storiografico, operazione che richiederebbe molto tempo e risulterebbe poco utile ai nostri fini, vogliamo forzare la lettura di concetti ed eventi per costruire una cassetta degli attrezzi. Vogliamo dotarci di strumenti da rimettere al lavoro oggi, da criticare, trasformare e mettere al servizio delle lotte attuali. Non studiamo questa esperienza per ripeterla, essendo quella storia ormai conclusa, ma per estrarne un metodo che sentiamo ancora vivo e utile per il presente. 
 
 ### **Perché studiare l'operaismo oggi?**
 
