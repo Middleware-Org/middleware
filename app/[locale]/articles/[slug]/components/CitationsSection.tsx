@@ -98,9 +98,10 @@ export default function CitationsSection({ citations }: CitationsSectionProps) {
                 >
                   {citation.index}.
                 </a>
-                <MonoTextLight className="text-base leading-relaxed flex-1">
-                  {citation.text}
-                </MonoTextLight>
+                <MonoTextLight
+                  className="text-base leading-relaxed flex-1"
+                  dangerouslySetInnerHTML={{ __html: citation.text }}
+                />
               </li>
             ))}
           </ol>

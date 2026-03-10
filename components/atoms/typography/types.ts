@@ -1,8 +1,9 @@
 import { ReactNode } from "react";
 
 export type TypographyProps = {
-  children: ReactNode;
+  children?: ReactNode;
   className?: string;
   style?: React.CSSProperties;
   onClick?: () => void;
+  dangerouslySetInnerHTML?: { __html: string };
 };

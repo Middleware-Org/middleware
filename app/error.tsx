@@ -48,14 +48,14 @@ export default function Error({ error, reset }: ErrorProps) {
           <Button
             onClick={reset}
             aria-label="Riprova a caricare la pagina"
-            className="px-6 py-3 bg-tertiary text-primary rounded hover:opacity-80 transition-opacity"
+            className="px-6 py-3 bg-tertiary text-white rounded hover:opacity-80 transition-opacity"
           >
             <MonoTextBold>Riprova</MonoTextBold>
           </Button>
           <Button
             onClick={() => (window.location.href = "/")}
             aria-label="Torna alla homepage"
-            className="px-6 py-3 bg-secondary text-primary rounded hover:opacity-80 transition-opacity"
+            className="px-6 py-3 bg-secondary text-white rounded hover:opacity-80 transition-opacity"
           >
             <MonoTextBold>Torna alla Home</MonoTextBold>
           </Button>
