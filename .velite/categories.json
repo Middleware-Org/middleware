@@ -1,22 +1,7 @@
 [
   {
-    "slug": "conflitti-globali",
-    "name": "Conflitti globali",
-    "description": "Raccolta di contributi sulla fase di ristrutturazione capitalista in funzione dell'economia di guerra"
-  },
-  {
-    "slug": "organizzazione",
-    "name": "Organizzazione",
-    "description": "Raccolta degli articoli che trattano il tema dell'organizzazione."
-  },
-  {
-    "slug": "transfemminismo",
-    "name": "Transfemminismo",
-    "description": "Raccolta degli articoli che trattano il tema del transfemminismo."
-  },
-  {
-    "slug": "universita-della-guerra",
-    "name": "Università della guerra",
-    "description": "Inchiesta sull'università della guerra."
+    "slug": "contro-formazione",
+    "name": "Contro-formazione",
+    "description": "Categoria dedicata alla raccolta dei momenti di contro-formazione colletiva."
   }
 ]

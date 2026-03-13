@@ -15,6 +15,7 @@ import { Book, Play } from "lucide-react";
 import CitationsSection from "./CitationsSection";
 import BookmarkManager from "./BookmarkManager";
 import { marked } from "marked";
+import { sanitizeInlineHtml, sanitizeRichHtml } from "@/lib/security/sanitizeHtml";
 
 type ArticleProps = {
   article: Article;
@@ -69,7 +70,7 @@ export default function Article({ article, dict }: ArticleProps) {
       if (text || citationId) {
         citations.push({
           id: citationId,
-          text,
+          text: sanitizeInlineHtml(text),
           index: index + 1,
         });
       }
@@ -111,7 +112,7 @@ export default function Article({ article, dict }: ArticleProps) {
     }
 
     return {
-      processedHtml,
+      processedHtml: sanitizeRichHtml(processedHtml),
       citations,
     };
   };

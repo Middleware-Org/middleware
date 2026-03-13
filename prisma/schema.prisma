@@ -19,7 +19,7 @@ model User {
   createdAt     DateTime  @default(now())
   email         String    @unique
   name          String?
-  role          UserRole  @default(ADMIN)
+  role          UserRole  @default(EDITOR)
   emailVerified Boolean   @default(false)
   image         String?
   updatedAt     DateTime  @default(now()) @updatedAt
