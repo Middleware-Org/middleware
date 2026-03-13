@@ -4,6 +4,9 @@
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/auth/server";
 import { getPodcastBySlug } from "@/lib/github/podcasts";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("API /podcasts/[slug]");
 
 /* **************************************************
  * Types
@@ -31,11 +34,10 @@ export async function GET(_request: Request, { params }: RouteParams) {
 
     return NextResponse.json(podcast);
   } catch (error) {
-    console.error("Error fetching podcast:", error);
+    logger.error("Error fetching podcast", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Failed to fetch podcast" },
       { status: 500 },
     );
   }
 }
-

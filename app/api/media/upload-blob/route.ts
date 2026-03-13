@@ -4,6 +4,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { handleUpload } from "@vercel/blob/client";
 import { getUser } from "@/lib/auth/server";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("API /media/upload-blob");
 
 /* **************************************************
  * Direct Blob Upload API Route
@@ -55,7 +58,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error("Error generating upload URL:", error);
+    logger.error("Error generating upload URL", error);
     return NextResponse.json(
       {
         error: error instanceof Error ? error.message : "Failed to generate upload URL",

@@ -3,6 +3,9 @@
  **************************************************/
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/auth/server";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("API /github/token-expiration");
 
 const GITHUB_API_URL = "https://api.github.com";
 const token = process.env.GITHUB_TOKEN!;
@@ -34,7 +37,10 @@ export async function GET() {
     });
 
     if (!res.ok) {
-      console.error("GitHub API error", res.status, await res.text());
+      logger.error("GitHub API error", {
+        status: res.status,
+        body: await res.text(),
+      });
       return NextResponse.json(
         { error: "Failed to check token expiration" },
         { status: res.status },
@@ -66,7 +72,7 @@ export async function GET() {
       isExpiringSoon,
     });
   } catch (error) {
-    console.error("Error checking GitHub token expiration:", error);
+    logger.error("Error checking GitHub token expiration", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

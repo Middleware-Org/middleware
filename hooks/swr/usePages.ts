@@ -2,9 +2,12 @@
  * Imports
  **************************************************/
 import useSWR from "swr";
+import { createLogger } from "@/lib/logger";
 import { createFetcher } from "./fetcher";
 import { swrConfig } from "./config";
 import type { Page } from "@/lib/github/types";
+
+const logger = createLogger("SWR");
 
 /* **************************************************
  * Types
@@ -29,9 +32,7 @@ export function usePages(initialData?: Page[]): UsePagesResponse {
     ...swrConfig,
     fallbackData: initialData,
     onSuccess: (data) => {
-      if (process.env.NODE_ENV === "development") {
-        console.log(`[SWR] usePages - Data loaded: ${Array.isArray(data) ? data.length : 1} pages`);
-      }
+      logger.debug(`usePages - Data loaded: ${Array.isArray(data) ? data.length : 1} pages`);
     },
   });
 
@@ -49,10 +50,8 @@ export function usePage(slug: string | null, initialData?: Page): UsePageRespons
     {
       ...swrConfig,
       fallbackData: initialData,
-      onSuccess: (data) => {
-        if (process.env.NODE_ENV === "development") {
-          console.log(`[SWR] usePage - Data loaded for slug: ${slug}`);
-        }
+      onSuccess: () => {
+        logger.debug(`usePage - Data loaded for slug: ${slug}`);
       },
     },
   );

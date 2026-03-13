@@ -3,6 +3,9 @@
  **************************************************/
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/auth/server";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("API /github/merge");
 
 const GITHUB_API_URL = "https://api.github.com";
 const owner = process.env.GITHUB_OWNER!;
@@ -67,7 +70,7 @@ export async function POST() {
 
     if (!mergeRes.ok) {
       const errorData = await mergeRes.json();
-      console.error("Merge error:", errorData);
+      logger.error("Merge error", errorData);
 
       // Check if it's a merge conflict
       if (mergeRes.status === 409) {
@@ -92,7 +95,7 @@ export async function POST() {
       commit: mergeData.commit,
     });
   } catch (error) {
-    console.error("Error merging branches:", error);
+    logger.error("Error merging branches", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

@@ -4,14 +4,14 @@
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/auth/server";
 import { getArticleBySlug } from "@/lib/github/articles";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("API /articles/[slug]");
 
 /* **************************************************
  * GET /api/articles/[slug]
  **************************************************/
-export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ slug: string }> },
-) {
+export async function GET(_request: Request, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const user = await getUser();
     if (!user) {
@@ -19,9 +19,8 @@ export async function GET(
     }
 
     const { slug } = await params;
-    
-    // Log per verificare se la richiesta viene fatta (non cache)
-    console.log("[API] GET /api/articles/[slug] - Richiesta REST effettuata", {
+
+    logger.debug("GET richiesta REST effettuata", {
       slug,
       timestamp: new Date().toISOString(),
       user: user.email,
@@ -36,14 +35,13 @@ export async function GET(
     const response = NextResponse.json(article);
     response.headers.set("X-Data-Source", "rest-api");
     response.headers.set("X-Timestamp", new Date().toISOString());
-    
+
     return response;
   } catch (error) {
-    console.error("Error fetching article:", error);
+    logger.error("Error fetching article", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Failed to fetch article" },
       { status: 500 },
     );
   }
 }
-

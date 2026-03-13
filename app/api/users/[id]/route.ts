@@ -4,6 +4,9 @@
 import { NextResponse } from "next/server";
 import { getAdminUser } from "@/lib/auth/server";
 import { getUserById } from "@/lib/github/users";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("API /users/[id]");
 
 /* **************************************************
  * GET /api/users/[id]
@@ -17,8 +20,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 
     const { id } = await params;
 
-    // Log per verificare se la richiesta viene fatta (non cache)
-    console.log("[API] GET /api/users/[id] - Richiesta REST effettuata", {
+    logger.debug("GET richiesta REST effettuata", {
       id,
       timestamp: new Date().toISOString(),
       user: user.email,
@@ -36,7 +38,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 
     return response;
   } catch (error) {
-    console.error("Error fetching user:", error);
+    logger.error("Error fetching user", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Failed to fetch user" },
       { status: 500 },

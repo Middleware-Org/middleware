@@ -4,6 +4,9 @@
 "use client";
 
 import { SWRConfig } from "swr";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("SWR");
 
 /* **************************************************
  * Types
@@ -18,27 +21,24 @@ interface SWRPageProviderProps {
  * Pre-popola la cache SWR con dati dal server
  **************************************************/
 export default function SWRPageProvider({ children, fallback }: SWRPageProviderProps) {
-  // Log in development per vedere cosa viene pre-popolato
-  if (process.env.NODE_ENV === "development") {
-    const fallbackKeys = Object.keys(fallback);
-    const fallbackSummary = fallbackKeys.reduce(
-      (acc, key) => {
-        const value = fallback[key];
-        acc[key] = {
-          type: Array.isArray(value) ? "array" : typeof value,
-          count: Array.isArray(value) ? value.length : value ? 1 : 0,
-        };
-        return acc;
-      },
-      {} as Record<string, { type: string; count: number }>,
-    );
+  const fallbackKeys = Object.keys(fallback);
+  const fallbackSummary = fallbackKeys.reduce(
+    (acc, key) => {
+      const value = fallback[key];
+      acc[key] = {
+        type: Array.isArray(value) ? "array" : typeof value,
+        count: Array.isArray(value) ? value.length : value ? 1 : 0,
+      };
+      return acc;
+    },
+    {} as Record<string, { type: string; count: number }>,
+  );
 
-    console.log("[SWR] Pre-popolazione cache con fallback:", {
-      keys: fallbackKeys,
-      summary: fallbackSummary,
-      timestamp: new Date().toISOString(),
-    });
-  }
+  logger.debug("Pre-popolazione cache con fallback", {
+    keys: fallbackKeys,
+    summary: fallbackSummary,
+    timestamp: new Date().toISOString(),
+  });
 
   return (
     <SWRConfig
@@ -52,13 +52,10 @@ export default function SWRPageProvider({ children, fallback }: SWRPageProviderP
         errorRetryInterval: 5000,
         keepPreviousData: true, // Mantieni i dati precedenti durante la navigazione
         onSuccess: (data, key) => {
-          // Log quando SWR usa i dati dal fallback (cache SSR)
-          if (process.env.NODE_ENV === "development") {
-            console.log("[SWR] Dati caricati da fallback (SSR cache):", key, {
-              timestamp: new Date().toISOString(),
-              itemsCount: Array.isArray(data) ? data.length : 1,
-            });
-          }
+          logger.debug(`Dati caricati da fallback (SSR cache): ${key}`, {
+            timestamp: new Date().toISOString(),
+            itemsCount: Array.isArray(data) ? data.length : 1,
+          });
         },
       }}
     >

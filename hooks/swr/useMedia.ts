@@ -3,8 +3,11 @@
  **************************************************/
 import useSWR from "swr";
 import type { MediaFile } from "@/lib/github/media";
+import { createLogger } from "@/lib/logger";
 import { createFetcher } from "./fetcher";
 import { swrConfig } from "./config";
+
+const logger = createLogger("SWR");
 
 /* **************************************************
  * Fetcher
@@ -21,13 +24,11 @@ export function useMedia() {
     {
       ...swrConfig,
       onSuccess: (data, key) => {
-        if (process.env.NODE_ENV === "development") {
-          console.log("[SWR] Dati caricati per:", key, {
-            timestamp: new Date().toISOString(),
-            itemsCount: Array.isArray(data) ? data.length : 1,
-            fromCache: !isValidating && data !== undefined,
-          });
-        }
+        logger.debug(`Dati caricati per: ${key}`, {
+          timestamp: new Date().toISOString(),
+          itemsCount: Array.isArray(data) ? data.length : 1,
+          fromCache: !isValidating && data !== undefined,
+        });
       },
     },
   );

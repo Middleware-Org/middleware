@@ -3,6 +3,9 @@
  **************************************************/
 import { NextRequest, NextResponse } from "next/server";
 import { getUser } from "@/lib/auth/server";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("API /github/image");
 
 const GITHUB_API_URL = "https://api.github.com";
 const owner = process.env.GITHUB_OWNER!;
@@ -96,7 +99,10 @@ export async function GET(request: NextRequest) {
     });
 
     if (!res.ok) {
-      console.error("GitHub API error", res.status, await res.text());
+      logger.error("GitHub API error", {
+        status: res.status,
+        body: await res.text(),
+      });
       return new NextResponse("Image not found", { status: 404 });
     }
 
@@ -139,7 +145,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Error proxying GitHub image:", error);
+    logger.error("Error proxying GitHub image", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

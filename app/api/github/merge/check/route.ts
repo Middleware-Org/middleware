@@ -3,6 +3,9 @@
  **************************************************/
 import { NextResponse } from "next/server";
 import { getUser } from "@/lib/auth/server";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("API /github/merge/check");
 
 const GITHUB_API_URL = "https://api.github.com";
 const owner = process.env.GITHUB_OWNER!;
@@ -79,7 +82,7 @@ export async function GET() {
       status: compareData.status, // "ahead", "behind", "identical", "diverged"
     });
   } catch (error) {
-    console.error("Error checking merge status:", error);
+    logger.error("Error checking merge status", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

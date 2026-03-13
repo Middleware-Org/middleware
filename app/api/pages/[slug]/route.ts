@@ -5,6 +5,9 @@ import { NextResponse } from "next/server";
 import { getPageBySlug } from "@/lib/github/pages";
 import { withAdminAuth } from "@/lib/api/withAdminAuth";
 import { apiError } from "@/lib/api/responses";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("API /pages/[slug]");
 
 /* **************************************************
  * GET /api/pages/[slug]
@@ -15,12 +18,10 @@ export const GET = withAdminAuth(
       const { slug } = await params;
       const page = await getPageBySlug(slug);
 
-      if (process.env.NODE_ENV === "development") {
-        console.log(`[API] GET /api/pages/${slug}`, {
-          found: !!page,
-          timestamp: new Date().toISOString(),
-        });
-      }
+      logger.debug(`GET ${slug}`, {
+        found: !!page,
+        timestamp: new Date().toISOString(),
+      });
 
       if (!page) {
         return apiError("Page not found", 404);
@@ -32,7 +33,7 @@ export const GET = withAdminAuth(
 
       return response;
     } catch (error) {
-      console.error(`[API] GET /api/pages/[slug] - Error:`, error);
+      logger.error("GET error", error);
       return apiError("Failed to fetch page");
     }
   },
