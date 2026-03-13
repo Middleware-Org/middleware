@@ -100,7 +100,11 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
     };
   }, [hasMore, filteredFiles.length, isOpen]);
 
-  const error = isError ? "Failed to load media files" : null;
+  useEffect(() => {
+    if (isError) {
+      toast.error("Impossibile caricare i file media");
+    }
+  }, [isError]);
 
   function handleSelect(imageUrl: string) {
     onSelect(imageUrl);
@@ -334,9 +338,7 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
               <div className={baseStyles.loadingText}>Caricamento immagini...</div>
             )}
 
-            {error && <div className={baseStyles.error}>{error}</div>}
-
-            {!loading && !error && filteredFiles.length === 0 && (
+            {!loading && !isError && filteredFiles.length === 0 && (
               <div className={styles.empty}>
                 <p>Nessuna immagine disponibile.</p>
                 <p className={baseStyles.emptyStateText}>
@@ -345,7 +347,7 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
               </div>
             )}
 
-            {!loading && !error && filteredFiles.length > 0 && (
+            {!loading && !isError && filteredFiles.length > 0 && (
               <>
                 <div className={styles.grid}>
                   {visibleFiles.map((file) => (

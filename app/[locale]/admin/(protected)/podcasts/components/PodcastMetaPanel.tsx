@@ -16,6 +16,7 @@ import SelectSearch from "../../articles/components/SelectSearch";
 import { mutate } from "swr";
 import { cn } from "@/lib/utils/classes";
 import { useIssues } from "@/hooks/swr";
+import { toast } from "@/hooks/use-toast";
 
 /* **************************************************
  * Types
@@ -60,7 +61,6 @@ export default function PodcastMetaPanel({
 }: PodcastMetaPanelProps) {
   const router = useRouter();
   const [isPending] = useTransition();
-  const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
   const [isAudioSelectorOpen, setIsAudioSelectorOpen] = useState(false);
   const [isAudioChunksSelectorOpen, setIsAudioChunksSelectorOpen] = useState(false);
   const [isDeleting, startDeleteTransition] = useTransition();
@@ -93,18 +93,15 @@ export default function PodcastMetaPanel({
   async function handleDeleteConfirm() {
     if (!podcast) return;
 
-    setError(null);
     setIsDeleteDialogOpen(false);
 
     startDeleteTransition(async () => {
       const result = await deletePodcastAction(podcast.slug);
 
       if (!result.success) {
-        setError({
-          message: result.error,
-          type: result.errorType || "error",
-        });
+        toast.actionResult(result, { errorTitle: "Impossibile eliminare podcast" });
       } else {
+        toast.success(result.message || "Podcast eliminato con successo");
         mutate("/api/podcasts");
         mutate(`/api/podcasts/${podcast.slug}`);
         router.push("/admin/podcasts");
@@ -329,12 +326,6 @@ export default function PodcastMetaPanel({
             </div>
           )}
         </div>
-
-        {editing && podcast && error && (
-          <div className={`mt-4 ${error.type === "warning" ? styles.errorWarning : styles.error}`}>
-            ⚠️ {error.message}
-          </div>
-        )}
       </div>
 
       {/* Delete Confirmation Dialog */}
@@ -354,4 +345,3 @@ export default function PodcastMetaPanel({
     </div>
   );
 }
-

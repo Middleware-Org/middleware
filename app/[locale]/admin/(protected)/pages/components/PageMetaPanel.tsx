@@ -10,9 +10,9 @@ import { cn } from "@/lib/utils/classes";
 import { deletePageAction } from "../actions";
 import ConfirmDialog from "@/components/molecules/confirmDialog";
 import styles from "../styles";
-import baseStyles from "../../styles";
 import type { Page } from "@/lib/github/types";
 import { mutate } from "swr";
+import { toast } from "@/hooks/use-toast";
 
 /* **************************************************
  * Types
@@ -54,8 +54,7 @@ export default function PageMetaPanel({
   formRef,
 }: PageMetaPanelProps) {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
+  const [isPending] = useTransition();
   const [isDeleting, startDeleteTransition] = useTransition();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   // Use null to indicate "not modified by user", otherwise use the user's custom value
@@ -93,18 +92,15 @@ export default function PageMetaPanel({
   async function handleDeleteConfirm() {
     if (!page) return;
 
-    setError(null);
     setIsDeleteDialogOpen(false);
 
     startDeleteTransition(async () => {
       const result = await deletePageAction(page.slug);
 
       if (!result.success) {
-        setError({
-          message: result.error,
-          type: result.errorType || "error",
-        });
+        toast.actionResult(result, { errorTitle: "Impossibile eliminare pagina" });
       } else {
+        toast.success(result.message || "Pagina eliminata con successo");
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/pages");
         mutate(`/api/pages/${page.slug}`);
@@ -217,14 +213,6 @@ export default function PageMetaPanel({
             </div>
           )}
         </div>
-
-        {editing && page && error && (
-          <div
-            className={`mt-4 ${error.type === "warning" ? baseStyles.errorWarning : baseStyles.error}`}
-          >
-            ⚠️ {error.message}
-          </div>
-        )}
       </div>
 
       {/* Delete Confirmation Dialog */}

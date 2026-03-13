@@ -18,6 +18,7 @@ import SelectSearch from "./SelectSearch";
 import { mutate } from "swr";
 import { cn } from "@/lib/utils/classes";
 import { usePodcasts } from "@/hooks/swr";
+import { toast } from "@/hooks/use-toast";
 
 /* **************************************************
  * Types
@@ -73,7 +74,6 @@ export default function ArticleMetaPanel({
 }: ArticleMetaPanelProps) {
   const router = useRouter();
   const [isPending] = useTransition();
-  const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
   const [isDeleting, startDeleteTransition] = useTransition();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   // Use null to indicate "not modified by user", otherwise use the user's custom value
@@ -111,18 +111,15 @@ export default function ArticleMetaPanel({
   async function handleDeleteConfirm() {
     if (!article) return;
 
-    setError(null);
     setIsDeleteDialogOpen(false);
 
     startDeleteTransition(async () => {
       const result = await deleteArticleAction(article.slug);
 
       if (!result.success) {
-        setError({
-          message: result.error,
-          type: result.errorType || "error",
-        });
+        toast.actionResult(result, { errorTitle: "Impossibile eliminare articolo" });
       } else {
+        toast.success(result.message || "Articolo eliminato con successo");
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/articles");
         mutate(`/api/articles/${article.slug}`);
@@ -322,12 +319,6 @@ export default function ArticleMetaPanel({
             </div>
           )}
         </div>
-
-        {editing && article && error && (
-          <div className={`mt-4 ${error.type === "warning" ? styles.errorWarning : styles.error}`}>
-            ⚠️ {error.message}
-          </div>
-        )}
       </div>
 
       {/* Delete Confirmation Dialog */}

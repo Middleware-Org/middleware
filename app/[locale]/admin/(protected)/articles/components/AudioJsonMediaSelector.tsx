@@ -104,7 +104,11 @@ export default function AudioJsonMediaSelector({
     };
   }, [hasMore, filteredMediaFiles.length, isOpen]);
 
-  const error = isError ? "Failed to load media files" : null;
+  useEffect(() => {
+    if (isError) {
+      toast.error("Impossibile caricare i file media");
+    }
+  }, [isError]);
 
   function handleSelect(fileUrl: string) {
     onSelect(fileUrl);
@@ -387,9 +391,7 @@ export default function AudioJsonMediaSelector({
               <div className={baseStyles.loadingText}>Caricamento file {fileTypeLabel}...</div>
             )}
 
-            {error && <div className={baseStyles.error}>{error}</div>}
-
-            {!loading && !error && filteredMediaFiles.length === 0 && (
+            {!loading && !isError && filteredMediaFiles.length === 0 && (
               <div className={styles.empty}>
                 {searchQuery ? (
                   <>
@@ -409,7 +411,7 @@ export default function AudioJsonMediaSelector({
               </div>
             )}
 
-            {!loading && !error && filteredMediaFiles.length > 0 && (
+            {!loading && !isError && filteredMediaFiles.length > 0 && (
               <>
                 <div className={styles.grid}>
                   {visibleFiles.map((file) => (

@@ -4,11 +4,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { deleteCategoryAction } from "../actions";
 import styles from "../styles";
 import { useCategory } from "@/hooks/swr";
 import { mutate } from "swr";
+import { toast } from "@/hooks/use-toast";
 
 /* **************************************************
  * Types
@@ -23,7 +24,6 @@ interface CategoryDeleteButtonProps {
 export default function CategoryDeleteButton({ categorySlug }: CategoryDeleteButtonProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
 
   // Usa SWR per ottenere la categoria (cache pre-popolata dal server)
   const { category } = useCategory(categorySlug);
@@ -35,17 +35,13 @@ export default function CategoryDeleteButton({ categorySlug }: CategoryDeleteBut
       return;
     }
 
-    setError(null);
-
     startTransition(async () => {
       const result = await deleteCategoryAction(categorySlug);
 
       if (!result.success) {
-        setError({
-          message: result.error,
-          type: result.errorType || "error",
-        });
+        toast.actionResult(result, { errorTitle: "Impossibile eliminare categoria" });
       } else {
+        toast.success(result.message || "Categoria eliminata con successo");
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/categories");
         mutate(`/api/categories/${categorySlug}`);
@@ -57,11 +53,6 @@ export default function CategoryDeleteButton({ categorySlug }: CategoryDeleteBut
   return (
     <div className="border-t pt-6">
       <h3 className="text-lg font-semibold mb-4 text-red-700">Zona Pericolosa</h3>
-      {error && (
-        <div className={`mb-4 ${error.type === "warning" ? styles.errorWarning : styles.error}`}>
-          ⚠️ {error.message}
-        </div>
-      )}
       <button onClick={handleDelete} className={styles.deleteButton} disabled={isPending}>
         {isPending ? "Eliminazione..." : "Elimina Categoria"}
       </button>
