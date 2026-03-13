@@ -68,7 +68,12 @@ export default async function RootPage({ params }: RootPageProps) {
               <Cover issue={issue} articleInEvidence={articleInEvidence} dict={dict} />
             </div>
             <div className={styles.issueArticlesContainer}>
-              <Articles articles={otherArticles} dict={dict} issue={issue} />
+              <Articles
+                articles={otherArticles}
+                dict={dict}
+                issue={issue}
+                disableShowArticles={true}
+              />
             </div>
           </div>
         );
