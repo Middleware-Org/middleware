@@ -4,6 +4,7 @@
 import { NextResponse } from "next/server";
 import { getAdminUser } from "@/lib/auth/server";
 import { createLogger } from "@/lib/logger";
+import { checkRateLimit, createRateLimitResponse, getClientIp } from "@/lib/security/rateLimit";
 
 const logger = createLogger("API /github/token-expiration");
 
@@ -17,8 +18,18 @@ const token = process.env.GITHUB_TOKEN!;
  * by making a request to the GitHub API and reading
  * the github-authentication-token-expiration header.
  **************************************************/
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const ip = getClientIp(request);
+    const rateLimit = checkRateLimit(`github:token-expiration:${ip}`, {
+      windowMs: 60_000,
+      maxRequests: 20,
+    });
+
+    if (!rateLimit.allowed) {
+      return createRateLimitResponse(rateLimit);
+    }
+
     const user = await getAdminUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

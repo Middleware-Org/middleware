@@ -4,6 +4,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUser } from "@/lib/auth/server";
 import { uploadMediaFile } from "@/lib/github/media";
+import { checkRateLimit, createRateLimitResponse, getClientIp } from "@/lib/security/rateLimit";
+
+const MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024;
+const ALLOWED_MIME_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+  "audio/mpeg",
+  "audio/wav",
+  "audio/mp3",
+  "application/json",
+]);
 
 /* **************************************************
  * Media Upload API Route
@@ -16,6 +29,16 @@ import { uploadMediaFile } from "@/lib/github/media";
  **************************************************/
 export async function POST(request: NextRequest) {
   try {
+    const ip = getClientIp(request);
+    const rateLimit = checkRateLimit(`media:upload:${ip}`, {
+      windowMs: 60_000,
+      maxRequests: 10,
+    });
+
+    if (!rateLimit.allowed) {
+      return createRateLimitResponse(rateLimit);
+    }
+
     const user = await getUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -33,6 +56,14 @@ export async function POST(request: NextRequest) {
     // Handle both File objects and base64 strings
     let fileBase64: string;
     if (fileInput instanceof File) {
+      if (fileInput.size > MAX_FILE_SIZE_BYTES) {
+        return NextResponse.json({ error: "File too large" }, { status: 413 });
+      }
+
+      if (!ALLOWED_MIME_TYPES.has(fileInput.type)) {
+        return NextResponse.json({ error: "Unsupported file type" }, { status: 400 });
+      }
+
       // Convert File to base64
       const arrayBuffer = await fileInput.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
@@ -50,11 +81,11 @@ export async function POST(request: NextRequest) {
       data: filePath,
       message: "File uploaded successfully",
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : "Failed to upload file",
+        error: "Failed to upload file",
       },
       { status: 500 },
     );

@@ -4,6 +4,7 @@
 import { NextResponse } from "next/server";
 import { getAdminUser } from "@/lib/auth/server";
 import { createLogger } from "@/lib/logger";
+import { checkRateLimit, createRateLimitResponse, getClientIp } from "@/lib/security/rateLimit";
 
 const logger = createLogger("API /github/merge/check");
 
@@ -17,8 +18,18 @@ const token = process.env.GITHUB_TOKEN!;
 /* **************************************************
  * Check if there are commits to merge from develop to main
  **************************************************/
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const ip = getClientIp(request);
+    const rateLimit = checkRateLimit(`github:merge-check:${ip}`, {
+      windowMs: 60_000,
+      maxRequests: 30,
+    });
+
+    if (!rateLimit.allowed) {
+      return createRateLimitResponse(rateLimit);
+    }
+
     const user = await getAdminUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

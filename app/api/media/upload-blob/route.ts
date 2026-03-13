@@ -5,8 +5,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { handleUpload } from "@vercel/blob/client";
 import { getUser } from "@/lib/auth/server";
 import { createLogger } from "@/lib/logger";
+import { checkRateLimit, createRateLimitResponse, getClientIp } from "@/lib/security/rateLimit";
 
 const logger = createLogger("API /media/upload-blob");
+const ALLOWED_PATHNAME_REGEX = /^media\/[a-zA-Z0-9._-]{1,120}$/;
 
 /* **************************************************
  * Direct Blob Upload API Route
@@ -18,6 +20,16 @@ const logger = createLogger("API /media/upload-blob");
  **************************************************/
 export async function POST(request: NextRequest) {
   try {
+    const ip = getClientIp(request);
+    const rateLimit = checkRateLimit(`media:upload-blob:${ip}`, {
+      windowMs: 60_000,
+      maxRequests: 20,
+    });
+
+    if (!rateLimit.allowed) {
+      return createRateLimitResponse(rateLimit);
+    }
+
     // Check authentication
     const user = await getUser();
     if (!user) {
@@ -31,6 +43,10 @@ export async function POST(request: NextRequest) {
       body,
       request,
       onBeforeGenerateToken: async (pathname) => {
+        if (!ALLOWED_PATHNAME_REGEX.test(pathname)) {
+          throw new Error("Invalid upload path");
+        }
+
         // Extract filename from pathname (should be "media/filename.ext")
         const filename = pathname.replace("media/", "");
 
@@ -61,7 +77,7 @@ export async function POST(request: NextRequest) {
     logger.error("Error generating upload URL", error);
     return NextResponse.json(
       {
-        error: error instanceof Error ? error.message : "Failed to generate upload URL",
+        error: "Failed to generate upload URL",
       },
       { status: 500 },
     );

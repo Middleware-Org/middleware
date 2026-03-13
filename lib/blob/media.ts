@@ -21,6 +21,23 @@ export type MediaFile = {
  **************************************************/
 const BLOB_PREFIX = "media"; // Prefix for all media files in blob storage
 
+function sanitizeFilename(filename: string): string {
+  const normalized = filename
+    .trim()
+    .replace(/[\\/]/g, "-")
+    .replace(/\s+/g, "-")
+    .replace(/[^a-zA-Z0-9._-]/g, "")
+    .replace(/\.{2,}/g, ".")
+    .replace(/^-+/, "")
+    .slice(0, 120);
+
+  if (!normalized) {
+    throw new Error("Invalid filename");
+  }
+
+  return normalized;
+}
+
 /* **************************************************
  * Helper Functions
  **************************************************/
@@ -49,6 +66,8 @@ function generateFilename(
     };
     return `file-${timestamp}-${random}.${extensions[fileType]}`;
   }
+
+  filename = sanitizeFilename(filename);
 
   // Ensure filename has correct extension based on file type
   const extensions = {
