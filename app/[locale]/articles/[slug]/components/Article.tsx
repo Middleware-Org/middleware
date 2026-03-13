@@ -13,7 +13,7 @@ import Link from "next/link";
 import { getMinText } from "@/lib/utils/text";
 import { Book, Play } from "lucide-react";
 import CitationsSection from "./CitationsSection";
-import BookmarkManager from "./BookmarkManager";
+import BookmarkManagerLazy from "./BookmarkManagerLazy";
 import { marked } from "marked";
 import { sanitizeInlineHtml, sanitizeRichHtml } from "@/lib/security/sanitizeHtml";
 import { withLocale } from "@/lib/i18n/path";
@@ -187,7 +187,7 @@ export default function Article({ article, dict, locale }: ArticleProps) {
               className="prose prose-lg max-w-none"
               dangerouslySetInnerHTML={{ __html: processedHtml }}
             ></div>
-            <BookmarkManager articleSlug={article.slug} contentContainerSelector=".prose" />
+            <BookmarkManagerLazy articleSlug={article.slug} contentContainerSelector=".prose" />
           </div>
           <div className="lg:w-1/4 md:w-1/3 w-full lg:flex md:flex hidden">
             <Separator className="lg:flex md:hidden hidden" />
