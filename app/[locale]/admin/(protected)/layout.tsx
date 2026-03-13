@@ -2,7 +2,7 @@
  * Imports
  **************************************************/
 import { redirect } from "next/navigation";
-import { getSession } from "@/lib/auth/server";
+import { getUser } from "@/lib/auth/server";
 import { getDictionary } from "@/lib/i18n/utils";
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import type { ReactNode } from "react";
@@ -25,9 +25,9 @@ export default async function AdminProtectedLayout({
   children,
   params,
 }: AdminProtectedLayoutProps) {
-  const session = await getSession();
+  const user = await getUser();
 
-  if (!session) {
+  if (!user) {
     redirect("/admin/login");
   }
 

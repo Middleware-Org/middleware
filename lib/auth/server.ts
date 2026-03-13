@@ -43,7 +43,25 @@ export async function getSession() {
   });
 }
 
-export async function getUser() {
+export async function getAuthenticatedUser() {
   const session = await getSession();
-  return session?.user;
+  return session?.user ?? null;
+}
+
+export async function getUser() {
+  const user = await getAuthenticatedUser();
+  if (!user) {
+    return null;
+  }
+
+  const dbUser = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { role: true },
+  });
+
+  if (!dbUser || dbUser.role !== "ADMIN") {
+    return null;
+  }
+
+  return user;
 }

@@ -9,11 +9,17 @@ datasource db {
   url      = env("MIDDLEWARE_PRISMA_DATABASE_URL")
 }
 
+enum UserRole {
+  ADMIN
+  EDITOR
+}
+
 model User {
   id            String    @id @default(uuid())
   createdAt     DateTime  @default(now())
   email         String    @unique
   name          String?
+  role          UserRole  @default(ADMIN)
   emailVerified Boolean   @default(false)
   image         String?
   updatedAt     DateTime  @default(now()) @updatedAt
