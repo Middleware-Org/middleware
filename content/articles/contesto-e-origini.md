@@ -2,9 +2,9 @@
 slug: contesto-e-origini
 title: Contesto e Origini
 date: '2026-02-23'
-last_update: '2026-03-10T11:10:25.771Z'
+last_update: '2026-03-13T09:04:07.021Z'
 author: middleware
-category: operaismo
+category: contro-formazione
 issue: operaismo-politico-italiano
 in_evidence: true
 published: true
