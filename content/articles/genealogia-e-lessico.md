@@ -2,9 +2,9 @@
 slug: genealogia-e-lessico
 title: Genealogia e lessico
 date: '2026-03-13'
-last_update: '2026-03-13'
+last_update: '2026-03-13T09:03:57.568Z'
 author: middleware
-category: operaismo
+category: contro-formazione
 issue: operaismo-politico-italiano
 in_evidence: false
 published: true
