@@ -3,7 +3,7 @@
  **************************************************/
 import { NextResponse } from "next/server";
 import { getPageBySlug } from "@/lib/github/pages";
-import { withAdminAuth } from "@/lib/api/withAdminAuth";
+import { withAuth } from "@/lib/api/withAuth";
 import { apiError } from "@/lib/api/responses";
 import { createLogger } from "@/lib/logger";
 
@@ -12,7 +12,7 @@ const logger = createLogger("API /pages/[slug]");
 /* **************************************************
  * GET /api/pages/[slug]
  **************************************************/
-export const GET = withAdminAuth(
+export const GET = withAuth(
   async (_user, _request: Request, { params }: { params: Promise<{ slug: string }> }) => {
     try {
       const { slug } = await params;

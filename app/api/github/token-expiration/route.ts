@@ -2,7 +2,7 @@
  * Imports
  **************************************************/
 import { NextResponse } from "next/server";
-import { getUser } from "@/lib/auth/server";
+import { getAdminUser } from "@/lib/auth/server";
 import { createLogger } from "@/lib/logger";
 
 const logger = createLogger("API /github/token-expiration");
@@ -19,7 +19,7 @@ const token = process.env.GITHUB_TOKEN!;
  **************************************************/
 export async function GET() {
   try {
-    const user = await getUser();
+    const user = await getAdminUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

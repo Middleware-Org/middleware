@@ -3,7 +3,7 @@
  **************************************************/
 import { NextResponse } from "next/server";
 import { getAllPages } from "@/lib/github/pages";
-import { withAdminAuth } from "@/lib/api/withAdminAuth";
+import { withAuth } from "@/lib/api/withAuth";
 import { apiError } from "@/lib/api/responses";
 import { createLogger } from "@/lib/logger";
 
@@ -12,7 +12,7 @@ const logger = createLogger("API /pages");
 /* **************************************************
  * GET /api/pages
  **************************************************/
-export const GET = withAdminAuth(async (user) => {
+export const GET = withAuth(async (user) => {
   try {
     const pages = await getAllPages();
 
