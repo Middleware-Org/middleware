@@ -6,14 +6,13 @@
 import { getUser } from "@/lib/auth/server";
 import { createCategory, updateCategory, deleteCategory } from "@/lib/github/categories";
 import type { Category } from "@/lib/github/types";
+import type { ActionResult } from "@/lib/actions/types";
 import { revalidateAdminPath } from "@/lib/cache/revalidate";
 
 /* **************************************************
  * Types
  **************************************************/
-export type ActionResult<T = void> =
-  | { success: true; data?: T; message?: string }
-  | { success: false; error: string; errorType?: "error" | "warning" };
+export type { ActionResult };
 
 /* **************************************************
  * Server Actions

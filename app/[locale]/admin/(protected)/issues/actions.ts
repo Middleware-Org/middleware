@@ -7,14 +7,13 @@ import { getUser } from "@/lib/auth/server";
 import { createIssue, updateIssue, deleteIssue } from "@/lib/github/issues";
 import { uploadImage } from "@/lib/github/client";
 import type { Issue } from "@/lib/github/types";
+import type { ActionResult } from "@/lib/actions/types";
 import { revalidateAdminPath } from "@/lib/cache/revalidate";
 
 /* **************************************************
  * Types
  **************************************************/
-export type ActionResult<T = void> =
-  | { success: true; data?: T; message?: string }
-  | { success: false; error: string; errorType?: "error" | "warning" };
+export type { ActionResult };
 
 /* **************************************************
  * Server Actions

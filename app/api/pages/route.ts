@@ -4,6 +4,7 @@
 import { NextResponse } from "next/server";
 import { getAllPages } from "@/lib/github/pages";
 import { withAdminAuth } from "@/lib/api/withAdminAuth";
+import { apiError } from "@/lib/api/responses";
 
 /* **************************************************
  * GET /api/pages
@@ -26,6 +27,6 @@ export const GET = withAdminAuth(async (user) => {
     return response;
   } catch (error) {
     console.error("[API] GET /api/pages - Error:", error);
-    return NextResponse.json({ error: "Failed to fetch pages" }, { status: 500 });
+    return apiError("Failed to fetch pages");
   }
 });

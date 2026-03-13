@@ -6,6 +6,7 @@
 import { getAdminUser } from "@/lib/auth/server";
 import { createUser, updateUser, deleteUser } from "@/lib/github/users";
 import type { User } from "@/lib/github/users";
+import type { ActionResult } from "@/lib/actions/types";
 import { revalidateAdminPath } from "@/lib/cache/revalidate";
 
 function parseRole(value: FormDataEntryValue | null): "ADMIN" | "EDITOR" {
@@ -15,9 +16,7 @@ function parseRole(value: FormDataEntryValue | null): "ADMIN" | "EDITOR" {
 /* **************************************************
  * Types
  **************************************************/
-export type ActionResult<T = void> =
-  | { success: true; data?: T; message?: string }
-  | { success: false; error: string; errorType?: "error" | "warning" };
+export type { ActionResult };
 
 /* **************************************************
  * Server Actions

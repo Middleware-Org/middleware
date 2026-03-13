@@ -11,14 +11,13 @@ import {
   getAllMediaFiles,
   type MediaFile,
 } from "@/lib/github/media";
+import type { ActionResult } from "@/lib/actions/types";
 import { revalidateAdminPath } from "@/lib/cache/revalidate";
 
 /* **************************************************
  * Types
  **************************************************/
-export type ActionResult<T = void> =
-  | { success: true; data?: T; message?: string }
-  | { success: false; error: string; errorType?: "error" | "warning" };
+export type { ActionResult };
 
 /* **************************************************
  * Server Actions

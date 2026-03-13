@@ -4,6 +4,7 @@
 import { NextResponse } from "next/server";
 import { getPageBySlug } from "@/lib/github/pages";
 import { withAdminAuth } from "@/lib/api/withAdminAuth";
+import { apiError } from "@/lib/api/responses";
 
 /* **************************************************
  * GET /api/pages/[slug]
@@ -22,7 +23,7 @@ export const GET = withAdminAuth(
       }
 
       if (!page) {
-        return NextResponse.json({ error: "Page not found" }, { status: 404 });
+        return apiError("Page not found", 404);
       }
 
       const response = NextResponse.json(page);
@@ -32,7 +33,7 @@ export const GET = withAdminAuth(
       return response;
     } catch (error) {
       console.error(`[API] GET /api/pages/[slug] - Error:`, error);
-      return NextResponse.json({ error: "Failed to fetch page" }, { status: 500 });
+      return apiError("Failed to fetch page");
     }
   },
 );
