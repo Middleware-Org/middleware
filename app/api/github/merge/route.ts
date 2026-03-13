@@ -1,7 +1,8 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { getUser } from "@/lib/auth/server";
 
 const GITHUB_API_URL = "https://api.github.com";
 const owner = process.env.GITHUB_OWNER!;
@@ -13,8 +14,17 @@ const token = process.env.GITHUB_TOKEN!;
 /* **************************************************
  * Merge develop into main
  **************************************************/
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
+    const user = await getUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!owner || !repo || !token) {
+      return NextResponse.json({ error: "GitHub configuration missing" }, { status: 500 });
+    }
+
     // First check if there are changes to merge
     const checkUrl = `${GITHUB_API_URL}/repos/${owner}/${repo}/compare/${mainBranch}...${devBranch}`;
     const checkRes = await fetch(checkUrl, {

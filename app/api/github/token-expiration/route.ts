@@ -2,6 +2,7 @@
  * Imports
  **************************************************/
 import { NextResponse } from "next/server";
+import { getUser } from "@/lib/auth/server";
 
 const GITHUB_API_URL = "https://api.github.com";
 const token = process.env.GITHUB_TOKEN!;
@@ -15,6 +16,11 @@ const token = process.env.GITHUB_TOKEN!;
  **************************************************/
 export async function GET() {
   try {
+    const user = await getUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     if (!token) {
       return NextResponse.json({ error: "GitHub token not configured" }, { status: 500 });
     }
