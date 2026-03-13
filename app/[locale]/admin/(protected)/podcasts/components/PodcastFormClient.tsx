@@ -15,6 +15,7 @@ import type { Podcast } from "@/lib/github/types";
 import { usePodcast } from "@/hooks/swr";
 import { mutate } from "swr";
 import { toast } from "@/hooks/use-toast";
+import { useLocalizedPath } from "@/lib/i18n/client";
 
 /* **************************************************
  * Types
@@ -28,6 +29,7 @@ interface PodcastFormClientProps {
  **************************************************/
 export default function PodcastFormClient({ podcastSlug }: PodcastFormClientProps) {
   const router = useRouter();
+  const toLocale = useLocalizedPath();
   const editing = !!podcastSlug;
 
   // Usa SWR per ottenere i dati (cache pre-popolata dal server)
@@ -84,8 +86,8 @@ export default function PodcastFormClient({ podcastSlug }: PodcastFormClientProp
       mutate(`/api/podcasts/${podcastSlug}`);
     }
     mutate("/api/github/merge/check");
-    router.push("/admin/podcasts");
-  }, [state, router, editing, podcastSlug]);
+    router.push(toLocale("/admin/podcasts"));
+  }, [state, router, editing, podcastSlug, toLocale]);
 
   function handleFormDataChange(field: string, value: string | boolean) {
     setFormData((prev) => ({ ...prev, [field]: value }));

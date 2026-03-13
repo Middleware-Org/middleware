@@ -10,24 +10,24 @@ import AuthorFormClient from "../../components/AuthorFormClient";
 import AuthorEditSkeleton from "../../components/AuthorEditSkeleton";
 import styles from "../../styles";
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
+import { withLocale } from "@/lib/i18n/path";
 
 /* **************************************************
  * Types
  **************************************************/
 interface EditAuthorPageProps {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }
 
 /* **************************************************
  * Edit Author Page (Server Component)
  **************************************************/
 export default async function EditAuthorPage({ params }: EditAuthorPageProps) {
+  const { locale, slug } = await params;
   const user = await getUser();
   if (!user) {
-    redirect("/admin/login");
+    redirect(withLocale("/admin/login", locale));
   }
-
-  const { slug } = await params;
   const author = await getAuthorBySlug(slug);
 
   if (!author) {
@@ -44,7 +44,7 @@ export default async function EditAuthorPage({ params }: EditAuthorPageProps) {
       <main className={styles.main}>
         <div className={styles.header}>
           <h1 className={styles.title}>Modifica Autore: {author.name}</h1>
-          <Link href="/admin/authors" className={styles.backButton}>
+          <Link href={withLocale("/admin/authors", locale)} className={styles.backButton}>
             ← Indietro
           </Link>
         </div>

@@ -13,14 +13,16 @@ import ArticleFormClient from "../components/ArticleFormClient";
 import ArticleFormSkeleton from "../components/ArticleFormSkeleton";
 import styles from "../styles";
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
+import { withLocale } from "@/lib/i18n/path";
 
 /* **************************************************
  * New Article Page (Server Component)
  **************************************************/
-export default async function NewArticlePage() {
+export default async function NewArticlePage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const user = await getUser();
   if (!user) {
-    redirect("/admin/login");
+    redirect(withLocale("/admin/login", locale));
   }
 
   const [categories, authors, issues] = await Promise.all([
@@ -41,7 +43,7 @@ export default async function NewArticlePage() {
       <div className={cn("h-full flex flex-col", styles.main)}>
         <div className={styles.header}>
           <h1 className={styles.title}>Nuovo Articolo</h1>
-          <Link href="/admin/articles" className={styles.backButton}>
+          <Link href={withLocale("/admin/articles", locale)} className={styles.backButton}>
             ← Indietro
           </Link>
         </div>

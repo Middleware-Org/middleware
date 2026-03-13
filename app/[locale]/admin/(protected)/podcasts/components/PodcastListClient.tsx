@@ -31,6 +31,7 @@ import { usePodcasts } from "@/hooks/swr";
 import { mutate } from "swr";
 import { ItemsPerPageSelector } from "@/components/table/ItemsPerPageSelector";
 import { toast } from "@/hooks/use-toast";
+import { useLocalizedPath } from "@/lib/i18n/client";
 
 /* **************************************************
  * Column Configuration
@@ -49,6 +50,7 @@ const columnConfig: ColumnConfig[] = [
  **************************************************/
 export default function PodcastListClient() {
   const router = useRouter();
+  const toLocale = useLocalizedPath();
   const [isPending, startTransition] = useTransition();
   const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; podcast: Podcast | null }>({
     isOpen: false,
@@ -112,7 +114,7 @@ export default function PodcastListClient() {
   }, [visibleColumns]);
 
   function handleEdit(podcast: Podcast) {
-    router.push(`/admin/podcasts/${podcast.slug}/edit`);
+    router.push(toLocale(`/admin/podcasts/${podcast.slug}/edit`));
   }
 
   function handleDeleteClick(podcast: Podcast) {

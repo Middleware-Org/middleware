@@ -10,6 +10,7 @@ import styles from "../styles";
 import { useAuthor } from "@/hooks/swr";
 import { mutate } from "swr";
 import { toast } from "@/hooks/use-toast";
+import { useLocalizedPath } from "@/lib/i18n/client";
 
 /* **************************************************
  * Types
@@ -23,6 +24,7 @@ interface AuthorDeleteButtonProps {
  **************************************************/
 export default function AuthorDeleteButton({ authorSlug }: AuthorDeleteButtonProps) {
   const router = useRouter();
+  const toLocale = useLocalizedPath();
   const [isPending, startTransition] = useTransition();
 
   // Usa SWR per ottenere l'autore (cache pre-popolata dal server)
@@ -45,7 +47,7 @@ export default function AuthorDeleteButton({ authorSlug }: AuthorDeleteButtonPro
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/authors");
         mutate(`/api/authors/${authorSlug}`);
-        router.push("/admin/authors");
+        router.push(toLocale("/admin/authors"));
       }
     });
   }

@@ -29,7 +29,7 @@ export async function generateStaticParams() {
     locales.map((locale) => ({
       locale,
       slug: issue.slug,
-    }))
+    })),
   );
 }
 
@@ -76,7 +76,7 @@ export default async function IssuePage({ params }: IssuePageProps) {
         <div className={styles.issueCoverContainer}>
           <div key={issue.slug} id={`issue-${issue.slug}`} className={styles.issueCoverContainer}>
             <div className={styles.link}>
-              <IssueCover issue={issue} />
+              <IssueCover issue={issue} locale={locale} />
             </div>
           </div>
         </div>

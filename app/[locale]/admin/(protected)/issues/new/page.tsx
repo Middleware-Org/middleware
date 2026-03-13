@@ -9,14 +9,16 @@ import IssueFormClient from "../components/IssueFormClient";
 import IssueFormSkeleton from "../components/IssueFormSkeleton";
 import styles from "../styles";
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
+import { withLocale } from "@/lib/i18n/path";
 
 /* **************************************************
  * New Issue Page (Server Component)
  **************************************************/
-export default async function NewIssuePage() {
+export default async function NewIssuePage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const user = await getUser();
   if (!user) {
-    redirect("/admin/login");
+    redirect(withLocale("/admin/login", locale));
   }
 
   return (
@@ -24,7 +26,7 @@ export default async function NewIssuePage() {
       <main className={styles.main}>
         <div className={styles.header}>
           <h1 className={styles.title}>Nuova Issue</h1>
-          <Link href="/admin/issues" className={styles.backButton}>
+          <Link href={withLocale("/admin/issues", locale)} className={styles.backButton}>
             ← Indietro
           </Link>
         </div>

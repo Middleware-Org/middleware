@@ -8,15 +8,17 @@ import { getAllMediaFiles } from "@/lib/github/media";
 import MediaListClient from "./components/MediaListClient";
 import MediaUploadClient from "./components/MediaUploadClient";
 import styles from "./styles";
+import { withLocale } from "@/lib/i18n/path";
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
 
 /* **************************************************
  * Media Page (Server Component)
  **************************************************/
-export default async function MediaPage() {
+export default async function MediaPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const user = await getUser();
   if (!user) {
-    redirect("/admin/login");
+    redirect(withLocale("/admin/login", locale));
   }
 
   const mediaFiles = await getAllMediaFiles();
@@ -31,7 +33,7 @@ export default async function MediaPage() {
       <main className={styles.main}>
         <div className={styles.header}>
           <h1 className={styles.title}>Gestione Media</h1>
-          <Link href="/admin" className={styles.backButton}>
+          <Link href={withLocale("/admin", locale)} className={styles.backButton}>
             ← Indietro
           </Link>
         </div>
@@ -46,4 +48,3 @@ export default async function MediaPage() {
     </SWRPageProvider>
   );
 }
-

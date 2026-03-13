@@ -20,6 +20,7 @@ import type { Author } from "@/lib/github/types";
 import { useAuthor } from "@/hooks/swr";
 import { mutate } from "swr";
 import { toast } from "@/hooks/use-toast";
+import { useLocalizedPath } from "@/lib/i18n/client";
 
 /* **************************************************
  * Types
@@ -61,6 +62,7 @@ function SubmitButton({ editing }: { editing: boolean }) {
  **************************************************/
 export default function AuthorFormClient({ authorSlug }: AuthorFormClientProps) {
   const router = useRouter();
+  const toLocale = useLocalizedPath();
   const editing = !!authorSlug;
 
   // Usa SWR per ottenere l'autore (cache pre-popolata dal server)
@@ -95,8 +97,8 @@ export default function AuthorFormClient({ authorSlug }: AuthorFormClientProps) 
       mutate(`/api/authors/${authorSlug}`);
     }
     mutate("/api/github/merge/check");
-    router.push("/admin/authors");
-  }, [state, router, editing, authorSlug]);
+    router.push(toLocale("/admin/authors"));
+  }, [state, router, editing, authorSlug, toLocale]);
 
   // Handler per generare lo slug dal nome
   function handleGenerateSlug() {
@@ -133,7 +135,7 @@ export default function AuthorFormClient({ authorSlug }: AuthorFormClientProps) 
         mutate("/api/authors");
         mutate(`/api/authors/${authorSlug}`);
         mutate("/api/github/merge/check");
-        router.push("/admin/authors");
+        router.push(toLocale("/admin/authors"));
       }
     });
   }
@@ -206,7 +208,7 @@ export default function AuthorFormClient({ authorSlug }: AuthorFormClientProps) 
             <>
               <button
                 type="button"
-                onClick={() => router.push("/admin/authors")}
+                onClick={() => router.push(toLocale("/admin/authors"))}
                 className={styles.cancelButton}
               >
                 Annulla

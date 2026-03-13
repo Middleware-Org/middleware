@@ -17,6 +17,7 @@ import { mutate } from "swr";
 import { cn } from "@/lib/utils/classes";
 import { useIssues } from "@/hooks/swr";
 import { toast } from "@/hooks/use-toast";
+import { useLocalizedPath } from "@/lib/i18n/client";
 
 /* **************************************************
  * Types
@@ -60,6 +61,7 @@ export default function PodcastMetaPanel({
   formRef,
 }: PodcastMetaPanelProps) {
   const router = useRouter();
+  const toLocale = useLocalizedPath();
   const [isPending] = useTransition();
   const [isAudioSelectorOpen, setIsAudioSelectorOpen] = useState(false);
   const [isAudioChunksSelectorOpen, setIsAudioChunksSelectorOpen] = useState(false);
@@ -104,7 +106,7 @@ export default function PodcastMetaPanel({
         toast.success(result.message || "Podcast eliminato con successo");
         mutate("/api/podcasts");
         mutate(`/api/podcasts/${podcast.slug}`);
-        router.push("/admin/podcasts");
+        router.push(toLocale("/admin/podcasts"));
       }
     });
   }
@@ -307,7 +309,7 @@ export default function PodcastMetaPanel({
           </button>
           <button
             type="button"
-            onClick={() => router.push("/admin/podcasts")}
+            onClick={() => router.push(toLocale("/admin/podcasts"))}
             className={styles.cancelButton}
             disabled={isPending}
           >

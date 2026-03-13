@@ -5,6 +5,8 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
+import { withLocale } from "@/lib/i18n/path";
 import styles from "./styles";
 
 /* **************************************************
@@ -19,6 +21,9 @@ interface ErrorProps {
  * Error Boundary
  **************************************************/
 export default function Error({ error, reset }: ErrorProps) {
+  const { locale } = useParams() as { locale?: string };
+  const dashboardHref = withLocale("/admin", locale);
+
   useEffect(() => {
     console.error("Categories page error:", error);
   }, [error]);
@@ -27,7 +32,7 @@ export default function Error({ error, reset }: ErrorProps) {
     <main className={styles.main}>
       <div className={styles.header}>
         <h1 className={styles.title}>Errore</h1>
-        <Link href="/admin" className={styles.backButton}>
+        <Link href={dashboardHref} className={styles.backButton}>
           ← Indietro
         </Link>
       </div>
@@ -39,7 +44,7 @@ export default function Error({ error, reset }: ErrorProps) {
           <button onClick={reset} className={styles.submitButton}>
             Riprova
           </button>
-          <Link href="/admin" className={styles.cancelButton}>
+          <Link href={dashboardHref} className={styles.cancelButton}>
             Torna alla Dashboard
           </Link>
         </div>

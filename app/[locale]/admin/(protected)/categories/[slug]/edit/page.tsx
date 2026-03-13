@@ -10,24 +10,24 @@ import CategoryFormClient from "../../components/CategoryFormClient";
 import CategoryEditSkeleton from "../../components/CategoryEditSkeleton";
 import styles from "../../styles";
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
+import { withLocale } from "@/lib/i18n/path";
 
 /* **************************************************
  * Types
  **************************************************/
 interface EditCategoryPageProps {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }
 
 /* **************************************************
  * Edit Category Page (Server Component)
  **************************************************/
 export default async function EditCategoryPage({ params }: EditCategoryPageProps) {
+  const { locale, slug } = await params;
   const user = await getUser();
   if (!user) {
-    redirect("/admin/login");
+    redirect(withLocale("/admin/login", locale));
   }
-
-  const { slug } = await params;
   const category = await getCategoryBySlug(slug);
 
   if (!category) {
@@ -41,18 +41,18 @@ export default async function EditCategoryPage({ params }: EditCategoryPageProps
 
   return (
     <SWRPageProvider fallback={swrFallback}>
-    <main className={styles.main}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>Modifica Categoria: {category.name}</h1>
-        <Link href="/admin/categories" className={styles.backButton}>
-          ← Indietro
-        </Link>
-      </div>
+      <main className={styles.main}>
+        <div className={styles.header}>
+          <h1 className={styles.title}>Modifica Categoria: {category.name}</h1>
+          <Link href={withLocale("/admin/categories", locale)} className={styles.backButton}>
+            ← Indietro
+          </Link>
+        </div>
 
-      <Suspense fallback={<CategoryEditSkeleton />}>
+        <Suspense fallback={<CategoryEditSkeleton />}>
           <CategoryFormClient categorySlug={slug} />
-      </Suspense>
-    </main>
+        </Suspense>
+      </main>
     </SWRPageProvider>
   );
 }

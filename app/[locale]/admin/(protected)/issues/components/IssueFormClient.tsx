@@ -23,6 +23,7 @@ import { useIssue } from "@/hooks/swr";
 import AudioJsonMediaSelector from "../../articles/components/AudioJsonMediaSelector";
 import { mutate } from "swr";
 import { toast } from "@/hooks/use-toast";
+import { useLocalizedPath } from "@/lib/i18n/client";
 
 /* **************************************************
  * Types
@@ -162,6 +163,7 @@ function ImageUpload({
  **************************************************/
 export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
   const router = useRouter();
+  const toLocale = useLocalizedPath();
   const editing = !!issueSlug;
 
   // Usa SWR per ottenere l'issue (cache pre-popolata dal server)
@@ -209,8 +211,8 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
     }
     mutate("/api/github/merge/check");
     setCoverImage("");
-    router.push("/admin/issues");
-  }, [state, router, editing, issueSlug]);
+    router.push(toLocale("/admin/issues"));
+  }, [state, router, editing, issueSlug, toLocale]);
 
   // Update hidden input when coverImage changes
   useEffect(() => {
@@ -255,7 +257,7 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
         mutate("/api/issues");
         mutate(`/api/issues/${issueSlug}`);
         mutate("/api/github/merge/check");
-        router.push("/admin/issues");
+        router.push(toLocale("/admin/issues"));
       }
     });
   }
@@ -376,7 +378,7 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
             <>
               <button
                 type="button"
-                onClick={() => router.push("/admin/issues")}
+                onClick={() => router.push(toLocale("/admin/issues"))}
                 className={styles.cancelButton}
               >
                 Annulla

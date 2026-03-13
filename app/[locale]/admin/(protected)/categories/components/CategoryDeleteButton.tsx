@@ -10,6 +10,7 @@ import styles from "../styles";
 import { useCategory } from "@/hooks/swr";
 import { mutate } from "swr";
 import { toast } from "@/hooks/use-toast";
+import { useLocalizedPath } from "@/lib/i18n/client";
 
 /* **************************************************
  * Types
@@ -23,6 +24,7 @@ interface CategoryDeleteButtonProps {
  **************************************************/
 export default function CategoryDeleteButton({ categorySlug }: CategoryDeleteButtonProps) {
   const router = useRouter();
+  const toLocale = useLocalizedPath();
   const [isPending, startTransition] = useTransition();
 
   // Usa SWR per ottenere la categoria (cache pre-popolata dal server)
@@ -45,7 +47,7 @@ export default function CategoryDeleteButton({ categorySlug }: CategoryDeleteBut
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/categories");
         mutate(`/api/categories/${categorySlug}`);
-        router.push("/admin/categories");
+        router.push(toLocale("/admin/categories"));
       }
     });
   }

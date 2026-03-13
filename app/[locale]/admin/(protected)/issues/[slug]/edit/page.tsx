@@ -10,24 +10,24 @@ import IssueFormClient from "../../components/IssueFormClient";
 import IssueEditSkeleton from "../../components/IssueEditSkeleton";
 import styles from "../../styles";
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
+import { withLocale } from "@/lib/i18n/path";
 
 /* **************************************************
  * Types
  **************************************************/
 interface EditIssuePageProps {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }
 
 /* **************************************************
  * Edit Issue Page (Server Component)
  **************************************************/
 export default async function EditIssuePage({ params }: EditIssuePageProps) {
+  const { locale, slug } = await params;
   const user = await getUser();
   if (!user) {
-    redirect("/admin/login");
+    redirect(withLocale("/admin/login", locale));
   }
-
-  const { slug } = await params;
   const issue = await getIssueBySlug(slug);
 
   if (!issue) {
@@ -44,7 +44,7 @@ export default async function EditIssuePage({ params }: EditIssuePageProps) {
       <main className={styles.main}>
         <div className={styles.header}>
           <h1 className={styles.title}>Modifica Issue: {issue.title}</h1>
-          <Link href="/admin/issues" className={styles.backButton}>
+          <Link href={withLocale("/admin/issues", locale)} className={styles.backButton}>
             ← Indietro
           </Link>
         </div>

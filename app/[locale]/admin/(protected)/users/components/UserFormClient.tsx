@@ -20,6 +20,7 @@ import type { User } from "@/lib/github/users";
 import { useUser } from "@/hooks/swr";
 import { mutate } from "swr";
 import { toast } from "@/hooks/use-toast";
+import { useLocalizedPath } from "@/lib/i18n/client";
 
 /* **************************************************
  * Types
@@ -46,6 +47,7 @@ function SubmitButton({ editing }: { editing: boolean }) {
  **************************************************/
 export default function UserFormClient({ userId }: UserFormClientProps) {
   const router = useRouter();
+  const toLocale = useLocalizedPath();
   const editing = !!userId;
 
   // Usa SWR per ottenere l'utente (cache pre-popolata dal server)
@@ -78,9 +80,9 @@ export default function UserFormClient({ userId }: UserFormClientProps) {
       if (editing && userId) {
         mutate(`/api/users/${userId}`);
       }
-      router.push("/admin/users");
+      router.push(toLocale("/admin/users"));
     }
-  }, [state, router, editing, userId]);
+  }, [state, router, editing, userId, toLocale]);
 
   // Validazione password prima del submit
   function handleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -142,7 +144,7 @@ export default function UserFormClient({ userId }: UserFormClientProps) {
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/users");
         mutate(`/api/users/${userId}`);
-        router.push("/admin/users");
+        router.push(toLocale("/admin/users"));
       }
     });
   }
@@ -218,7 +220,7 @@ export default function UserFormClient({ userId }: UserFormClientProps) {
             <>
               <button
                 type="button"
-                onClick={() => router.push("/admin/users")}
+                onClick={() => router.push(toLocale("/admin/users"))}
                 className={styles.cancelButton}
               >
                 Annulla

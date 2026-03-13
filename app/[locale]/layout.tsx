@@ -85,7 +85,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
     <>
       <StructuredData data={organizationSchema} />
       {children}
-      <PolicyBanner dict={dict} />
+      <PolicyBanner dict={dict} locale={locale} />
       <Analytics />
     </>
   );

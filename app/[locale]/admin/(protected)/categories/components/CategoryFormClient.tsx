@@ -20,6 +20,7 @@ import type { Category } from "@/lib/github/types";
 import { useCategory } from "@/hooks/swr";
 import { mutate } from "swr";
 import { toast } from "@/hooks/use-toast";
+import { useLocalizedPath } from "@/lib/i18n/client";
 
 /* **************************************************
  * Types
@@ -61,6 +62,7 @@ function SubmitButton({ editing }: { editing: boolean }) {
  **************************************************/
 export default function CategoryFormClient({ categorySlug }: CategoryFormClientProps) {
   const router = useRouter();
+  const toLocale = useLocalizedPath();
   const editing = !!categorySlug;
 
   // Usa SWR per ottenere la categoria (cache pre-popolata dal server)
@@ -96,8 +98,8 @@ export default function CategoryFormClient({ categorySlug }: CategoryFormClientP
       mutate(`/api/categories/${categorySlug}`);
     }
     mutate("/api/github/merge/check");
-    router.push("/admin/categories");
-  }, [state, router, editing, categorySlug]);
+    router.push(toLocale("/admin/categories"));
+  }, [state, router, editing, categorySlug, toLocale]);
 
   // Handler per generare lo slug dal nome
   function handleGenerateSlug() {
@@ -134,7 +136,7 @@ export default function CategoryFormClient({ categorySlug }: CategoryFormClientP
         mutate("/api/categories");
         mutate(`/api/categories/${categorySlug}`);
         mutate("/api/github/merge/check");
-        router.push("/admin/categories");
+        router.push(toLocale("/admin/categories"));
       }
     });
   }
@@ -207,7 +209,7 @@ export default function CategoryFormClient({ categorySlug }: CategoryFormClientP
             <>
               <button
                 type="button"
-                onClick={() => router.push("/admin/categories")}
+                onClick={() => router.push(toLocale("/admin/categories"))}
                 className={styles.cancelButton}
               >
                 Annulla

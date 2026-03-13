@@ -5,10 +5,12 @@ import { MonoTextLight } from "@/components/atoms/typography";
 import { cn } from "@/lib/utils/classes";
 import Link from "next/link";
 import { CommonDictionary } from "@/lib/i18n/types";
+import { withLocale } from "@/lib/i18n/path";
 
 type PolicyBannerProps = {
   className?: string;
   dict: Pick<CommonDictionary, "banner">;
+  locale: string;
   cookieName?: string;
   maxAgeDays?: number;
 };
@@ -16,6 +18,7 @@ type PolicyBannerProps = {
 export default async function PolicyBanner({
   className,
   dict,
+  locale,
   cookieName = "policyAccepted",
   maxAgeDays = 180,
 }: PolicyBannerProps) {
@@ -54,11 +57,11 @@ export default async function PolicyBanner({
       <div className="max-w-[1472px] mx-auto flex flex-col gap-3">
         <MonoTextLight className="text-sm">
           {dict.banner.message}{" "}
-          <Link href="/privacy-policy">
+          <Link href={withLocale("/privacy-policy", locale)}>
             <span className="underline">{dict.banner.privacy}</span>
           </Link>{" "}
           &amp;{" "}
-          <Link href="/cookie-policy">
+          <Link href={withLocale("/cookie-policy", locale)}>
             <span className="underline">{dict.banner.cookie}</span>
           </Link>
           .

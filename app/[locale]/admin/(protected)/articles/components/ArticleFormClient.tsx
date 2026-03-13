@@ -16,6 +16,7 @@ import type { Article } from "@/lib/github/types";
 import { useArticle, useAuthors, useCategories, useIssues } from "@/hooks/swr";
 import { mutate } from "swr";
 import { toast } from "@/hooks/use-toast";
+import { useLocalizedPath } from "@/lib/i18n/client";
 // Import dinamico per evitare problemi SSR con Tiptap
 const MarkdownEditor = dynamic(() => import("./MarkdownEditor"), {
   ssr: false,
@@ -40,6 +41,7 @@ interface ArticleFormClientProps {
  **************************************************/
 export default function ArticleFormClient({ articleSlug }: ArticleFormClientProps) {
   const router = useRouter();
+  const toLocale = useLocalizedPath();
   const editing = !!articleSlug;
 
   // Usa SWR per ottenere i dati (cache pre-popolata dal server)
@@ -104,8 +106,8 @@ export default function ArticleFormClient({ articleSlug }: ArticleFormClientProp
       mutate(`/api/articles/${articleSlug}`);
     }
     mutate("/api/github/merge/check");
-    router.push("/admin/articles");
-  }, [state, router, editing, articleSlug]);
+    router.push(toLocale("/admin/articles"));
+  }, [state, router, editing, articleSlug, toLocale]);
 
   function handleFormDataChange(field: string, value: string | boolean) {
     setFormData((prev) => ({ ...prev, [field]: value }));

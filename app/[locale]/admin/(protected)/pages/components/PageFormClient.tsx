@@ -16,6 +16,7 @@ import type { Page } from "@/lib/github/types";
 import { usePage } from "@/hooks/swr";
 import { mutate } from "swr";
 import { toast } from "@/hooks/use-toast";
+import { useLocalizedPath } from "@/lib/i18n/client";
 
 // Import dinamico per evitare problemi SSR con Tiptap
 const MarkdownEditor = dynamic(() => import("../../articles/components/MarkdownEditor"), {
@@ -41,6 +42,7 @@ interface PageFormClientProps {
  **************************************************/
 export default function PageFormClient({ pageSlug }: PageFormClientProps) {
   const router = useRouter();
+  const toLocale = useLocalizedPath();
   const editing = !!pageSlug;
 
   // Usa SWR per ottenere i dati (cache pre-popolata dal server)
@@ -87,8 +89,8 @@ export default function PageFormClient({ pageSlug }: PageFormClientProps) {
       mutate(`/api/pages/${pageSlug}`);
     }
     mutate("/api/github/merge/check");
-    router.push("/admin/pages");
-  }, [state, router, editing, pageSlug]);
+    router.push(toLocale("/admin/pages"));
+  }, [state, router, editing, pageSlug, toLocale]);
 
   // Aggiorna lo stato quando la pagina viene caricata
   useEffect(() => {

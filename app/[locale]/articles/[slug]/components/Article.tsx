@@ -16,13 +16,15 @@ import CitationsSection from "./CitationsSection";
 import BookmarkManager from "./BookmarkManager";
 import { marked } from "marked";
 import { sanitizeInlineHtml, sanitizeRichHtml } from "@/lib/security/sanitizeHtml";
+import { withLocale } from "@/lib/i18n/path";
 
 type ArticleProps = {
   article: Article;
   dict: Pick<ArticleDictionary, "page">;
+  locale: string;
 };
 
-export default function Article({ article, dict }: ArticleProps) {
+export default function Article({ article, dict, locale }: ArticleProps) {
   const author = getAuthorBySlug(article.author);
   const category = getCategoryBySlug(article.category);
 
@@ -121,6 +123,9 @@ export default function Article({ article, dict }: ArticleProps) {
 
   // Check if there's a related podcast
   const relatedPodcast = article.podcast ? getPodcastBySlug(article.podcast) : null;
+  const authorHref = withLocale(`/authors?author=${author.slug}`, locale);
+  const categoryHref = withLocale(`/categories?category=${category.slug}`, locale);
+  const podcastHref = relatedPodcast ? withLocale(`/podcast/${relatedPodcast.slug}`, locale) : null;
 
   return (
     <article>
@@ -130,7 +135,7 @@ export default function Article({ article, dict }: ArticleProps) {
             <MonoTextLight className="border-b border-secondary lg:pb-2.5 lg:text-lg text-base mb-5">
               {dict.page.wordsBy}
             </MonoTextLight>
-            <Link href={`/authors?author=${author.slug}`}>
+            <Link href={authorHref}>
               <MonoTextBold className="lg:pb-2.5 lg:text-lg text-base mb-5">
                 {author.name}
               </MonoTextBold>
@@ -144,10 +149,7 @@ export default function Article({ article, dict }: ArticleProps) {
             <FormattedDate date={article.date} lang="it" />
           </span>
           {relatedPodcast && (
-            <Link
-              href={`/podcast/${relatedPodcast.slug}`}
-              className="flex items-center gap-2 hover:underline"
-            >
+            <Link href={podcastHref || "#"} className="flex items-center gap-2 hover:underline">
               <Play className="w-4 h-4" />
               <MonoTextLight className="lg:text-[16px] text-[14px]">
                 Ascolta il podcast
@@ -157,7 +159,7 @@ export default function Article({ article, dict }: ArticleProps) {
         </div>
         <Separator className="lg:mt-2.5 lg:mb-2.5 mt-2.5 mb-2.5" />
         <div className="flex justify-between items-center">
-          <Link href={`/categories?category=${category.slug}`}>
+          <Link href={categoryHref}>
             <MonoTextLight className="hover:underline">{category.name}</MonoTextLight>
           </Link>
           <div className="lg:text-[16px] text-[12px] flex items-center gap-2 text-secondary">

@@ -33,6 +33,7 @@ import { useIssues } from "@/hooks/swr";
 import { mutate } from "swr";
 import { getGitHubImageUrl } from "@/lib/github/images";
 import { toast } from "@/hooks/use-toast";
+import { useLocalizedPath } from "@/lib/i18n/client";
 
 /* **************************************************
  * Column Configuration
@@ -52,6 +53,7 @@ const columnConfig: ColumnConfig[] = [
  **************************************************/
 export default function IssueListClient() {
   const router = useRouter();
+  const toLocale = useLocalizedPath();
   const [isPending, startTransition] = useTransition();
   const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; issue: Issue | null }>({
     isOpen: false,
@@ -120,7 +122,7 @@ export default function IssueListClient() {
   }, [search, currentPage, clearSelection]);
 
   function handleEdit(issue: Issue) {
-    router.push(`/admin/issues/${issue.slug}/edit`);
+    router.push(toLocale(`/admin/issues/${issue.slug}/edit`));
   }
 
   function handleDeleteClick(issue: Issue) {

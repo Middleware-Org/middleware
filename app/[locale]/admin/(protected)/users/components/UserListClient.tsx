@@ -31,6 +31,7 @@ import { useUsers } from "@/hooks/swr";
 import { mutate } from "swr";
 import { ItemsPerPageSelector } from "@/components/table/ItemsPerPageSelector";
 import { toast } from "@/hooks/use-toast";
+import { useLocalizedPath } from "@/lib/i18n/client";
 
 /* **************************************************
  * Column Configuration
@@ -48,6 +49,7 @@ const columnConfig: ColumnConfig[] = [
  **************************************************/
 export default function UserListClient() {
   const router = useRouter();
+  const toLocale = useLocalizedPath();
   const [isPending, startTransition] = useTransition();
   const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; user: User | null }>({
     isOpen: false,
@@ -116,7 +118,7 @@ export default function UserListClient() {
   }, [search, currentPage, clearSelection]);
 
   function handleEdit(user: User) {
-    router.push(`/admin/users/${user.id}/edit`);
+    router.push(toLocale(`/admin/users/${user.id}/edit`));
   }
 
   function handleDeleteClick(user: User) {

@@ -10,15 +10,17 @@ import PodcastListClient from "./components/PodcastListClient";
 import PodcastListSkeleton from "./components/PodcastListSkeleton";
 import styles from "./styles";
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
+import { withLocale } from "@/lib/i18n/path";
 import { Plus, ArrowLeft } from "lucide-react";
 
 /* **************************************************
  * Podcasts List Page (Server Component)
  **************************************************/
-export default async function PodcastsPage() {
+export default async function PodcastsPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const user = await getUser();
   if (!user) {
-    redirect("/admin/login");
+    redirect(withLocale("/admin/login", locale));
   }
 
   const podcasts = await getAllPodcasts();
@@ -35,7 +37,7 @@ export default async function PodcastsPage() {
           <h1 className={styles.title}>Gestione Podcasts</h1>
           <div className="flex gap-2">
             <Link
-              href="/admin/podcasts/new"
+              href={withLocale("/admin/podcasts/new", locale)}
               className={styles.iconButton}
               aria-label="Nuovo Podcast"
               title="Nuovo Podcast"
@@ -43,7 +45,7 @@ export default async function PodcastsPage() {
               <Plus className="w-4 h-4" />
             </Link>
             <Link
-              href="/admin"
+              href={withLocale("/admin", locale)}
               className={styles.iconButton}
               aria-label="Indietro"
               title="Indietro"
@@ -60,4 +62,3 @@ export default async function PodcastsPage() {
     </SWRPageProvider>
   );
 }
-

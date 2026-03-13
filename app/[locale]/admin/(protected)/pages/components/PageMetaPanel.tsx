@@ -13,6 +13,7 @@ import styles from "../styles";
 import type { Page } from "@/lib/github/types";
 import { mutate } from "swr";
 import { toast } from "@/hooks/use-toast";
+import { useLocalizedPath } from "@/lib/i18n/client";
 
 /* **************************************************
  * Types
@@ -54,6 +55,7 @@ export default function PageMetaPanel({
   formRef,
 }: PageMetaPanelProps) {
   const router = useRouter();
+  const toLocale = useLocalizedPath();
   const [isPending] = useTransition();
   const [isDeleting, startDeleteTransition] = useTransition();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -104,7 +106,7 @@ export default function PageMetaPanel({
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/pages");
         mutate(`/api/pages/${page.slug}`);
-        router.push("/admin/pages");
+        router.push(toLocale("/admin/pages"));
       }
     });
   }
@@ -194,7 +196,7 @@ export default function PageMetaPanel({
           </button>
           <button
             type="button"
-            onClick={() => router.push("/admin/pages")}
+            onClick={() => router.push(toLocale("/admin/pages"))}
             className={styles.cancelButton}
             disabled={isPending}
           >

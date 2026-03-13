@@ -198,7 +198,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   return (
     <div>
       <StructuredData id={`article-ld-${slug}`} data={getArticleStructuredData(locale, slug)} />
-      <Article article={article} dict={dict} />
+      <Article article={article} dict={dict} locale={locale} />
     </div>
   );
 }

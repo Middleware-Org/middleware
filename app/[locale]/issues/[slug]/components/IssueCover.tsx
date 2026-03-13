@@ -8,12 +8,14 @@ import { lightenColor } from "@/lib/utils/color";
 import { Issue } from "@/.velite";
 import { cn } from "@/lib/utils/classes";
 import { getGitHubImageUrl } from "@/lib/github/images";
+import { withLocale } from "@/lib/i18n/path";
 
 /* **************************************************
  * Types
  **************************************************/
 type IssueCoverProps = {
   issue: Issue;
+  locale: string;
 };
 
 /* **************************************************
@@ -32,14 +34,15 @@ const styles = {
 /* **************************************************
  * IssueCover
  **************************************************/
-export default function IssueCover({ issue }: IssueCoverProps) {
+export default function IssueCover({ issue, locale }: IssueCoverProps) {
   const lightColor = lightenColor(issue.color);
+  const issueHref = withLocale(`/issues/${issue.slug}`, locale);
 
   return (
     <div className={styles.coverContainer}>
       <div className={styles.issueLabelContainer} style={{ backgroundColor: lightColor }}>
         <Link
-          href={`/issues/${issue.slug}`}
+          href={issueHref}
           className={styles.issueLabelLink}
           style={{
             borderLeft: `1px solid ${issue.color}`,

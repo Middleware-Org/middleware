@@ -31,6 +31,7 @@ import type { Page } from "@/lib/github/types";
 import { usePages } from "@/hooks/swr";
 import { mutate } from "swr";
 import { toast } from "@/hooks/use-toast";
+import { useLocalizedPath } from "@/lib/i18n/client";
 
 /* **************************************************
  * Column Configuration
@@ -46,6 +47,7 @@ const columnConfig: ColumnConfig[] = [
  **************************************************/
 export default function PageListClient() {
   const router = useRouter();
+  const toLocale = useLocalizedPath();
   const [isPending, startTransition] = useTransition();
   const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; page: Page | null }>({
     isOpen: false,
@@ -109,7 +111,7 @@ export default function PageListClient() {
   }, [search, currentPage, clearSelection]);
 
   function handleEdit(page: Page) {
-    router.push(`/admin/pages/${page.slug}/edit`);
+    router.push(toLocale(`/admin/pages/${page.slug}/edit`));
   }
 
   function handleDeleteClick(page: Page) {

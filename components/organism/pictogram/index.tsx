@@ -1,9 +1,12 @@
+"use client";
+
 /* **************************************************
  * Imports
  **************************************************/
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils/classes";
+import { useLocalizedPath } from "@/lib/i18n/client";
 import styles from "./styles";
 
 /* **************************************************
@@ -18,8 +21,10 @@ interface PictogramProps {
  * Pictogram
  **************************************************/
 export default function Pictogram({ className, size = 48 }: PictogramProps) {
+  const toLocale = useLocalizedPath();
+
   return (
-    <Link href="/">
+    <Link href={toLocale("/")}>
       <span className={cn(styles.pictogram, className ?? "")}>
         <Image src="/logo.svg" alt="" width={size} height={size} priority />
       </span>

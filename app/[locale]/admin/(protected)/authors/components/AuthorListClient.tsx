@@ -31,6 +31,7 @@ import type { Author } from "@/lib/github/types";
 import { useAuthors } from "@/hooks/swr";
 import { mutate } from "swr";
 import { toast } from "@/hooks/use-toast";
+import { useLocalizedPath } from "@/lib/i18n/client";
 
 /* **************************************************
  * Column Configuration
@@ -47,6 +48,7 @@ const columnConfig: ColumnConfig[] = [
  **************************************************/
 export default function AuthorListClient() {
   const router = useRouter();
+  const toLocale = useLocalizedPath();
   const [isPending, startTransition] = useTransition();
   const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; author: Author | null }>({
     isOpen: false,
@@ -115,7 +117,7 @@ export default function AuthorListClient() {
   }, [search, currentPage, clearSelection]);
 
   function handleEdit(author: Author) {
-    router.push(`/admin/authors/${author.slug}/edit`);
+    router.push(toLocale(`/admin/authors/${author.slug}/edit`));
   }
 
   function handleDeleteClick(author: Author) {

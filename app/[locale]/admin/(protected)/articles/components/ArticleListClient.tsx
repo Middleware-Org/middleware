@@ -32,6 +32,7 @@ import { useArticles, useIssues, useCategories, useAuthors } from "@/hooks/swr";
 import { mutate } from "swr";
 import { ItemsPerPageSelector } from "@/components/table/ItemsPerPageSelector";
 import { toast } from "@/hooks/use-toast";
+import { useLocalizedPath } from "@/lib/i18n/client";
 
 /* **************************************************
  * Column Configuration
@@ -52,6 +53,7 @@ const columnConfig: ColumnConfig[] = [
  **************************************************/
 export default function ArticleListClient() {
   const router = useRouter();
+  const toLocale = useLocalizedPath();
   const [isPending, startTransition] = useTransition();
   const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; article: Article | null }>({
     isOpen: false,
@@ -206,7 +208,7 @@ export default function ArticleListClient() {
   }
 
   function handleEdit(article: Article) {
-    router.push(`/admin/articles/${article.slug}/edit`);
+    router.push(toLocale(`/admin/articles/${article.slug}/edit`));
   }
 
   function handleDeleteClick(article: Article) {

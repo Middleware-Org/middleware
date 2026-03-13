@@ -1,10 +1,13 @@
+"use client";
+
 /* **************************************************
  * Imports
  **************************************************/
 import Link from "next/link";
 import type { Podcast } from "@/.velite";
 import Separator from "@/components/atoms/separetor";
-import { H3, MonoTextBold, MonoTextLight, SerifText } from "@/components/atoms/typography";
+import { H3, MonoTextBold, SerifText } from "@/components/atoms/typography";
+import { useLocalizedPath } from "@/lib/i18n/client";
 import { CommonDictionary } from "@/lib/i18n/types";
 import styles from "../articleCard/styles";
 
@@ -20,7 +23,8 @@ type PodcastCardProps = {
  * PodcastCard
  **************************************************/
 export default function PodcastCard({ podcast, dict }: PodcastCardProps) {
-  const podcastLink = `/podcast/${podcast.slug}`;
+  const toLocale = useLocalizedPath();
+  const podcastLink = toLocale(`/podcast/${podcast.slug}`);
 
   return (
     <article className={styles.article}>
@@ -45,4 +49,3 @@ export default function PodcastCard({ podcast, dict }: PodcastCardProps) {
     </article>
   );
 }
-

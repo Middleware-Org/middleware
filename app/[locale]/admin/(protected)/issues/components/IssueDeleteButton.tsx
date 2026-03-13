@@ -10,6 +10,7 @@ import styles from "../styles";
 import { useIssue } from "@/hooks/swr";
 import { mutate } from "swr";
 import { toast } from "@/hooks/use-toast";
+import { useLocalizedPath } from "@/lib/i18n/client";
 
 /* **************************************************
  * Types
@@ -23,6 +24,7 @@ interface IssueDeleteButtonProps {
  **************************************************/
 export default function IssueDeleteButton({ issueSlug }: IssueDeleteButtonProps) {
   const router = useRouter();
+  const toLocale = useLocalizedPath();
   const [isPending, startTransition] = useTransition();
 
   // Usa SWR per ottenere l'issue (cache pre-popolata dal server)
@@ -45,7 +47,7 @@ export default function IssueDeleteButton({ issueSlug }: IssueDeleteButtonProps)
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/issues");
         mutate(`/api/issues/${issueSlug}`);
-        router.push("/admin/issues");
+        router.push(toLocale("/admin/issues"));
       }
     });
   }

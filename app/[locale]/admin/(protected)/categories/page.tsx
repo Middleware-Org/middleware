@@ -10,15 +10,17 @@ import CategoryListClient from "./components/CategoryListClient";
 import CategoryListSkeleton from "./components/CategoryListSkeleton";
 import styles from "./styles";
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
+import { withLocale } from "@/lib/i18n/path";
 import { Plus, ArrowLeft } from "lucide-react";
 
 /* **************************************************
  * Categories List Page (Server Component)
  **************************************************/
-export default async function CategoriesPage() {
+export default async function CategoriesPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const user = await getUser();
   if (!user) {
-    redirect("/admin/login");
+    redirect(withLocale("/admin/login", locale));
   }
 
   const categories = await getAllCategories();
@@ -35,7 +37,7 @@ export default async function CategoriesPage() {
           <h1 className={styles.title}>Gestione Categorie</h1>
           <div className="flex gap-2">
             <Link
-              href="/admin/categories/new"
+              href={withLocale("/admin/categories/new", locale)}
               className={styles.iconButton}
               aria-label="Nuova Categoria"
               title="Nuova Categoria"
@@ -43,7 +45,7 @@ export default async function CategoriesPage() {
               <Plus className="w-4 h-4" />
             </Link>
             <Link
-              href="/admin"
+              href={withLocale("/admin", locale)}
               className={styles.iconButton}
               aria-label="Indietro"
               title="Indietro"

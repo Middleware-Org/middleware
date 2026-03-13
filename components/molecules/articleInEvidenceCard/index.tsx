@@ -14,6 +14,7 @@ import styles from "./styles";
 import type { Article, Issue } from "@/.velite";
 import { CommonDictionary } from "@/lib/i18n/types";
 import { getAuthorBySlug, getCategoryBySlug } from "@/lib/content";
+import { withLocale } from "@/lib/i18n/path";
 
 /* **************************************************
  * Types
@@ -44,6 +45,11 @@ export default function ArticleInEvidenceCard({
 
   if (!author || !category) return null;
 
+  const issueHref = withLocale(`/issues/${issue.slug}`, locale);
+  const articleHref = withLocale(`/articles/${article.slug}`, locale);
+  const authorHref = withLocale(`/authors?author=${author.slug}`, locale);
+  const categoryHref = withLocale(`/categories?category=${category.slug}`, locale);
+
   return (
     <article className={styles.article} style={{ backgroundColor: issue.color }}>
       <header className={styles.header}>
@@ -53,13 +59,13 @@ export default function ArticleInEvidenceCard({
               <FormattedDate date={article.date} lang={locale} className={styles.badgeTextDate} />
             </div>
             <div className={styles.badgeTitle}>
-              <Link href={`/issues/${issue.slug}`}>
+              <Link href={issueHref}>
                 <MonoTextLight className={styles.badgeTextTitle}>{issue.title}</MonoTextLight>
               </Link>
             </div>
           </div>
         )}
-        <Link href={`/articles/${article.slug}`}>
+        <Link href={articleHref}>
           <H3 className={cn(styles.title, textColor)}>{article.title}</H3>
         </Link>
 
@@ -67,7 +73,7 @@ export default function ArticleInEvidenceCard({
           <MonoTextLight className={cn(styles.authorLabel, textColor)}>
             {dict.articleCard.wordsBy}
           </MonoTextLight>
-          <Link href={`/authors?author=${author.slug}`}>
+          <Link href={authorHref}>
             <MonoTextBold className={cn(styles.authorLink, textColor)}>{author.name}</MonoTextBold>
           </Link>
         </div>
@@ -76,7 +82,7 @@ export default function ArticleInEvidenceCard({
       <section>
         <SerifText className={cn(styles.excerpt, textColor)}>{article.excerpt}</SerifText>
         <div className={styles.readMore}>
-          <Link href={`/articles/${article.slug}`}>
+          <Link href={articleHref}>
             <MonoTextBold className={cn(styles.readMoreLink, textColor)}>
               {dict.articleCard.readMore} →
             </MonoTextBold>
@@ -85,7 +91,7 @@ export default function ArticleInEvidenceCard({
       </section>
       <Separator className={cn(backgroundColor)} />
       <footer>
-        <Link href={`/categories?category=${category.slug}`}>
+        <Link href={categoryHref}>
           <div className={styles.category}>
             <MonoTextLight className={cn(styles.categoryLink, textColor)}>
               {category.name}

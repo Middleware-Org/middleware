@@ -13,6 +13,7 @@ import { CommonDictionary } from "@/lib/i18n/types";
 import type { Article, Issue } from "@/.velite";
 import Link from "next/link";
 import { getGitHubImageUrl } from "@/lib/github/images";
+import { withLocale } from "@/lib/i18n/path";
 
 /* **************************************************
  * Types
@@ -34,6 +35,7 @@ const IMAGE_HEIGHT = 500;
  **************************************************/
 export default function Cover({ issue, articleInEvidence, dict }: CoverProps) {
   const { locale = "it" } = useParams() as { locale: string };
+  const issueHref = withLocale(`/issues/${issue.slug}`, locale);
 
   return (
     <div className={styles.link}>
@@ -56,7 +58,7 @@ export default function Cover({ issue, articleInEvidence, dict }: CoverProps) {
               />
             </div>
             <div className={styles.badgeTitle}>
-              <Link href={`/issues/${issue.slug}`} aria-label={`Leggi il numero ${issue.title}`}>
+              <Link href={issueHref} aria-label={`Leggi il numero ${issue.title}`}>
                 <MonoTextLight className={styles.badgeTextTitle}>{issue.title}</MonoTextLight>
               </Link>
             </div>

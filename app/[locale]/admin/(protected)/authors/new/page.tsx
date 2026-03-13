@@ -9,14 +9,16 @@ import AuthorFormClient from "../components/AuthorFormClient";
 import AuthorFormSkeleton from "../components/AuthorFormSkeleton";
 import styles from "../styles";
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
+import { withLocale } from "@/lib/i18n/path";
 
 /* **************************************************
  * New Author Page (Server Component)
  **************************************************/
-export default async function NewAuthorPage() {
+export default async function NewAuthorPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const user = await getUser();
   if (!user) {
-    redirect("/admin/login");
+    redirect(withLocale("/admin/login", locale));
   }
 
   return (
@@ -24,7 +26,7 @@ export default async function NewAuthorPage() {
       <main className={styles.main}>
         <div className={styles.header}>
           <h1 className={styles.title}>Nuovo Autore</h1>
-          <Link href="/admin/authors" className={styles.backButton}>
+          <Link href={withLocale("/admin/authors", locale)} className={styles.backButton}>
             ← Indietro
           </Link>
         </div>
@@ -36,4 +38,3 @@ export default async function NewAuthorPage() {
     </SWRPageProvider>
   );
 }
-

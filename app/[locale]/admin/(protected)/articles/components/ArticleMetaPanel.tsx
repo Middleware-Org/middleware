@@ -19,6 +19,7 @@ import { mutate } from "swr";
 import { cn } from "@/lib/utils/classes";
 import { usePodcasts } from "@/hooks/swr";
 import { toast } from "@/hooks/use-toast";
+import { useLocalizedPath } from "@/lib/i18n/client";
 
 /* **************************************************
  * Types
@@ -73,6 +74,7 @@ export default function ArticleMetaPanel({
   formRef,
 }: ArticleMetaPanelProps) {
   const router = useRouter();
+  const toLocale = useLocalizedPath();
   const [isPending] = useTransition();
   const [isDeleting, startDeleteTransition] = useTransition();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -123,7 +125,7 @@ export default function ArticleMetaPanel({
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/articles");
         mutate(`/api/articles/${article.slug}`);
-        router.push("/admin/articles");
+        router.push(toLocale("/admin/articles"));
       }
     });
   }
@@ -300,7 +302,7 @@ export default function ArticleMetaPanel({
           </button>
           <button
             type="button"
-            onClick={() => router.push("/admin/articles")}
+            onClick={() => router.push(toLocale("/admin/articles"))}
             className={styles.cancelButton}
             disabled={isPending}
           >
