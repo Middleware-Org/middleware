@@ -12,8 +12,8 @@ import { mutate } from "swr";
 import { cn } from "@/lib/utils/classes";
 import ConfirmDialog from "@/components/molecules/confirmDialog";
 import styles from "../styles";
-import baseStyles from "../../styles";
 import type { MediaFile } from "@/lib/github/media";
+import { toast } from "@/hooks/use-toast";
 
 /* **************************************************
  * Types
@@ -29,14 +29,12 @@ interface MediaDialogProps {
  **************************************************/
 export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps) {
   const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
   const [newFilename, setNewFilename] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [jsonContent, setJsonContent] = useState<string | null>(null);
 
   const handleClose = useCallback(() => {
     if (!isPending) {
-      setError(null);
       setNewFilename("");
       onClose();
     }
@@ -76,7 +74,6 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
       const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
       setTimeout(() => {
         setNewFilename(nameWithoutExt);
-        setError(null);
         setJsonContent(null);
       }, 0);
 
@@ -98,12 +95,12 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
 
   async function handleRename() {
     if (!file) {
-      setError({ message: "Nessun file selezionato", type: "error" });
+      toast.error("Nessun file selezionato");
       return;
     }
 
     if (!newFilename.trim()) {
-      setError({ message: "Il nome del file non può essere vuoto", type: "error" });
+      toast.warning("Il nome del file non puo essere vuoto");
       return;
     }
 
@@ -117,17 +114,13 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
       return;
     }
 
-    setError(null);
-
     startTransition(async () => {
       const result = await renameMediaAction(file.name, finalFilename);
 
       if (!result.success) {
-        setError({
-          message: result.error,
-          type: result.errorType || "error",
-        });
+        toast.actionResult(result, { errorTitle: "Impossibile rinominare file" });
       } else {
+        toast.success(result.message || "File rinominato con successo");
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/media");
         mutate("/api/github/merge/check");
@@ -139,18 +132,15 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
   async function handleDelete() {
     if (!file) return;
 
-    setError(null);
     setShowDeleteConfirm(false);
 
     startTransition(async () => {
       const result = await deleteMediaAction(file.name);
 
       if (!result.success) {
-        setError({
-          message: result.error,
-          type: result.errorType || "error",
-        });
+        toast.actionResult(result, { errorTitle: "Impossibile eliminare file" });
       } else {
+        toast.success(result.message || "File eliminato con successo");
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/media");
         mutate("/api/github/merge/check");
@@ -199,17 +189,6 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
 
           {/* Content */}
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
-            {error && (
-              <div
-                className={cn(
-                  "p-4 border",
-                  error.type === "warning" ? baseStyles.errorWarning : baseStyles.error,
-                )}
-              >
-                ⚠️ {error.message}
-              </div>
-            )}
-
             {/* Preview */}
             <div>
               <h3 className="text-sm font-medium text-secondary mb-2">Anteprima</h3>

@@ -14,6 +14,7 @@ import { mutate } from "swr";
 import { cn } from "@/lib/utils/classes";
 import type { MediaFile } from "@/lib/github/media";
 import MediaDialog from "../../media/components/MediaDialog";
+import { toast } from "@/hooks/use-toast";
 
 /* **************************************************
  * Types
@@ -31,8 +32,6 @@ const ITEMS_PER_PAGE = 20;
 
 export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelectorProps) {
   const [uploading, setUploading] = useState(false);
-  const [uploadError, setUploadError] = useState<string | null>(null);
-  const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -125,13 +124,13 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
 
     // Validate file type
     if (!file.type.startsWith("image/")) {
-      alert("Seleziona un file immagine");
+      toast.warning("Seleziona un file immagine");
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert("La dimensione dell'immagine deve essere inferiore a 5MB");
+      toast.warning("La dimensione dell'immagine deve essere inferiore a 5MB");
       return;
     }
 
@@ -166,13 +165,11 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
 
   async function handleUpload() {
     if (!selectedFile) {
-      setUploadError("Seleziona un'immagine prima di caricare");
+      toast.warning("Seleziona un'immagine prima di caricare");
       return;
     }
 
     setUploading(true);
-    setUploadError(null);
-    setUploadSuccess(null);
 
     try {
       // Generate filename
@@ -196,7 +193,7 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
         handleUploadUrl: "/api/media/upload-blob",
       });
 
-      setUploadSuccess("Immagine caricata con successo");
+      toast.success("Immagine caricata con successo");
       // Invalida la cache SWR per forzare il refetch
       mutate("/api/media");
       mutate("/api/github/merge/check");
@@ -210,7 +207,7 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
         fileInputRef.current.value = "";
       }
     } catch (err) {
-      setUploadError(err instanceof Error ? err.message : "Errore durante il caricamento");
+      toast.error("Errore durante il caricamento", err instanceof Error ? err.message : undefined);
     } finally {
       setUploading(false);
     }
@@ -290,12 +287,6 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
                     <p className="text-sm text-secondary/60 mt-2">JPG, PNG, GIF o WEBP (max 5MB)</p>
                   </div>
                 </div>
-              )}
-
-              {uploadError && <div className={`mt-2 ${baseStyles.error}`}>{uploadError}</div>}
-
-              {uploadSuccess && (
-                <div className={`mt-2 ${baseStyles.successMessageGreen}`}>{uploadSuccess}</div>
               )}
             </div>
           </div>

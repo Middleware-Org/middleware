@@ -4,6 +4,7 @@
 import "@/globals.css";
 import { getBaseUrl, createOpenGraphMetadata, createTwitterMetadata } from "@/lib/utils/metadata";
 import { editorFont, gtAmericaMono } from "@/lib/fonts";
+import Toaster from "@/components/ui/sonner";
 
 /* **************************************************
  * Types
@@ -44,9 +45,7 @@ export async function generateMetadata() {
         it: `/it/`,
       },
       types: {
-        "application/rss+xml": [
-          { url: "/rss.xml", title: "Middleware RSS Feed" },
-        ],
+        "application/rss+xml": [{ url: "/rss.xml", title: "Middleware RSS Feed" }],
       },
     },
     openGraph: createOpenGraphMetadata({
@@ -98,7 +97,10 @@ export async function generateMetadata() {
 export default async function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="it" className={`${editorFont.variable} ${gtAmericaMono.variable}`}>
-      <body className={editorFont.className}>{children}</body>
+      <body className={editorFont.className}>
+        {children}
+        <Toaster />
+      </body>
     </html>
   );
 }

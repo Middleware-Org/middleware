@@ -16,10 +16,10 @@ import {
 import ConfirmDialog from "@/components/molecules/confirmDialog";
 import PasswordInput, { isPasswordStrongEnough } from "./PasswordInput";
 import styles from "../styles";
-import baseStyles from "../../styles";
 import type { User } from "@/lib/github/users";
 import { useUser } from "@/hooks/swr";
 import { mutate } from "swr";
+import { toast } from "@/hooks/use-toast";
 
 /* **************************************************
  * Types
@@ -57,10 +57,6 @@ export default function UserFormClient({ userId }: UserFormClientProps) {
     null,
   );
 
-  const [deleteError, setDeleteError] = useState<{
-    message: string;
-    type: "error" | "warning";
-  } | null>(null);
   const [isDeleting, startDeleteTransition] = useTransition();
   const [, startSubmitTransition] = useTransition();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -69,7 +65,13 @@ export default function UserFormClient({ userId }: UserFormClientProps) {
 
   // Reset form and navigate on success
   useEffect(() => {
+    if (state && !state.success) {
+      toast.actionResult(state, { errorTitle: "Operazione non riuscita" });
+      return;
+    }
+
     if (state?.success) {
+      toast.success(state.message || (editing ? "Utente aggiornato" : "Utente creato"));
       formRef.current?.reset();
       // Invalida la cache SWR per forzare il refetch della lista
       mutate("/api/users");
@@ -128,18 +130,15 @@ export default function UserFormClient({ userId }: UserFormClientProps) {
   async function handleDeleteConfirm() {
     if (!userId || !user) return;
 
-    setDeleteError(null);
     setIsDeleteDialogOpen(false);
 
     startDeleteTransition(async () => {
       const result = await deleteUserAction(userId);
 
       if (!result.success) {
-        setDeleteError({
-          message: result.error,
-          type: result.errorType || "error",
-        });
+        toast.actionResult(result, { errorTitle: "Impossibile eliminare utente" });
       } else {
+        toast.success(result.message || "Utente eliminato con successo");
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/users");
         mutate(`/api/users/${userId}`);
@@ -150,22 +149,6 @@ export default function UserFormClient({ userId }: UserFormClientProps) {
 
   return (
     <>
-      {state && !state.success && (
-        <div className={state.errorType === "warning" ? styles.errorWarning : styles.error}>
-          {state.error}
-        </div>
-      )}
-
-      {deleteError && (
-        <div className={deleteError.type === "warning" ? styles.errorWarning : styles.error}>
-          ⚠️ {deleteError.message}
-        </div>
-      )}
-
-      {state?.success && state.message && (
-        <div className={baseStyles.successMessageGreen}>{state.message}</div>
-      )}
-
       <form ref={formRef} action={formAction} onSubmit={handleFormSubmit} className={styles.form}>
         <h2 className={styles.formTitle}>{editing ? "Modifica Utente" : "Nuovo Utente"}</h2>
 
