@@ -30,6 +30,7 @@ import baseStyles from "../../styles";
 import type { Page } from "@/lib/github/types";
 import { usePages } from "@/hooks/swr";
 import { mutate } from "swr";
+import { toast } from "@/hooks/use-toast";
 
 /* **************************************************
  * Column Configuration
@@ -46,7 +47,6 @@ const columnConfig: ColumnConfig[] = [
 export default function PageListClient() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
   const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; page: Page | null }>({
     isOpen: false,
     page: null,
@@ -120,18 +120,15 @@ export default function PageListClient() {
     if (!deleteDialog.page) return;
 
     const { slug } = deleteDialog.page;
-    setError(null);
     setDeleteDialog({ isOpen: false, page: null });
 
     startTransition(async () => {
       const result = await deletePageAction(slug);
 
       if (!result.success) {
-        setError({
-          message: result.error,
-          type: result.errorType || "error",
-        });
+        toast.actionResult(result, { errorTitle: "Impossibile eliminare pagina" });
       } else {
+        toast.success(result.message || "Pagina eliminata con successo");
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/pages");
         mutate(`/api/pages/${slug}`);
@@ -149,18 +146,15 @@ export default function PageListClient() {
   async function handleDeleteMultipleConfirm() {
     if (selectedIds.length === 0) return;
 
-    setError(null);
     setDeleteMultipleDialog({ isOpen: false, count: 0 });
 
     startTransition(async () => {
       const result = await deletePagesAction(selectedIds);
 
       if (!result.success) {
-        setError({
-          message: result.error,
-          type: result.errorType || "error",
-        });
+        toast.actionResult(result, { errorTitle: "Eliminazione multipla non completata" });
       } else {
+        toast.success(result.message || "Pagine eliminate con successo");
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/pages");
         // Invalida anche le singole pagine
@@ -233,12 +227,6 @@ export default function PageListClient() {
 
   return (
     <div className={baseStyles.container}>
-      {error && (
-        <div className={error.type === "warning" ? baseStyles.errorWarning : baseStyles.error}>
-          ⚠️ {error.message}
-        </div>
-      )}
-
       {/* Search and Filters */}
       <div className={baseStyles.searchContainer}>
         <div className={baseStyles.searchRow}>

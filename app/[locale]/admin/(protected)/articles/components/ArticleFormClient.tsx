@@ -15,6 +15,7 @@ import baseStyles from "../../styles";
 import type { Article } from "@/lib/github/types";
 import { useArticle, useAuthors, useCategories, useIssues } from "@/hooks/swr";
 import { mutate } from "swr";
+import { toast } from "@/hooks/use-toast";
 // Import dinamico per evitare problemi SSR con Tiptap
 const MarkdownEditor = dynamic(() => import("./MarkdownEditor"), {
   ssr: false,
@@ -87,16 +88,23 @@ export default function ArticleFormClient({ articleSlug }: ArticleFormClientProp
 
   // Reset form and navigate on success
   useEffect(() => {
-    if (state?.success) {
-      formRef.current?.reset();
-      // Invalida la cache SWR per forzare il refetch della lista
-      mutate("/api/articles");
-      if (editing && articleSlug) {
-        mutate(`/api/articles/${articleSlug}`);
-      }
-      mutate("/api/github/merge/check");
-      router.push("/admin/articles");
+    if (!state) {
+      return;
     }
+
+    if (!state.success) {
+      toast.actionResult(state, { errorTitle: "Operazione non riuscita" });
+      return;
+    }
+
+    toast.success(state.message || (editing ? "Articolo aggiornato" : "Articolo creato"));
+    formRef.current?.reset();
+    mutate("/api/articles");
+    if (editing && articleSlug) {
+      mutate(`/api/articles/${articleSlug}`);
+    }
+    mutate("/api/github/merge/check");
+    router.push("/admin/articles");
   }, [state, router, editing, articleSlug]);
 
   function handleFormDataChange(field: string, value: string | boolean) {
@@ -145,18 +153,6 @@ export default function ArticleFormClient({ articleSlug }: ArticleFormClientProp
       action={handleAction}
       className={cn(baseStyles.formContainer, "flex flex-col h-full")}
     >
-      {state && !state.success && (
-        <div
-          className={`mb-4 ${state.errorType === "warning" ? baseStyles.errorWarning : baseStyles.error}`}
-        >
-          {state.error}
-        </div>
-      )}
-
-      {state?.success && state.message && (
-        <div className={baseStyles.successMessage}>{state.message}</div>
-      )}
-
       <div className={cn(styles.editorContainer, "flex-1 min-h-0")}>
         {/* Editor Markdown - 3/4 width */}
         <div className={styles.editorWrapper}>

@@ -16,10 +16,10 @@ import {
 } from "../actions";
 import ConfirmDialog from "@/components/molecules/confirmDialog";
 import styles from "../styles";
-import baseStyles from "../../styles";
 import type { Category } from "@/lib/github/types";
 import { useCategory } from "@/hooks/swr";
 import { mutate } from "swr";
+import { toast } from "@/hooks/use-toast";
 
 /* **************************************************
  * Types
@@ -75,25 +75,28 @@ export default function CategoryFormClient({ categorySlug }: CategoryFormClientP
   // State per il campo slug (per poterlo aggiornare dinamicamente)
   // Initialize with category slug if available
   const [slugValue, setSlugValue] = useState(category?.slug || "");
-  const [deleteError, setDeleteError] = useState<{
-    message: string;
-    type: "error" | "warning";
-  } | null>(null);
   const [isDeleting, startDeleteTransition] = useTransition();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   // Reset form and navigate on success
   useEffect(() => {
-    if (state?.success) {
-      formRef.current?.reset();
-      // Invalida la cache SWR per forzare il refetch della lista
-      mutate("/api/categories");
-      if (editing && categorySlug) {
-        mutate(`/api/categories/${categorySlug}`);
-      }
-      mutate("/api/github/merge/check");
-      router.push("/admin/categories");
+    if (!state) {
+      return;
     }
+
+    if (!state.success) {
+      toast.actionResult(state, { errorTitle: "Operazione non riuscita" });
+      return;
+    }
+
+    toast.success(state.message || (editing ? "Categoria aggiornata" : "Categoria creata"));
+    formRef.current?.reset();
+    mutate("/api/categories");
+    if (editing && categorySlug) {
+      mutate(`/api/categories/${categorySlug}`);
+    }
+    mutate("/api/github/merge/check");
+    router.push("/admin/categories");
   }, [state, router, editing, categorySlug]);
 
   // Handler per generare lo slug dal nome
@@ -118,18 +121,15 @@ export default function CategoryFormClient({ categorySlug }: CategoryFormClientP
   async function handleDeleteConfirm() {
     if (!categorySlug || !category) return;
 
-    setDeleteError(null);
     setIsDeleteDialogOpen(false);
 
     startDeleteTransition(async () => {
       const result = await deleteCategoryAction(categorySlug);
 
       if (!result.success) {
-        setDeleteError({
-          message: result.error,
-          type: result.errorType || "error",
-        });
+        toast.actionResult(result, { errorTitle: "Impossibile eliminare categoria" });
       } else {
+        toast.success(result.message || "Categoria eliminata con successo");
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/categories");
         mutate(`/api/categories/${categorySlug}`);
@@ -141,22 +141,6 @@ export default function CategoryFormClient({ categorySlug }: CategoryFormClientP
 
   return (
     <>
-      {state && !state.success && (
-        <div className={state.errorType === "warning" ? styles.errorWarning : styles.error}>
-          {state.error}
-        </div>
-      )}
-
-      {deleteError && (
-        <div className={deleteError.type === "warning" ? styles.errorWarning : styles.error}>
-          ⚠️ {deleteError.message}
-        </div>
-      )}
-
-      {state?.success && state.message && (
-        <div className={baseStyles.successMessageGreen}>{state.message}</div>
-      )}
-
       <form ref={formRef} action={formAction} className={styles.form}>
         <h2 className={styles.formTitle}>{editing ? "Modifica Categoria" : "Nuova Categoria"}</h2>
 

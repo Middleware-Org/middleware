@@ -32,6 +32,7 @@ import Image from "next/image";
 import { useIssues } from "@/hooks/swr";
 import { mutate } from "swr";
 import { getGitHubImageUrl } from "@/lib/github/images";
+import { toast } from "@/hooks/use-toast";
 
 /* **************************************************
  * Column Configuration
@@ -52,7 +53,6 @@ const columnConfig: ColumnConfig[] = [
 export default function IssueListClient() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
   const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; issue: Issue | null }>({
     isOpen: false,
     issue: null,
@@ -131,18 +131,15 @@ export default function IssueListClient() {
     if (!deleteDialog.issue) return;
 
     const { slug } = deleteDialog.issue;
-    setError(null);
     setDeleteDialog({ isOpen: false, issue: null });
 
     startTransition(async () => {
       const result = await deleteIssueAction(slug);
 
       if (!result.success) {
-        setError({
-          message: result.error,
-          type: result.errorType || "error",
-        });
+        toast.actionResult(result, { errorTitle: "Impossibile eliminare issue" });
       } else {
+        toast.success(result.message || "Issue eliminata con successo");
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/issues");
         mutate("/api/github/merge/check");
@@ -159,18 +156,15 @@ export default function IssueListClient() {
   async function handleDeleteMultipleConfirm() {
     if (selectedIds.length === 0) return;
 
-    setError(null);
     setDeleteMultipleDialog({ isOpen: false, count: 0 });
 
     startTransition(async () => {
       const result = await deleteIssuesAction(selectedIds);
 
       if (!result.success) {
-        setError({
-          message: result.error,
-          type: result.errorType || "error",
-        });
+        toast.actionResult(result, { errorTitle: "Eliminazione multipla non completata" });
       } else {
+        toast.success(result.message || "Issue eliminate con successo");
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/issues");
         mutate("/api/github/merge/check");
@@ -269,12 +263,6 @@ export default function IssueListClient() {
 
   return (
     <div className={baseStyles.container}>
-      {error && (
-        <div className={error.type === "warning" ? baseStyles.errorWarning : baseStyles.error}>
-          ⚠️ {error.message}
-        </div>
-      )}
-
       {/* Search and Filters */}
       <div className={baseStyles.searchContainer}>
         <div className={baseStyles.searchRow}>

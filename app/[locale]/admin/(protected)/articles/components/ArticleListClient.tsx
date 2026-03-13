@@ -31,6 +31,7 @@ import type { Article } from "@/lib/github/types";
 import { useArticles, useIssues, useCategories, useAuthors } from "@/hooks/swr";
 import { mutate } from "swr";
 import { ItemsPerPageSelector } from "@/components/table/ItemsPerPageSelector";
+import { toast } from "@/hooks/use-toast";
 
 /* **************************************************
  * Column Configuration
@@ -52,7 +53,6 @@ const columnConfig: ColumnConfig[] = [
 export default function ArticleListClient() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
   const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; article: Article | null }>({
     isOpen: false,
     article: null,
@@ -217,18 +217,15 @@ export default function ArticleListClient() {
     if (!deleteDialog.article) return;
 
     const { slug } = deleteDialog.article;
-    setError(null);
     setDeleteDialog({ isOpen: false, article: null });
 
     startTransition(async () => {
       const result = await deleteArticleAction(slug);
 
       if (!result.success) {
-        setError({
-          message: result.error,
-          type: result.errorType || "error",
-        });
+        toast.actionResult(result, { errorTitle: "Impossibile eliminare articolo" });
       } else {
+        toast.success(result.message || "Articolo eliminato con successo");
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/articles");
         mutate("/api/github/merge/check");
@@ -245,18 +242,15 @@ export default function ArticleListClient() {
   async function handleDeleteMultipleConfirm() {
     if (selectedIds.length === 0) return;
 
-    setError(null);
     setDeleteMultipleDialog({ isOpen: false, count: 0 });
 
     startTransition(async () => {
       const result = await deleteArticlesAction(selectedIds);
 
       if (!result.success) {
-        setError({
-          message: result.error,
-          type: result.errorType || "error",
-        });
+        toast.actionResult(result, { errorTitle: "Eliminazione multipla non completata" });
       } else {
+        toast.success(result.message || "Articoli eliminati con successo");
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/articles");
         mutate("/api/github/merge/check");
@@ -339,12 +333,6 @@ export default function ArticleListClient() {
 
   return (
     <div className={baseStyles.container}>
-      {error && (
-        <div className={error.type === "warning" ? baseStyles.errorWarning : baseStyles.error}>
-          ⚠️ {error.message}
-        </div>
-      )}
-
       {/* Search and Filters */}
       <div className={baseStyles.searchContainer}>
         <div className={baseStyles.searchRow}>

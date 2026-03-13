@@ -22,6 +22,7 @@ import Image from "next/image";
 import { useIssue } from "@/hooks/swr";
 import AudioJsonMediaSelector from "../../articles/components/AudioJsonMediaSelector";
 import { mutate } from "swr";
+import { toast } from "@/hooks/use-toast";
 
 /* **************************************************
  * Types
@@ -178,10 +179,6 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
 
   // State per il campo slug (per poterlo aggiornare dinamicamente)
   const [slugValue, setSlugValue] = useState(issue?.slug || "");
-  const [deleteError, setDeleteError] = useState<{
-    message: string;
-    type: "error" | "warning";
-  } | null>(null);
   const [isDeleting, startDeleteTransition] = useTransition();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
@@ -195,18 +192,24 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
 
   // Reset form and navigate on success
   useEffect(() => {
-    if (state?.success) {
-      formRef.current?.reset();
-      // Invalida la cache SWR per forzare il refetch della lista
-      mutate("/api/issues");
-      if (editing && issueSlug) {
-        mutate(`/api/issues/${issueSlug}`);
-      }
-      mutate("/api/github/merge/check");
-      // Reset coverImage before navigation (component will unmount anyway)
-      setCoverImage("");
-      router.push("/admin/issues");
+    if (!state) {
+      return;
     }
+
+    if (!state.success) {
+      toast.actionResult(state, { errorTitle: "Operazione non riuscita" });
+      return;
+    }
+
+    toast.success(state.message || (editing ? "Issue aggiornata" : "Issue creata"));
+    formRef.current?.reset();
+    mutate("/api/issues");
+    if (editing && issueSlug) {
+      mutate(`/api/issues/${issueSlug}`);
+    }
+    mutate("/api/github/merge/check");
+    setCoverImage("");
+    router.push("/admin/issues");
   }, [state, router, editing, issueSlug]);
 
   // Update hidden input when coverImage changes
@@ -239,18 +242,15 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
   async function handleDeleteConfirm() {
     if (!issueSlug || !issue) return;
 
-    setDeleteError(null);
     setIsDeleteDialogOpen(false);
 
     startDeleteTransition(async () => {
       const result = await deleteIssueAction(issueSlug);
 
       if (!result.success) {
-        setDeleteError({
-          message: result.error,
-          type: result.errorType || "error",
-        });
+        toast.actionResult(result, { errorTitle: "Impossibile eliminare issue" });
       } else {
+        toast.success(result.message || "Issue eliminata con successo");
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/issues");
         mutate(`/api/issues/${issueSlug}`);
@@ -262,24 +262,6 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
 
   return (
     <>
-      {state && !state.success && (
-        <div className={state.errorType === "warning" ? styles.errorWarning : styles.error}>
-          {state.error}
-        </div>
-      )}
-
-      {deleteError && (
-        <div className={deleteError.type === "warning" ? styles.errorWarning : styles.error}>
-          ⚠️ {deleteError.message}
-        </div>
-      )}
-
-      {state?.success && state.message && (
-        <div className="mb-4 p-4 bg-green-50 border border-green-200 text-green-700">
-          {state.message}
-        </div>
-      )}
-
       <form ref={formRef} action={formAction} className={styles.form}>
         <h2 className={styles.formTitle}>{editing ? "Modifica Issue" : "Nuova Issue"}</h2>
 
