@@ -21,7 +21,7 @@ const INITIAL_PODCASTS_COUNT = 3;
  **************************************************/
 type IssuePodcastsProps = {
   podcasts: Podcast[];
-  dictCommon: Pick<CommonDictionary, "articleCard">;
+  dictCommon: Pick<CommonDictionary, "articleCard" | "lists">;
   issue: Issue;
 };
 
@@ -34,7 +34,7 @@ export default function IssuePodcasts({ podcasts, dictCommon, issue }: IssuePodc
   const visiblePodcasts = showAllPodcasts ? podcasts : podcasts.slice(0, INITIAL_PODCASTS_COUNT);
   const hasMorePodcasts = podcasts.length > INITIAL_PODCASTS_COUNT;
 
-  const toggleText = showAllPodcasts ? "Nascondi tutti" : "Mostra tutti";
+  const toggleText = showAllPodcasts ? dictCommon.lists.hideAll : dictCommon.lists.showAll;
 
   return (
     <>

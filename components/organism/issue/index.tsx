@@ -15,7 +15,7 @@ import styles from "./styles";
  **************************************************/
 type IssueProps = {
   issue: Issue;
-  dictCommon: Pick<CommonDictionary, "articleCard">;
+  dictCommon: Pick<CommonDictionary, "articleCard" | "lists">;
   isLastIssue: boolean;
 };
 

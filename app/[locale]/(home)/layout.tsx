@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: HomeLayoutProps) {
     alternates: {
       canonical: url,
       languages: {
-        [locale]: `/${locale}/${TRANSLATION_NAMESPACES.HOME}`,
+        [locale]: `/${locale}`,
       },
     },
     openGraph: createOpenGraphMetadata({

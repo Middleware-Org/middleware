@@ -43,7 +43,7 @@ export default async function PodcastsPage({ params }: PodcastsPageProps) {
     <div className={styles.container}>
       <AutoScroll paramName="issue" />
       <div className={styles.mobileToggle}>
-        <MobileIssuesToggle issues={issues} />
+        <MobileIssuesToggle issues={issues} dict={dictCommon} />
       </div>
 
       <div className={styles.grid}>

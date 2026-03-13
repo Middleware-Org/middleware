@@ -33,12 +33,15 @@ export default async function AdminProtectedLayout({
     redirect(withLocale("/admin/login", locale));
   }
 
-  const dict = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
+  const [dict, adminDict] = await Promise.all([
+    getDictionary(locale, TRANSLATION_NAMESPACES.COMMON),
+    getDictionary(locale, TRANSLATION_NAMESPACES.ADMIN),
+  ]);
 
   return (
     <SWRProvider>
       <div className="flex h-screen overflow-hidden">
-        <Sidebar dict={dict} locale={locale} currentUserRole={user.role} />
+        <Sidebar dict={dict} adminDict={adminDict} locale={locale} currentUserRole={user.role} />
         <main className="flex-1 overflow-auto">{children}</main>
       </div>
       {/* Debug indicator solo in development */}

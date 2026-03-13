@@ -37,7 +37,10 @@ function Logo({ dict, locale }: { dict: Pick<CommonDictionary, "title">; locale:
  ************************************************** */
 export default async function AdminLoginPage({ params }: LoginPageProps) {
   const { locale } = await params;
-  const dict = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
+  const [dict, adminDict] = await Promise.all([
+    getDictionary(locale, TRANSLATION_NAMESPACES.COMMON),
+    getDictionary(locale, TRANSLATION_NAMESPACES.ADMIN),
+  ]);
 
   return (
     <main className={styles.main}>
@@ -46,10 +49,10 @@ export default async function AdminLoginPage({ params }: LoginPageProps) {
           <div className={styles.logoWrapper}>
             <Logo dict={dict} locale={locale} />
           </div>
-          <h1 className={styles.title}>Area admin</h1>
-          <p className={styles.description}>Accedi con email e password</p>
+          <h1 className={styles.title}>{adminDict.login.title}</h1>
+          <p className={styles.description}>{adminDict.login.description}</p>
         </div>
-        <LoginForm locale={locale} />
+        <LoginForm locale={locale} dict={adminDict.login} />
       </div>
     </main>
   );

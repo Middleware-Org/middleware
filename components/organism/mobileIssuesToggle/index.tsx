@@ -12,23 +12,25 @@ import { cn } from "@/lib/utils/classes";
 import type { Issue } from "@/.velite";
 import styles from "./styles";
 import { useIssuesList } from "@/lib/store/issuesList";
+import type { CommonDictionary } from "@/lib/i18n/types";
 
 /* **************************************************
  * Types
  **************************************************/
 type MobileIssuesToggleProps = {
   issues: Issue[];
+  dict: Pick<CommonDictionary, "lists">;
 };
 
 /* **************************************************
  * MobileIssuesToggle Component
  **************************************************/
-export default function MobileIssuesToggle({ issues }: MobileIssuesToggleProps) {
+export default function MobileIssuesToggle({ issues, dict }: MobileIssuesToggleProps) {
   const { isOpen, toggleOpen } = useIssuesList();
   const searchParams = useSearchParams();
   const activeIssue = searchParams.get("issue");
 
-  const buttonText = isOpen ? "Chiudi" : "Mostra Uscite";
+  const buttonText = isOpen ? dict.lists.close : dict.lists.showIssues;
   const buttonVariant = isOpen ? "secondary" : "primary";
   const buttonTextClass = isOpen ? styles.buttonTextClosed : styles.buttonTextOpen;
 

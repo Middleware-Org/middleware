@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth/client";
 import { withLocale } from "@/lib/i18n/path";
+import type { AdminDictionary } from "@/lib/i18n/types";
 import styles from "./styles";
 
 /* **************************************************
@@ -15,7 +16,12 @@ import styles from "./styles";
 /* **************************************************
  * Login Form Component
  ************************************************** */
-export default function LoginForm({ locale }: { locale: string }) {
+type LoginFormProps = {
+  locale: string;
+  dict: AdminDictionary["login"];
+};
+
+export default function LoginForm({ locale, dict }: LoginFormProps) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,7 +43,7 @@ export default function LoginForm({ locale }: { locale: string }) {
       });
 
       if (result.error) {
-        setError(result.error.message || "Errore durante il login");
+        setError(result.error.message || dict.genericError);
         return;
       }
 
@@ -45,7 +51,7 @@ export default function LoginForm({ locale }: { locale: string }) {
         router.push(withLocale("/admin", locale));
       }
     } catch {
-      setError("Errore durante il login. Riprova.");
+      setError(dict.retryError);
     } finally {
       setLoading(false);
     }
@@ -61,7 +67,7 @@ export default function LoginForm({ locale }: { locale: string }) {
       <form onSubmit={handleSubmit} className={styles.form}>
         <div className={styles.field}>
           <label htmlFor="email" className={styles.label}>
-            Email
+            {dict.emailLabel}
           </label>
           <input
             id="email"
@@ -77,7 +83,7 @@ export default function LoginForm({ locale }: { locale: string }) {
 
         <div className={styles.field}>
           <label htmlFor="password" className={styles.label}>
-            Password
+            {dict.passwordLabel}
           </label>
           <input
             id="password"
@@ -92,7 +98,7 @@ export default function LoginForm({ locale }: { locale: string }) {
         </div>
 
         <button type="submit" disabled={loading} className={styles.button}>
-          {loading ? "Accesso in corso..." : "Accedi"}
+          {loading ? dict.submitting : dict.submit}
         </button>
       </form>
     </>
