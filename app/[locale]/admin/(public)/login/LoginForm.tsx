@@ -62,7 +62,11 @@ export default function LoginForm({ locale, dict }: LoginFormProps) {
    ************************************************** */
   return (
     <>
-      {error && <div className={styles.error}>{error}</div>}
+      {error && (
+        <div className={styles.error} role="alert" aria-live="assertive">
+          {error}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className={styles.form}>
         <div className={styles.field}>
@@ -78,6 +82,7 @@ export default function LoginForm({ locale, dict }: LoginFormProps) {
             disabled={loading}
             className={styles.input}
             autoComplete="email"
+            aria-invalid={Boolean(error)}
           />
         </div>
 
@@ -94,6 +99,7 @@ export default function LoginForm({ locale, dict }: LoginFormProps) {
             disabled={loading}
             className={styles.input}
             autoComplete="current-password"
+            aria-invalid={Boolean(error)}
           />
         </div>
 

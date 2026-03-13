@@ -3,12 +3,14 @@
  **************************************************/
 import IssuesList from "@/components/organism/issuesList";
 import MobileIssuesToggle from "@/components/organism/mobileIssuesToggle";
-import { getAllIssues, getAllPodcasts } from "@/lib/content";
+import { getAllIssues } from "@/lib/content";
 import { getDictionary } from "@/lib/i18n/utils";
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import Issue from "@/components/organism/issue";
 import { cn } from "@/lib/utils/classes";
 import AutoScroll from "@/components/AutoScroll";
+import { getBaseUrl } from "@/lib/utils/metadata";
+import type { Metadata } from "next";
 
 /* **************************************************
  * Types
@@ -16,6 +18,32 @@ import AutoScroll from "@/components/AutoScroll";
 type PodcastsPageProps = {
   params: Promise<{ locale: string }>;
 };
+
+export async function generateMetadata({ params }: PodcastsPageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const baseUrl = getBaseUrl();
+  const pageUrl = `${baseUrl}/${locale}/podcasts`;
+  const description =
+    "Archivio podcast di Middleware su tecnologia, cultura digitale e innovazione.";
+
+  return {
+    title: "Podcast",
+    description,
+    alternates: {
+      canonical: pageUrl,
+    },
+    openGraph: {
+      title: "Podcast",
+      description,
+      url: pageUrl,
+      type: "website",
+    },
+    twitter: {
+      title: "Podcast",
+      description,
+    },
+  };
+}
 
 /* **************************************************
  * Styles
@@ -55,8 +83,6 @@ export default async function PodcastsPage({ params }: PodcastsPageProps) {
 
         <div className={styles.content}>
           {issues.map((issue, index) => {
-            const podcasts = getAllPodcasts();
-            if (podcasts.length === 0) return null;
             return (
               <Issue
                 key={issue.slug}
