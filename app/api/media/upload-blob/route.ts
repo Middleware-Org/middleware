@@ -21,7 +21,7 @@ const ALLOWED_PATHNAME_REGEX = /^media\/[a-zA-Z0-9._-]{1,120}$/;
 export async function POST(request: NextRequest) {
   try {
     const ip = getClientIp(request);
-    const rateLimit = checkRateLimit(`media:upload-blob:${ip}`, {
+    const rateLimit = await checkRateLimit(`media:upload-blob:${ip}`, {
       windowMs: 60_000,
       maxRequests: 20,
     });

@@ -18,7 +18,7 @@ export async function POST(request: Request) {
   const ip = getClientIp(request);
 
   const isSignIn = pathname.includes("/sign-in");
-  const limit = checkRateLimit(`auth:${ip}:${isSignIn ? "sign-in" : "post"}`, {
+  const limit = await checkRateLimit(`auth:${ip}:${isSignIn ? "sign-in" : "post"}`, {
     windowMs: 60_000,
     maxRequests: isSignIn ? 5 : 20,
   });

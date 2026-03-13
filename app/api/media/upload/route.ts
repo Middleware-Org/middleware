@@ -30,7 +30,7 @@ const ALLOWED_MIME_TYPES = new Set([
 export async function POST(request: NextRequest) {
   try {
     const ip = getClientIp(request);
-    const rateLimit = checkRateLimit(`media:upload:${ip}`, {
+    const rateLimit = await checkRateLimit(`media:upload:${ip}`, {
       windowMs: 60_000,
       maxRequests: 10,
     });

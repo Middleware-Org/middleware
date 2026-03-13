@@ -21,7 +21,7 @@ const token = process.env.GITHUB_TOKEN!;
 export async function GET(request: Request) {
   try {
     const ip = getClientIp(request);
-    const rateLimit = checkRateLimit(`github:token-expiration:${ip}`, {
+    const rateLimit = await checkRateLimit(`github:token-expiration:${ip}`, {
       windowMs: 60_000,
       maxRequests: 20,
     });

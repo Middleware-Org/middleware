@@ -21,7 +21,7 @@ const token = process.env.GITHUB_TOKEN!;
 export async function POST(request: Request) {
   try {
     const ip = getClientIp(request);
-    const rateLimit = checkRateLimit(`github:merge:${ip}`, {
+    const rateLimit = await checkRateLimit(`github:merge:${ip}`, {
       windowMs: 60_000,
       maxRequests: 5,
     });

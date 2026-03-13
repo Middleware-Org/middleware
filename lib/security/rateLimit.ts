@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getRedisClient } from "@/lib/redis/client";
 
 type RateLimitOptions = {
   windowMs: number;
@@ -48,7 +49,7 @@ export function getClientIp(request: Request): string {
   return "unknown";
 }
 
-export function checkRateLimit(key: string, options: RateLimitOptions): RateLimitResult {
+function checkRateLimitInMemory(key: string, options: RateLimitOptions): RateLimitResult {
   const now = Date.now();
   const store = getRateLimitStore();
   const existing = store.get(key);
@@ -82,6 +83,44 @@ export function checkRateLimit(key: string, options: RateLimitOptions): RateLimi
     remaining: options.maxRequests - existing.count,
     retryAfterSeconds: Math.max(1, Math.ceil((existing.resetAt - now) / 1000)),
   };
+}
+
+export async function checkRateLimit(
+  key: string,
+  options: RateLimitOptions,
+): Promise<RateLimitResult> {
+  const fallbackResult = checkRateLimitInMemory(key, options);
+
+  try {
+    const redis = await getRedisClient();
+    if (!redis) {
+      return fallbackResult;
+    }
+
+    const now = Date.now();
+    const windowStart = Math.floor(now / options.windowMs) * options.windowMs;
+    const redisKey = `rl:${key}:${windowStart}`;
+
+    const count = await redis.incr(redisKey);
+    if (count === 1) {
+      await redis.pExpire(redisKey, options.windowMs);
+    }
+
+    let ttlMs = await redis.pTTL(redisKey);
+    if (ttlMs <= 0) {
+      ttlMs = Math.max(1, options.windowMs - (now - windowStart));
+    }
+
+    return {
+      allowed: count <= options.maxRequests,
+      limit: options.maxRequests,
+      remaining: Math.max(0, options.maxRequests - count),
+      retryAfterSeconds: Math.max(1, Math.ceil(ttlMs / 1000)),
+    };
+  } catch (error) {
+    console.error("Redis rate limit failed, falling back to in-memory", error);
+    return fallbackResult;
+  }
 }
 
 export function createRateLimitResponse(result: RateLimitResult) {
