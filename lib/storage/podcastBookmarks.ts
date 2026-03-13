@@ -1,5 +1,7 @@
 import { openDB, DBSchema, IDBPDatabase } from "idb";
 
+export const PODCAST_BOOKMARKS_UPDATED_EVENT = "podcast-bookmarks-updated";
+
 /* **************************************************
  * Types
  **************************************************/
@@ -32,6 +34,18 @@ class PodcastBookmarksStorage {
   private dbName = "podcast-bookmarks-db";
   private dbVersion = 1;
   private db: IDBPDatabase<PodcastBookmarksDB> | null = null;
+
+  private emitBookmarksUpdated(podcastSlug: string): void {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    window.dispatchEvent(
+      new CustomEvent<{ podcastSlug: string }>(PODCAST_BOOKMARKS_UPDATED_EVENT, {
+        detail: { podcastSlug },
+      }),
+    );
+  }
 
   /**
    * Inizializza il database IndexedDB
@@ -134,6 +148,7 @@ class PodcastBookmarksStorage {
       };
 
       await this.db.put("podcastBookmarks", newBookmark);
+      this.emitBookmarksUpdated(newBookmark.podcastSlug);
       return newBookmark;
     } catch (error) {
       console.error("Errore nel salvataggio del segnaposto:", error);
@@ -159,7 +174,11 @@ class PodcastBookmarksStorage {
     }
 
     try {
+      const existing = await this.db.get("podcastBookmarks", bookmarkId);
       await this.db.delete("podcastBookmarks", bookmarkId);
+      if (existing) {
+        this.emitBookmarksUpdated(existing.podcastSlug);
+      }
     } catch (error) {
       console.error(`Errore nella rimozione del segnaposto ${bookmarkId}:`, error);
       throw error;
@@ -193,6 +212,7 @@ class PodcastBookmarksStorage {
         this.db!.delete("podcastBookmarks", bookmark.id),
       );
       await Promise.all(deletePromises);
+      this.emitBookmarksUpdated(podcastSlug);
     } catch (error) {
       console.error(`Errore nella rimozione dei segnaposto per ${podcastSlug}:`, error);
       throw error;

@@ -99,19 +99,10 @@ export default function PodcastPlayer({ podcast, issue }: PodcastPlayerProps) {
   }, [podcast.audio_chunks]);
 
   // Usa il custom hook per gestire i bookmarks
-  const { bookmarks, addBookmark, hasBookmarkInChunk, refreshBookmarks } = usePodcastBookmarks({
+  const { bookmarks, addBookmark, removeBookmark, hasBookmarkInChunk } = usePodcastBookmarks({
     podcastSlug: podcastId,
     segments,
   });
-
-  // Ricarica i bookmarks periodicamente per sincronizzare con eliminazioni da PodcastBookmarkManager
-  // TODO: Migliorare con eventi custom o callback diretti
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      await refreshBookmarks();
-    }, 500);
-    return () => clearInterval(interval);
-  }, [refreshBookmarks]);
 
   // Funzione per aggiungere segnaposto al tempo corrente
   const handleToggleBookmark = useCallback(async () => {
@@ -192,8 +183,8 @@ export default function PodcastPlayer({ podcast, issue }: PodcastPlayerProps) {
         transcriptContainerRef={transcriptContainerRef}
         transcriptContentInnerRef={transcriptContentInnerRef}
         activeSegmentRef={activeSegmentRef}
-        podcastSlug={podcast.slug}
         bookmarks={bookmarks}
+        onRemoveBookmark={removeBookmark}
       />
     </div>
   );
