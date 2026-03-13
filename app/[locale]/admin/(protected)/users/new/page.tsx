@@ -4,7 +4,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getUser } from "@/lib/auth/server";
+import { getAdminUser } from "@/lib/auth/server";
 import UserFormClient from "../components/UserFormClient";
 import UserFormSkeleton from "../components/UserFormSkeleton";
 import styles from "../styles";
@@ -14,9 +14,9 @@ import SWRPageProvider from "@/components/providers/SWRPageProvider";
  * New User Page (Server Component)
  **************************************************/
 export default async function NewUserPage() {
-  const user = await getUser();
+  const user = await getAdminUser();
   if (!user) {
-    redirect("/admin/login");
+    redirect("/admin");
   }
 
   return (
@@ -36,4 +36,3 @@ export default async function NewUserPage() {
     </SWRPageProvider>
   );
 }
-

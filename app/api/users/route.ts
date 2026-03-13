@@ -2,7 +2,7 @@
  * Imports
  **************************************************/
 import { NextResponse } from "next/server";
-import { getUser } from "@/lib/auth/server";
+import { getAdminUser } from "@/lib/auth/server";
 import { getAllUsers } from "@/lib/github/users";
 
 /* **************************************************
@@ -10,7 +10,7 @@ import { getAllUsers } from "@/lib/github/users";
  **************************************************/
 export async function GET() {
   try {
-    const user = await getUser();
+    const user = await getAdminUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

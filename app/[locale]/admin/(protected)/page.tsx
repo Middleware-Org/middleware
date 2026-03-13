@@ -26,7 +26,7 @@ export default async function AdminProtectedPage() {
     return null;
   }
 
-  const [issues, articles, categories, authors, pages, media, podcasts, users] = await Promise.all([
+  const [issues, articles, categories, authors, pages, media, podcasts] = await Promise.all([
     getAllIssues(),
     getAllArticles(),
     getAllCategories(),
@@ -34,8 +34,9 @@ export default async function AdminProtectedPage() {
     getAllPages(),
     getAllMediaFiles(),
     getAllPodcasts(),
-    getAllUsers(),
   ]);
+
+  const users = user.role === "ADMIN" ? await getAllUsers() : [];
 
   const stats = [
     {
@@ -94,14 +95,18 @@ export default async function AdminProtectedPage() {
       description: "Numero totale",
       color: "tertiary",
     },
-    {
-      title: "Utenti",
-      count: users.length,
-      href: "/admin/users",
-      icon: "👤",
-      description: "Numero totale",
-      color: "tertiary",
-    },
+    ...(user.role === "ADMIN"
+      ? [
+          {
+            title: "Utenti",
+            count: users.length,
+            href: "/admin/users",
+            icon: "👤",
+            description: "Numero totale",
+            color: "tertiary",
+          },
+        ]
+      : []),
   ];
 
   return (

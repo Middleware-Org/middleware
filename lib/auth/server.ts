@@ -49,17 +49,29 @@ export async function getAuthenticatedUser() {
 }
 
 export async function getUser() {
-  const user = await getAuthenticatedUser();
-  if (!user) {
+  const sessionUser = await getAuthenticatedUser();
+  if (!sessionUser) {
     return null;
   }
 
   const dbUser = await prisma.user.findUnique({
-    where: { id: user.id },
+    where: { id: sessionUser.id },
     select: { role: true },
   });
 
-  if (!dbUser || dbUser.role !== "ADMIN") {
+  if (!dbUser) {
+    return null;
+  }
+
+  return {
+    ...sessionUser,
+    role: dbUser.role,
+  };
+}
+
+export async function getAdminUser() {
+  const user = await getUser();
+  if (!user || user.role !== "ADMIN") {
     return null;
   }
 

@@ -32,6 +32,7 @@ import styles from "./styles";
 interface SidebarProps {
   dict: Pick<CommonDictionary, "title">;
   locale: string;
+  currentUserRole: "ADMIN" | "EDITOR";
 }
 
 /* **************************************************
@@ -88,7 +89,7 @@ const navItems = [
 /* **************************************************
  * Sidebar Component
  **************************************************/
-export default function Sidebar({ dict, locale }: SidebarProps) {
+export default function Sidebar({ dict, locale, currentUserRole }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -108,6 +109,12 @@ export default function Sidebar({ dict, locale }: SidebarProps) {
   }
 
   const pathnameWithoutLocale = getPathnameWithoutLocale(pathname);
+  const visibleNavItems = navItems.filter((item) => {
+    if (item.href === "/admin/users" && currentUserRole !== "ADMIN") {
+      return false;
+    }
+    return true;
+  });
 
   return (
     <aside className={styles.sidebar}>
@@ -122,8 +129,7 @@ export default function Sidebar({ dict, locale }: SidebarProps) {
 
       <nav className={styles.nav}>
         <ul className={styles.navList}>
-          {navItems.map((item) => {
-            console.log("item", item);
+          {visibleNavItems.map((item) => {
             const Icon = item.icon;
             const isActive =
               item.href === "/admin"

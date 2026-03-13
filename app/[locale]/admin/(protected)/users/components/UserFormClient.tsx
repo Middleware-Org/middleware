@@ -71,9 +71,6 @@ export default function UserFormClient({ userId }: UserFormClientProps) {
   useEffect(() => {
     if (state?.success) {
       formRef.current?.reset();
-      // Reset password state before navigation (component will unmount anyway)
-      setPassword("");
-      setPasswordError(null);
       // Invalida la cache SWR per forzare il refetch della lista
       mutate("/api/users");
       if (editing && userId) {
@@ -199,6 +196,22 @@ export default function UserFormClient({ userId }: UserFormClientProps) {
             defaultValue={user?.name || ""}
             className={styles.input}
           />
+        </div>
+
+        <div className={styles.field}>
+          <label htmlFor="role" className={styles.label}>
+            Ruolo *
+          </label>
+          <select
+            id="role"
+            name="role"
+            defaultValue={user?.role || "EDITOR"}
+            className={styles.input}
+            required
+          >
+            <option value="EDITOR">Editor</option>
+            <option value="ADMIN">Admin</option>
+          </select>
         </div>
 
         <div className={styles.field}>

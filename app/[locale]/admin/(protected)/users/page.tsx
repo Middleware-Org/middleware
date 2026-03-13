@@ -4,7 +4,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getUser } from "@/lib/auth/server";
+import { getAdminUser } from "@/lib/auth/server";
 import { getAllUsers } from "@/lib/github/users";
 import UserListClient from "./components/UserListClient";
 import UserListSkeleton from "./components/UserListSkeleton";
@@ -16,9 +16,9 @@ import { Plus, ArrowLeft } from "lucide-react";
  * Users List Page (Server Component)
  **************************************************/
 export default async function UsersPage() {
-  const user = await getUser();
+  const user = await getAdminUser();
   if (!user) {
-    redirect("/admin/login");
+    redirect("/admin");
   }
 
   const users = await getAllUsers();

@@ -37,6 +37,7 @@ import { ItemsPerPageSelector } from "@/components/table/ItemsPerPageSelector";
 const columnConfig: ColumnConfig[] = [
   { key: "email", label: "Email", defaultVisible: true },
   { key: "name", label: "Nome", defaultVisible: true },
+  { key: "role", label: "Ruolo", defaultVisible: true },
   { key: "createdAt", label: "Data Creazione", defaultVisible: true },
   { key: "actions", label: "Azioni", defaultVisible: true },
 ];
@@ -189,6 +190,8 @@ export default function UserListClient() {
         return <TableCell className="font-medium">{user.email}</TableCell>;
       case "name":
         return <TableCell>{user.name || <span className="text-secondary/60">—</span>}</TableCell>;
+      case "role":
+        return <TableCell>{user.role === "ADMIN" ? "Admin" : "Editor"}</TableCell>;
       case "createdAt":
         return <TableCell className="text-secondary/80">{formatDate(user.createdAt)}</TableCell>;
       case "actions":

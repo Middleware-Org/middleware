@@ -4,7 +4,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
-import { getUser } from "@/lib/auth/server";
+import { getAdminUser } from "@/lib/auth/server";
 import { getUserById } from "@/lib/github/users";
 import UserFormClient from "../../components/UserFormClient";
 import UserEditSkeleton from "../../components/UserEditSkeleton";
@@ -22,9 +22,9 @@ interface EditUserPageProps {
  * Edit User Page (Server Component)
  **************************************************/
 export default async function EditUserPage({ params }: EditUserPageProps) {
-  const user = await getUser();
+  const user = await getAdminUser();
   if (!user) {
-    redirect("/admin/login");
+    redirect("/admin");
   }
 
   const { id } = await params;
@@ -56,4 +56,3 @@ export default async function EditUserPage({ params }: EditUserPageProps) {
     </SWRPageProvider>
   );
 }
-
