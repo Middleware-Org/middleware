@@ -8,6 +8,7 @@ import PodcastPlayer from "./components/PodcastPlayer";
 import type { Metadata } from "next";
 import { getBaseUrl } from "@/lib/utils/metadata";
 import { getGitHubImageUrl } from "@/lib/github/images";
+import StructuredData from "@/components/StructuredData";
 
 /* **************************************************
  * Types
@@ -33,7 +34,35 @@ export async function generateMetadata({ params }: PodcastPageProps): Promise<Me
   const baseUrl = getBaseUrl();
   const podcastUrl = `${baseUrl}/${locale}/podcast/${slug}`;
 
-  // Structured data for Podcast
+  return {
+    title: podcast.title,
+    description: podcast.description,
+    openGraph: {
+      title: podcast.title,
+      description: podcast.description,
+      url: podcastUrl,
+      locale: locale,
+      type: "website",
+    },
+    twitter: {
+      title: podcast.title,
+      description: podcast.description,
+    },
+    alternates: {
+      canonical: podcastUrl,
+    },
+  };
+}
+
+function getPodcastStructuredData(locale: string, slug: string) {
+  const podcast = getPodcastBySlug(slug);
+  if (!podcast) {
+    return [] as Array<Record<string, unknown>>;
+  }
+
+  const baseUrl = getBaseUrl();
+  const podcastUrl = `${baseUrl}/${locale}/podcast/${slug}`;
+
   const podcastSchema = {
     "@context": "https://schema.org",
     "@type": "PodcastEpisode",
@@ -77,27 +106,7 @@ export async function generateMetadata({ params }: PodcastPageProps): Promise<Me
     ],
   };
 
-  return {
-    title: podcast.title,
-    description: podcast.description,
-    openGraph: {
-      title: podcast.title,
-      description: podcast.description,
-      url: podcastUrl,
-      locale: locale,
-      type: "website",
-    },
-    twitter: {
-      title: podcast.title,
-      description: podcast.description,
-    },
-    alternates: {
-      canonical: podcastUrl,
-    },
-    other: {
-      "application/ld+json": JSON.stringify([podcastSchema, breadcrumbSchema]),
-    },
-  };
+  return [podcastSchema, breadcrumbSchema];
 }
 
 /* **************************************************
@@ -119,7 +128,7 @@ export async function generateStaticParams() {
  * Podcast Page
  ***************************************************/
 export default async function PodcastPage({ params }: PodcastPageProps) {
-  const { slug } = await params;
+  const { locale, slug } = await params;
 
   const podcast = getPodcastBySlug(slug);
 
@@ -130,5 +139,10 @@ export default async function PodcastPage({ params }: PodcastPageProps) {
   // Get associated issue for cover image
   const issue = podcast.issue ? getIssueBySlug(podcast.issue) : undefined;
 
-  return <PodcastPlayer podcast={podcast} issue={issue} />;
+  return (
+    <>
+      <StructuredData id={`podcast-ld-${slug}`} data={getPodcastStructuredData(locale, slug)} />
+      <PodcastPlayer podcast={podcast} issue={issue} />
+    </>
+  );
 }

@@ -87,7 +87,7 @@ export default function ArchiveIssueCard({
   index,
 }: ArchiveIssueCardProps) {
   const lightColor = lightenColor(issue.color);
-  const { lang = "it" } = useParams() as { lang: "it" };
+  const { locale: routeLocale = "it" } = useParams() as { locale: "it" };
   const { textColor, backgroundColor } = getTextColor(issue.color);
 
   return (
@@ -168,7 +168,11 @@ export default function ArchiveIssueCard({
               <header className={styles.header}>
                 <div className={styles.badgesMobile}>
                   <div className={styles.badgeDate}>
-                    <FormattedDate date={issue.date} lang={lang} className={styles.badgeTextDate} />
+                    <FormattedDate
+                      date={issue.date}
+                      lang={routeLocale}
+                      className={styles.badgeTextDate}
+                    />
                   </div>
                   <div className={styles.badgeTitle}>
                     <MonoTextLight className={styles.badgeTextTitle}>{issue.title}</MonoTextLight>

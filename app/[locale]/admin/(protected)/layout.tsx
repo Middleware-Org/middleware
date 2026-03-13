@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { getUser } from "@/lib/auth/server";
 import { getDictionary } from "@/lib/i18n/utils";
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
+import { withLocale } from "@/lib/i18n/path";
 import type { ReactNode } from "react";
 import Sidebar from "./components/Sidebar";
 import SWRProvider from "@/components/providers/SWRProvider";
@@ -25,13 +26,13 @@ export default async function AdminProtectedLayout({
   children,
   params,
 }: AdminProtectedLayoutProps) {
+  const { locale } = await params;
   const user = await getUser();
 
   if (!user) {
-    redirect("/admin/login");
+    redirect(withLocale("/admin/login", locale));
   }
 
-  const { locale } = await params;
   const dict = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
 
   return (

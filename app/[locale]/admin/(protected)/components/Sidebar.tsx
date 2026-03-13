@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils/classes";
 import { authClient } from "@/lib/auth/client";
-import { i18nSettings } from "@/lib/i18n/settings";
+import { stripLocalePrefix, withLocale } from "@/lib/i18n/path";
 import Pictogram from "@/components/organism/pictogram";
 import { MonoTextBold } from "@/components/atoms/typography";
 import type { CommonDictionary } from "@/lib/i18n/types";
@@ -95,20 +95,10 @@ export default function Sidebar({ dict, locale, currentUserRole }: SidebarProps)
 
   async function handleLogout() {
     await authClient.signOut();
-    router.push("/admin/login");
+    router.push(withLocale("/admin/login", locale));
   }
 
-  // Rimuove il locale dal pathname (es. /it/admin -> /admin)
-  function getPathnameWithoutLocale(path: string): string {
-    const segments = path.split("/").filter(Boolean);
-    // Se il primo segmento è un locale supportato, rimuovilo
-    if (segments.length > 0 && i18nSettings.locales.includes(segments[0])) {
-      return "/" + segments.slice(1).join("/");
-    }
-    return path;
-  }
-
-  const pathnameWithoutLocale = getPathnameWithoutLocale(pathname);
+  const pathnameWithoutLocale = stripLocalePrefix(pathname);
   const visibleNavItems = navItems.filter((item) => {
     if (item.href === "/admin/users" && currentUserRole !== "ADMIN") {
       return false;
@@ -140,7 +130,7 @@ export default function Sidebar({ dict, locale, currentUserRole }: SidebarProps)
             return (
               <li key={item.href}>
                 <Link
-                  href={item.href}
+                  href={withLocale(item.href, locale)}
                   className={cn(
                     styles.navItem,
                     isActive ? styles.navItemActive : styles.navItemInactive,

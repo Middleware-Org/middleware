@@ -33,7 +33,7 @@ const IMAGE_HEIGHT = 500;
  * Cover
  **************************************************/
 export default function Cover({ issue, articleInEvidence, dict }: CoverProps) {
-  const { lang = "it" } = useParams() as { lang: string };
+  const { locale = "it" } = useParams() as { locale: string };
 
   return (
     <div className={styles.link}>
@@ -51,7 +51,7 @@ export default function Cover({ issue, articleInEvidence, dict }: CoverProps) {
             <div className={styles.badgeDate}>
               <FormattedDate
                 date={issue.date}
-                lang={lang as "it"}
+                lang={locale as "it"}
                 className={styles.badgeTextDate}
               />
             </div>

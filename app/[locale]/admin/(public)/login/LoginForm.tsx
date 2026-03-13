@@ -6,17 +6,16 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth/client";
+import { withLocale } from "@/lib/i18n/path";
 import styles from "./styles";
 
 /* **************************************************
  * Constants
  ************************************************** */
-const CALLBACK_URL = "/admin";
-
 /* **************************************************
  * Login Form Component
  ************************************************** */
-export default function LoginForm() {
+export default function LoginForm({ locale }: { locale: string }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -43,7 +42,7 @@ export default function LoginForm() {
       }
 
       if (result.data) {
-        router.push(CALLBACK_URL);
+        router.push(withLocale("/admin", locale));
       }
     } catch {
       setError("Errore durante il login. Riprova.");

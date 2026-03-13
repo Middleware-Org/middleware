@@ -7,6 +7,7 @@ import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import Pictogram from "@/components/organism/pictogram";
 import { MonoTextBold } from "@/components/atoms/typography";
 import type { CommonDictionary } from "@/lib/i18n/types";
+import { withLocale } from "@/lib/i18n/path";
 import LoginForm from "./LoginForm";
 import styles from "./styles";
 
@@ -20,11 +21,11 @@ type LoginPageProps = {
 /* **************************************************
  * Logo Component
  ************************************************** */
-function Logo({ dict }: { dict: Pick<CommonDictionary, "title"> }) {
+function Logo({ dict, locale }: { dict: Pick<CommonDictionary, "title">; locale: string }) {
   return (
     <div className={styles.logoContainer}>
       <Pictogram size={48} />
-      <Link href="/">
+      <Link href={withLocale("/", locale)}>
         <MonoTextBold className={styles.logoText}>{dict.title}</MonoTextBold>
       </Link>
     </div>
@@ -43,12 +44,12 @@ export default async function AdminLoginPage({ params }: LoginPageProps) {
       <div className={styles.container}>
         <div className={styles.header}>
           <div className={styles.logoWrapper}>
-            <Logo dict={dict} />
+            <Logo dict={dict} locale={locale} />
           </div>
           <h1 className={styles.title}>Area admin</h1>
           <p className={styles.description}>Accedi con email e password</p>
         </div>
-        <LoginForm />
+        <LoginForm locale={locale} />
       </div>
     </main>
   );

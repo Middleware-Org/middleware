@@ -8,6 +8,7 @@ import { i18nSettings } from "@/lib/i18n/settings";
 import { getBaseUrl } from "@/lib/utils/metadata";
 import { notFound } from "next/navigation";
 import Article from "./components/Article";
+import StructuredData from "@/components/StructuredData";
 import type { Metadata } from "next";
 
 interface ArticlePageProps {
@@ -34,9 +35,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
 
   // Optimize meta description length (max 160 characters)
   const optimizedDescription =
-    article.excerpt.length > 160
-      ? article.excerpt.substring(0, 157) + "..."
-      : article.excerpt;
+    article.excerpt.length > 160 ? article.excerpt.substring(0, 157) + "..." : article.excerpt;
 
   // Generate dynamic OG image URL with article metadata
   const ogImageUrl = `${baseUrl}/api/og?${new URLSearchParams({
@@ -46,7 +45,72 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
     ...(issue?.color && { color: issue.color }),
   }).toString()}`;
 
-  // Structured data for Article
+  return {
+    title: article.title,
+    description: optimizedDescription,
+    authors: author ? [{ name: author.name }] : [{ name: "Middleware" }],
+    keywords: [
+      "tecnologia",
+      "innovazione",
+      "digitale",
+      ...(category ? [category.name] : []),
+      ...(author ? [author.name] : []),
+      article.title.split(" ").slice(0, 3),
+    ].join(", "),
+    openGraph: {
+      title: article.title,
+      description: optimizedDescription,
+      url: articleUrl,
+      locale: locale,
+      type: "article",
+      publishedTime: article.date,
+      modifiedTime: article.last_update || article.date,
+      authors: author ? [author.name] : ["Middleware"],
+      tags: [...(category ? [category.name] : []), ...(author ? [author.name] : [])],
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: article.title,
+        },
+      ],
+    },
+    twitter: {
+      title: article.title,
+      description: optimizedDescription,
+      images: [ogImageUrl],
+    },
+    alternates: {
+      canonical: articleUrl,
+    },
+    other: {
+      "article:published_time": article.date,
+      "article:modified_time": article.last_update || article.date,
+      "article:author": author?.name || "Middleware",
+      "article:section": category?.name || "Tecnologia",
+    },
+  };
+}
+
+function getArticleStructuredData(locale: string, slug: string) {
+  const article = getArticleBySlug(slug);
+  if (!article) {
+    return [] as Array<Record<string, unknown>>;
+  }
+
+  const author = getAuthorBySlug(article.author);
+  const category = getCategoryBySlug(article.category);
+  const issue = article.issue ? getIssueBySlug(article.issue) : undefined;
+  const baseUrl = getBaseUrl();
+  const articleUrl = `${baseUrl}/${locale}/articles/${slug}`;
+  const ogImageUrl = `${baseUrl}/api/og?${new URLSearchParams({
+    title: article.title,
+    ...(author && { author: author.name }),
+    ...(category && { category: category.name }),
+    ...(issue?.color && { color: issue.color }),
+  }).toString()}`;
+
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -101,56 +165,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
     ],
   };
 
-  return {
-    title: article.title,
-    description: optimizedDescription,
-    authors: author ? [{ name: author.name }] : [{ name: "Middleware" }],
-    keywords: [
-      "tecnologia",
-      "innovazione",
-      "digitale",
-      ...(category ? [category.name] : []),
-      ...(author ? [author.name] : []),
-      article.title.split(" ").slice(0, 3),
-    ].join(", "),
-    openGraph: {
-      title: article.title,
-      description: optimizedDescription,
-      url: articleUrl,
-      locale: locale,
-      type: "article",
-      publishedTime: article.date,
-      modifiedTime: article.last_update || article.date,
-      authors: author ? [author.name] : ["Middleware"],
-      tags: [
-        ...(category ? [category.name] : []),
-        ...(author ? [author.name] : []),
-      ],
-      images: [
-        {
-          url: ogImageUrl,
-          width: 1200,
-          height: 630,
-          alt: article.title,
-        },
-      ],
-    },
-    twitter: {
-      title: article.title,
-      description: optimizedDescription,
-      images: [ogImageUrl],
-    },
-    alternates: {
-      canonical: articleUrl,
-    },
-    other: {
-      "article:published_time": article.date,
-      "article:modified_time": article.last_update || article.date,
-      "article:author": author?.name || "Middleware",
-      "article:section": category?.name || "Tecnologia",
-      "application/ld+json": JSON.stringify([articleSchema, breadcrumbSchema]),
-    },
-  };
+  return [articleSchema, breadcrumbSchema];
 }
 
 // Enable Incremental Static Regeneration (ISR) - revalidate every hour
@@ -182,6 +197,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
   return (
     <div>
+      <StructuredData id={`article-ld-${slug}`} data={getArticleStructuredData(locale, slug)} />
       <Article article={article} dict={dict} />
     </div>
   );

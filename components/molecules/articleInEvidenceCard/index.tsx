@@ -34,7 +34,7 @@ export default function ArticleInEvidenceCard({
   dict,
   disableBadges = false,
 }: ArticleInEvidenceCardProps) {
-  const { lang = "it" } = useParams() as { lang: "it" };
+  const { locale = "it" } = useParams() as { locale: "it" };
 
   const { textColor, backgroundColor } = getTextColor(issue.color);
 
@@ -50,7 +50,7 @@ export default function ArticleInEvidenceCard({
         {!disableBadges && (
           <div className={styles.badgesMobile}>
             <div className={styles.badgeDate}>
-              <FormattedDate date={article.date} lang={lang} className={styles.badgeTextDate} />
+              <FormattedDate date={article.date} lang={locale} className={styles.badgeTextDate} />
             </div>
             <div className={styles.badgeTitle}>
               <Link href={`/issues/${issue.slug}`}>
