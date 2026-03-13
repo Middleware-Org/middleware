@@ -1,3 +1,5 @@
+import typography from "@tailwindcss/typography";
+
 /** @type {import('tailwindcss').Config} */
 const config = {
   content: [
@@ -5,7 +7,7 @@ const config = {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
-  plugins: [require("@tailwindcss/typography")],
+  plugins: [typography],
 };
 
 export default config;
