@@ -3,10 +3,10 @@
  **************************************************/
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { getUser } from "@/lib/auth/server";
 import { createCategory, updateCategory, deleteCategory } from "@/lib/github/categories";
 import type { Category } from "@/lib/github/types";
+import { revalidateAdminPath } from "@/lib/cache/revalidate";
 
 /* **************************************************
  * Types
@@ -46,7 +46,7 @@ export async function createCategoryAction(
       slug: slug?.trim() || undefined,
     });
 
-    revalidatePath("/admin/categories");
+    revalidateAdminPath("/admin/categories");
     return { success: true, data: category, message: "Category created successfully" };
   } catch (error) {
     return {
@@ -86,7 +86,7 @@ export async function updateCategoryAction(
       newSlug: newSlug?.trim() || undefined,
     });
 
-    revalidatePath("/admin/categories");
+    revalidateAdminPath("/admin/categories");
     return { success: true, data: category, message: "Category updated successfully" };
   } catch (error) {
     return {
@@ -109,7 +109,7 @@ export async function deleteCategoryAction(slug: string): Promise<ActionResult> 
     }
 
     await deleteCategory(slug);
-    revalidatePath("/admin/categories");
+    revalidateAdminPath("/admin/categories");
 
     return { success: true, message: "Category deleted successfully" };
   } catch (error) {
@@ -152,7 +152,7 @@ export async function deleteCategoriesAction(
       }
     }
 
-    revalidatePath("/admin/categories");
+    revalidateAdminPath("/admin/categories");
 
     if (failed > 0) {
       return {

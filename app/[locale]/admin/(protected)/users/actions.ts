@@ -3,10 +3,10 @@
  **************************************************/
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { getAdminUser } from "@/lib/auth/server";
 import { createUser, updateUser, deleteUser } from "@/lib/github/users";
 import type { User } from "@/lib/github/users";
+import { revalidateAdminPath } from "@/lib/cache/revalidate";
 
 function parseRole(value: FormDataEntryValue | null): "ADMIN" | "EDITOR" {
   return value === "ADMIN" ? "ADMIN" : "EDITOR";
@@ -60,7 +60,7 @@ export async function createUserAction(
       role,
     });
 
-    revalidatePath("/admin/users");
+    revalidateAdminPath("/admin/users");
     return { success: true, data: userData, message: "User created successfully" };
   } catch (error) {
     return {
@@ -115,7 +115,7 @@ export async function updateUserAction(
 
     const userData = await updateUser(id, updateData);
 
-    revalidatePath("/admin/users");
+    revalidateAdminPath("/admin/users");
     return { success: true, data: userData, message: "User updated successfully" };
   } catch (error) {
     return {
@@ -138,7 +138,7 @@ export async function deleteUserAction(id: string): Promise<ActionResult> {
     }
 
     await deleteUser(id);
-    revalidatePath("/admin/users");
+    revalidateAdminPath("/admin/users");
 
     return { success: true, message: "User deleted successfully" };
   } catch (error) {
@@ -181,7 +181,7 @@ export async function deleteUsersAction(
       }
     }
 
-    revalidatePath("/admin/users");
+    revalidateAdminPath("/admin/users");
 
     if (failed > 0) {
       return {

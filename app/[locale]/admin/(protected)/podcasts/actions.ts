@@ -3,10 +3,10 @@
  **************************************************/
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { getUser } from "@/lib/auth/server";
 import { createPodcast, updatePodcast, deletePodcast } from "@/lib/github/podcasts";
 import type { Podcast } from "@/lib/github/types";
+import { revalidateAdminPath } from "@/lib/cache/revalidate";
 
 /* **************************************************
  * Types
@@ -58,7 +58,7 @@ export async function createPodcastAction(
       slug: slug?.trim() || undefined,
     });
 
-    revalidatePath("/admin/podcasts");
+    revalidateAdminPath("/admin/podcasts");
     return { success: true, data: podcast, message: "Podcast created successfully" };
   } catch (error) {
     return {
@@ -108,7 +108,7 @@ export async function updatePodcastAction(
       newSlug: newSlug?.trim() || undefined,
     });
 
-    revalidatePath("/admin/podcasts");
+    revalidateAdminPath("/admin/podcasts");
     return { success: true, data: podcast, message: "Podcast updated successfully" };
   } catch (error) {
     return {
@@ -131,7 +131,7 @@ export async function deletePodcastAction(slug: string): Promise<ActionResult> {
     }
 
     await deletePodcast(slug);
-    revalidatePath("/admin/podcasts");
+    revalidateAdminPath("/admin/podcasts");
 
     return { success: true, message: "Podcast deleted successfully" };
   } catch (error) {
@@ -171,7 +171,7 @@ export async function deletePodcastsAction(
       }
     }
 
-    revalidatePath("/admin/podcasts");
+    revalidateAdminPath("/admin/podcasts");
 
     if (failed > 0) {
       return {
@@ -194,4 +194,3 @@ export async function deletePodcastsAction(
     };
   }
 }
-

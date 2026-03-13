@@ -3,10 +3,10 @@
  **************************************************/
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { getUser } from "@/lib/auth/server";
 import { createPage, updatePage, deletePage } from "@/lib/github/pages";
 import type { Page } from "@/lib/github/types";
+import { revalidateAdminPath } from "@/lib/cache/revalidate";
 
 /* **************************************************
  * Types
@@ -48,7 +48,7 @@ export async function createPageAction(
       content: content.trim(),
     });
 
-    revalidatePath("/admin/pages");
+    revalidateAdminPath("/admin/pages");
     return { success: true, data: page, message: "Page created successfully" };
   } catch (error) {
     return {
@@ -90,7 +90,7 @@ export async function updatePageAction(
       newSlug: newSlug?.trim() || undefined,
     });
 
-    revalidatePath("/admin/pages");
+    revalidateAdminPath("/admin/pages");
     return { success: true, data: page, message: "Page updated successfully" };
   } catch (error) {
     return {
@@ -113,7 +113,7 @@ export async function deletePageAction(slug: string): Promise<ActionResult> {
     }
 
     await deletePage(slug);
-    revalidatePath("/admin/pages");
+    revalidateAdminPath("/admin/pages");
 
     return { success: true, message: "Page deleted successfully" };
   } catch (error) {
@@ -153,7 +153,7 @@ export async function deletePagesAction(
       }
     }
 
-    revalidatePath("/admin/pages");
+    revalidateAdminPath("/admin/pages");
 
     if (failed > 0) {
       return {

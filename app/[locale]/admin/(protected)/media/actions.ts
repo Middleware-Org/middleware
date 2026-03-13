@@ -3,7 +3,6 @@
  **************************************************/
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { getUser } from "@/lib/auth/server";
 import {
   deleteMediaFile,
@@ -12,6 +11,7 @@ import {
   getAllMediaFiles,
   type MediaFile,
 } from "@/lib/github/media";
+import { revalidateAdminPath } from "@/lib/cache/revalidate";
 
 /* **************************************************
  * Types
@@ -60,7 +60,7 @@ export async function uploadMediaAction(
 
     const filePath = await uploadMediaFile(fileBase64, filename?.trim() || undefined, fileType);
 
-    revalidatePath("/admin/media");
+    revalidateAdminPath("/admin/media");
     return { success: true, data: filePath, message: "File uploaded successfully" };
   } catch (error) {
     return {
@@ -83,7 +83,7 @@ export async function deleteMediaAction(filename: string): Promise<ActionResult>
     }
 
     await deleteMediaFile(filename);
-    revalidatePath("/admin/media");
+    revalidateAdminPath("/admin/media");
 
     return { success: true, message: "File deleted successfully" };
   } catch (error) {
@@ -126,7 +126,7 @@ export async function deleteMediaFilesAction(
       }
     }
 
-    revalidatePath("/admin/media");
+    revalidateAdminPath("/admin/media");
 
     if (failed > 0) {
       return {
@@ -165,7 +165,7 @@ export async function renameMediaAction(
     }
 
     const newUrl = await renameMediaFile(oldFilename, newFilename);
-    revalidatePath("/admin/media");
+    revalidateAdminPath("/admin/media");
 
     return { success: true, data: newUrl, message: "File renamed successfully" };
   } catch (error) {

@@ -3,11 +3,11 @@
  **************************************************/
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { getUser } from "@/lib/auth/server";
 import { createIssue, updateIssue, deleteIssue } from "@/lib/github/issues";
 import { uploadImage } from "@/lib/github/client";
 import type { Issue } from "@/lib/github/types";
+import { revalidateAdminPath } from "@/lib/cache/revalidate";
 
 /* **************************************************
  * Types
@@ -71,7 +71,7 @@ export async function createIssueAction(
       slug: slug?.trim() || undefined,
     });
 
-    revalidatePath("/admin/issues");
+    revalidateAdminPath("/admin/issues");
     return { success: true, data: issue, message: "Issue created successfully" };
   } catch (error) {
     return {
@@ -133,7 +133,7 @@ export async function updateIssueAction(
       newSlug: newSlug?.trim() || undefined,
     });
 
-    revalidatePath("/admin/issues");
+    revalidateAdminPath("/admin/issues");
     return { success: true, data: issue, message: "Issue updated successfully" };
   } catch (error) {
     return {
@@ -156,7 +156,7 @@ export async function deleteIssueAction(slug: string): Promise<ActionResult> {
     }
 
     await deleteIssue(slug);
-    revalidatePath("/admin/issues");
+    revalidateAdminPath("/admin/issues");
 
     return { success: true, message: "Issue deleted successfully" };
   } catch (error) {
@@ -199,7 +199,7 @@ export async function deleteIssuesAction(
       }
     }
 
-    revalidatePath("/admin/issues");
+    revalidateAdminPath("/admin/issues");
 
     if (failed > 0) {
       return {

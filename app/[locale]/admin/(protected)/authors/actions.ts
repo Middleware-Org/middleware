@@ -3,10 +3,10 @@
  **************************************************/
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { getUser } from "@/lib/auth/server";
 import { createAuthor, updateAuthor, deleteAuthor } from "@/lib/github/authors";
 import type { Author } from "@/lib/github/types";
+import { revalidateAdminPath } from "@/lib/cache/revalidate";
 
 /* **************************************************
  * Types
@@ -46,7 +46,7 @@ export async function createAuthorAction(
       slug: slug?.trim() || undefined,
     });
 
-    revalidatePath("/admin/authors");
+    revalidateAdminPath("/admin/authors");
     return { success: true, data: author, message: "Author created successfully" };
   } catch (error) {
     return {
@@ -86,7 +86,7 @@ export async function updateAuthorAction(
       newSlug: newSlug?.trim() || undefined,
     });
 
-    revalidatePath("/admin/authors");
+    revalidateAdminPath("/admin/authors");
     return { success: true, data: author, message: "Author updated successfully" };
   } catch (error) {
     return {
@@ -109,7 +109,7 @@ export async function deleteAuthorAction(slug: string): Promise<ActionResult> {
     }
 
     await deleteAuthor(slug);
-    revalidatePath("/admin/authors");
+    revalidateAdminPath("/admin/authors");
 
     return { success: true, message: "Author deleted successfully" };
   } catch (error) {
@@ -152,7 +152,7 @@ export async function deleteAuthorsAction(
       }
     }
 
-    revalidatePath("/admin/authors");
+    revalidateAdminPath("/admin/authors");
 
     if (failed > 0) {
       return {

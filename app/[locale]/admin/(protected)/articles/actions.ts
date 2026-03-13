@@ -3,10 +3,10 @@
  **************************************************/
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { getUser } from "@/lib/auth/server";
 import { createArticle, updateArticle, deleteArticle } from "@/lib/github/articles";
 import type { Article } from "@/lib/github/types";
+import { revalidateAdminPath } from "@/lib/cache/revalidate";
 
 /* **************************************************
  * Types
@@ -64,7 +64,7 @@ export async function createArticleAction(
       slug: slug?.trim() || undefined,
     });
 
-    revalidatePath("/admin/articles");
+    revalidateAdminPath("/admin/articles");
     return { success: true, data: article, message: "Article created successfully" };
   } catch (error) {
     return {
@@ -120,7 +120,7 @@ export async function updateArticleAction(
       newSlug: newSlug?.trim() || undefined,
     });
 
-    revalidatePath("/admin/articles");
+    revalidateAdminPath("/admin/articles");
     return { success: true, data: article, message: "Article updated successfully" };
   } catch (error) {
     return {
@@ -143,7 +143,7 @@ export async function deleteArticleAction(slug: string): Promise<ActionResult> {
     }
 
     await deleteArticle(slug);
-    revalidatePath("/admin/articles");
+    revalidateAdminPath("/admin/articles");
 
     return { success: true, message: "Article deleted successfully" };
   } catch (error) {
@@ -183,7 +183,7 @@ export async function deleteArticlesAction(
       }
     }
 
-    revalidatePath("/admin/articles");
+    revalidateAdminPath("/admin/articles");
 
     if (failed > 0) {
       return {
