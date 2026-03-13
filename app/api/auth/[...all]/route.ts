@@ -2,9 +2,22 @@
  * Imports
  **************************************************/
 import { auth } from "@/lib/auth/server";
+import { NextResponse } from "next/server";
 import { toNextJsHandler } from "better-auth/next-js";
 
 /* **************************************************
  * Auth API Route
  **************************************************/
-export const { GET, POST } = toNextJsHandler(auth);
+const authHandler = toNextJsHandler(auth);
+
+export const GET = authHandler.GET;
+
+export async function POST(request: Request) {
+  const pathname = new URL(request.url).pathname;
+
+  if (pathname.includes("/sign-up")) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
+  return authHandler.POST(request);
+}
