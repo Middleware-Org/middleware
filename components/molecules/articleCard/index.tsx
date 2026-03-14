@@ -27,8 +27,8 @@ type ArticleCardProps = {
  **************************************************/
 export default function ArticleCard({ article, dict, isPodcast = false }: ArticleCardProps) {
   const { locale = "it" } = useParams() as { locale: "it" };
-  const author = getAuthorBySlug(article.author);
-  const category = getCategoryBySlug(article.category);
+  const author = getAuthorById(article.authorId);
+  const category = getCategoryById(article.categoryId);
 
   if (!author || !category) return null;
 
