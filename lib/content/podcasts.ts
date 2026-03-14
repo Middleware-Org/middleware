@@ -1,7 +1,7 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { podcasts } from "@/.velite";
+import { podcasts, issues } from "@/.velite";
 
 /* **************************************************
  * Podcasts
@@ -16,6 +16,13 @@ export const getPodcastBySlug = (slug: string) => {
   return podcast && podcast.published ? podcast : undefined;
 };
 
+export const getPodcastById = (id: string) => {
+  const podcast = podcasts.find((p) => p.id === id);
+  return podcast && podcast.published ? podcast : undefined;
+};
+
 export const getPodcastsByIssue = (issueSlug: string) => {
-  return getAllPodcasts().filter((podcast) => podcast.issue === issueSlug);
+  const issue = issues.find((i) => i.slug === issueSlug && i.published);
+  if (!issue) return [];
+  return getAllPodcasts().filter((podcast) => podcast.issueId === issue.id);
 };

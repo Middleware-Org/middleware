@@ -1,7 +1,9 @@
 ---
+id: dec35ea6-a129-4222-8c01-f3692334de59
 slug: privacy-policy
 title: Privacy Policy
 excerpt: Spiegazione e elenco della privacy del sito
+createdBy: 00000000-0000-0000-0000-000000000001
 ---
 **Ultimo aggiornamento:** 4 agosto 2025
 

@@ -1,11 +1,12 @@
 ---
+id: f3047674-954e-4a6b-a01f-cf7ca9727523
 slug: genealogia-e-lessico
 title: Genealogia e lessico
 date: '2026-03-13'
 last_update: '2026-03-13T09:10:11.742Z'
-author: middleware
-category: contro-formazione
-issue: operaismo-politico-italiano
+authorId: 9e421669-3a18-4bdb-94f9-e0bf8fef86dd
+categoryId: 6dfdddaf-c93c-4f34-8a6d-c3b4eebb0859
+issueId: 3ae30972-293d-440e-ab7c-9ee1c28954a8
 in_evidence: false
 published: true
 excerpt: >-
@@ -13,7 +14,8 @@ excerpt: >-
   contro-formazione dedicati all’operaismo politico italiano (un ciclo
   strutturato in quattro parti: contesto e origini, genealogia e lessico,
   conricerca e stile della militanza, e infine tracce e ipotesi).
-podcast: genealogia-e-lessico
+podcastId: 9625a885-03e2-42ca-8736-d1f2474bdfb0
+createdBy: 00000000-0000-0000-0000-000000000001
 ---
 Nel primo incontro abbiamo ricostruito il contesto: l’Italia del miracolo economico, la crisi del movimento operaio tradizionale e l’emergere di una figura nuova, l’operaio-massa. Abbiamo visto chi fossero gli operaisti, da dove provenissero e cosa li tenesse insieme: non la pietà filantropica per gli oppressi, ma la lucida ricerca di chi lotta. Abbiamo compreso come un manipolo di militanti abbia potuto esercitare un impatto sproporzionato rispetto ai propri numeri: perché hanno anticipato. Lavorando d’anticipo, gli operaisti hanno scommesso su una composizione di classe che nessuno ancora vedeva, smettendo di inseguire le lotte per iniziare ad anticiparle.
 

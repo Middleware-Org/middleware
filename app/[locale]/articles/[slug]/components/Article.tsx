@@ -5,9 +5,9 @@ import type { Article } from "@/.velite";
 import SeparatorWithLogo from "@/components/molecules/SeparatorWithLogo";
 import FormattedDate from "@/components/atoms/date";
 import { ArticleDictionary } from "@/lib/i18n/types";
-import { getCategoryBySlug } from "@/lib/content/categories";
-import { getAuthorBySlug } from "@/lib/content/authors";
-import { getPodcastBySlug } from "@/lib/content/podcasts";
+import { getCategoryById } from "@/lib/content/categories";
+import { getAuthorById } from "@/lib/content/authors";
+import { getPodcastById } from "@/lib/content/podcasts";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getMinText } from "@/lib/utils/text";
@@ -25,8 +25,8 @@ type ArticleProps = {
 };
 
 export default function Article({ article, dict, locale }: ArticleProps) {
-  const author = getAuthorBySlug(article.author);
-  const category = getCategoryBySlug(article.category);
+  const author = getAuthorById(article.authorId);
+  const category = getCategoryById(article.categoryId);
 
   const readingTime = getMinText(article.content);
 
@@ -122,7 +122,7 @@ export default function Article({ article, dict, locale }: ArticleProps) {
   const { processedHtml, citations } = processCitations(article.content);
 
   // Check if there's a related podcast
-  const relatedPodcast = article.podcast ? getPodcastBySlug(article.podcast) : null;
+  const relatedPodcast = article.podcastId ? getPodcastById(article.podcastId) : null;
   const authorHref = withLocale(`/authors?author=${author.slug}`, locale);
   const categoryHref = withLocale(`/categories?category=${category.slug}`, locale);
   const podcastHref = relatedPodcast ? withLocale(`/podcast/${relatedPodcast.slug}`, locale) : null;

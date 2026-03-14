@@ -11,6 +11,7 @@ import {
 import { getAllArticles } from "./articles";
 import { generateSlug, generateUniqueSlug } from "./utils";
 import type { Issue } from "./types";
+import { randomUUID } from "crypto";
 
 /* **************************************************
  * Issues
@@ -30,14 +31,6 @@ export async function getAllIssues(): Promise<Issue[]> {
 
         const issue = JSON.parse(content) as Issue;
         issue.slug = file.name.replace(".json", "");
-        // Default published to false if not present (retrocompatibility)
-        if (issue.published === undefined) {
-          issue.published = false;
-        }
-        // Default last_update to date if not present (retrocompatibility)
-        if (!issue.last_update) {
-          issue.last_update = issue.date;
-        }
         return issue;
       } catch {
         return null;
@@ -56,37 +49,41 @@ export async function getIssueBySlug(slug: string): Promise<Issue | undefined> {
   try {
     const content = await getFileContent(`content/issues/${slug}.json`);
 
-    // Valida che il contenuto non sia vuoto
     if (!content || content.trim().length === 0) {
       return undefined;
     }
 
     const issue = JSON.parse(content) as Issue;
     issue.slug = slug;
-    // Default published to false if not present (retrocompatibility)
-    if (issue.published === undefined) {
-      issue.published = false;
-    }
-    // Default last_update to date if not present (retrocompatibility)
-    if (!issue.last_update) {
-      issue.last_update = issue.date;
-    }
     return issue;
   } catch {
     return undefined;
   }
 }
 
-export async function createIssue(issue: Omit<Issue, "slug"> & { slug?: string }) {
+export async function getIssueById(id: string): Promise<Issue | undefined> {
+  const issues = await getAllIssues();
+  return issues.find((i) => i.id === id);
+}
+
+export async function createIssue(
+  issue: Omit<Issue, "slug" | "id" | "articlesOrder" | "showOrder"> & {
+    slug?: string;
+    showOrder?: boolean;
+    createdBy: string;
+  },
+) {
   // Generate slug from title if not provided
   const baseSlug = issue.slug || generateSlug(issue.title);
 
   // Ensure slug is unique
   const slug = await generateUniqueSlug("content/issues", baseSlug, ".json");
+  const id = randomUUID();
 
   const filePath = `content/issues/${slug}.json`;
   const content = JSON.stringify(
     {
+      id,
       slug,
       title: issue.title,
       description: issue.description,
@@ -95,18 +92,21 @@ export async function createIssue(issue: Omit<Issue, "slug"> & { slug?: string }
       date: issue.date,
       last_update: issue.last_update || issue.date,
       published: issue.published ?? false,
+      articlesOrder: [],
+      showOrder: issue.showOrder ?? false,
+      createdBy: issue.createdBy,
     },
     null,
     2,
   );
 
   await createOrUpdateFile(filePath, content, `Create issue: ${issue.title}`);
-  return { ...issue, slug };
+  return { ...issue, id, slug, articlesOrder: [], showOrder: issue.showOrder ?? false };
 }
 
 export async function updateIssue(
   slug: string,
-  issue: Partial<Omit<Issue, "slug">> & { newSlug?: string },
+  issue: Partial<Omit<Issue, "slug" | "id" | "createdBy">> & { newSlug?: string },
 ) {
   const existing = await getIssueBySlug(slug);
   if (!existing) {
@@ -124,6 +124,7 @@ export async function updateIssue(
   const currentDateTime = new Date().toISOString();
 
   const updated: Issue = {
+    id: existing.id,
     slug: finalSlug,
     title: issue.title ?? existing.title,
     description: issue.description ?? existing.description,
@@ -132,10 +133,14 @@ export async function updateIssue(
     date: issue.date ?? existing.date,
     last_update: currentDateTime,
     published: issue.published !== undefined ? issue.published : existing.published,
+    articlesOrder: issue.articlesOrder ?? existing.articlesOrder,
+    showOrder: issue.showOrder !== undefined ? issue.showOrder : existing.showOrder,
+    createdBy: existing.createdBy,
   };
 
   const content = JSON.stringify(
     {
+      id: updated.id,
       slug: updated.slug,
       title: updated.title,
       description: updated.description,
@@ -144,6 +149,9 @@ export async function updateIssue(
       date: updated.date,
       last_update: updated.last_update,
       published: updated.published,
+      articlesOrder: updated.articlesOrder,
+      showOrder: updated.showOrder,
+      createdBy: updated.createdBy,
     },
     null,
     2,
@@ -175,7 +183,7 @@ export async function deleteIssue(slug: string) {
 
   // Verifica se ci sono articoli che usano questa issue
   const articles = await getAllArticles();
-  const articlesUsingIssue = articles.filter((article) => article.issue === slug);
+  const articlesUsingIssue = articles.filter((article) => article.issueId === issue.id);
 
   if (articlesUsingIssue.length > 0) {
     const articleTitles = articlesUsingIssue.map((a) => a.title).join(", ");
@@ -187,4 +195,86 @@ export async function deleteIssue(slug: string) {
   // Se non ci sono articoli che usano l'issue, procedi con l'eliminazione
   const filePath = `content/issues/${slug}.json`;
   await deleteFile(filePath, `Delete issue: ${slug}`);
+}
+
+/* **************************************************
+ * Ordering helpers
+ ************************************************** */
+
+/**
+ * Salva l'ordine completo degli articoli in una issue.
+ * Questa è l'operazione usata dal drag & drop: salva la lista finale degli UUID.
+ */
+export async function reorderArticlesInIssue(
+  issueSlug: string,
+  orderedIds: string[],
+): Promise<void> {
+  const existing = await getIssueBySlug(issueSlug);
+  if (!existing) {
+    throw new Error(`Issue ${issueSlug} not found`);
+  }
+
+  const currentDateTime = new Date().toISOString();
+  const content = JSON.stringify(
+    {
+      id: existing.id,
+      slug: existing.slug,
+      title: existing.title,
+      description: existing.description,
+      cover: existing.cover,
+      color: existing.color,
+      date: existing.date,
+      last_update: currentDateTime,
+      published: existing.published,
+      articlesOrder: orderedIds,
+      showOrder: existing.showOrder,
+      createdBy: existing.createdBy,
+    },
+    null,
+    2,
+  );
+
+  await createOrUpdateFile(
+    `content/issues/${issueSlug}.json`,
+    content,
+    `Reorder articles in issue: ${existing.title}`,
+  );
+}
+
+/**
+ * Aggiunge l'UUID di un articolo in fondo all'ordine di una issue.
+ * Idempotente: se l'UUID è già presente, non lo duplica.
+ */
+export async function addArticleToIssue(issueSlug: string, articleId: string): Promise<void> {
+  const existing = await getIssueBySlug(issueSlug);
+  if (!existing) {
+    throw new Error(`Issue ${issueSlug} not found`);
+  }
+
+  // Idempotente: skip se già presente
+  if (existing.articlesOrder.includes(articleId)) {
+    return;
+  }
+
+  const newOrder = [...existing.articlesOrder, articleId];
+  await reorderArticlesInIssue(issueSlug, newOrder);
+}
+
+/**
+ * Rimuove l'UUID di un articolo dall'ordine di una issue.
+ */
+export async function removeArticleFromIssue(issueSlug: string, articleId: string): Promise<void> {
+  const existing = await getIssueBySlug(issueSlug);
+  if (!existing) {
+    // Issue non trovata (potrebbe essere già stata eliminata): non è un errore critico
+    return;
+  }
+
+  const newOrder = existing.articlesOrder.filter((id) => id !== articleId);
+  if (newOrder.length === existing.articlesOrder.length) {
+    // L'UUID non era nell'ordine: no-op
+    return;
+  }
+
+  await reorderArticlesInIssue(issueSlug, newOrder);
 }

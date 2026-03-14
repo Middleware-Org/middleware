@@ -70,6 +70,14 @@ const styles = {
     "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:border-secondary",
   ),
   iconButtonDanger: cn("border-tertiary text-tertiary hover:bg-tertiary hover:text-white"),
+  checkbox: cn(
+    "w-4 h-4 text-tertiary border-secondary",
+    "focus:ring-2 focus:ring-tertiary transition-all duration-150",
+  ),
+  editorContainer: cn("flex gap-6"),
+  metaPanel: cn("w-80 flex flex-col gap-4 h-full min-h-0"),
+  metaCard: cn("bg-primary border border-secondary p-4"),
+  metaCardTitle: cn("text-lg font-semibold mb-4"),
   imageUpload: cn(
     "border-2 border-dashed border-secondary p-4",
     "hover:border-tertiary transition-colors duration-150 cursor-pointer",

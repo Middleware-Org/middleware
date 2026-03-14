@@ -1,7 +1,7 @@
 import { getArticleBySlug, getAllArticles } from "@/lib/content";
-import { getAuthorBySlug } from "@/lib/content/authors";
-import { getCategoryBySlug } from "@/lib/content/categories";
-import { getIssueBySlug } from "@/lib/content/issues";
+import { getAuthorById } from "@/lib/content/authors";
+import { getCategoryById } from "@/lib/content/categories";
+import { getIssueById } from "@/lib/content/issues";
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import { getDictionary } from "@/lib/i18n/utils";
 import { i18nSettings } from "@/lib/i18n/settings";
@@ -27,9 +27,9 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
     };
   }
 
-  const author = getAuthorBySlug(article.author);
-  const category = getCategoryBySlug(article.category);
-  const issue = article.issue ? getIssueBySlug(article.issue) : undefined;
+  const author = getAuthorById(article.authorId);
+  const category = getCategoryById(article.categoryId);
+  const issue = article.issueId ? getIssueById(article.issueId) : undefined;
   const baseUrl = getBaseUrl();
   const articleUrl = `${baseUrl}/${locale}/articles/${slug}`;
 
@@ -99,9 +99,9 @@ function getArticleStructuredData(locale: string, slug: string) {
     return [] as Array<Record<string, unknown>>;
   }
 
-  const author = getAuthorBySlug(article.author);
-  const category = getCategoryBySlug(article.category);
-  const issue = article.issue ? getIssueBySlug(article.issue) : undefined;
+  const author = getAuthorById(article.authorId);
+  const category = getCategoryById(article.categoryId);
+  const issue = article.issueId ? getIssueById(article.issueId) : undefined;
   const baseUrl = getBaseUrl();
   const articleUrl = `${baseUrl}/${locale}/articles/${slug}`;
   const ogImageUrl = `${baseUrl}/api/og?${new URLSearchParams({

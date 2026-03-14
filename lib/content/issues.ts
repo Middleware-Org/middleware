@@ -15,3 +15,8 @@ export const getIssueBySlug = (slug: string) => {
   const issue = issues.find((i) => i.slug === slug);
   return issue && issue.published ? issue : undefined;
 };
+
+export const getIssueById = (id: string) => {
+  const issue = issues.find((i) => i.id === id);
+  return issue && issue.published ? issue : undefined;
+};

@@ -13,7 +13,7 @@ import FormattedDate from "@/components/atoms/date";
 import styles from "./styles";
 import type { Article, Issue } from "@/.velite";
 import { CommonDictionary } from "@/lib/i18n/types";
-import { getAuthorBySlug, getCategoryBySlug } from "@/lib/content";
+import { getAuthorById, getCategoryById } from "@/lib/content";
 import { withLocale } from "@/lib/i18n/path";
 
 /* **************************************************
@@ -39,9 +39,8 @@ export default function ArticleInEvidenceCard({
 
   const { textColor, backgroundColor } = getTextColor(issue.color);
 
-  const author = getAuthorBySlug(article.author);
-
-  const category = getCategoryBySlug(article.category);
+  const author = getAuthorById(article.authorId);
+  const category = getCategoryById(article.categoryId);
 
   if (!author || !category) return null;
 

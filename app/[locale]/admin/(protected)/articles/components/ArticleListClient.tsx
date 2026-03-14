@@ -147,7 +147,7 @@ export default function ArticleListClient() {
     return [
       { value: "", label: "Tutte le issue" },
       ...issues.map((issue) => ({
-        value: issue.slug,
+        value: issue.id,
         label: issue.title,
       })),
     ];
@@ -157,7 +157,7 @@ export default function ArticleListClient() {
     return [
       { value: "", label: "Tutte le categorie" },
       ...categories.map((category) => ({
-        value: category.slug,
+        value: category.id,
         label: category.name,
       })),
     ];
@@ -167,7 +167,7 @@ export default function ArticleListClient() {
     return [
       { value: "", label: "Tutti gli autori" },
       ...authors.map((author) => ({
-        value: author.slug,
+        value: author.id,
         label: author.name,
       })),
     ];
@@ -183,14 +183,14 @@ export default function ArticleListClient() {
   // Get filter labels for display
   const getFilterLabel = (key: string, value: string) => {
     switch (key) {
-      case "issue":
-        const issue = issues.find((i) => i.slug === value);
+      case "issueId":
+        const issue = issues.find((i) => i.id === value);
         return issue ? issue.title : value;
-      case "category":
-        const category = categories.find((c) => c.slug === value);
+      case "categoryId":
+        const category = categories.find((c) => c.id === value);
         return category ? category.name : value;
-      case "author":
-        const author = authors.find((a) => a.slug === value);
+      case "authorId":
+        const author = authors.find((a) => a.id === value);
         return author ? author.name : value;
       default:
         return value;
@@ -202,9 +202,9 @@ export default function ArticleListClient() {
   }
 
   function handleClearAllFilters() {
-    setFilter("issue", null);
-    setFilter("category", null);
-    setFilter("author", null);
+    setFilter("issueId", null);
+    setFilter("categoryId", null);
+    setFilter("authorId", null);
   }
 
   function handleEdit(article: Article) {
@@ -276,14 +276,14 @@ export default function ArticleListClient() {
       case "date":
         return <TableCell>{new Date(article.date).toLocaleDateString("it-IT")}</TableCell>;
       case "author":
-        const author = authors.find((a) => a.slug === article.author);
-        return <TableCell>{author?.name || article.author}</TableCell>;
+        const author = authors.find((a) => a.id === article.authorId);
+        return <TableCell>{author?.name || article.authorId}</TableCell>;
       case "category":
-        const category = categories.find((c) => c.slug === article.category);
-        return <TableCell>{category?.name || article.category}</TableCell>;
+        const category = categories.find((c) => c.id === article.categoryId);
+        return <TableCell>{category?.name || article.categoryId}</TableCell>;
       case "issue":
-        const issue = issues.find((i) => i.slug === article.issue);
-        return <TableCell>{issue?.title || article.issue}</TableCell>;
+        const issue = issues.find((i) => i.id === article.issueId);
+        return <TableCell>{issue?.title || ""}</TableCell>;
       case "in_evidence":
         return (
           <TableCell>
@@ -380,33 +380,33 @@ export default function ArticleListClient() {
                 <div className="p-4 space-y-4">
                   {/* Issue Filter */}
                   <SelectSearch
-                    id="filter-issue"
+                    id="filter-issueId"
                     label="Issue"
-                    value={(filters.issue as string) || ""}
+                    value={(filters.issueId as string) || ""}
                     options={issueOptions}
-                    onChange={(value) => setFilter("issue", value || null)}
+                    onChange={(value) => setFilter("issueId", value || null)}
                     placeholder="Seleziona un'issue"
                     emptyMessage="Nessuna issue disponibile"
                   />
 
                   {/* Category Filter */}
                   <SelectSearch
-                    id="filter-category"
+                    id="filter-categoryId"
                     label="Categoria"
-                    value={(filters.category as string) || ""}
+                    value={(filters.categoryId as string) || ""}
                     options={categoryOptions}
-                    onChange={(value) => setFilter("category", value || null)}
+                    onChange={(value) => setFilter("categoryId", value || null)}
                     placeholder="Seleziona una categoria"
                     emptyMessage="Nessuna categoria disponibile"
                   />
 
                   {/* Author Filter */}
                   <SelectSearch
-                    id="filter-author"
+                    id="filter-authorId"
                     label="Autore"
-                    value={(filters.author as string) || ""}
+                    value={(filters.authorId as string) || ""}
                     options={authorOptions}
-                    onChange={(value) => setFilter("author", value || null)}
+                    onChange={(value) => setFilter("authorId", value || null)}
                     placeholder="Seleziona un autore"
                     emptyMessage="Nessun autore disponibile"
                   />

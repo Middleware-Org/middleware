@@ -56,13 +56,13 @@ export default function ArticleFormClient({ articleSlug }: ArticleFormClientProp
   const defaultFormData = {
     title: "",
     date: new Date().toISOString().split("T")[0],
-    author: "",
-    category: "",
-    issue: "",
+    authorId: "",
+    categoryId: "",
+    issueId: "",
     in_evidence: false,
     published: false,
     excerpt: "",
-    podcast: "",
+    podcastId: "",
   };
 
   // Inizializza lo stato con i valori dell'articolo se disponibile
@@ -72,13 +72,13 @@ export default function ArticleFormClient({ articleSlug }: ArticleFormClientProp
       ? {
           title: article.title || "",
           date: article.date || new Date().toISOString().split("T")[0],
-          author: article.author || "",
-          category: article.category || "",
-          issue: article.issue || "",
+          authorId: article.authorId || "",
+          categoryId: article.categoryId || "",
+          issueId: article.issueId || "",
           in_evidence: article.in_evidence || false,
           published: article.published ?? false,
           excerpt: article.excerpt || "",
-          podcast: article.podcast || "",
+          podcastId: article.podcastId || "",
         }
       : defaultFormData,
   );
@@ -117,16 +117,18 @@ export default function ArticleFormClient({ articleSlug }: ArticleFormClientProp
     const preparedFormData = new FormData();
     preparedFormData.set("title", formData.title);
     preparedFormData.set("date", formData.date);
-    preparedFormData.set("author", formData.author);
-    preparedFormData.set("category", formData.category);
-    preparedFormData.set("issue", formData.issue);
+    preparedFormData.set("authorId", formData.authorId);
+    preparedFormData.set("categoryId", formData.categoryId);
+    if (formData.issueId) {
+      preparedFormData.set("issueId", formData.issueId);
+    }
     preparedFormData.set("in_evidence", formData.in_evidence.toString());
     preparedFormData.set("published", formData.published.toString());
     preparedFormData.set("excerpt", formData.excerpt);
     preparedFormData.set("content", content);
 
-    if (formData.podcast) {
-      preparedFormData.set("podcast", formData.podcast);
+    if (formData.podcastId) {
+      preparedFormData.set("podcastId", formData.podcastId);
     }
 
     if (editing && articleSlug) {

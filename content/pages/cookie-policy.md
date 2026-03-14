@@ -1,7 +1,9 @@
 ---
+id: c58c1d71-c9b1-46da-907c-829cbdfb67c2
 slug: cookie-policy
 title: Cookie Policy
 excerpt: Spiegazione e elenco dei cookie del sito
+createdBy: 00000000-0000-0000-0000-000000000001
 ---
 **Ultimo aggiornamento:** 4 agosto 2025
 
