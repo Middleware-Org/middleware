@@ -130,6 +130,7 @@ export default async function IssuePage({ params }: IssuePageProps) {
               article={articleInEvidence}
               dict={dict}
               issue={issue}
+              locale={locale as "it" | "en"}
               disableBadges={true}
             />
           </div>

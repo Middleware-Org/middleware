@@ -68,6 +68,7 @@ export default function PodcastFormClient({ podcastSlug }: PodcastFormClientProp
     editing ? updatePodcastAction : createPodcastAction,
     null,
   );
+  const handledStateRef = useRef<ActionResult<Podcast> | null>(null);
 
   useEffect(() => {
     if (!podcast) {
@@ -103,22 +104,17 @@ export default function PodcastFormClient({ podcastSlug }: PodcastFormClientProp
     }, 0);
 
     return () => clearTimeout(timeoutId);
-  }, [
-    podcast?.id,
-    podcast?.title,
-    podcast?.description,
-    podcast?.date,
-    podcast?.audio,
-    podcast?.audio_chunks,
-    podcast?.issueId,
-    podcast?.published,
-  ]);
+  }, [podcast]);
 
   // Reset form and navigate on success
   useEffect(() => {
     if (!state) {
       return;
     }
+    if (handledStateRef.current === state) {
+      return;
+    }
+    handledStateRef.current = state;
 
     if (!state.success) {
       toast.actionResult(state, { errorTitle: "Operazione non riuscita" });

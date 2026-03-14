@@ -1,9 +1,6 @@
-"use client";
-
 /* **************************************************
  * Imports
  **************************************************/
-import { useParams } from "next/navigation";
 import Link from "next/link";
 import Separator from "@/components/atoms/separetor";
 import { H3, MonoTextBold, MonoTextLight, SerifText } from "@/components/atoms/typography";
@@ -23,7 +20,9 @@ type ArticleInEvidenceCardProps = {
   article: Article;
   issue: Issue;
   dict: Pick<CommonDictionary, "articleCard">;
+  locale: "it" | "en";
   disableBadges?: boolean;
+  orderNumber?: number;
 };
 
 /* **************************************************
@@ -33,10 +32,10 @@ export default function ArticleInEvidenceCard({
   article,
   issue,
   dict,
+  locale,
   disableBadges = false,
+  orderNumber,
 }: ArticleInEvidenceCardProps) {
-  const { locale = "it" } = useParams() as { locale: "it" };
-
   const { textColor, backgroundColor } = getTextColor(issue.color);
 
   const author = getAuthorById(article.authorId);
@@ -65,7 +64,10 @@ export default function ArticleInEvidenceCard({
           </div>
         )}
         <Link href={articleHref}>
-          <H3 className={cn(styles.title, textColor)}>{article.title}</H3>
+          <H3 className={cn(styles.title, textColor)}>
+            {orderNumber !== undefined && `#${orderNumber} `}
+            {article.title}
+          </H3>
         </Link>
 
         <div className={styles.authorInfo}>

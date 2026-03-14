@@ -1,9 +1,6 @@
-"use client";
-
 /* **************************************************
  * Imports
  **************************************************/
-import { useParams } from "next/navigation";
 import Image from "next/image";
 import { MonoTextLight } from "@/components/atoms/typography";
 import FormattedDate from "@/components/atoms/date";
@@ -22,6 +19,8 @@ type CoverProps = {
   issue: Issue;
   articleInEvidence: Article;
   dict: Pick<CommonDictionary, "articleCard">;
+  locale: string;
+  articleInEvidenceOrderNumber?: number;
 };
 
 /* **************************************************
@@ -33,8 +32,13 @@ const IMAGE_HEIGHT = 500;
 /* **************************************************
  * Cover
  **************************************************/
-export default function Cover({ issue, articleInEvidence, dict }: CoverProps) {
-  const { locale = "it" } = useParams() as { locale: string };
+export default function Cover({
+  issue,
+  articleInEvidence,
+  dict,
+  locale,
+  articleInEvidenceOrderNumber,
+}: CoverProps) {
   const issueHref = withLocale(`/issues/${issue.slug}`, locale);
 
   return (
@@ -66,7 +70,13 @@ export default function Cover({ issue, articleInEvidence, dict }: CoverProps) {
         </div>
         <div className={styles.footer} style={{ backgroundColor: issue.color }}>
           {articleInEvidence && (
-            <ArticleInEvidenceCard article={articleInEvidence} dict={dict} issue={issue} />
+            <ArticleInEvidenceCard
+              article={articleInEvidence}
+              dict={dict}
+              issue={issue}
+              locale={locale as "it" | "en"}
+              orderNumber={articleInEvidenceOrderNumber}
+            />
           )}
         </div>
       </div>

@@ -8,10 +8,11 @@ import { useParams } from "next/navigation";
 import type { Article } from "@/.velite";
 import Separator from "@/components/atoms/separetor";
 import { H3, MonoTextBold, MonoTextLight, SerifText } from "@/components/atoms/typography";
-import { getAuthorById, getCategoryById } from "@/lib/content";
+import { useAuthors, useCategories } from "@/hooks/swr";
 import { CommonDictionary } from "@/lib/i18n/types";
 import { withLocale } from "@/lib/i18n/path";
 import styles from "./styles";
+import { getAuthorById, getCategoryById } from "@/lib/content";
 
 /* **************************************************
  * Types
@@ -20,13 +21,20 @@ type ArticleCardProps = {
   article: Article;
   dict: Pick<CommonDictionary, "articleCard">;
   isPodcast?: boolean;
+  orderNumber?: number;
 };
 
 /* **************************************************
  * ArticleCard
  **************************************************/
-export default function ArticleCard({ article, dict, isPodcast = false }: ArticleCardProps) {
+export default function ArticleCard({
+  article,
+  dict,
+  isPodcast = false,
+  orderNumber,
+}: ArticleCardProps) {
   const { locale = "it" } = useParams() as { locale: "it" };
+
   const author = getAuthorById(article.authorId);
   const category = getCategoryById(article.categoryId);
 
@@ -43,7 +51,10 @@ export default function ArticleCard({ article, dict, isPodcast = false }: Articl
     <article className={styles.article}>
       <header className={styles.header}>
         <Link href={articleLink}>
-          <H3 className={styles.title}>{article.title}</H3>
+          <H3 className={styles.title}>
+            {orderNumber !== undefined && `#${orderNumber} `}
+            {article.title}
+          </H3>
         </Link>
 
         <div className={styles.authorInfo}>
