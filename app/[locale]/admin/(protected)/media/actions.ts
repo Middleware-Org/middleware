@@ -15,11 +15,6 @@ import type { ActionResult } from "@/lib/actions/types";
 import { revalidateAdminPath } from "@/lib/cache/revalidate";
 
 /* **************************************************
- * Types
- **************************************************/
-export type { ActionResult };
-
-/* **************************************************
  * Server Actions
  **************************************************/
 export async function uploadMediaAction(

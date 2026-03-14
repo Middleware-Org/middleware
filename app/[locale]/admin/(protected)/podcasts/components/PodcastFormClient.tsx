@@ -7,7 +7,8 @@ import { useEffect, useRef, useState } from "react";
 import { useActionState } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils/classes";
-import { createPodcastAction, updatePodcastAction, type ActionResult } from "../actions";
+import type { ActionResult } from "@/lib/actions/types";
+import { createPodcastAction, updatePodcastAction } from "../actions";
 import PodcastMetaPanel from "./PodcastMetaPanel";
 import styles from "../styles";
 import baseStyles from "../../styles";
@@ -44,7 +45,7 @@ export default function PodcastFormClient({ podcastSlug }: PodcastFormClientProp
     date: new Date().toISOString().split("T")[0],
     audio: "",
     audio_chunks: "",
-    issue: "",
+    issueId: "",
     published: false,
   };
 
@@ -57,7 +58,7 @@ export default function PodcastFormClient({ podcastSlug }: PodcastFormClientProp
           date: podcast.date || new Date().toISOString().split("T")[0],
           audio: podcast.audio || "",
           audio_chunks: podcast.audio_chunks || "",
-          issue: podcast.issue || "",
+          issueId: podcast.issueId || "",
           published: podcast.published ?? false,
         }
       : defaultFormData,
@@ -67,6 +68,51 @@ export default function PodcastFormClient({ podcastSlug }: PodcastFormClientProp
     editing ? updatePodcastAction : createPodcastAction,
     null,
   );
+
+  useEffect(() => {
+    if (!podcast) {
+      return;
+    }
+
+    const next = {
+      title: podcast.title || "",
+      description: podcast.description || "",
+      date: podcast.date || new Date().toISOString().split("T")[0],
+      audio: podcast.audio || "",
+      audio_chunks: podcast.audio_chunks || "",
+      issueId: podcast.issueId || "",
+      published: podcast.published ?? false,
+    };
+
+    const timeoutId = setTimeout(() => {
+      setFormData((prev) => {
+        if (
+          prev.title === next.title &&
+          prev.description === next.description &&
+          prev.date === next.date &&
+          prev.audio === next.audio &&
+          prev.audio_chunks === next.audio_chunks &&
+          prev.issueId === next.issueId &&
+          prev.published === next.published
+        ) {
+          return prev;
+        }
+
+        return next;
+      });
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, [
+    podcast?.id,
+    podcast?.title,
+    podcast?.description,
+    podcast?.date,
+    podcast?.audio,
+    podcast?.audio_chunks,
+    podcast?.issueId,
+    podcast?.published,
+  ]);
 
   // Reset form and navigate on success
   useEffect(() => {
@@ -94,20 +140,28 @@ export default function PodcastFormClient({ podcastSlug }: PodcastFormClientProp
   }
 
   async function handleAction() {
-    const preparedFormData = new FormData();
-    preparedFormData.set("title", formData.title);
-    preparedFormData.set("description", formData.description);
-    preparedFormData.set("date", formData.date);
-    preparedFormData.set("published", formData.published.toString());
+    const effectiveFormData =
+      editing && podcast
+        ? {
+            ...formData,
+            issueId: formData.issueId || podcast.issueId || "",
+          }
+        : formData;
 
-    if (formData.audio) {
-      preparedFormData.set("audio", formData.audio);
+    const preparedFormData = new FormData();
+    preparedFormData.set("title", effectiveFormData.title);
+    preparedFormData.set("description", effectiveFormData.description);
+    preparedFormData.set("date", effectiveFormData.date);
+    preparedFormData.set("published", effectiveFormData.published.toString());
+
+    if (effectiveFormData.audio) {
+      preparedFormData.set("audio", effectiveFormData.audio);
     }
-    if (formData.audio_chunks) {
-      preparedFormData.set("audio_chunks", formData.audio_chunks);
+    if (effectiveFormData.audio_chunks) {
+      preparedFormData.set("audio_chunks", effectiveFormData.audio_chunks);
     }
-    if (formData.issue) {
-      preparedFormData.set("issue", formData.issue);
+    if (effectiveFormData.issueId) {
+      preparedFormData.set("issueId", effectiveFormData.issueId);
     }
 
     if (editing && podcastSlug) {
@@ -129,6 +183,14 @@ export default function PodcastFormClient({ podcastSlug }: PodcastFormClientProp
 
     return formAction(preparedFormData);
   }
+
+  const panelFormData =
+    editing && podcast
+      ? {
+          ...formData,
+          issueId: formData.issueId || podcast.issueId || "",
+        }
+      : formData;
 
   return (
     <form
@@ -156,7 +218,7 @@ export default function PodcastFormClient({ podcastSlug }: PodcastFormClientProp
         {/* Meta Panel - 1/4 width */}
         <PodcastMetaPanel
           podcast={podcast || null}
-          formData={formData}
+          formData={panelFormData}
           onFormDataChange={handleFormDataChange}
           editing={editing}
           formRef={formRef}

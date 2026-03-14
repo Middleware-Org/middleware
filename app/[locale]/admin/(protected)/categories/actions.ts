@@ -10,11 +10,6 @@ import type { ActionResult } from "@/lib/actions/types";
 import { revalidateAdminPath } from "@/lib/cache/revalidate";
 
 /* **************************************************
- * Types
- **************************************************/
-export type { ActionResult };
-
-/* **************************************************
  * Server Actions
  **************************************************/
 export async function createCategoryAction(
@@ -43,6 +38,7 @@ export async function createCategoryAction(
       name: name.trim(),
       description: description.trim(),
       slug: slug?.trim() || undefined,
+      createdBy: user.id,
     });
 
     revalidateAdminPath("/admin/categories");

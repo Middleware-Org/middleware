@@ -10,11 +10,6 @@ import type { ActionResult } from "@/lib/actions/types";
 import { revalidateAdminPath } from "@/lib/cache/revalidate";
 
 /* **************************************************
- * Types
- **************************************************/
-export type { ActionResult };
-
-/* **************************************************
  * Server Actions
  **************************************************/
 export async function createPageAction(
@@ -45,6 +40,7 @@ export async function createPageAction(
       title: title.trim(),
       excerpt: excerpt?.trim() || "",
       content: content.trim(),
+      createdBy: user.id,
     });
 
     revalidateAdminPath("/admin/pages");

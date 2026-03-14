@@ -11,6 +11,7 @@ import {
 } from "./client";
 import { generateSlug, generateUniqueSlug } from "./utils";
 import type { Page } from "./types";
+import { randomUUID } from "crypto";
 
 /* **************************************************
  * Pages
@@ -29,13 +30,30 @@ export async function getAllPages(): Promise<Page[]> {
         }
 
         const { data, content: markdownContent } = matter(content);
+        const existingId = typeof data.id === "string" ? data.id.trim() : "";
+        const id = existingId || randomUUID();
 
-        return {
-          slug: data.slug || file.name.replace(".md", ""),
-          title: data.title || "",
-          excerpt: data.excerpt || "",
+        const page: Page = {
+          id,
+          slug: (data.slug as string) || file.name.replace(".md", ""),
+          title: (data.title as string) || "",
+          excerpt: (data.excerpt as string) || "",
           content: markdownContent,
-        } as Page;
+          createdBy: (data.createdBy as string) || "",
+        };
+
+        if (!existingId) {
+          const normalized = matter.stringify(page.content, {
+            id: page.id,
+            slug: page.slug,
+            title: page.title,
+            excerpt: page.excerpt,
+            createdBy: page.createdBy,
+          });
+          await createOrUpdateFile(file.path, normalized, `Add missing id to page: ${page.slug}`);
+        }
+
+        return page;
       } catch {
         return null;
       }
@@ -47,33 +65,56 @@ export async function getAllPages(): Promise<Page[]> {
 
 export async function getPageBySlug(slug: string): Promise<Page | null> {
   try {
-    const content = await getFileContent(`content/pages/${slug}.md`);
+    const filePath = `content/pages/${slug}.md`;
+    const content = await getFileContent(filePath);
 
     if (!content || content.trim().length === 0) {
       return null;
     }
 
     const { data, content: markdownContent } = matter(content);
+    const existingId = typeof data.id === "string" ? data.id.trim() : "";
+    const id = existingId || randomUUID();
 
-    return {
-      slug: data.slug || slug,
-      title: data.title || "",
-      excerpt: data.excerpt || "",
+    const page: Page = {
+      id,
+      slug: (data.slug as string) || slug,
+      title: (data.title as string) || "",
+      excerpt: (data.excerpt as string) || "",
       content: markdownContent,
+      createdBy: (data.createdBy as string) || "",
     };
+
+    if (!existingId) {
+      const normalized = matter.stringify(page.content, {
+        id: page.id,
+        slug: page.slug,
+        title: page.title,
+        excerpt: page.excerpt,
+        createdBy: page.createdBy,
+      });
+      await createOrUpdateFile(filePath, normalized, `Add missing id to page: ${page.slug}`);
+    }
+
+    return page;
   } catch {
     return null;
   }
 }
 
-export async function createPage(page: Omit<Page, "slug"> & { slug?: string }): Promise<Page> {
+export async function createPage(
+  page: Omit<Page, "slug" | "id"> & { slug?: string },
+): Promise<Page> {
+  const id = randomUUID();
   const baseSlug = page.slug || generateSlug(page.title || "page");
   const slug = await generateUniqueSlug("content/pages", baseSlug, ".md");
 
   const frontmatter = {
+    id,
     slug,
     title: page.title,
     excerpt: page.excerpt || "",
+    createdBy: page.createdBy,
   };
 
   const content = matter.stringify(page.content, frontmatter);
@@ -81,16 +122,18 @@ export async function createPage(page: Omit<Page, "slug"> & { slug?: string }): 
   await createOrUpdateFile(`content/pages/${slug}.md`, content, `Create page: ${page.title}`);
 
   return {
+    id,
     slug,
     title: page.title,
     excerpt: page.excerpt || "",
     content: page.content,
+    createdBy: page.createdBy,
   };
 }
 
 export async function updatePage(
   slug: string,
-  page: Partial<Omit<Page, "slug">> & { newSlug?: string },
+  page: Partial<Omit<Page, "slug" | "id">> & { newSlug?: string },
 ): Promise<Page> {
   const existing = await getPageBySlug(slug);
   if (!existing) {
@@ -104,16 +147,20 @@ export async function updatePage(
   }
 
   const updated: Page = {
+    id: existing.id,
     slug: finalSlug,
     title: page.title !== undefined ? page.title : existing.title,
     excerpt: page.excerpt !== undefined ? page.excerpt : existing.excerpt,
     content: page.content !== undefined ? page.content : existing.content,
+    createdBy: existing.createdBy,
   };
 
   const frontmatter = {
+    id: updated.id,
     slug: finalSlug,
     title: updated.title,
     excerpt: updated.excerpt || "",
+    createdBy: updated.createdBy,
   };
 
   const content = matter.stringify(updated.content, frontmatter);

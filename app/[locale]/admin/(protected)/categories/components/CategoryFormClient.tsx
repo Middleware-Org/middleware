@@ -8,12 +8,8 @@ import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { useRouter } from "next/navigation";
 import { Sparkles } from "lucide-react";
-import {
-  createCategoryAction,
-  updateCategoryAction,
-  deleteCategoryAction,
-  type ActionResult,
-} from "../actions";
+import type { ActionResult } from "@/lib/actions/types";
+import { createCategoryAction, updateCategoryAction, deleteCategoryAction } from "../actions";
 import ConfirmDialog from "@/components/molecules/confirmDialog";
 import styles from "../styles";
 import type { Category } from "@/lib/github/types";

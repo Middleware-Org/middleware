@@ -8,7 +8,8 @@ import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { useRouter } from "next/navigation";
 import { Sparkles } from "lucide-react";
-import { createIssueAction, updateIssueAction, type ActionResult } from "../actions";
+import type { ActionResult } from "@/lib/actions/types";
+import { createIssueAction, updateIssueAction } from "../actions";
 import { getGitHubImageUrl } from "@/lib/github/images";
 import styles from "../styles";
 import type { Issue } from "@/lib/github/types";
@@ -141,6 +142,7 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
   const router = useRouter();
   const toLocale = useLocalizedPath();
   const editing = !!issueSlug;
+  const editFormId = "issue-edit-form";
 
   const { issue } = useIssue(issueSlug || null);
 
@@ -344,7 +346,12 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
   if (editing && issue) {
     return (
       <div className={cn(styles.editorContainer, "items-start")}>
-        <form ref={formRef} action={formAction} className={cn(styles.form, "flex-1")}>
+        <form
+          id={editFormId}
+          ref={formRef}
+          action={formAction}
+          className={cn(styles.form, "flex-1")}
+        >
           <h2 className={styles.formTitle}>Modifica Issue</h2>
           {formContent}
         </form>
@@ -352,6 +359,7 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
           issue={issue}
           issueSlug={issueSlug}
           formRef={formRef}
+          formId={editFormId}
           showOrder={showOrder}
           onShowOrderChange={setShowOrder}
         />

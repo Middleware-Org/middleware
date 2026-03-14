@@ -8,12 +8,8 @@ import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { useRouter } from "next/navigation";
 import { Sparkles } from "lucide-react";
-import {
-  createAuthorAction,
-  updateAuthorAction,
-  deleteAuthorAction,
-  type ActionResult,
-} from "../actions";
+import type { ActionResult } from "@/lib/actions/types";
+import { createAuthorAction, updateAuthorAction, deleteAuthorAction } from "../actions";
 import ConfirmDialog from "@/components/molecules/confirmDialog";
 import styles from "../styles";
 import type { Author } from "@/lib/github/types";
