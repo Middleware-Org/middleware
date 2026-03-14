@@ -7,12 +7,8 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { useRouter } from "next/navigation";
-import {
-  createUserAction,
-  updateUserAction,
-  deleteUserAction,
-  type ActionResult,
-} from "../actions";
+import type { ActionResult } from "@/lib/actions/types";
+import { createUserAction, updateUserAction, deleteUserAction } from "../actions";
 import ConfirmDialog from "@/components/molecules/confirmDialog";
 import PasswordInput, { isPasswordStrongEnough } from "./PasswordInput";
 import styles from "../styles";

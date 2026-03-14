@@ -4,16 +4,11 @@
 "use server";
 
 import { getCmsUser } from "@/lib/auth/server";
-import { createIssue, updateIssue, deleteIssue, reorderArticlesInIssue } from "@/lib/github/issues";
+import { createIssue, updateIssue, deleteIssue } from "@/lib/github/issues";
 import { uploadImage } from "@/lib/github/client";
 import type { Issue } from "@/lib/github/types";
 import type { ActionResult } from "@/lib/actions/types";
 import { revalidateAdminPath } from "@/lib/cache/revalidate";
-
-/* **************************************************
- * Types
- **************************************************/
-export type { ActionResult };
 
 /* **************************************************
  * Server Actions
@@ -103,6 +98,21 @@ export async function updateIssueAction(
     const date = formData.get("date") as string;
     const published = formData.get("published") === "on";
     const showOrder = formData.get("showOrder") === "on";
+    const articlesOrderRaw = formData.get("articlesOrder") as string | null;
+
+    let articlesOrder: string[] | undefined;
+    if (articlesOrderRaw && articlesOrderRaw.trim()) {
+      try {
+        const parsed = JSON.parse(articlesOrderRaw);
+        if (Array.isArray(parsed)) {
+          articlesOrder = parsed.filter(
+            (id): id is string => typeof id === "string" && id.trim().length > 0,
+          );
+        }
+      } catch {
+        articlesOrder = undefined;
+      }
+    }
 
     if (!slug || !title || !description || !color || !date) {
       return {
@@ -134,6 +144,7 @@ export async function updateIssueAction(
       date: date.trim(),
       published,
       showOrder,
+      articlesOrder,
       newSlug: newSlug?.trim() || undefined,
     });
 
@@ -222,33 +233,6 @@ export async function deleteIssuesAction(
     return {
       success: false,
       error: error instanceof Error ? error.message : "Failed to delete issues",
-      errorType: "error",
-    };
-  }
-}
-
-export async function reorderIssueArticlesAction(
-  issueSlug: string,
-  orderedIds: string[],
-): Promise<ActionResult> {
-  try {
-    const user = await getCmsUser();
-    if (!user) {
-      return { success: false, error: "Unauthorized", errorType: "error" };
-    }
-
-    if (!issueSlug) {
-      return { success: false, error: "Issue slug is required", errorType: "error" };
-    }
-
-    await reorderArticlesInIssue(issueSlug, orderedIds);
-    revalidateAdminPath("/admin/issues");
-
-    return { success: true, message: "Articles reordered successfully" };
-  } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Failed to reorder articles",
       errorType: "error",
     };
   }

@@ -4,7 +4,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition, useCallback } from "react";
+import { useState, useTransition, useCallback, useMemo } from "react";
 import {
   DndContext,
   DragEndEvent,
@@ -20,7 +20,7 @@ import {
   arrayMove,
   sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
-import { deleteIssueAction, reorderIssueArticlesAction } from "../actions";
+import { deleteIssueAction } from "../actions";
 import { SortableTableRow } from "@/components/table/SortableTableRow";
 import { TableCell } from "@/components/table";
 import ConfirmDialog from "@/components/molecules/confirmDialog";
@@ -40,6 +40,7 @@ interface IssueMetaPanelProps {
   issue: Issue;
   issueSlug: string;
   formRef: React.RefObject<HTMLFormElement | null>;
+  formId: string;
   showOrder: boolean;
   onShowOrderChange: (value: boolean) => void;
 }
@@ -51,31 +52,42 @@ export default function IssueMetaPanel({
   issue,
   issueSlug,
   formRef,
+  formId,
   showOrder,
   onShowOrderChange,
 }: IssueMetaPanelProps) {
   const router = useRouter();
   const toLocale = useLocalizedPath();
   const [isDeleting, startDeleteTransition] = useTransition();
-  const [isReordering, startReorderTransition] = useTransition();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [localOrder, setLocalOrder] = useState<string[] | null>(null);
 
   const { articles = [] } = useArticles();
 
   // Build the ordered article list for this issue
-  const issueArticles = articles.filter((a) => a.issueId === issue.id);
-  const orderedIds = issue.articlesOrder || [];
+  const issueArticles = useMemo(
+    () => articles.filter((a) => a.issueId === issue.id),
+    [articles, issue.id],
+  );
+  const orderedIdsKey =
+    issue.articlesOrder && issue.articlesOrder.length > 0 ? issue.articlesOrder.join("|") : "";
+  const orderedIds = useMemo(
+    () => (orderedIdsKey ? orderedIdsKey.split("|") : []),
+    [orderedIdsKey],
+  );
 
-  // Apply canonical order: first those in articlesOrder (in order), then unordered
-  const [localOrder, setLocalOrder] = useState<string[]>(() => {
+  const canonicalOrder = useMemo(() => {
     const inOrder = orderedIds.filter((id) => issueArticles.some((a) => a.id === id));
-    const unordered = issueArticles
-      .filter((a) => !orderedIds.includes(a.id))
-      .map((a) => a.id);
+    const unordered = issueArticles.filter((a) => !orderedIds.includes(a.id)).map((a) => a.id);
     return [...inOrder, ...unordered];
-  });
+  }, [orderedIds, issueArticles]);
 
-  const articleMap = new Map<string, Article>(issueArticles.map((a) => [a.id, a]));
+  const effectiveOrder = useMemo(() => localOrder ?? canonicalOrder, [localOrder, canonicalOrder]);
+
+  const articleMap = useMemo(
+    () => new Map<string, Article>(issueArticles.map((a) => [a.id, a])),
+    [issueArticles],
+  );
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -87,26 +99,14 @@ export default function IssueMetaPanel({
       const { active, over } = event;
       if (!over || active.id === over.id) return;
 
-      const oldIndex = localOrder.indexOf(active.id as string);
-      const newIndex = localOrder.indexOf(over.id as string);
+      const oldIndex = effectiveOrder.indexOf(active.id as string);
+      const newIndex = effectiveOrder.indexOf(over.id as string);
       if (oldIndex === -1 || newIndex === -1) return;
 
-      const newOrder = arrayMove(localOrder, oldIndex, newIndex);
+      const newOrder = arrayMove(effectiveOrder, oldIndex, newIndex);
       setLocalOrder(newOrder);
-
-      startReorderTransition(async () => {
-        const result = await reorderIssueArticlesAction(issueSlug, newOrder);
-        if (!result.success) {
-          toast.actionResult(result, { errorTitle: "Impossibile riordinare articoli" });
-          // Revert on failure
-          setLocalOrder(localOrder);
-        } else {
-          mutate(`/api/issues/${issueSlug}`);
-          mutate("/api/issues");
-        }
-      });
     },
-    [localOrder, issueSlug],
+    [effectiveOrder],
   );
 
   function handleDeleteClick() {
@@ -133,6 +133,13 @@ export default function IssueMetaPanel({
 
   return (
     <div className={styles.metaPanel}>
+      <input
+        type="hidden"
+        name="articlesOrder"
+        form={formId}
+        value={JSON.stringify(effectiveOrder)}
+        readOnly
+      />
       {/* Settings Card */}
       <div className={styles.metaCard}>
         <h3 className={styles.metaCardTitle}>Impostazioni</h3>
@@ -151,10 +158,8 @@ export default function IssueMetaPanel({
 
       {/* Articles Order Card */}
       <div className={cn(styles.metaCard, "flex-1 overflow-y-auto min-h-0")}>
-        <h3 className={styles.metaCardTitle}>
-          Articoli ({localOrder.length})
-        </h3>
-        {localOrder.length === 0 ? (
+        <h3 className={styles.metaCardTitle}>Articoli ({effectiveOrder.length})</h3>
+        {effectiveOrder.length === 0 ? (
           <p className="text-sm text-secondary/60">
             Nessun articolo in questa issue. Assegna articoli dalla loro pagina di modifica.
           </p>
@@ -164,16 +169,16 @@ export default function IssueMetaPanel({
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
           >
-            <SortableContext items={localOrder} strategy={verticalListSortingStrategy}>
+            <SortableContext items={effectiveOrder} strategy={verticalListSortingStrategy}>
               <div className="space-y-0">
                 <table className="w-full">
                   <tbody>
-                    {localOrder.map((id) => {
+                    {effectiveOrder.map((id) => {
                       const article = articleMap.get(id);
                       if (!article) return null;
                       return (
-                        <SortableTableRow key={id} id={id}>
-                          <TableCell className="py-2 text-sm truncate max-w-[180px]">
+                        <SortableTableRow key={id} id={id} className="border-b border-secondary/20">
+                          <TableCell className="py-2 text-sm truncate max-w-[180px] border-b border-secondary/20">
                             {article.title}
                           </TableCell>
                         </SortableTableRow>
@@ -184,9 +189,6 @@ export default function IssueMetaPanel({
               </div>
             </SortableContext>
           </DndContext>
-        )}
-        {isReordering && (
-          <p className="text-xs text-secondary/60 mt-2">Salvataggio ordine...</p>
         )}
       </div>
 

@@ -14,11 +14,6 @@ function parseRole(value: FormDataEntryValue | null): "ADMIN" | "EDITOR" {
 }
 
 /* **************************************************
- * Types
- **************************************************/
-export type { ActionResult };
-
-/* **************************************************
  * Server Actions
  **************************************************/
 export async function createUserAction(
