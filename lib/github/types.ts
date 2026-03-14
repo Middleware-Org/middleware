@@ -10,23 +10,24 @@ export type GitHubFile = {
 };
 
 export type Article = {
+  id: string;
   slug: string;
   title: string;
   date: string;
   last_update: string;
-  author: string;
-  category: string;
-  issue: string;
+  authorId: string;
+  categoryId: string;
+  issueId?: string;
   in_evidence: boolean;
   published: boolean;
   excerpt: string;
   content: string;
-  audio?: string;
-  audio_chunks?: string;
-  podcast?: string;
+  podcastId?: string;
+  createdBy: string;
 };
 
 export type Issue = {
+  id: string;
   slug: string;
   title: string;
   description: string;
@@ -35,28 +36,38 @@ export type Issue = {
   date: string;
   last_update: string;
   published: boolean;
+  articlesOrder: string[];
+  showOrder: boolean;
+  createdBy: string;
 };
 
 export type Category = {
+  id: string;
   slug: string;
   name: string;
   description: string;
+  createdBy: string;
 };
 
 export type Author = {
+  id: string;
   slug: string;
   name: string;
   description: string;
+  createdBy: string;
 };
 
 export type Page = {
+  id: string;
   slug: string;
   title: string;
   excerpt: string;
   content: string;
+  createdBy: string;
 };
 
 export type Podcast = {
+  id: string;
   slug: string;
   title: string;
   description: string;
@@ -64,6 +75,7 @@ export type Podcast = {
   last_update: string;
   audio: string;
   audio_chunks: string;
-  issue?: string;
+  issueId?: string;
   published: boolean;
+  createdBy: string;
 };

@@ -4,7 +4,7 @@
 "use server";
 
 import { getCmsUser } from "@/lib/auth/server";
-import { createIssue, updateIssue, deleteIssue } from "@/lib/github/issues";
+import { createIssue, updateIssue, deleteIssue, reorderArticlesInIssue } from "@/lib/github/issues";
 import { uploadImage } from "@/lib/github/client";
 import type { Issue } from "@/lib/github/types";
 import type { ActionResult } from "@/lib/actions/types";
@@ -34,6 +34,7 @@ export async function createIssueAction(
     const color = formData.get("color") as string;
     const date = formData.get("date") as string;
     const published = formData.get("published") === "on";
+    const showOrder = formData.get("showOrder") === "on";
     const slug = formData.get("slug") as string | null;
 
     if (!title || !description || !color || !date) {
@@ -65,13 +66,15 @@ export async function createIssueAction(
       cover: coverPath,
       color: color.trim(),
       date: issueDate,
-      last_update: issueDate, // Alla creazione, last_update = date
+      last_update: issueDate,
       published,
+      showOrder,
       slug: slug?.trim() || undefined,
+      createdBy: user.id,
     });
 
     revalidateAdminPath("/admin/issues");
-    return { success: true, data: issue, message: "Issue created successfully" };
+    return { success: true, data: issue as Issue, message: "Issue created successfully" };
   } catch (error) {
     return {
       success: false,
@@ -99,6 +102,7 @@ export async function updateIssueAction(
     const color = formData.get("color") as string;
     const date = formData.get("date") as string;
     const published = formData.get("published") === "on";
+    const showOrder = formData.get("showOrder") === "on";
 
     if (!slug || !title || !description || !color || !date) {
       return {
@@ -129,6 +133,7 @@ export async function updateIssueAction(
       color: color.trim(),
       date: date.trim(),
       published,
+      showOrder,
       newSlug: newSlug?.trim() || undefined,
     });
 
@@ -217,6 +222,33 @@ export async function deleteIssuesAction(
     return {
       success: false,
       error: error instanceof Error ? error.message : "Failed to delete issues",
+      errorType: "error",
+    };
+  }
+}
+
+export async function reorderIssueArticlesAction(
+  issueSlug: string,
+  orderedIds: string[],
+): Promise<ActionResult> {
+  try {
+    const user = await getCmsUser();
+    if (!user) {
+      return { success: false, error: "Unauthorized", errorType: "error" };
+    }
+
+    if (!issueSlug) {
+      return { success: false, error: "Issue slug is required", errorType: "error" };
+    }
+
+    await reorderArticlesInIssue(issueSlug, orderedIds);
+    revalidateAdminPath("/admin/issues");
+
+    return { success: true, message: "Articles reordered successfully" };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to reorder articles",
       errorType: "error",
     };
   }

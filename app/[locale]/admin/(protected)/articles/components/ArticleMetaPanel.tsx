@@ -33,13 +33,13 @@ interface ArticleMetaPanelProps {
   formData: {
     title: string;
     date: string;
-    author: string;
-    category: string;
-    issue: string;
+    authorId: string;
+    categoryId: string;
+    issueId: string;
     in_evidence: boolean;
     published: boolean;
     excerpt: string;
-    podcast?: string;
+    podcastId?: string;
   };
   onFormDataChange: (field: string, value: string | boolean) => void;
   editing: boolean;
@@ -181,42 +181,44 @@ export default function ArticleMetaPanel({
         </div>
 
         <SelectSearch
-          id="author"
+          id="authorId"
           label="Autore"
-          value={formData.author}
+          value={formData.authorId}
           options={authors.map((author) => ({
-            value: author.slug,
+            value: author.id,
             label: author.name,
           }))}
-          onChange={(value) => onFormDataChange("author", value)}
+          onChange={(value) => onFormDataChange("authorId", value)}
           placeholder="Seleziona un autore"
           required
         />
 
         <SelectSearch
-          id="category"
+          id="categoryId"
           label="Categoria"
-          value={formData.category}
+          value={formData.categoryId}
           options={categories.map((category) => ({
-            value: category.slug,
+            value: category.id,
             label: category.name,
           }))}
-          onChange={(value) => onFormDataChange("category", value)}
+          onChange={(value) => onFormDataChange("categoryId", value)}
           placeholder="Seleziona una categoria"
           required
         />
 
         <SelectSearch
-          id="issue"
+          id="issueId"
           label="Issue"
-          value={formData.issue}
-          options={issues.map((issue) => ({
-            value: issue.slug,
-            label: issue.title,
-          }))}
-          onChange={(value) => onFormDataChange("issue", value)}
+          value={formData.issueId}
+          options={[
+            { value: "", label: "Nessuna issue" },
+            ...issues.map((issue) => ({
+              value: issue.id,
+              label: issue.title,
+            })),
+          ]}
+          onChange={(value) => onFormDataChange("issueId", value)}
           placeholder="Seleziona un'issue"
-          required
         />
 
         <div className={styles.field}>
@@ -257,17 +259,17 @@ export default function ArticleMetaPanel({
         </div>
 
         <SelectSearch
-          id="podcast"
+          id="podcastId"
           label="Podcast (opzionale)"
-          value={formData.podcast || ""}
+          value={formData.podcastId || ""}
           options={[
             { value: "", label: "Nessun podcast" },
             ...podcasts.map((podcast) => ({
-              value: podcast.slug,
+              value: podcast.id,
               label: podcast.title,
             })),
           ]}
-          onChange={(value) => onFormDataChange("podcast", value || "")}
+          onChange={(value) => onFormDataChange("podcastId", value || "")}
           placeholder="Seleziona un podcast"
         />
       </div>

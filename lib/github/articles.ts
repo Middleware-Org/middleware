@@ -10,7 +10,9 @@ import {
   renameFile,
 } from "./client";
 import { generateSlug, generateUniqueSlug } from "./utils";
+import { addArticleToIssue, getIssueById, removeArticleFromIssue } from "./issues";
 import type { Article } from "./types";
+import { randomUUID } from "crypto";
 
 /* **************************************************
  * Articles
@@ -30,22 +32,21 @@ export async function getAllArticles(): Promise<Article[]> {
 
         const { data, content: markdownContent } = matter(content);
 
-        const articleDate = data.date as string;
-        const lastUpdate = (data.last_update as string) || articleDate;
-
         return {
-          slug: data.slug || file.name.replace(".md", ""),
-          title: data.title,
-          date: articleDate,
-          last_update: lastUpdate,
-          author: data.author,
-          category: data.category,
-          issue: data.issue,
-          in_evidence: data.in_evidence ?? false,
-          published: data.published ?? false,
-          excerpt: data.excerpt || "",
+          id: data.id as string,
+          slug: (data.slug as string) || file.name.replace(".md", ""),
+          title: data.title as string,
+          date: data.date as string,
+          last_update: (data.last_update as string) || (data.date as string),
+          authorId: data.authorId as string,
+          categoryId: data.categoryId as string,
+          issueId: data.issueId as string | undefined,
+          in_evidence: (data.in_evidence as boolean) ?? false,
+          published: (data.published as boolean) ?? false,
+          excerpt: (data.excerpt as string) || "",
           content: markdownContent,
-          podcast: data.podcast,
+          podcastId: data.podcastId as string | undefined,
+          createdBy: data.createdBy as string,
         } as Article;
       } catch {
         return null;
@@ -92,86 +93,94 @@ export async function getArticleBySlug(slug: string): Promise<Article | undefine
       return undefined;
     }
 
-    try {
-      const { data, content: markdownContent } = matter(content);
+    const { data, content: markdownContent } = matter(content);
 
-      const articleDate = (data.date as string) || new Date().toISOString().split("T")[0];
-      const lastUpdate = (data.last_update as string) || articleDate;
-
-      return {
-        slug: (data.slug as string) || slug,
-        title: (data.title as string) || "Untitled",
-        date: articleDate,
-        last_update: lastUpdate,
-        author: (data.author as string) || "",
-        category: (data.category as string) || "",
-        issue: (data.issue as string) || "",
-        in_evidence: (data.in_evidence as boolean) ?? false,
-        published: (data.published as boolean) ?? false,
-        excerpt: (data.excerpt as string) || "",
-        content: markdownContent || "",
-        podcast: (data.podcast as string) || undefined,
-      } as Article;
-    } catch {
-      return undefined;
-    }
+    return {
+      id: data.id as string,
+      slug: (data.slug as string) || slug,
+      title: (data.title as string) || "Untitled",
+      date: (data.date as string) || new Date().toISOString().split("T")[0],
+      last_update: (data.last_update as string) || (data.date as string),
+      authorId: (data.authorId as string) || "",
+      categoryId: (data.categoryId as string) || "",
+      issueId: data.issueId as string | undefined,
+      in_evidence: (data.in_evidence as boolean) ?? false,
+      published: (data.published as boolean) ?? false,
+      excerpt: (data.excerpt as string) || "",
+      content: markdownContent || "",
+      podcastId: data.podcastId as string | undefined,
+      createdBy: (data.createdBy as string) || "",
+    } as Article;
   } catch {
     return undefined;
   }
 }
 
-export async function getArticlesByIssue(issueSlug: string): Promise<Article[]> {
+export async function getArticlesByIssueId(issueId: string): Promise<Article[]> {
   const articles = await getAllArticles();
-  return articles.filter((a) => a.issue === issueSlug);
+  return articles.filter((a) => a.issueId === issueId);
 }
 
-export async function createArticle(article: Omit<Article, "slug"> & { slug?: string }) {
+export async function createArticle(
+  article: Omit<Article, "slug" | "id"> & { slug?: string; createdBy: string },
+) {
+  const id = randomUUID();
+
   // Generate slug from title if not provided
   const baseSlug = article.slug || generateSlug(article.title);
 
   // Ensure slug is unique
   const slug = await generateUniqueSlug("content/articles", baseSlug, ".md");
 
-  // Crea il frontmatter
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const frontmatter: Record<string, any> = {
+    id,
     slug,
     title: article.title,
     date: article.date,
     last_update: article.last_update || article.date,
-    author: article.author,
-    category: article.category,
-    issue: article.issue,
+    authorId: article.authorId,
+    categoryId: article.categoryId,
     in_evidence: article.in_evidence ?? false,
     published: article.published ?? false,
     excerpt: article.excerpt || "",
+    createdBy: article.createdBy,
   };
 
-  if (article.podcast) {
-    frontmatter.podcast = article.podcast;
+  if (article.issueId) {
+    frontmatter.issueId = article.issueId;
   }
 
-  // Combina frontmatter e contenuto
+  if (article.podcastId) {
+    frontmatter.podcastId = article.podcastId;
+  }
+
   const fileContent = matter.stringify(article.content, frontmatter);
 
   const filePath = `content/articles/${slug}.md`;
   await createOrUpdateFile(filePath, fileContent, `Create article: ${article.title}`);
 
-  return { ...article, slug };
+  // Add to issue ordering if issueId provided
+  if (article.issueId) {
+    const issue = await getIssueById(article.issueId);
+    if (issue) {
+      await addArticleToIssue(issue.slug, id);
+    }
+  }
+
+  return { ...article, id, slug };
 }
 
 export async function updateArticle(
   slug: string,
-  article: Partial<Omit<Article, "slug">> & { newSlug?: string },
+  article: Partial<Omit<Article, "slug" | "id" | "createdBy">> & { newSlug?: string },
 ) {
-  // Trova il file reale usando lo stesso metodo di getArticleBySlug
+  // Find real file using same method as getArticleBySlug
   const files = await listDirectoryFiles("content/articles");
   const mdFiles = files.filter((f) => f.type === "file" && f.name.endsWith(".md"));
 
-  // Prima cerca per nome file esatto
   let file = mdFiles.find((f) => f.name === `${slug}.md`);
 
-  // Se non trovato, cerca per slug nel frontmatter
   if (!file) {
     for (const f of mdFiles) {
       try {
@@ -200,53 +209,61 @@ export async function updateArticle(
     throw new Error(`Article ${slug} not found`);
   }
 
-  // Gestisci cambio slug se necessario
+  // Handle slug change if needed
   let finalSlug = fileSlug;
   if (article.newSlug && article.newSlug.trim() !== fileSlug) {
     const baseSlug = article.newSlug.trim();
     finalSlug = await generateUniqueSlug("content/articles", baseSlug, ".md", fileSlug);
   }
 
-  // All'aggiornamento, last_update diventa la data e ora corrente
   const currentDateTime = new Date().toISOString();
 
+  const newIssueId = article.issueId !== undefined ? article.issueId : existing.issueId;
+
   const updated: Article = {
+    id: existing.id,
     slug: finalSlug,
     title: article.title ?? existing.title,
     date: article.date ?? existing.date,
     last_update: currentDateTime,
-    author: article.author ?? existing.author,
-    category: article.category ?? existing.category,
-    issue: article.issue ?? existing.issue,
+    authorId: article.authorId ?? existing.authorId,
+    categoryId: article.categoryId ?? existing.categoryId,
+    issueId: newIssueId,
     in_evidence: article.in_evidence !== undefined ? article.in_evidence : existing.in_evidence,
     published: article.published !== undefined ? article.published : existing.published,
     excerpt: article.excerpt ?? existing.excerpt,
     content: article.content ?? existing.content,
-    podcast: article.podcast !== undefined ? article.podcast : existing.podcast,
+    podcastId: article.podcastId !== undefined ? article.podcastId : existing.podcastId,
+    createdBy: existing.createdBy,
   };
 
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   const frontmatter: Record<string, any> = {
+    id: updated.id,
     slug: finalSlug,
     title: updated.title,
     date: updated.date,
     last_update: updated.last_update,
-    author: updated.author,
-    category: updated.category,
-    issue: updated.issue,
+    authorId: updated.authorId,
+    categoryId: updated.categoryId,
     in_evidence: updated.in_evidence,
     published: updated.published,
     excerpt: updated.excerpt,
+    createdBy: updated.createdBy,
   };
 
-  if (updated.podcast) {
-    frontmatter.podcast = updated.podcast;
+  if (updated.issueId) {
+    frontmatter.issueId = updated.issueId;
+  }
+
+  if (updated.podcastId) {
+    frontmatter.podcastId = updated.podcastId;
   }
 
   const fileContent = matter.stringify(updated.content, frontmatter);
   const newFilePath = `content/articles/${finalSlug}.md`;
   const oldFilePath = `content/articles/${fileSlug}.md`;
 
-  // Se lo slug è cambiato, rinomina il file, altrimenti aggiorna normalmente
   if (finalSlug !== fileSlug) {
     await renameFile(
       oldFilePath,
@@ -258,6 +275,23 @@ export async function updateArticle(
     await createOrUpdateFile(newFilePath, fileContent, `Update article: ${updated.title}`);
   }
 
+  // Sync issue ordering when issueId changes
+  const oldIssueId = existing.issueId;
+  if (oldIssueId !== newIssueId) {
+    if (oldIssueId) {
+      const oldIssue = await getIssueById(oldIssueId);
+      if (oldIssue) {
+        await removeArticleFromIssue(oldIssue.slug, existing.id);
+      }
+    }
+    if (newIssueId) {
+      const newIssue = await getIssueById(newIssueId);
+      if (newIssue) {
+        await addArticleToIssue(newIssue.slug, existing.id);
+      }
+    }
+  }
+
   return updated;
 }
 
@@ -265,6 +299,14 @@ export async function deleteArticle(slug: string) {
   const article = await getArticleBySlug(slug);
   if (!article) {
     throw new Error(`Article ${slug} not found`);
+  }
+
+  // Remove from issue ordering before deletion
+  if (article.issueId) {
+    const issue = await getIssueById(article.issueId);
+    if (issue) {
+      await removeArticleFromIssue(issue.slug, article.id);
+    }
   }
 
   const filePath = `content/articles/${slug}.md`;

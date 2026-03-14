@@ -29,20 +29,20 @@ export async function createArticleAction(
 
     const title = formData.get("title") as string;
     const date = formData.get("date") as string;
-    const author = formData.get("author") as string;
-    const category = formData.get("category") as string;
-    const issue = formData.get("issue") as string;
+    const authorId = formData.get("authorId") as string;
+    const categoryId = formData.get("categoryId") as string;
+    const issueId = formData.get("issueId") as string | null;
     const in_evidence = formData.get("in_evidence") === "true";
     const published = formData.get("published") === "true";
     const excerpt = formData.get("excerpt") as string;
     const content = formData.get("content") as string;
-    const podcast = formData.get("podcast") as string | null;
+    const podcastId = formData.get("podcastId") as string | null;
     const slug = formData.get("slug") as string | null;
 
-    if (!title || !date || !author || !category || !issue || !content) {
+    if (!title || !date || !authorId || !categoryId || !content) {
       return {
         success: false,
-        error: "Title, date, author, category, issue and content are required",
+        error: "Title, date, author, category and content are required",
         errorType: "error",
       };
     }
@@ -51,20 +51,21 @@ export async function createArticleAction(
     const article = await createArticle({
       title: title.trim(),
       date: articleDate,
-      last_update: articleDate, // Alla creazione, last_update = date
-      author: author.trim(),
-      category: category.trim(),
-      issue: issue.trim(),
+      last_update: articleDate,
+      authorId: authorId.trim(),
+      categoryId: categoryId.trim(),
+      issueId: issueId?.trim() || undefined,
       in_evidence,
       published,
       excerpt: excerpt?.trim() || "",
       content: content.trim(),
-      podcast: podcast?.trim() || undefined,
+      podcastId: podcastId?.trim() || undefined,
       slug: slug?.trim() || undefined,
+      createdBy: user.id,
     });
 
     revalidateAdminPath("/admin/articles");
-    return { success: true, data: article, message: "Article created successfully" };
+    return { success: true, data: article as Article, message: "Article created successfully" };
   } catch (error) {
     return {
       success: false,
@@ -88,19 +89,19 @@ export async function updateArticleAction(
     const newSlug = formData.get("newSlug") as string | null;
     const title = formData.get("title") as string;
     const date = formData.get("date") as string;
-    const author = formData.get("author") as string;
-    const category = formData.get("category") as string;
-    const issue = formData.get("issue") as string;
+    const authorId = formData.get("authorId") as string;
+    const categoryId = formData.get("categoryId") as string;
+    const issueId = formData.get("issueId") as string | null;
     const in_evidence = formData.get("in_evidence") === "true";
     const published = formData.get("published") === "true";
     const excerpt = formData.get("excerpt") as string;
     const content = formData.get("content") as string;
-    const podcast = formData.get("podcast") as string | null;
+    const podcastId = formData.get("podcastId") as string | null;
 
-    if (!slug || !title || !date || !author || !category || !issue || !content) {
+    if (!slug || !title || !date || !authorId || !categoryId || !content) {
       return {
         success: false,
-        error: "Slug, title, date, author, category, issue and content are required",
+        error: "Slug, title, date, author, category and content are required",
         errorType: "error",
       };
     }
@@ -108,14 +109,14 @@ export async function updateArticleAction(
     const article = await updateArticle(slug, {
       title: title.trim(),
       date: date.trim(),
-      author: author.trim(),
-      category: category.trim(),
-      issue: issue.trim(),
+      authorId: authorId.trim(),
+      categoryId: categoryId.trim(),
+      issueId: issueId?.trim() || undefined,
       in_evidence,
       published,
       excerpt: excerpt?.trim() || "",
       content: content.trim(),
-      podcast: podcast?.trim() || undefined,
+      podcastId: podcastId?.trim() || undefined,
       newSlug: newSlug?.trim() || undefined,
     });
 

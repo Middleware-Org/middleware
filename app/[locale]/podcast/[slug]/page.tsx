@@ -1,7 +1,7 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { getAllPodcasts, getPodcastBySlug, getIssueBySlug } from "@/lib/content";
+import { getAllPodcasts, getPodcastBySlug, getIssueById } from "@/lib/content";
 import { i18nSettings } from "@/lib/i18n/settings";
 import { notFound } from "next/navigation";
 import PodcastPlayer from "./components/PodcastPlayer";
@@ -137,7 +137,7 @@ export default async function PodcastPage({ params }: PodcastPageProps) {
   }
 
   // Get associated issue for cover image
-  const issue = podcast.issue ? getIssueBySlug(podcast.issue) : undefined;
+  const issue = podcast.issueId ? getIssueById(podcast.issueId) : undefined;
 
   return (
     <>

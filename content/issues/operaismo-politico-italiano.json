@@ -1,4 +1,5 @@
 {
+  "id": "3ae30972-293d-440e-ab7c-9ee1c28954a8",
   "slug": "operaismo-politico-italiano",
   "title": "Operaismo Politico Italiano",
   "description": "Questo ciclo di formazione in quattro incontri ripercorre genealogia, lessico e metodo dell'operaismo politico italiano: non per conservarne la memoria, ma per estrarne gli strumenti da usare nel presente. Partendo dal contesto degli anni Sessanta e dalla specificità di quella rottura teorica e politica, arriveremo a interrogare le trasformazioni della composizione di classe degli ultimi vent'anni e le ipotesi di ricomposizione nel presente.",
@@ -6,5 +7,11 @@
   "color": "#000000",
   "date": "2026-02-23",
   "last_update": "2026-03-10T11:12:26.857Z",
-  "published": true
+  "published": true,
+  "articlesOrder": [
+    "f2eeff9e-9885-4d19-b010-d191e37af37e",
+    "f3047674-954e-4a6b-a01f-cf7ca9727523"
+  ],
+  "showOrder": false,
+  "createdBy": "00000000-0000-0000-0000-000000000001"
 }
