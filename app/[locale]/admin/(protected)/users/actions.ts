@@ -3,17 +3,20 @@
  **************************************************/
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { getUser } from "@/lib/auth/server";
+import { getAdminUser } from "@/lib/auth/server";
 import { createUser, updateUser, deleteUser } from "@/lib/github/users";
 import type { User } from "@/lib/github/users";
+import type { ActionResult } from "@/lib/actions/types";
+import { revalidateAdminPath } from "@/lib/cache/revalidate";
+
+function parseRole(value: FormDataEntryValue | null): "ADMIN" | "EDITOR" {
+  return value === "ADMIN" ? "ADMIN" : "EDITOR";
+}
 
 /* **************************************************
  * Types
  **************************************************/
-export type ActionResult<T = void> =
-  | { success: true; data?: T; message?: string }
-  | { success: false; error: string; errorType?: "error" | "warning" };
+export type { ActionResult };
 
 /* **************************************************
  * Server Actions
@@ -23,7 +26,7 @@ export async function createUserAction(
   formData: FormData,
 ): Promise<ActionResult<User>> {
   try {
-    const user = await getUser();
+    const user = await getAdminUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
@@ -31,6 +34,7 @@ export async function createUserAction(
     const email = formData.get("email") as string;
     const name = formData.get("name") as string | null;
     const password = formData.get("password") as string;
+    const role = parseRole(formData.get("role"));
 
     if (!email) {
       return {
@@ -52,9 +56,10 @@ export async function createUserAction(
       email: email.trim(),
       name: name?.trim() || null,
       password,
+      role,
     });
 
-    revalidatePath("/admin/users");
+    revalidateAdminPath("/admin/users");
     return { success: true, data: userData, message: "User created successfully" };
   } catch (error) {
     return {
@@ -70,7 +75,7 @@ export async function updateUserAction(
   formData: FormData,
 ): Promise<ActionResult<User>> {
   try {
-    const user = await getUser();
+    const user = await getAdminUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
@@ -79,6 +84,7 @@ export async function updateUserAction(
     const email = formData.get("email") as string;
     const name = formData.get("name") as string | null;
     const password = formData.get("password") as string | null;
+    const role = parseRole(formData.get("role"));
 
     if (!id || !email) {
       return {
@@ -92,6 +98,7 @@ export async function updateUserAction(
     const updateData: Parameters<typeof updateUser>[1] = {
       email: email.trim(),
       name: name?.trim() || null,
+      role,
     };
 
     if (password && password.trim().length > 0) {
@@ -107,7 +114,7 @@ export async function updateUserAction(
 
     const userData = await updateUser(id, updateData);
 
-    revalidatePath("/admin/users");
+    revalidateAdminPath("/admin/users");
     return { success: true, data: userData, message: "User updated successfully" };
   } catch (error) {
     return {
@@ -120,7 +127,7 @@ export async function updateUserAction(
 
 export async function deleteUserAction(id: string): Promise<ActionResult> {
   try {
-    const user = await getUser();
+    const user = await getAdminUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
@@ -130,7 +137,7 @@ export async function deleteUserAction(id: string): Promise<ActionResult> {
     }
 
     await deleteUser(id);
-    revalidatePath("/admin/users");
+    revalidateAdminPath("/admin/users");
 
     return { success: true, message: "User deleted successfully" };
   } catch (error) {
@@ -149,7 +156,7 @@ export async function deleteUsersAction(
   ids: string[],
 ): Promise<ActionResult<{ deleted: number; failed: number }>> {
   try {
-    const user = await getUser();
+    const user = await getAdminUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
@@ -173,7 +180,7 @@ export async function deleteUsersAction(
       }
     }
 
-    revalidatePath("/admin/users");
+    revalidateAdminPath("/admin/users");
 
     if (failed > 0) {
       return {

@@ -10,14 +10,16 @@ import PodcastFormClient from "../components/PodcastFormClient";
 import PodcastFormSkeleton from "../components/PodcastFormSkeleton";
 import styles from "../styles";
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
+import { withLocale } from "@/lib/i18n/path";
 
 /* **************************************************
  * New Podcast Page (Server Component)
  **************************************************/
-export default async function NewPodcastPage() {
+export default async function NewPodcastPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const user = await getUser();
   if (!user) {
-    redirect("/admin/login");
+    redirect(withLocale("/admin/login", locale));
   }
 
   return (
@@ -25,7 +27,7 @@ export default async function NewPodcastPage() {
       <div className={cn("h-full flex flex-col", styles.main)}>
         <div className={styles.header}>
           <h1 className={styles.title}>Nuovo Podcast</h1>
-          <Link href="/admin/podcasts" className={styles.backButton}>
+          <Link href={withLocale("/admin/podcasts", locale)} className={styles.backButton}>
             ← Indietro
           </Link>
         </div>
@@ -39,4 +41,3 @@ export default async function NewPodcastPage() {
     </SWRPageProvider>
   );
 }
-

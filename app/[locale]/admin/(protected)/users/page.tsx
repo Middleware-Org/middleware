@@ -4,21 +4,23 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getUser } from "@/lib/auth/server";
+import { getAdminUser } from "@/lib/auth/server";
 import { getAllUsers } from "@/lib/github/users";
 import UserListClient from "./components/UserListClient";
 import UserListSkeleton from "./components/UserListSkeleton";
 import styles from "./styles";
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
+import { withLocale } from "@/lib/i18n/path";
 import { Plus, ArrowLeft } from "lucide-react";
 
 /* **************************************************
  * Users List Page (Server Component)
  **************************************************/
-export default async function UsersPage() {
-  const user = await getUser();
+export default async function UsersPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const user = await getAdminUser();
   if (!user) {
-    redirect("/admin/login");
+    redirect(withLocale("/admin", locale));
   }
 
   const users = await getAllUsers();
@@ -35,7 +37,7 @@ export default async function UsersPage() {
           <h1 className={styles.title}>Gestione Utenti</h1>
           <div className="flex gap-2">
             <Link
-              href="/admin/users/new"
+              href={withLocale("/admin/users/new", locale)}
               className={styles.iconButton}
               aria-label="Nuovo Utente"
               title="Nuovo Utente"
@@ -43,7 +45,7 @@ export default async function UsersPage() {
               <Plus className="w-4 h-4" />
             </Link>
             <Link
-              href="/admin"
+              href={withLocale("/admin", locale)}
               className={styles.iconButton}
               aria-label="Indietro"
               title="Indietro"

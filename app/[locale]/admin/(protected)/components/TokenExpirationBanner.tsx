@@ -3,11 +3,16 @@
  **************************************************/
 "use client";
 
-import { useMemo } from "react";
 import { AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils/classes";
 import useSWR from "swr";
 import { createFetcher } from "@/hooks/swr/fetcher";
+import type { AdminDictionary } from "@/lib/i18n/types";
+
+type TokenExpirationBannerProps = {
+  locale: string;
+  dict: AdminDictionary["tokenBanner"];
+};
 
 /* **************************************************
  * Fetcher
@@ -21,14 +26,14 @@ const fetcher = createFetcher<{
 /* **************************************************
  * Token Expiration Banner Component
  **************************************************/
-export default function TokenExpirationBanner() {
+export default function TokenExpirationBanner({ locale, dict }: TokenExpirationBannerProps) {
   const { data, error, isLoading } = useSWR("/api/github/token-expiration", fetcher, {
     refreshInterval: 0,
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
   });
 
-  const bannerContent = useMemo(() => {
+  const bannerContent = (() => {
     if (isLoading || error || !data) {
       return null;
     }
@@ -38,7 +43,7 @@ export default function TokenExpirationBanner() {
     }
 
     const expirationDate = new Date(data.expirationDate);
-    const formattedDate = expirationDate.toLocaleDateString("it-IT", {
+    const formattedDate = expirationDate.toLocaleDateString(locale === "it" ? "it-IT" : locale, {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -49,7 +54,7 @@ export default function TokenExpirationBanner() {
       daysUntilExpiration: data.daysUntilExpiration,
       isExpiringSoon: data.isExpiringSoon,
     };
-  }, [data, error, isLoading]);
+  })();
 
   if (!bannerContent) {
     return null;
@@ -66,19 +71,19 @@ export default function TokenExpirationBanner() {
       <div className="flex items-start gap-3">
         <AlertTriangle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
         <div className="flex-1">
-          <p className="text-sm font-medium">Token GitHub in scadenza</p>
+          <p className="text-sm font-medium">{dict.title}</p>
           <p className="text-sm mt-1">
-            Il token GitHub scadrà il <span className="font-semibold">{expirationDate}</span>
+            {dict.prefix} <span className="font-semibold">{expirationDate}</span>
             {daysUntilExpiration !== null && (
               <>
                 {" "}
-                (tra{" "}
+                ({dict.in}{" "}
                 <span className="font-semibold">
                   {daysUntilExpiration === 0
-                    ? "oggi"
+                    ? dict.today
                     : daysUntilExpiration === 1
-                      ? "1 giorno"
-                      : `${daysUntilExpiration} giorni`}
+                      ? dict.oneDay
+                      : `${daysUntilExpiration} ${dict.manyDays}`}
                 </span>
                 )
               </>

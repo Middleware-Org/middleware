@@ -1,5 +1,10 @@
 "use client";
 
-import { useTranslation } from "react-i18next";
+import { useParams } from "next/navigation";
+import { withLocale } from "@/lib/i18n/path";
 
-export { useTranslation };
+export function useLocalizedPath() {
+  const { locale } = useParams() as { locale?: string };
+
+  return (path: string) => withLocale(path, locale);
+}

@@ -3,17 +3,16 @@
  **************************************************/
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { getUser } from "@/lib/auth/server";
+import { getCmsUser } from "@/lib/auth/server";
 import { createAuthor, updateAuthor, deleteAuthor } from "@/lib/github/authors";
 import type { Author } from "@/lib/github/types";
+import type { ActionResult } from "@/lib/actions/types";
+import { revalidateAdminPath } from "@/lib/cache/revalidate";
 
 /* **************************************************
  * Types
  **************************************************/
-export type ActionResult<T = void> =
-  | { success: true; data?: T; message?: string }
-  | { success: false; error: string; errorType?: "error" | "warning" };
+export type { ActionResult };
 
 /* **************************************************
  * Server Actions
@@ -23,7 +22,7 @@ export async function createAuthorAction(
   formData: FormData,
 ): Promise<ActionResult<Author>> {
   try {
-    const user = await getUser();
+    const user = await getCmsUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
@@ -46,7 +45,7 @@ export async function createAuthorAction(
       slug: slug?.trim() || undefined,
     });
 
-    revalidatePath("/admin/authors");
+    revalidateAdminPath("/admin/authors");
     return { success: true, data: author, message: "Author created successfully" };
   } catch (error) {
     return {
@@ -62,7 +61,7 @@ export async function updateAuthorAction(
   formData: FormData,
 ): Promise<ActionResult<Author>> {
   try {
-    const user = await getUser();
+    const user = await getCmsUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
@@ -86,7 +85,7 @@ export async function updateAuthorAction(
       newSlug: newSlug?.trim() || undefined,
     });
 
-    revalidatePath("/admin/authors");
+    revalidateAdminPath("/admin/authors");
     return { success: true, data: author, message: "Author updated successfully" };
   } catch (error) {
     return {
@@ -99,7 +98,7 @@ export async function updateAuthorAction(
 
 export async function deleteAuthorAction(slug: string): Promise<ActionResult> {
   try {
-    const user = await getUser();
+    const user = await getCmsUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
@@ -109,7 +108,7 @@ export async function deleteAuthorAction(slug: string): Promise<ActionResult> {
     }
 
     await deleteAuthor(slug);
-    revalidatePath("/admin/authors");
+    revalidateAdminPath("/admin/authors");
 
     return { success: true, message: "Author deleted successfully" };
   } catch (error) {
@@ -128,7 +127,7 @@ export async function deleteAuthorsAction(
   slugs: string[],
 ): Promise<ActionResult<{ deleted: number; failed: number }>> {
   try {
-    const user = await getUser();
+    const user = await getCmsUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
@@ -152,7 +151,7 @@ export async function deleteAuthorsAction(
       }
     }
 
-    revalidatePath("/admin/authors");
+    revalidateAdminPath("/admin/authors");
 
     if (failed > 0) {
       return {

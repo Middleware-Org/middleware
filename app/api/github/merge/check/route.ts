@@ -1,7 +1,12 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { getAdminUser } from "@/lib/auth/server";
+import { createLogger } from "@/lib/logger";
+import { checkRateLimit, createRateLimitResponse, getClientIp } from "@/lib/security/rateLimit";
+
+const logger = createLogger("API /github/merge/check");
 
 const GITHUB_API_URL = "https://api.github.com";
 const owner = process.env.GITHUB_OWNER!;
@@ -13,8 +18,27 @@ const token = process.env.GITHUB_TOKEN!;
 /* **************************************************
  * Check if there are commits to merge from develop to main
  **************************************************/
-export async function GET(request: NextRequest) {
+export async function GET(request: Request) {
   try {
+    const ip = getClientIp(request);
+    const rateLimit = await checkRateLimit(`github:merge-check:${ip}`, {
+      windowMs: 60_000,
+      maxRequests: 30,
+    });
+
+    if (!rateLimit.allowed) {
+      return createRateLimitResponse(rateLimit);
+    }
+
+    const user = await getAdminUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!owner || !repo || !token) {
+      return NextResponse.json({ error: "GitHub configuration missing" }, { status: 500 });
+    }
+
     // Get the latest commit SHA for both branches
     const [mainBranchData, devBranchData] = await Promise.all([
       fetch(`${GITHUB_API_URL}/repos/${owner}/${repo}/branches/${mainBranch}`, {
@@ -69,7 +93,7 @@ export async function GET(request: NextRequest) {
       status: compareData.status, // "ahead", "behind", "identical", "diverged"
     });
   } catch (error) {
-    console.error("Error checking merge status:", error);
+    logger.error("Error checking merge status", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

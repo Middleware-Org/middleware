@@ -1,11 +1,7 @@
 /* **************************************************
  * Imports
  **************************************************/
-"use client";
-
-import { useEffect, useRef } from "react";
 import { MonoTextLight } from "@/components/atoms/typography";
-import { scrollToElement } from "@/lib/utils/window";
 
 /* **************************************************
  * Types
@@ -24,60 +20,12 @@ interface CitationsSectionProps {
  * Citations Section Component
  **************************************************/
 export default function CitationsSection({ citations }: CitationsSectionProps) {
-  const sectionRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    // Gestisce lo scroll quando si clicca su una citazione nel testo (scrolla alla sezione citazioni)
-    const handleHashChange = () => {
-      if (window.location.hash) {
-        const hash = window.location.hash.substring(1);
-        if (hash.startsWith("citation-")) {
-          setTimeout(() => {
-            scrollToElement(hash, 150);
-          }, 100);
-        } else if (hash.startsWith("cit-")) {
-          // Quando si clicca dalla sezione citazioni, scrolla al punto nel contenuto
-          setTimeout(() => {
-            scrollToElement(hash, 150);
-          }, 100);
-        }
-      }
-    };
-
-    // Gestisce i click sui link delle citazioni nel contenuto
-    const handleCitationClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.classList.contains("citation-link")) {
-        e.preventDefault();
-        const href = target.getAttribute("href");
-        if (href) {
-          window.history.pushState(null, "", href);
-          handleHashChange();
-        }
-      }
-    };
-
-    // Controlla l'hash all'inizio
-    handleHashChange();
-
-    // Ascolta i cambiamenti dell'hash
-    window.addEventListener("hashchange", handleHashChange);
-    // Ascolta i click sui link delle citazioni nel contenuto
-    document.addEventListener("click", handleCitationClick);
-
-    return () => {
-      window.removeEventListener("hashchange", handleHashChange);
-      document.removeEventListener("click", handleCitationClick);
-    };
-  }, []);
-
   if (citations.length === 0) {
     return null;
   }
 
   return (
     <section
-      ref={sectionRef}
       id="citations"
       className="w-full flex flex-col max-w-[1472px] mx-auto lg:px-10 md:px-4 px-4 gap-5"
     >

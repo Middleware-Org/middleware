@@ -38,7 +38,7 @@ export async function generateMetadata({ params }: LocaleLayoutProps) {
     alternates: {
       canonical: url,
       languages: {
-        [locale]: `/${locale}/${TRANSLATION_NAMESPACES.HOME}`,
+        [locale]: `/${locale}`,
       },
     },
     openGraph: createOpenGraphMetadata({
@@ -85,7 +85,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
     <>
       <StructuredData data={organizationSchema} />
       {children}
-      <PolicyBanner dict={dict} />
+      <PolicyBanner dict={dict} locale={locale} />
       <Analytics />
     </>
   );

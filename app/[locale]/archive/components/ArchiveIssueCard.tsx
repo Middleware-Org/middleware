@@ -10,9 +10,10 @@ import { MonoTextBold, MonoTextLight, SerifText } from "@/components/atoms/typog
 import { lightenColor, getTextColor } from "@/lib/utils/color";
 import { Article, Issue } from "@/.velite";
 import { CommonDictionary } from "@/lib/i18n/types";
-import { getAuthorBySlug, getCategoryBySlug } from "@/lib/content";
+import { getAuthorById, getCategoryById } from "@/lib/content";
 import { cn } from "@/lib/utils/classes";
 import { getGitHubImageUrl } from "@/lib/github/images";
+import { useLocalizedPath } from "@/lib/i18n/client";
 
 /* **************************************************
  * Types
@@ -62,6 +63,7 @@ const styles = {
  * ArchiveIssueCard
  **************************************************/
 export default function ArchiveIssueCard({ issue, articles, dict, index }: ArchiveIssueCardProps) {
+  const toLocale = useLocalizedPath();
   const lightColor = lightenColor(issue.color);
   const { textColor, backgroundColor } = getTextColor(issue.color);
 
@@ -75,7 +77,7 @@ export default function ArchiveIssueCard({ issue, articles, dict, index }: Archi
         <div className={styles.coverContainer}>
           <div className={styles.issueLabelContainer} style={{ backgroundColor: lightColor }}>
             <Link
-              href={`/issues/${issue.slug}`}
+              href={toLocale(`/issues/${issue.slug}`)}
               className={styles.issueLabelLink}
               style={{
                 borderLeft: `1px solid ${issue.color}`,
@@ -96,7 +98,7 @@ export default function ArchiveIssueCard({ issue, articles, dict, index }: Archi
             </Link>
           </div>
           <div className={styles.imageWrapper} style={{ backgroundColor: issue.color }}>
-            <Link href={`/issues/${issue.slug}`} className={styles.imageLink}>
+            <Link href={toLocale(`/issues/${issue.slug}`)} className={styles.imageLink}>
               <Image
                 src={getGitHubImageUrl(issue.cover)}
                 alt={issue.title}
@@ -132,14 +134,14 @@ export default function ArchiveIssueCard({ issue, articles, dict, index }: Archi
               <Separator className={cn(backgroundColor)} />
               <div className={styles.articlesList}>
                 {articles.map((article, index) => {
-                  const author = getAuthorBySlug(article.author);
-                  const category = getCategoryBySlug(article.category);
+                  const author = getAuthorById(article.authorId);
+                  const category = getCategoryById(article.categoryId);
 
                   if (!author || !category || index > 2) return null;
 
                   return (
                     <div key={article.slug} className={styles.articleItem}>
-                      <Link href={`/articles/${article.slug}`}>
+                      <Link href={toLocale(`/articles/${article.slug}`)}>
                         <MonoTextBold className={cn(styles.articleTitle, textColor)}>
                           {article.title}
                         </MonoTextBold>
@@ -147,11 +149,11 @@ export default function ArchiveIssueCard({ issue, articles, dict, index }: Archi
                       <div className={styles.articleMeta}>
                         <MonoTextLight className={cn(styles.articleAuthor, textColor)}>
                           {dict.articleCard.wordsBy}{" "}
-                          <Link href={`/authors?author=${author.slug}`}>
+                          <Link href={toLocale(`/authors?author=${author.slug}`)}>
                             <span className={styles.articleAuthorLink}>{author.name}</span>
                           </Link>
                         </MonoTextLight>
-                        <Link href={`/categories?category=${category.slug}`}>
+                        <Link href={toLocale(`/categories?category=${category.slug}`)}>
                           <MonoTextLight className={cn(styles.articleCategory, textColor)}>
                             {category.name}
                           </MonoTextLight>

@@ -15,6 +15,8 @@ import baseStyles from "../../styles";
 import type { Article } from "@/lib/github/types";
 import { useArticle, useAuthors, useCategories, useIssues } from "@/hooks/swr";
 import { mutate } from "swr";
+import { toast } from "@/hooks/use-toast";
+import { useLocalizedPath } from "@/lib/i18n/client";
 // Import dinamico per evitare problemi SSR con Tiptap
 const MarkdownEditor = dynamic(() => import("./MarkdownEditor"), {
   ssr: false,
@@ -39,6 +41,7 @@ interface ArticleFormClientProps {
  **************************************************/
 export default function ArticleFormClient({ articleSlug }: ArticleFormClientProps) {
   const router = useRouter();
+  const toLocale = useLocalizedPath();
   const editing = !!articleSlug;
 
   // Usa SWR per ottenere i dati (cache pre-popolata dal server)
@@ -53,13 +56,13 @@ export default function ArticleFormClient({ articleSlug }: ArticleFormClientProp
   const defaultFormData = {
     title: "",
     date: new Date().toISOString().split("T")[0],
-    author: "",
-    category: "",
-    issue: "",
+    authorId: "",
+    categoryId: "",
+    issueId: "",
     in_evidence: false,
     published: false,
     excerpt: "",
-    podcast: "",
+    podcastId: "",
   };
 
   // Inizializza lo stato con i valori dell'articolo se disponibile
@@ -69,13 +72,13 @@ export default function ArticleFormClient({ articleSlug }: ArticleFormClientProp
       ? {
           title: article.title || "",
           date: article.date || new Date().toISOString().split("T")[0],
-          author: article.author || "",
-          category: article.category || "",
-          issue: article.issue || "",
+          authorId: article.authorId || "",
+          categoryId: article.categoryId || "",
+          issueId: article.issueId || "",
           in_evidence: article.in_evidence || false,
           published: article.published ?? false,
           excerpt: article.excerpt || "",
-          podcast: article.podcast || "",
+          podcastId: article.podcastId || "",
         }
       : defaultFormData,
   );
@@ -87,17 +90,24 @@ export default function ArticleFormClient({ articleSlug }: ArticleFormClientProp
 
   // Reset form and navigate on success
   useEffect(() => {
-    if (state?.success) {
-      formRef.current?.reset();
-      // Invalida la cache SWR per forzare il refetch della lista
-      mutate("/api/articles");
-      if (editing && articleSlug) {
-        mutate(`/api/articles/${articleSlug}`);
-      }
-      mutate("/api/github/merge/check");
-      router.push("/admin/articles");
+    if (!state) {
+      return;
     }
-  }, [state, router, editing, articleSlug]);
+
+    if (!state.success) {
+      toast.actionResult(state, { errorTitle: "Operazione non riuscita" });
+      return;
+    }
+
+    toast.success(state.message || (editing ? "Articolo aggiornato" : "Articolo creato"));
+    formRef.current?.reset();
+    mutate("/api/articles");
+    if (editing && articleSlug) {
+      mutate(`/api/articles/${articleSlug}`);
+    }
+    mutate("/api/github/merge/check");
+    router.push(toLocale("/admin/articles"));
+  }, [state, router, editing, articleSlug, toLocale]);
 
   function handleFormDataChange(field: string, value: string | boolean) {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -107,16 +117,18 @@ export default function ArticleFormClient({ articleSlug }: ArticleFormClientProp
     const preparedFormData = new FormData();
     preparedFormData.set("title", formData.title);
     preparedFormData.set("date", formData.date);
-    preparedFormData.set("author", formData.author);
-    preparedFormData.set("category", formData.category);
-    preparedFormData.set("issue", formData.issue);
+    preparedFormData.set("authorId", formData.authorId);
+    preparedFormData.set("categoryId", formData.categoryId);
+    if (formData.issueId) {
+      preparedFormData.set("issueId", formData.issueId);
+    }
     preparedFormData.set("in_evidence", formData.in_evidence.toString());
     preparedFormData.set("published", formData.published.toString());
     preparedFormData.set("excerpt", formData.excerpt);
     preparedFormData.set("content", content);
 
-    if (formData.podcast) {
-      preparedFormData.set("podcast", formData.podcast);
+    if (formData.podcastId) {
+      preparedFormData.set("podcastId", formData.podcastId);
     }
 
     if (editing && articleSlug) {
@@ -145,18 +157,6 @@ export default function ArticleFormClient({ articleSlug }: ArticleFormClientProp
       action={handleAction}
       className={cn(baseStyles.formContainer, "flex flex-col h-full")}
     >
-      {state && !state.success && (
-        <div
-          className={`mb-4 ${state.errorType === "warning" ? baseStyles.errorWarning : baseStyles.error}`}
-        >
-          {state.error}
-        </div>
-      )}
-
-      {state?.success && state.message && (
-        <div className={baseStyles.successMessage}>{state.message}</div>
-      )}
-
       <div className={cn(styles.editorContainer, "flex-1 min-h-0")}>
         {/* Editor Markdown - 3/4 width */}
         <div className={styles.editorWrapper}>

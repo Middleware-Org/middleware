@@ -2,8 +2,12 @@
  * Imports
  **************************************************/
 import { NextResponse } from "next/server";
+import { CACHE_PROFILES, setPrivateCacheHeaders } from "@/lib/api/cache";
 import { getUser } from "@/lib/auth/server";
 import { getPodcastBySlug } from "@/lib/github/podcasts";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("API /podcasts/[slug]");
 
 /* **************************************************
  * Types
@@ -29,13 +33,17 @@ export async function GET(_request: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "Podcast not found" }, { status: 404 });
     }
 
-    return NextResponse.json(podcast);
+    const response = NextResponse.json(podcast);
+    response.headers.set("X-Data-Source", "rest-api");
+    response.headers.set("X-Timestamp", new Date().toISOString());
+    setPrivateCacheHeaders(response, CACHE_PROFILES.detail);
+
+    return response;
   } catch (error) {
-    console.error("Error fetching podcast:", error);
+    logger.error("Error fetching podcast", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Failed to fetch podcast" },
       { status: 500 },
     );
   }
 }
-

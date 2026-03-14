@@ -5,9 +5,9 @@
 
 import { useRef, useState } from "react";
 import { upload } from "@vercel/blob/client";
-import type { ActionResult } from "../actions";
 import styles from "../styles";
 import Image from "next/image";
+import { toast } from "@/hooks/use-toast";
 
 /* **************************************************
  * Media Upload Client Component
@@ -19,7 +19,6 @@ export default function MediaUploadClient() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [filename, setFilename] = useState<string>("");
   const [fileType, setFileType] = useState<"image" | "audio" | "json">("image");
-  const [state, setState] = useState<ActionResult<string> | null>(null);
   const [isPending, setIsPending] = useState(false);
 
   function handleFileSelect(event: React.ChangeEvent<HTMLInputElement>) {
@@ -39,8 +38,9 @@ export default function MediaUploadClient() {
     } else if (file.type === "application/json" || file.name.endsWith(".json")) {
       detectedType = "json";
     } else {
-      alert(
-        "Formato file non supportato. Usa immagini (JPG, PNG, GIF, WEBP), audio (MP3, WAV) o JSON.",
+      toast.warning(
+        "Formato non supportato",
+        "Usa immagini (JPG, PNG, GIF, WEBP), audio (MP3, WAV) o JSON.",
       );
       return;
     }
@@ -50,7 +50,7 @@ export default function MediaUploadClient() {
     // Validate file size (max 50MB for audio, 10MB for others)
     const maxSize = detectedType === "audio" ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
     if (file.size > maxSize) {
-      alert(`La dimensione del file deve essere inferiore a ${maxSize / 1024 / 1024}MB`);
+      toast.warning(`La dimensione del file deve essere inferiore a ${maxSize / 1024 / 1024}MB`);
       return;
     }
 
@@ -89,12 +89,11 @@ export default function MediaUploadClient() {
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!selectedFile) {
-      alert("Seleziona un file prima di caricare");
+      toast.warning("Seleziona un file prima di caricare");
       return;
     }
 
     setIsPending(true);
-    setState(null);
 
     try {
       // Generate filename
@@ -130,7 +129,7 @@ export default function MediaUploadClient() {
       // Upload file directly to Vercel Blob Storage using direct client upload
       // This bypasses serverless function size limits
       // The filename will be processed by the server to add the media/ prefix
-      const blob = await upload(`media/${finalFilename}`, selectedFile, {
+      await upload(`media/${finalFilename}`, selectedFile, {
         access: "public",
         contentType:
           selectedFile.type ||
@@ -143,11 +142,7 @@ export default function MediaUploadClient() {
       });
 
       // Success - invalidate cache and reset form
-      setState({
-        success: true,
-        data: blob.url,
-        message: "File uploaded successfully",
-      });
+      toast.success("File caricato con successo");
       // Invalida la cache SWR per forzare il refetch
       const { mutate } = await import("swr");
       mutate("/api/media");
@@ -157,11 +152,10 @@ export default function MediaUploadClient() {
         formRef.current?.reset();
       }, 100);
     } catch (error) {
-      setState({
-        success: false,
-        error: error instanceof Error ? error.message : "Failed to upload file",
-        errorType: "error",
-      });
+      toast.error(
+        "Errore durante il caricamento",
+        error instanceof Error ? error.message : undefined,
+      );
     } finally {
       setIsPending(false);
     }
@@ -226,18 +220,6 @@ export default function MediaUploadClient() {
   return (
     <div className={styles.form}>
       <h2 className={styles.formTitle}>Carica Nuovo File</h2>
-
-      {state && !state.success && (
-        <div className={state.errorType === "warning" ? styles.errorWarning : styles.error}>
-          {state.error}
-        </div>
-      )}
-
-      {state?.success && state.message && (
-        <div className="mb-4 p-4 bg-green-50 border border-green-200 text-green-700">
-          {state.message}
-        </div>
-      )}
 
       <form ref={formRef} onSubmit={handleSubmit}>
         <div className={styles.field}>

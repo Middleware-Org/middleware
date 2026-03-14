@@ -9,15 +9,17 @@ import { getAllPages } from "@/lib/github/pages";
 import PageListClient from "./components/PageListClient";
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
 import styles from "./styles";
+import { withLocale } from "@/lib/i18n/path";
 import { Plus, ArrowLeft } from "lucide-react";
 
 /* **************************************************
  * Pages List Page (Server Component)
  **************************************************/
-export default async function PagesPage() {
+export default async function PagesPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const user = await getUser();
   if (!user) {
-    redirect("/admin/login");
+    redirect(withLocale("/admin/login", locale));
   }
 
   const pages = await getAllPages();
@@ -34,7 +36,7 @@ export default async function PagesPage() {
           <h1 className={styles.title}>Gestione Pagine</h1>
           <div className="flex gap-2">
             <Link
-              href="/admin/pages/new"
+              href={withLocale("/admin/pages/new", locale)}
               className={styles.iconButton}
               aria-label="Nuova Pagina"
               title="Nuova Pagina"
@@ -42,7 +44,7 @@ export default async function PagesPage() {
               <Plus className="w-4 h-4" />
             </Link>
             <Link
-              href="/admin"
+              href={withLocale("/admin", locale)}
               className={styles.iconButton}
               aria-label="Indietro"
               title="Indietro"

@@ -12,6 +12,7 @@ export type User = {
   id: string;
   email: string;
   name: string | null;
+  role: "ADMIN" | "EDITOR";
   image: string | null;
   createdAt: Date;
   updatedAt: Date;
@@ -29,6 +30,7 @@ export async function getAllUsers(): Promise<User[]> {
       id: true,
       email: true,
       name: true,
+      role: true,
       image: true,
       createdAt: true,
       updatedAt: true,
@@ -46,6 +48,7 @@ export async function getUserById(id: string): Promise<User | undefined> {
         id: true,
         email: true,
         name: true,
+        role: true,
         emailVerified: true,
         image: true,
         createdAt: true,
@@ -64,6 +67,7 @@ export async function createUser(userData: {
   name?: string | null;
   image?: string | null;
   password: string;
+  role?: "ADMIN" | "EDITOR";
 }) {
   // Verifica se l'email esiste già
   const existingUser = await prisma.user.findUnique({
@@ -87,6 +91,7 @@ export async function createUser(userData: {
     data: {
       email: userData.email,
       name: userData.name || null,
+      role: userData.role || "EDITOR",
       emailVerified: true,
       image: userData.image || null,
     },
@@ -94,6 +99,7 @@ export async function createUser(userData: {
       id: true,
       email: true,
       name: true,
+      role: true,
       image: true,
       createdAt: true,
       updatedAt: true,
@@ -121,6 +127,7 @@ export async function updateUser(
     name?: string | null;
     image?: string | null;
     password?: string;
+    role?: "ADMIN" | "EDITOR";
   },
 ) {
   const existing = await getUserById(id);
@@ -145,6 +152,7 @@ export async function updateUser(
     data: {
       email: userData.email,
       name: userData.name !== undefined ? userData.name : existing.name,
+      role: userData.role !== undefined ? userData.role : existing.role,
       emailVerified: true,
       image: userData.image !== undefined ? userData.image : existing.image,
     },
@@ -152,6 +160,7 @@ export async function updateUser(
       id: true,
       email: true,
       name: true,
+      role: true,
       image: true,
       createdAt: true,
       updatedAt: true,

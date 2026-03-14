@@ -20,7 +20,7 @@ type ArticlesProps = {
   articles: Article[];
   issue: Issue;
   disableShowArticles?: boolean;
-  dict: Pick<CommonDictionary, "articleCard">;
+  dict: Pick<CommonDictionary, "articleCard" | "lists">;
 };
 
 /* **************************************************
@@ -79,7 +79,9 @@ export default function Articles({ articles, dict, issue, disableShowArticles }:
             style={{ borderColor: color }}
           >
             <MonoTextLight style={{ color: `${color}!important` }}>
-              {showArticles ? "Nascondi articoli" : `Mostra ${articles.length} articoli`}
+              {showArticles
+                ? dict.lists.hideArticles
+                : `${dict.lists.showArticles} ${articles.length} ${dict.lists.articlesSuffix}`}
             </MonoTextLight>
           </Button>
         </div>

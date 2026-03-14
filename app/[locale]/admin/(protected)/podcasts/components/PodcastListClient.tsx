@@ -30,6 +30,8 @@ import type { Podcast } from "@/lib/github/types";
 import { usePodcasts } from "@/hooks/swr";
 import { mutate } from "swr";
 import { ItemsPerPageSelector } from "@/components/table/ItemsPerPageSelector";
+import { toast } from "@/hooks/use-toast";
+import { useLocalizedPath } from "@/lib/i18n/client";
 
 /* **************************************************
  * Column Configuration
@@ -48,8 +50,8 @@ const columnConfig: ColumnConfig[] = [
  **************************************************/
 export default function PodcastListClient() {
   const router = useRouter();
+  const toLocale = useLocalizedPath();
   const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
   const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; podcast: Podcast | null }>({
     isOpen: false,
     podcast: null,
@@ -112,7 +114,7 @@ export default function PodcastListClient() {
   }, [visibleColumns]);
 
   function handleEdit(podcast: Podcast) {
-    router.push(`/admin/podcasts/${podcast.slug}/edit`);
+    router.push(toLocale(`/admin/podcasts/${podcast.slug}/edit`));
   }
 
   function handleDeleteClick(podcast: Podcast) {
@@ -123,18 +125,15 @@ export default function PodcastListClient() {
     if (!deleteDialog.podcast) return;
 
     const { slug } = deleteDialog.podcast;
-    setError(null);
     setDeleteDialog({ isOpen: false, podcast: null });
 
     startTransition(async () => {
       const result = await deletePodcastAction(slug);
 
       if (!result.success) {
-        setError({
-          message: result.error,
-          type: result.errorType || "error",
-        });
+        toast.actionResult(result, { errorTitle: "Impossibile eliminare podcast" });
       } else {
+        toast.success(result.message || "Podcast eliminato con successo");
         mutate("/api/podcasts");
         mutate("/api/github/merge/check");
         clearSelection();
@@ -150,18 +149,15 @@ export default function PodcastListClient() {
   async function handleDeleteMultipleConfirm() {
     if (selectedIds.length === 0) return;
 
-    setError(null);
     setDeleteMultipleDialog({ isOpen: false, count: 0 });
 
     startTransition(async () => {
       const result = await deletePodcastsAction(selectedIds);
 
       if (!result.success) {
-        setError({
-          message: result.error,
-          type: result.errorType || "error",
-        });
+        toast.actionResult(result, { errorTitle: "Eliminazione multipla non completata" });
       } else {
+        toast.success(result.message || "Podcast eliminati con successo");
         mutate("/api/podcasts");
         mutate("/api/github/merge/check");
         clearSelection();
@@ -234,12 +230,6 @@ export default function PodcastListClient() {
 
   return (
     <div className={baseStyles.container}>
-      {error && (
-        <div className={error.type === "warning" ? baseStyles.errorWarning : baseStyles.error}>
-          ⚠️ {error.message}
-        </div>
-      )}
-
       {/* Search and Filters */}
       <div className={baseStyles.searchContainer}>
         <div className={baseStyles.searchRow}>

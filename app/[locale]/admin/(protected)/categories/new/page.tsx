@@ -9,14 +9,16 @@ import CategoryFormClient from "../components/CategoryFormClient";
 import CategoryFormSkeleton from "../components/CategoryFormSkeleton";
 import styles from "../styles";
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
+import { withLocale } from "@/lib/i18n/path";
 
 /* **************************************************
  * New Category Page (Server Component)
  **************************************************/
-export default async function NewCategoryPage() {
+export default async function NewCategoryPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const user = await getUser();
   if (!user) {
-    redirect("/admin/login");
+    redirect(withLocale("/admin/login", locale));
   }
 
   return (
@@ -24,7 +26,7 @@ export default async function NewCategoryPage() {
       <main className={styles.main}>
         <div className={styles.header}>
           <h1 className={styles.title}>Nuova Categoria</h1>
-          <Link href="/admin/categories" className={styles.backButton}>
+          <Link href={withLocale("/admin/categories", locale)} className={styles.backButton}>
             ← Indietro
           </Link>
         </div>

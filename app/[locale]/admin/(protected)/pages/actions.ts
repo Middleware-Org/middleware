@@ -3,17 +3,16 @@
  **************************************************/
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { getUser } from "@/lib/auth/server";
+import { getCmsUser } from "@/lib/auth/server";
 import { createPage, updatePage, deletePage } from "@/lib/github/pages";
 import type { Page } from "@/lib/github/types";
+import type { ActionResult } from "@/lib/actions/types";
+import { revalidateAdminPath } from "@/lib/cache/revalidate";
 
 /* **************************************************
  * Types
  **************************************************/
-export type ActionResult<T = void> =
-  | { success: true; data?: T; message?: string }
-  | { success: false; error: string; errorType?: "error" | "warning" };
+export type { ActionResult };
 
 /* **************************************************
  * Server Actions
@@ -23,7 +22,7 @@ export async function createPageAction(
   formData: FormData,
 ): Promise<ActionResult<Page>> {
   try {
-    const user = await getUser();
+    const user = await getCmsUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
@@ -48,7 +47,7 @@ export async function createPageAction(
       content: content.trim(),
     });
 
-    revalidatePath("/admin/pages");
+    revalidateAdminPath("/admin/pages");
     return { success: true, data: page, message: "Page created successfully" };
   } catch (error) {
     return {
@@ -64,7 +63,7 @@ export async function updatePageAction(
   formData: FormData,
 ): Promise<ActionResult<Page>> {
   try {
-    const user = await getUser();
+    const user = await getCmsUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
@@ -90,7 +89,7 @@ export async function updatePageAction(
       newSlug: newSlug?.trim() || undefined,
     });
 
-    revalidatePath("/admin/pages");
+    revalidateAdminPath("/admin/pages");
     return { success: true, data: page, message: "Page updated successfully" };
   } catch (error) {
     return {
@@ -103,7 +102,7 @@ export async function updatePageAction(
 
 export async function deletePageAction(slug: string): Promise<ActionResult> {
   try {
-    const user = await getUser();
+    const user = await getCmsUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
@@ -113,7 +112,7 @@ export async function deletePageAction(slug: string): Promise<ActionResult> {
     }
 
     await deletePage(slug);
-    revalidatePath("/admin/pages");
+    revalidateAdminPath("/admin/pages");
 
     return { success: true, message: "Page deleted successfully" };
   } catch (error) {
@@ -129,7 +128,7 @@ export async function deletePagesAction(
   slugs: string[],
 ): Promise<ActionResult<{ deleted: number; failed: number }>> {
   try {
-    const user = await getUser();
+    const user = await getCmsUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
@@ -153,7 +152,7 @@ export async function deletePagesAction(
       }
     }
 
-    revalidatePath("/admin/pages");
+    revalidateAdminPath("/admin/pages");
 
     if (failed > 0) {
       return {

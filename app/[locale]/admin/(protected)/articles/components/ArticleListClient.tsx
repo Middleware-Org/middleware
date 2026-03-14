@@ -31,6 +31,8 @@ import type { Article } from "@/lib/github/types";
 import { useArticles, useIssues, useCategories, useAuthors } from "@/hooks/swr";
 import { mutate } from "swr";
 import { ItemsPerPageSelector } from "@/components/table/ItemsPerPageSelector";
+import { toast } from "@/hooks/use-toast";
+import { useLocalizedPath } from "@/lib/i18n/client";
 
 /* **************************************************
  * Column Configuration
@@ -51,8 +53,8 @@ const columnConfig: ColumnConfig[] = [
  **************************************************/
 export default function ArticleListClient() {
   const router = useRouter();
+  const toLocale = useLocalizedPath();
   const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
   const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; article: Article | null }>({
     isOpen: false,
     article: null,
@@ -145,7 +147,7 @@ export default function ArticleListClient() {
     return [
       { value: "", label: "Tutte le issue" },
       ...issues.map((issue) => ({
-        value: issue.slug,
+        value: issue.id,
         label: issue.title,
       })),
     ];
@@ -155,7 +157,7 @@ export default function ArticleListClient() {
     return [
       { value: "", label: "Tutte le categorie" },
       ...categories.map((category) => ({
-        value: category.slug,
+        value: category.id,
         label: category.name,
       })),
     ];
@@ -165,7 +167,7 @@ export default function ArticleListClient() {
     return [
       { value: "", label: "Tutti gli autori" },
       ...authors.map((author) => ({
-        value: author.slug,
+        value: author.id,
         label: author.name,
       })),
     ];
@@ -181,14 +183,14 @@ export default function ArticleListClient() {
   // Get filter labels for display
   const getFilterLabel = (key: string, value: string) => {
     switch (key) {
-      case "issue":
-        const issue = issues.find((i) => i.slug === value);
+      case "issueId":
+        const issue = issues.find((i) => i.id === value);
         return issue ? issue.title : value;
-      case "category":
-        const category = categories.find((c) => c.slug === value);
+      case "categoryId":
+        const category = categories.find((c) => c.id === value);
         return category ? category.name : value;
-      case "author":
-        const author = authors.find((a) => a.slug === value);
+      case "authorId":
+        const author = authors.find((a) => a.id === value);
         return author ? author.name : value;
       default:
         return value;
@@ -200,13 +202,13 @@ export default function ArticleListClient() {
   }
 
   function handleClearAllFilters() {
-    setFilter("issue", null);
-    setFilter("category", null);
-    setFilter("author", null);
+    setFilter("issueId", null);
+    setFilter("categoryId", null);
+    setFilter("authorId", null);
   }
 
   function handleEdit(article: Article) {
-    router.push(`/admin/articles/${article.slug}/edit`);
+    router.push(toLocale(`/admin/articles/${article.slug}/edit`));
   }
 
   function handleDeleteClick(article: Article) {
@@ -217,18 +219,15 @@ export default function ArticleListClient() {
     if (!deleteDialog.article) return;
 
     const { slug } = deleteDialog.article;
-    setError(null);
     setDeleteDialog({ isOpen: false, article: null });
 
     startTransition(async () => {
       const result = await deleteArticleAction(slug);
 
       if (!result.success) {
-        setError({
-          message: result.error,
-          type: result.errorType || "error",
-        });
+        toast.actionResult(result, { errorTitle: "Impossibile eliminare articolo" });
       } else {
+        toast.success(result.message || "Articolo eliminato con successo");
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/articles");
         mutate("/api/github/merge/check");
@@ -245,18 +244,15 @@ export default function ArticleListClient() {
   async function handleDeleteMultipleConfirm() {
     if (selectedIds.length === 0) return;
 
-    setError(null);
     setDeleteMultipleDialog({ isOpen: false, count: 0 });
 
     startTransition(async () => {
       const result = await deleteArticlesAction(selectedIds);
 
       if (!result.success) {
-        setError({
-          message: result.error,
-          type: result.errorType || "error",
-        });
+        toast.actionResult(result, { errorTitle: "Eliminazione multipla non completata" });
       } else {
+        toast.success(result.message || "Articoli eliminati con successo");
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/articles");
         mutate("/api/github/merge/check");
@@ -280,14 +276,14 @@ export default function ArticleListClient() {
       case "date":
         return <TableCell>{new Date(article.date).toLocaleDateString("it-IT")}</TableCell>;
       case "author":
-        const author = authors.find((a) => a.slug === article.author);
-        return <TableCell>{author?.name || article.author}</TableCell>;
+        const author = authors.find((a) => a.id === article.authorId);
+        return <TableCell>{author?.name || article.authorId}</TableCell>;
       case "category":
-        const category = categories.find((c) => c.slug === article.category);
-        return <TableCell>{category?.name || article.category}</TableCell>;
+        const category = categories.find((c) => c.id === article.categoryId);
+        return <TableCell>{category?.name || article.categoryId}</TableCell>;
       case "issue":
-        const issue = issues.find((i) => i.slug === article.issue);
-        return <TableCell>{issue?.title || article.issue}</TableCell>;
+        const issue = issues.find((i) => i.id === article.issueId);
+        return <TableCell>{issue?.title || ""}</TableCell>;
       case "in_evidence":
         return (
           <TableCell>
@@ -339,12 +335,6 @@ export default function ArticleListClient() {
 
   return (
     <div className={baseStyles.container}>
-      {error && (
-        <div className={error.type === "warning" ? baseStyles.errorWarning : baseStyles.error}>
-          ⚠️ {error.message}
-        </div>
-      )}
-
       {/* Search and Filters */}
       <div className={baseStyles.searchContainer}>
         <div className={baseStyles.searchRow}>
@@ -390,33 +380,33 @@ export default function ArticleListClient() {
                 <div className="p-4 space-y-4">
                   {/* Issue Filter */}
                   <SelectSearch
-                    id="filter-issue"
+                    id="filter-issueId"
                     label="Issue"
-                    value={(filters.issue as string) || ""}
+                    value={(filters.issueId as string) || ""}
                     options={issueOptions}
-                    onChange={(value) => setFilter("issue", value || null)}
+                    onChange={(value) => setFilter("issueId", value || null)}
                     placeholder="Seleziona un'issue"
                     emptyMessage="Nessuna issue disponibile"
                   />
 
                   {/* Category Filter */}
                   <SelectSearch
-                    id="filter-category"
+                    id="filter-categoryId"
                     label="Categoria"
-                    value={(filters.category as string) || ""}
+                    value={(filters.categoryId as string) || ""}
                     options={categoryOptions}
-                    onChange={(value) => setFilter("category", value || null)}
+                    onChange={(value) => setFilter("categoryId", value || null)}
                     placeholder="Seleziona una categoria"
                     emptyMessage="Nessuna categoria disponibile"
                   />
 
                   {/* Author Filter */}
                   <SelectSearch
-                    id="filter-author"
+                    id="filter-authorId"
                     label="Autore"
-                    value={(filters.author as string) || ""}
+                    value={(filters.authorId as string) || ""}
                     options={authorOptions}
-                    onChange={(value) => setFilter("author", value || null)}
+                    onChange={(value) => setFilter("authorId", value || null)}
                     placeholder="Seleziona un autore"
                     emptyMessage="Nessun autore disponibile"
                   />

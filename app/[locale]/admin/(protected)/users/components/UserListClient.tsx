@@ -30,6 +30,8 @@ import type { User } from "@/lib/github/users";
 import { useUsers } from "@/hooks/swr";
 import { mutate } from "swr";
 import { ItemsPerPageSelector } from "@/components/table/ItemsPerPageSelector";
+import { toast } from "@/hooks/use-toast";
+import { useLocalizedPath } from "@/lib/i18n/client";
 
 /* **************************************************
  * Column Configuration
@@ -37,6 +39,7 @@ import { ItemsPerPageSelector } from "@/components/table/ItemsPerPageSelector";
 const columnConfig: ColumnConfig[] = [
   { key: "email", label: "Email", defaultVisible: true },
   { key: "name", label: "Nome", defaultVisible: true },
+  { key: "role", label: "Ruolo", defaultVisible: true },
   { key: "createdAt", label: "Data Creazione", defaultVisible: true },
   { key: "actions", label: "Azioni", defaultVisible: true },
 ];
@@ -46,8 +49,8 @@ const columnConfig: ColumnConfig[] = [
  **************************************************/
 export default function UserListClient() {
   const router = useRouter();
+  const toLocale = useLocalizedPath();
   const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
   const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; user: User | null }>({
     isOpen: false,
     user: null,
@@ -115,7 +118,7 @@ export default function UserListClient() {
   }, [search, currentPage, clearSelection]);
 
   function handleEdit(user: User) {
-    router.push(`/admin/users/${user.id}/edit`);
+    router.push(toLocale(`/admin/users/${user.id}/edit`));
   }
 
   function handleDeleteClick(user: User) {
@@ -126,18 +129,15 @@ export default function UserListClient() {
     if (!deleteDialog.user) return;
 
     const { id } = deleteDialog.user;
-    setError(null);
     setDeleteDialog({ isOpen: false, user: null });
 
     startTransition(async () => {
       const result = await deleteUserAction(id);
 
       if (!result.success) {
-        setError({
-          message: result.error,
-          type: result.errorType || "error",
-        });
+        toast.actionResult(result, { errorTitle: "Impossibile eliminare utente" });
       } else {
+        toast.success(result.message || "Utente eliminato con successo");
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/users");
         clearSelection();
@@ -153,18 +153,15 @@ export default function UserListClient() {
   async function handleDeleteMultipleConfirm() {
     if (selectedIds.length === 0) return;
 
-    setError(null);
     setDeleteMultipleDialog({ isOpen: false, count: 0 });
 
     startTransition(async () => {
       const result = await deleteUsersAction(selectedIds);
 
       if (!result.success) {
-        setError({
-          message: result.error,
-          type: result.errorType || "error",
-        });
+        toast.actionResult(result, { errorTitle: "Eliminazione multipla non completata" });
       } else {
+        toast.success(result.message || "Utenti eliminati con successo");
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/users");
         clearSelection();
@@ -189,6 +186,8 @@ export default function UserListClient() {
         return <TableCell className="font-medium">{user.email}</TableCell>;
       case "name":
         return <TableCell>{user.name || <span className="text-secondary/60">—</span>}</TableCell>;
+      case "role":
+        return <TableCell>{user.role === "ADMIN" ? "Admin" : "Editor"}</TableCell>;
       case "createdAt":
         return <TableCell className="text-secondary/80">{formatDate(user.createdAt)}</TableCell>;
       case "actions":
@@ -232,12 +231,6 @@ export default function UserListClient() {
 
   return (
     <div className={baseStyles.container}>
-      {error && (
-        <div className={error.type === "warning" ? baseStyles.errorWarning : baseStyles.error}>
-          ⚠️ {error.message}
-        </div>
-      )}
-
       {/* Search and Filters */}
       <div className={baseStyles.searchContainer}>
         <div className={baseStyles.searchRow}>

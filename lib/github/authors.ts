@@ -5,6 +5,7 @@ import { createOrUpdateFile, deleteFile, getFileContent, listDirectoryFiles, ren
 import { getAllArticles } from "./articles";
 import { generateSlug, generateUniqueSlug } from "./utils";
 import type { Author } from "./types";
+import { randomUUID } from "crypto";
 
 /* **************************************************
  * Authors
@@ -42,7 +43,6 @@ export async function getAuthorBySlug(slug: string): Promise<Author | undefined>
   try {
     const content = await getFileContent(`content/authors/${slug}.json`);
 
-    // Valida che il contenuto non sia vuoto
     if (!content || content.trim().length === 0) {
       return undefined;
     }
@@ -55,7 +55,11 @@ export async function getAuthorBySlug(slug: string): Promise<Author | undefined>
   }
 }
 
-export async function createAuthor(author: Omit<Author, "slug"> & { slug?: string }) {
+export async function createAuthor(
+  author: Omit<Author, "slug" | "id"> & { slug?: string; createdBy: string },
+) {
+  const id = randomUUID();
+
   // Generate slug from name if not provided
   const baseSlug = author.slug || generateSlug(author.name);
 
@@ -65,21 +69,23 @@ export async function createAuthor(author: Omit<Author, "slug"> & { slug?: strin
   const filePath = `content/authors/${slug}.json`;
   const content = JSON.stringify(
     {
+      id,
       slug,
       name: author.name,
       description: author.description,
+      createdBy: author.createdBy,
     },
     null,
     2,
   );
 
   await createOrUpdateFile(filePath, content, `Create author: ${author.name}`);
-  return { ...author, slug };
+  return { ...author, id, slug };
 }
 
 export async function updateAuthor(
   slug: string,
-  author: Partial<Omit<Author, "slug">> & { newSlug?: string },
+  author: Partial<Omit<Author, "slug" | "id" | "createdBy">> & { newSlug?: string },
 ) {
   const existing = await getAuthorBySlug(slug);
   if (!existing) {
@@ -94,16 +100,17 @@ export async function updateAuthor(
   }
 
   const updated: Author = {
+    id: existing.id,
     slug: finalSlug,
     name: author.name ?? existing.name,
     description: author.description ?? existing.description,
+    createdBy: existing.createdBy,
   };
 
   const content = JSON.stringify(updated, null, 2);
   const newFilePath = `content/authors/${finalSlug}.json`;
   const oldFilePath = `content/authors/${slug}.json`;
 
-  // Se lo slug è cambiato, rinomina il file, altrimenti aggiorna normalmente
   if (finalSlug !== slug) {
     await renameFile(oldFilePath, newFilePath, content, `Rename author: ${updated.name} (${slug} -> ${finalSlug})`);
   } else {
@@ -114,7 +121,6 @@ export async function updateAuthor(
 }
 
 export async function deleteAuthor(slug: string) {
-  // Verifica se l'autore esiste
   const author = await getAuthorBySlug(slug);
   if (!author) {
     throw new Error(`Author ${slug} not found`);
@@ -122,7 +128,7 @@ export async function deleteAuthor(slug: string) {
 
   // Verifica se ci sono articoli che usano questo autore
   const articles = await getAllArticles();
-  const articlesUsingAuthor = articles.filter((article) => article.author === slug);
+  const articlesUsingAuthor = articles.filter((article) => article.authorId === author.id);
 
   if (articlesUsingAuthor.length > 0) {
     const articleTitles = articlesUsingAuthor.map((a) => a.title).join(", ");
@@ -131,7 +137,6 @@ export async function deleteAuthor(slug: string) {
     );
   }
 
-  // Se non ci sono articoli che usano l'autore, procedi con l'eliminazione
   const filePath = `content/authors/${slug}.json`;
   await deleteFile(filePath, `Delete author: ${slug}`);
 }

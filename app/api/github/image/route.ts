@@ -2,6 +2,10 @@
  * Imports
  **************************************************/
 import { NextRequest, NextResponse } from "next/server";
+import { getUser } from "@/lib/auth/server";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("API /github/image");
 
 const GITHUB_API_URL = "https://api.github.com";
 const owner = process.env.GITHUB_OWNER!;
@@ -11,25 +15,79 @@ const devBranch = process.env.GITHUB_DEV_BRANCH || "develop";
 const readBranch = devBranch;
 const token = process.env.GITHUB_TOKEN!;
 
+const PUBLIC_IMAGE_PREFIX = "public/assets/";
+const ALLOWED_IMAGE_EXTENSIONS = new Set(["jpg", "jpeg", "png", "gif", "webp", "svg", "avif"]);
+
+function sanitizePath(rawPath: string): string {
+  const trimmed = rawPath.trim().replace(/^\/+/, "");
+
+  if (!trimmed) {
+    throw new Error("Invalid path");
+  }
+
+  if (trimmed.includes("..") || trimmed.includes("\\") || /[\x00-\x1F\x7F]/.test(trimmed)) {
+    throw new Error("Invalid path");
+  }
+
+  return trimmed;
+}
+
+function isAllowedImagePath(path: string): boolean {
+  if (!path.startsWith(PUBLIC_IMAGE_PREFIX)) {
+    return false;
+  }
+
+  const extension = path.split(".").pop()?.toLowerCase();
+  if (!extension) {
+    return false;
+  }
+
+  return ALLOWED_IMAGE_EXTENSIONS.has(extension);
+}
+
+function encodeGitHubPath(path: string): string {
+  return path
+    .split("/")
+    .map((segment) => encodeURIComponent(segment))
+    .join("/");
+}
+
 /* **************************************************
  * GitHub Image Proxy API Route
-  * 
+ *
  * This route proxies image requests to GitHub for private repositories.
  * It handles authentication server-side and streams the image to the client.
  * Uses GitHub API raw endpoint for better performance (no base64 decoding needed).
-  **************************************************/
+ **************************************************/
 export async function GET(request: NextRequest) {
   try {
-    const searchParams = request.nextUrl.searchParams;
-    const path = searchParams.get("path");
+    if (!owner || !repo || !token) {
+      return NextResponse.json({ error: "GitHub configuration missing" }, { status: 500 });
+    }
 
-    if (!path) {
+    const searchParams = request.nextUrl.searchParams;
+    const rawPath = searchParams.get("path");
+
+    if (!rawPath) {
       return NextResponse.json({ error: "Missing 'path' query param" }, { status: 400 });
+    }
+
+    const path = sanitizePath(rawPath);
+    const isAllowedPublicAsset = isAllowedImagePath(path);
+
+    if (!isAllowedPublicAsset) {
+      const user = await getUser();
+      if (!user) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+
+      return NextResponse.json({ error: "Path not allowed" }, { status: 403 });
     }
 
     // Use GitHub API raw endpoint for direct binary response
     // Read from dev branch to see latest changes
-    const apiUrl = `${GITHUB_API_URL}/repos/${owner}/${repo}/contents/${path}?ref=${readBranch}`;
+    const encodedPath = encodeGitHubPath(path);
+    const apiUrl = `${GITHUB_API_URL}/repos/${owner}/${repo}/contents/${encodedPath}?ref=${readBranch}`;
 
     const res = await fetch(apiUrl, {
       headers: {
@@ -41,7 +99,10 @@ export async function GET(request: NextRequest) {
     });
 
     if (!res.ok) {
-      console.error("GitHub API error", res.status, await res.text());
+      logger.error("GitHub API error", {
+        status: res.status,
+        body: await res.text(),
+      });
       return new NextResponse("Image not found", { status: 404 });
     }
 
@@ -63,6 +124,9 @@ export async function GET(request: NextRequest) {
       case "webp":
         contentType = "image/webp";
         break;
+      case "avif":
+        contentType = "image/avif";
+        break;
       case "svg":
         contentType = "image/svg+xml";
         break;
@@ -77,11 +141,11 @@ export async function GET(request: NextRequest) {
       status: 200,
       headers: {
         "Content-Type": contentType,
-        "Cache-Control": "public, max-age=3600, s-maxage=3600", // Cache for 1 hour
+        "Cache-Control": "public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800",
       },
     });
   } catch (error) {
-    console.error("Error proxying GitHub image:", error);
+    logger.error("Error proxying GitHub image", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

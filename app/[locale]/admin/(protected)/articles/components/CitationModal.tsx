@@ -73,15 +73,23 @@ export default function CitationModal({
         className={baseStyles.modalContainer}
         onClick={(e) => e.stopPropagation()}
         style={{ maxWidth: "600px" }}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="citation-modal-title"
       >
         <div className={baseStyles.modalHeader}>
           <div className="flex items-center gap-2">
             <Quote className="w-5 h-5 text-secondary" />
-            <h2 className={baseStyles.modalTitle}>
+            <h2 id="citation-modal-title" className={baseStyles.modalTitle}>
               {currentCitationId ? "Modifica Citazione" : "Inserisci Citazione"}
             </h2>
           </div>
-          <button type="button" onClick={onClose} className={baseStyles.modalCloseButton}>
+          <button
+            type="button"
+            onClick={onClose}
+            className={baseStyles.modalCloseButton}
+            aria-label="Chiudi finestra citazione"
+          >
             <X className="w-5 h-5" />
           </button>
         </div>

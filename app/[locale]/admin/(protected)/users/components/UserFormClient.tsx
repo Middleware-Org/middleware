@@ -16,10 +16,11 @@ import {
 import ConfirmDialog from "@/components/molecules/confirmDialog";
 import PasswordInput, { isPasswordStrongEnough } from "./PasswordInput";
 import styles from "../styles";
-import baseStyles from "../../styles";
 import type { User } from "@/lib/github/users";
 import { useUser } from "@/hooks/swr";
 import { mutate } from "swr";
+import { toast } from "@/hooks/use-toast";
+import { useLocalizedPath } from "@/lib/i18n/client";
 
 /* **************************************************
  * Types
@@ -46,6 +47,7 @@ function SubmitButton({ editing }: { editing: boolean }) {
  **************************************************/
 export default function UserFormClient({ userId }: UserFormClientProps) {
   const router = useRouter();
+  const toLocale = useLocalizedPath();
   const editing = !!userId;
 
   // Usa SWR per ottenere l'utente (cache pre-popolata dal server)
@@ -57,10 +59,6 @@ export default function UserFormClient({ userId }: UserFormClientProps) {
     null,
   );
 
-  const [deleteError, setDeleteError] = useState<{
-    message: string;
-    type: "error" | "warning";
-  } | null>(null);
   const [isDeleting, startDeleteTransition] = useTransition();
   const [, startSubmitTransition] = useTransition();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -69,19 +67,22 @@ export default function UserFormClient({ userId }: UserFormClientProps) {
 
   // Reset form and navigate on success
   useEffect(() => {
+    if (state && !state.success) {
+      toast.actionResult(state, { errorTitle: "Operazione non riuscita" });
+      return;
+    }
+
     if (state?.success) {
+      toast.success(state.message || (editing ? "Utente aggiornato" : "Utente creato"));
       formRef.current?.reset();
-      // Reset password state before navigation (component will unmount anyway)
-      setPassword("");
-      setPasswordError(null);
       // Invalida la cache SWR per forzare il refetch della lista
       mutate("/api/users");
       if (editing && userId) {
         mutate(`/api/users/${userId}`);
       }
-      router.push("/admin/users");
+      router.push(toLocale("/admin/users"));
     }
-  }, [state, router, editing, userId]);
+  }, [state, router, editing, userId, toLocale]);
 
   // Validazione password prima del submit
   function handleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -131,44 +132,25 @@ export default function UserFormClient({ userId }: UserFormClientProps) {
   async function handleDeleteConfirm() {
     if (!userId || !user) return;
 
-    setDeleteError(null);
     setIsDeleteDialogOpen(false);
 
     startDeleteTransition(async () => {
       const result = await deleteUserAction(userId);
 
       if (!result.success) {
-        setDeleteError({
-          message: result.error,
-          type: result.errorType || "error",
-        });
+        toast.actionResult(result, { errorTitle: "Impossibile eliminare utente" });
       } else {
+        toast.success(result.message || "Utente eliminato con successo");
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/users");
         mutate(`/api/users/${userId}`);
-        router.push("/admin/users");
+        router.push(toLocale("/admin/users"));
       }
     });
   }
 
   return (
     <>
-      {state && !state.success && (
-        <div className={state.errorType === "warning" ? styles.errorWarning : styles.error}>
-          {state.error}
-        </div>
-      )}
-
-      {deleteError && (
-        <div className={deleteError.type === "warning" ? styles.errorWarning : styles.error}>
-          ⚠️ {deleteError.message}
-        </div>
-      )}
-
-      {state?.success && state.message && (
-        <div className={baseStyles.successMessageGreen}>{state.message}</div>
-      )}
-
       <form ref={formRef} action={formAction} onSubmit={handleFormSubmit} className={styles.form}>
         <h2 className={styles.formTitle}>{editing ? "Modifica Utente" : "Nuovo Utente"}</h2>
 
@@ -202,6 +184,22 @@ export default function UserFormClient({ userId }: UserFormClientProps) {
         </div>
 
         <div className={styles.field}>
+          <label htmlFor="role" className={styles.label}>
+            Ruolo *
+          </label>
+          <select
+            id="role"
+            name="role"
+            defaultValue={user?.role || "EDITOR"}
+            className={styles.input}
+            required
+          >
+            <option value="EDITOR">Editor</option>
+            <option value="ADMIN">Admin</option>
+          </select>
+        </div>
+
+        <div className={styles.field}>
           <label htmlFor="password" className={styles.label}>
             Password {editing ? "(lascia vuoto per non modificare)" : "*"}
           </label>
@@ -222,7 +220,7 @@ export default function UserFormClient({ userId }: UserFormClientProps) {
             <>
               <button
                 type="button"
-                onClick={() => router.push("/admin/users")}
+                onClick={() => router.push(toLocale("/admin/users"))}
                 className={styles.cancelButton}
               >
                 Annulla

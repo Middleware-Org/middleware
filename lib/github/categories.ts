@@ -11,6 +11,7 @@ import {
 import { getAllArticles } from "./articles";
 import { generateSlug, generateUniqueSlug } from "./utils";
 import type { Category } from "./types";
+import { randomUUID } from "crypto";
 
 /* **************************************************
  * Categories
@@ -48,7 +49,6 @@ export async function getCategoryBySlug(slug: string): Promise<Category | undefi
   try {
     const content = await getFileContent(`content/categories/${slug}.json`);
 
-    // Valida che il contenuto non sia vuoto
     if (!content || content.trim().length === 0) {
       return undefined;
     }
@@ -61,7 +61,11 @@ export async function getCategoryBySlug(slug: string): Promise<Category | undefi
   }
 }
 
-export async function createCategory(category: Omit<Category, "slug"> & { slug?: string }) {
+export async function createCategory(
+  category: Omit<Category, "slug" | "id"> & { slug?: string; createdBy: string },
+) {
+  const id = randomUUID();
+
   // Generate slug from name if not provided
   const baseSlug = category.slug || generateSlug(category.name);
 
@@ -71,21 +75,23 @@ export async function createCategory(category: Omit<Category, "slug"> & { slug?:
   const filePath = `content/categories/${slug}.json`;
   const content = JSON.stringify(
     {
+      id,
       slug,
       name: category.name,
       description: category.description,
+      createdBy: category.createdBy,
     },
     null,
     2,
   );
 
   await createOrUpdateFile(filePath, content, `Create category: ${category.name}`);
-  return { ...category, slug };
+  return { ...category, id, slug };
 }
 
 export async function updateCategory(
   slug: string,
-  category: Partial<Omit<Category, "slug">> & { newSlug?: string },
+  category: Partial<Omit<Category, "slug" | "id" | "createdBy">> & { newSlug?: string },
 ) {
   const existing = await getCategoryBySlug(slug);
   if (!existing) {
@@ -100,16 +106,17 @@ export async function updateCategory(
   }
 
   const updated: Category = {
+    id: existing.id,
     slug: finalSlug,
     name: category.name ?? existing.name,
     description: category.description ?? existing.description,
+    createdBy: existing.createdBy,
   };
 
   const content = JSON.stringify(updated, null, 2);
   const newFilePath = `content/categories/${finalSlug}.json`;
   const oldFilePath = `content/categories/${slug}.json`;
 
-  // Se lo slug è cambiato, rinomina il file, altrimenti aggiorna normalmente
   if (finalSlug !== slug) {
     await renameFile(
       oldFilePath,
@@ -125,7 +132,6 @@ export async function updateCategory(
 }
 
 export async function deleteCategory(slug: string) {
-  // Verifica se la categoria esiste
   const category = await getCategoryBySlug(slug);
   if (!category) {
     throw new Error(`Category ${slug} not found`);
@@ -133,7 +139,7 @@ export async function deleteCategory(slug: string) {
 
   // Verifica se ci sono articoli che usano questa categoria
   const articles = await getAllArticles();
-  const articlesUsingCategory = articles.filter((article) => article.category === slug);
+  const articlesUsingCategory = articles.filter((article) => article.categoryId === category.id);
 
   if (articlesUsingCategory.length > 0) {
     const articleTitles = articlesUsingCategory.map((a) => a.title).join(", ");
@@ -142,7 +148,6 @@ export async function deleteCategory(slug: string) {
     );
   }
 
-  // Se non ci sono articoli che usano la categoria, procedi con l'eliminazione
   const filePath = `content/categories/${slug}.json`;
   await deleteFile(filePath, `Delete category: ${slug}`);
 }

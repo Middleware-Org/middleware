@@ -9,6 +9,9 @@ import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import { getDictionary } from "@/lib/i18n/utils";
 import { i18nSettings } from "@/lib/i18n/settings";
 import { cn } from "@/lib/utils/classes";
+import { getBaseUrl } from "@/lib/utils/metadata";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import IssueCover from "./components/IssueCover";
 
 /* **************************************************
@@ -17,6 +20,45 @@ import IssueCover from "./components/IssueCover";
 type IssuePageProps = {
   params: Promise<{ locale: string; slug: string }>;
 };
+
+export async function generateMetadata({ params }: IssuePageProps): Promise<Metadata> {
+  const { locale, slug } = await params;
+  const issue = getIssueBySlug(slug);
+
+  if (!issue) {
+    return {
+      title: "Issue non trovata",
+      description: "La issue richiesta non esiste",
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
+  }
+
+  const baseUrl = getBaseUrl();
+  const issueUrl = `${baseUrl}/${locale}/issues/${slug}`;
+  const description =
+    issue.description.length > 160 ? `${issue.description.slice(0, 157)}...` : issue.description;
+
+  return {
+    title: issue.title,
+    description,
+    alternates: {
+      canonical: issueUrl,
+    },
+    openGraph: {
+      title: issue.title,
+      description,
+      url: issueUrl,
+      type: "website",
+    },
+    twitter: {
+      title: issue.title,
+      description,
+    },
+  };
+}
 
 /* **************************************************
  * Generate Static Params
@@ -29,7 +71,7 @@ export async function generateStaticParams() {
     locales.map((locale) => ({
       locale,
       slug: issue.slug,
-    }))
+    })),
   );
 }
 
@@ -68,7 +110,9 @@ export default async function IssuePage({ params }: IssuePageProps) {
     { articleInEvidence: undefined as Article | undefined, otherArticles: [] as Article[] },
   );
 
-  if (!articleInEvidence || !issue) return null;
+  if (!articleInEvidence || !issue) {
+    notFound();
+  }
 
   return (
     <div className={styles.container}>
@@ -76,7 +120,7 @@ export default async function IssuePage({ params }: IssuePageProps) {
         <div className={styles.issueCoverContainer}>
           <div key={issue.slug} id={`issue-${issue.slug}`} className={styles.issueCoverContainer}>
             <div className={styles.link}>
-              <IssueCover issue={issue} />
+              <IssueCover issue={issue} locale={locale} />
             </div>
           </div>
         </div>

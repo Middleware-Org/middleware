@@ -2,6 +2,11 @@
  * Imports
  **************************************************/
 import { NextResponse } from "next/server";
+import { getAdminUser } from "@/lib/auth/server";
+import { createLogger } from "@/lib/logger";
+import { checkRateLimit, createRateLimitResponse, getClientIp } from "@/lib/security/rateLimit";
+
+const logger = createLogger("API /github/token-expiration");
 
 const GITHUB_API_URL = "https://api.github.com";
 const token = process.env.GITHUB_TOKEN!;
@@ -13,8 +18,23 @@ const token = process.env.GITHUB_TOKEN!;
  * by making a request to the GitHub API and reading
  * the github-authentication-token-expiration header.
  **************************************************/
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const ip = getClientIp(request);
+    const rateLimit = await checkRateLimit(`github:token-expiration:${ip}`, {
+      windowMs: 60_000,
+      maxRequests: 20,
+    });
+
+    if (!rateLimit.allowed) {
+      return createRateLimitResponse(rateLimit);
+    }
+
+    const user = await getAdminUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     if (!token) {
       return NextResponse.json({ error: "GitHub token not configured" }, { status: 500 });
     }
@@ -28,7 +48,10 @@ export async function GET() {
     });
 
     if (!res.ok) {
-      console.error("GitHub API error", res.status, await res.text());
+      logger.error("GitHub API error", {
+        status: res.status,
+        body: await res.text(),
+      });
       return NextResponse.json(
         { error: "Failed to check token expiration" },
         { status: res.status },
@@ -60,7 +83,7 @@ export async function GET() {
       isExpiringSoon,
     });
   } catch (error) {
-    console.error("Error checking GitHub token expiration:", error);
+    logger.error("Error checking GitHub token expiration", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

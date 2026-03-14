@@ -17,7 +17,10 @@ import type { Issue } from "@/lib/github/types";
 import SelectSearch from "./SelectSearch";
 import { mutate } from "swr";
 import { cn } from "@/lib/utils/classes";
+import { generateSlug } from "@/lib/utils/slug";
 import { usePodcasts } from "@/hooks/swr";
+import { toast } from "@/hooks/use-toast";
+import { useLocalizedPath } from "@/lib/i18n/client";
 
 /* **************************************************
  * Types
@@ -30,13 +33,13 @@ interface ArticleMetaPanelProps {
   formData: {
     title: string;
     date: string;
-    author: string;
-    category: string;
-    issue: string;
+    authorId: string;
+    categoryId: string;
+    issueId: string;
     in_evidence: boolean;
     published: boolean;
     excerpt: string;
-    podcast?: string;
+    podcastId?: string;
   };
   onFormDataChange: (field: string, value: string | boolean) => void;
   editing: boolean;
@@ -46,21 +49,6 @@ interface ArticleMetaPanelProps {
 /* **************************************************
  * Article Meta Panel Component
  **************************************************/
-/* **************************************************
- * Slug Generation Utility (Client-side)
- **************************************************/
-function generateSlug(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .normalize("NFD") // Normalize to decomposed form for handling accents
-    .replace(/[\u0300-\u036f]/g, "") // Remove diacritics
-    .replace(/[^a-z0-9\s-]/g, "") // Remove special characters except spaces and hyphens
-    .replace(/\s+/g, "-") // Replace spaces with hyphens
-    .replace(/-+/g, "-") // Replace multiple hyphens with single hyphen
-    .replace(/^-|-$/g, ""); // Remove leading/trailing hyphens
-}
-
 export default function ArticleMetaPanel({
   article,
   categories,
@@ -72,8 +60,8 @@ export default function ArticleMetaPanel({
   formRef,
 }: ArticleMetaPanelProps) {
   const router = useRouter();
+  const toLocale = useLocalizedPath();
   const [isPending] = useTransition();
-  const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
   const [isDeleting, startDeleteTransition] = useTransition();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   // Use null to indicate "not modified by user", otherwise use the user's custom value
@@ -111,22 +99,19 @@ export default function ArticleMetaPanel({
   async function handleDeleteConfirm() {
     if (!article) return;
 
-    setError(null);
     setIsDeleteDialogOpen(false);
 
     startDeleteTransition(async () => {
       const result = await deleteArticleAction(article.slug);
 
       if (!result.success) {
-        setError({
-          message: result.error,
-          type: result.errorType || "error",
-        });
+        toast.actionResult(result, { errorTitle: "Impossibile eliminare articolo" });
       } else {
+        toast.success(result.message || "Articolo eliminato con successo");
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/articles");
         mutate(`/api/articles/${article.slug}`);
-        router.push("/admin/articles");
+        router.push(toLocale("/admin/articles"));
       }
     });
   }
@@ -196,42 +181,44 @@ export default function ArticleMetaPanel({
         </div>
 
         <SelectSearch
-          id="author"
+          id="authorId"
           label="Autore"
-          value={formData.author}
+          value={formData.authorId}
           options={authors.map((author) => ({
-            value: author.slug,
+            value: author.id,
             label: author.name,
           }))}
-          onChange={(value) => onFormDataChange("author", value)}
+          onChange={(value) => onFormDataChange("authorId", value)}
           placeholder="Seleziona un autore"
           required
         />
 
         <SelectSearch
-          id="category"
+          id="categoryId"
           label="Categoria"
-          value={formData.category}
+          value={formData.categoryId}
           options={categories.map((category) => ({
-            value: category.slug,
+            value: category.id,
             label: category.name,
           }))}
-          onChange={(value) => onFormDataChange("category", value)}
+          onChange={(value) => onFormDataChange("categoryId", value)}
           placeholder="Seleziona una categoria"
           required
         />
 
         <SelectSearch
-          id="issue"
+          id="issueId"
           label="Issue"
-          value={formData.issue}
-          options={issues.map((issue) => ({
-            value: issue.slug,
-            label: issue.title,
-          }))}
-          onChange={(value) => onFormDataChange("issue", value)}
+          value={formData.issueId}
+          options={[
+            { value: "", label: "Nessuna issue" },
+            ...issues.map((issue) => ({
+              value: issue.id,
+              label: issue.title,
+            })),
+          ]}
+          onChange={(value) => onFormDataChange("issueId", value)}
           placeholder="Seleziona un'issue"
-          required
         />
 
         <div className={styles.field}>
@@ -272,17 +259,17 @@ export default function ArticleMetaPanel({
         </div>
 
         <SelectSearch
-          id="podcast"
+          id="podcastId"
           label="Podcast (opzionale)"
-          value={formData.podcast || ""}
+          value={formData.podcastId || ""}
           options={[
             { value: "", label: "Nessun podcast" },
             ...podcasts.map((podcast) => ({
-              value: podcast.slug,
+              value: podcast.id,
               label: podcast.title,
             })),
           ]}
-          onChange={(value) => onFormDataChange("podcast", value || "")}
+          onChange={(value) => onFormDataChange("podcastId", value || "")}
           placeholder="Seleziona un podcast"
         />
       </div>
@@ -303,7 +290,7 @@ export default function ArticleMetaPanel({
           </button>
           <button
             type="button"
-            onClick={() => router.push("/admin/articles")}
+            onClick={() => router.push(toLocale("/admin/articles"))}
             className={styles.cancelButton}
             disabled={isPending}
           >
@@ -322,12 +309,6 @@ export default function ArticleMetaPanel({
             </div>
           )}
         </div>
-
-        {editing && article && error && (
-          <div className={`mt-4 ${error.type === "warning" ? styles.errorWarning : styles.error}`}>
-            ⚠️ {error.message}
-          </div>
-        )}
       </div>
 
       {/* Delete Confirmation Dialog */}

@@ -2,21 +2,23 @@
  * Imports
  **************************************************/
 import { NextResponse } from "next/server";
-import { getUser } from "@/lib/auth/server";
+import { getAdminUser } from "@/lib/auth/server";
 import { getAllUsers } from "@/lib/github/users";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("API /users");
 
 /* **************************************************
  * GET /api/users
  **************************************************/
 export async function GET() {
   try {
-    const user = await getUser();
+    const user = await getAdminUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Log per verificare se la richiesta viene fatta (non cache)
-    console.log("[API] GET /api/users - Richiesta REST effettuata", {
+    logger.debug("GET richiesta REST effettuata", {
       timestamp: new Date().toISOString(),
       user: user.email,
     });
@@ -29,7 +31,7 @@ export async function GET() {
 
     return response;
   } catch (error) {
-    console.error("Error fetching users:", error);
+    logger.error("Error fetching users", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Failed to fetch users" },
       { status: 500 },

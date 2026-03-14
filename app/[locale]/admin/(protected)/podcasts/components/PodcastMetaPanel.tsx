@@ -15,7 +15,10 @@ import AudioJsonMediaSelector from "../../articles/components/AudioJsonMediaSele
 import SelectSearch from "../../articles/components/SelectSearch";
 import { mutate } from "swr";
 import { cn } from "@/lib/utils/classes";
+import { generateSlug } from "@/lib/utils/slug";
 import { useIssues } from "@/hooks/swr";
+import { toast } from "@/hooks/use-toast";
+import { useLocalizedPath } from "@/lib/i18n/client";
 
 /* **************************************************
  * Types
@@ -36,21 +39,6 @@ interface PodcastMetaPanelProps {
   formRef: React.RefObject<HTMLFormElement | null>;
 }
 
-/* **************************************************
- * Slug Generation Utility (Client-side)
- **************************************************/
-function generateSlug(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
-}
-
 export default function PodcastMetaPanel({
   podcast,
   formData,
@@ -59,8 +47,8 @@ export default function PodcastMetaPanel({
   formRef,
 }: PodcastMetaPanelProps) {
   const router = useRouter();
+  const toLocale = useLocalizedPath();
   const [isPending] = useTransition();
-  const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
   const [isAudioSelectorOpen, setIsAudioSelectorOpen] = useState(false);
   const [isAudioChunksSelectorOpen, setIsAudioChunksSelectorOpen] = useState(false);
   const [isDeleting, startDeleteTransition] = useTransition();
@@ -93,21 +81,18 @@ export default function PodcastMetaPanel({
   async function handleDeleteConfirm() {
     if (!podcast) return;
 
-    setError(null);
     setIsDeleteDialogOpen(false);
 
     startDeleteTransition(async () => {
       const result = await deletePodcastAction(podcast.slug);
 
       if (!result.success) {
-        setError({
-          message: result.error,
-          type: result.errorType || "error",
-        });
+        toast.actionResult(result, { errorTitle: "Impossibile eliminare podcast" });
       } else {
+        toast.success(result.message || "Podcast eliminato con successo");
         mutate("/api/podcasts");
         mutate(`/api/podcasts/${podcast.slug}`);
-        router.push("/admin/podcasts");
+        router.push(toLocale("/admin/podcasts"));
       }
     });
   }
@@ -310,7 +295,7 @@ export default function PodcastMetaPanel({
           </button>
           <button
             type="button"
-            onClick={() => router.push("/admin/podcasts")}
+            onClick={() => router.push(toLocale("/admin/podcasts"))}
             className={styles.cancelButton}
             disabled={isPending}
           >
@@ -329,12 +314,6 @@ export default function PodcastMetaPanel({
             </div>
           )}
         </div>
-
-        {editing && podcast && error && (
-          <div className={`mt-4 ${error.type === "warning" ? styles.errorWarning : styles.error}`}>
-            ⚠️ {error.message}
-          </div>
-        )}
       </div>
 
       {/* Delete Confirmation Dialog */}
@@ -354,4 +333,3 @@ export default function PodcastMetaPanel({
     </div>
   );
 }
-

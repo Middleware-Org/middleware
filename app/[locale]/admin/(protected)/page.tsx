@@ -3,6 +3,9 @@
  **************************************************/
 import Link from "next/link";
 import { getUser } from "@/lib/auth/server";
+import { getDictionary } from "@/lib/i18n/utils";
+import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
+import { withLocale } from "@/lib/i18n/path";
 import {
   getAllIssues,
   getAllArticles,
@@ -19,103 +22,115 @@ import styles from "./styles";
 /* **************************************************
  * Admin Protected Page
  ************************************************** */
-export default async function AdminProtectedPage() {
+type AdminProtectedPageProps = {
+  params: Promise<{ locale: string }>;
+};
+
+export default async function AdminProtectedPage({ params }: AdminProtectedPageProps) {
+  const { locale } = await params;
   const user = await getUser();
 
   if (!user) {
     return null;
   }
 
-  const [issues, articles, categories, authors, pages, media, podcasts, users] = await Promise.all([
-    getAllIssues(),
-    getAllArticles(),
-    getAllCategories(),
-    getAllAuthors(),
-    getAllPages(),
-    getAllMediaFiles(),
-    getAllPodcasts(),
-    getAllUsers(),
-  ]);
+  const [adminDict, issues, articles, categories, authors, pages, media, podcasts] =
+    await Promise.all([
+      getDictionary(locale, TRANSLATION_NAMESPACES.ADMIN),
+      getAllIssues(),
+      getAllArticles(),
+      getAllCategories(),
+      getAllAuthors(),
+      getAllPages(),
+      getAllMediaFiles(),
+      getAllPodcasts(),
+    ]);
+
+  const users = user.role === "ADMIN" ? await getAllUsers() : [];
 
   const stats = [
     {
-      title: "Articoli",
+      title: adminDict.dashboard.stats.articles,
       count: articles.length,
-      href: "/admin/articles",
+      href: withLocale("/admin/articles", locale),
       icon: "📝",
-      description: "Numero totale",
+      description: adminDict.dashboard.totalCount,
       color: "tertiary",
     },
     {
-      title: "Issues",
+      title: adminDict.dashboard.stats.issues,
       count: issues.length,
-      href: "/admin/issues",
+      href: withLocale("/admin/issues", locale),
       icon: "📚",
-      description: "Numero totale",
+      description: adminDict.dashboard.totalCount,
       color: "tertiary",
     },
     {
-      title: "Categorie",
+      title: adminDict.dashboard.stats.categories,
       count: categories.length,
-      href: "/admin/categories",
+      href: withLocale("/admin/categories", locale),
       icon: "📁",
-      description: "Numero totale",
+      description: adminDict.dashboard.totalCount,
       color: "tertiary",
     },
     {
-      title: "Autori",
+      title: adminDict.dashboard.stats.authors,
       count: authors.length,
-      href: "/admin/authors",
+      href: withLocale("/admin/authors", locale),
       icon: "👤",
-      description: "Numero totale",
+      description: adminDict.dashboard.totalCount,
       color: "tertiary",
     },
     {
-      title: "Pagine",
+      title: adminDict.dashboard.stats.pages,
       count: pages.length,
-      href: "/admin/pages",
+      href: withLocale("/admin/pages", locale),
       icon: "📄",
-      description: "Pagine statiche",
+      description: adminDict.dashboard.staticPages,
       color: "tertiary",
     },
     {
-      title: "Media",
+      title: adminDict.dashboard.stats.media,
       count: media.length,
-      href: "/admin/media",
+      href: withLocale("/admin/media", locale),
       icon: "🖼️",
-      description: "File caricati",
+      description: adminDict.dashboard.uploadedFiles,
       color: "tertiary",
     },
     {
-      title: "Podcasts",
+      title: adminDict.dashboard.stats.podcasts,
       count: podcasts.length,
-      href: "/admin/podcasts",
+      href: withLocale("/admin/podcasts", locale),
       icon: "🎙️",
-      description: "Numero totale",
+      description: adminDict.dashboard.totalCount,
       color: "tertiary",
     },
-    {
-      title: "Utenti",
-      count: users.length,
-      href: "/admin/users",
-      icon: "👤",
-      description: "Numero totale",
-      color: "tertiary",
-    },
+    ...(user.role === "ADMIN"
+      ? [
+          {
+            title: adminDict.dashboard.stats.users,
+            count: users.length,
+            href: withLocale("/admin/users", locale),
+            icon: "👤",
+            description: adminDict.dashboard.totalCount,
+            color: "tertiary",
+          },
+        ]
+      : []),
   ];
 
   return (
     <main className={styles.main}>
       <div className={styles.header}>
         <div>
-          <h1 className={styles.title}>Dashboard</h1>
+          <h1 className={styles.title}>{adminDict.dashboard.title}</h1>
           <p className={styles.welcome}>
-            Ciao {user.name ?? user.email}, benvenutə nell&apos;area riservata.
+            {adminDict.dashboard.welcome.replace("{{name}}", user.name ?? user.email)}
           </p>
         </div>
       </div>
 
-      <TokenExpirationBanner />
+      <TokenExpirationBanner locale={locale} dict={adminDict.tokenBanner} />
 
       <div className={styles.statsGrid}>
         {stats.map((stat) => (
@@ -129,7 +144,7 @@ export default async function AdminProtectedPage() {
             </div>
             <div className={styles.statCardFooter}>
               <span className={styles.statCount}>{stat.count}</span>
-              <span className={styles.statLink}>Vedi tutti →</span>
+              <span className={styles.statLink}>{adminDict.dashboard.viewAll} →</span>
             </div>
           </Link>
         ))}

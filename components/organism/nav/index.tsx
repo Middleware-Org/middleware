@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils/classes";
 import Link from "next/link";
 import styles from "./styles";
 import type { CommonDictionary } from "@/lib/i18n/types";
+import { useLocalizedPath } from "@/lib/i18n/client";
 
 /* **************************************************
  * Types
@@ -23,6 +24,7 @@ interface NavProps {
  **************************************************/
 export default function Nav({ dict }: NavProps) {
   const pathname = usePathname();
+  const toLocale = useLocalizedPath();
 
   return (
     <nav className={cn(styles.nav)}>
@@ -33,7 +35,7 @@ export default function Nav({ dict }: NavProps) {
             key={headerLink.label}
             className={cn(styles.linkContainer, isActive ? styles.linkContainerActive : "")}
           >
-            <Link href={headerLink.href}>
+            <Link href={toLocale(headerLink.href)}>
               <MonoTextLight
                 className={cn(styles.linkText, isActive ? styles.linkTextHighlighted : "")}
               >

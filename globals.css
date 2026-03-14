@@ -326,3 +326,41 @@ html {
   white-space: nowrap;
   border-width: 0;
 }
+
+.mw-toast {
+  background: var(--primary) !important;
+  color: var(--secondary) !important;
+  border: 1px solid var(--secondary) !important;
+  border-radius: 0 !important;
+  box-shadow: 4px 4px 0 var(--secondary) !important;
+}
+
+.mw-toast-title {
+  font-weight: 700 !important;
+  font-family: var(--font-editor), Georgia, serif !important;
+}
+
+.mw-toast-description {
+  color: color-mix(in srgb, var(--secondary) 70%, transparent) !important;
+}
+
+.mw-toast[data-rich-colors="true"][data-type="success"] {
+  border-color: #15803d !important;
+  box-shadow: 4px 4px 0 #15803d !important;
+}
+
+.mw-toast[data-rich-colors="true"][data-type="error"] {
+  border-color: var(--tertiary) !important;
+  box-shadow: 4px 4px 0 var(--tertiary) !important;
+}
+
+.mw-toast-warning {
+  border-color: #a16207 !important;
+  box-shadow: 4px 4px 0 #a16207 !important;
+}
+
+.mw-toast-action,
+.mw-toast-cancel {
+  border-radius: 0 !important;
+  border: 1px solid var(--secondary) !important;
+}

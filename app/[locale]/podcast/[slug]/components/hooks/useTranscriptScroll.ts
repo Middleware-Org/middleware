@@ -1,7 +1,7 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 
 /* **************************************************
  * Types
@@ -78,6 +78,12 @@ export function useTranscriptScroll({
       // Apply transform to move the content
       innerContent.style.transform = `translateY(${translateY}px)`;
     }
-  }, [currentSegmentIndex, currentTime, segments, activeSegmentRef, transcriptContainerRef, transcriptContentInnerRef]);
+  }, [
+    currentSegmentIndex,
+    currentTime,
+    segments,
+    activeSegmentRef,
+    transcriptContainerRef,
+    transcriptContentInnerRef,
+  ]);
 }
-

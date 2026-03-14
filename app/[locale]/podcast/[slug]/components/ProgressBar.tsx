@@ -46,14 +46,10 @@ export default function ProgressBar({
     return Math.min(100, Math.max(0, percentage));
   });
 
-  // Crea il background con le tacchette
-  const bookmarkMarkers = bookmarkPositions
-    .map((pos) => `${pos}%`)
-    .join(", ");
-  
-  const backgroundStyle = totalPositions > 0
-    ? `linear-gradient(to right, var(--tertiary) 0%, var(--tertiary) ${(currentPosition / Math.max(totalPositions - 1, 1)) * 100}%, var(--secondary) ${(currentPosition / Math.max(totalPositions - 1, 1)) * 100}%, var(--secondary) 100%)`
-    : `linear-gradient(to right, var(--secondary) 0%, var(--secondary) 100%)`;
+  const backgroundStyle =
+    totalPositions > 0
+      ? `linear-gradient(to right, var(--tertiary) 0%, var(--tertiary) ${(currentPosition / Math.max(totalPositions - 1, 1)) * 100}%, var(--secondary) ${(currentPosition / Math.max(totalPositions - 1, 1)) * 100}%, var(--secondary) 100%)`
+      : `linear-gradient(to right, var(--secondary) 0%, var(--secondary) 100%)`;
 
   return (
     <div className={styles.progressContainer}>
@@ -101,4 +97,3 @@ export default function ProgressBar({
     </div>
   );
 }
-

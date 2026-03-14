@@ -1,0 +1,66 @@
+{
+  "login": {
+    "title": "Area admin",
+    "description": "Accedi con email e password",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "submit": "Accedi",
+    "submitting": "Accesso in corso...",
+    "genericError": "Errore durante il login",
+    "retryError": "Errore durante il login. Riprova."
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "articles": "Articoli",
+    "podcasts": "Podcasts",
+    "media": "Media",
+    "issues": "Issues",
+    "pages": "Pagine",
+    "categories": "Categorie",
+    "authors": "Autori",
+    "users": "Utenti",
+    "logout": "Logout"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Ciao {{name}}, benvenutə nell'area riservata.",
+    "totalCount": "Numero totale",
+    "staticPages": "Pagine statiche",
+    "uploadedFiles": "File caricati",
+    "viewAll": "Vedi tutti",
+    "stats": {
+      "articles": "Articoli",
+      "issues": "Issues",
+      "categories": "Categorie",
+      "authors": "Autori",
+      "pages": "Pagine",
+      "media": "Media",
+      "podcasts": "Podcasts",
+      "users": "Utenti"
+    }
+  },
+  "mergeButton": {
+    "checkError": "Errore durante il controllo stato pubblicazione",
+    "conflictError": "Conflitto di merge rilevato. Risolvi manualmente.",
+    "publishError": "Errore durante la pubblicazione",
+    "checking": "Controllo...",
+    "noChanges": "Nessuna modifica",
+    "publishing": "Pubblicando...",
+    "publishChanges": "Pubblica Modifiche",
+    "confirmTitle": "Pubblica modifiche",
+    "confirmMessage": "Sei sicuro di voler pubblicare {{count}} modifiche? Questa azione attivera il processo di pubblicazione.",
+    "confirmButton": "Pubblica",
+    "cancelButton": "Annulla",
+    "successTitle": "Pubblicazione completata",
+    "successMessage": "Le modifiche sono state pubblicate con successo! La pipeline e stata avviata.",
+    "successButton": "OK"
+  },
+  "tokenBanner": {
+    "title": "Token GitHub in scadenza",
+    "prefix": "Il token GitHub scadra il",
+    "today": "oggi",
+    "oneDay": "1 giorno",
+    "manyDays": "giorni",
+    "in": "tra"
+  }
+}

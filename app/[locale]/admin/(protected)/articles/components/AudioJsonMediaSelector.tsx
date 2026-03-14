@@ -12,6 +12,7 @@ import styles from "../../media/styles";
 import { useMedia } from "@/hooks/swr";
 import { mutate } from "swr";
 import { cn } from "@/lib/utils/classes";
+import { toast } from "@/hooks/use-toast";
 
 /* **************************************************
  * Types
@@ -37,8 +38,6 @@ export default function AudioJsonMediaSelector({
   title,
 }: AudioJsonMediaSelectorProps) {
   const [uploading, setUploading] = useState(false);
-  const [uploadError, setUploadError] = useState<string | null>(null);
-  const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -105,7 +104,11 @@ export default function AudioJsonMediaSelector({
     };
   }, [hasMore, filteredMediaFiles.length, isOpen]);
 
-  const error = isError ? "Failed to load media files" : null;
+  useEffect(() => {
+    if (isError) {
+      toast.error("Impossibile caricare i file media");
+    }
+  }, [isError]);
 
   function handleSelect(fileUrl: string) {
     onSelect(fileUrl);
@@ -119,17 +122,17 @@ export default function AudioJsonMediaSelector({
     // Validate file type
     if (fileType === "audio") {
       if (!file.type.startsWith("audio/") && !file.name.match(/\.(mp3|wav)$/i)) {
-        alert("Seleziona un file audio (MP3 o WAV)");
+        toast.warning("Seleziona un file audio (MP3 o WAV)");
         return;
       }
     } else if (fileType === "json") {
       if (file.type !== "application/json" && !file.name.endsWith(".json")) {
-        alert("Seleziona un file JSON");
+        toast.warning("Seleziona un file JSON");
         return;
       }
     } else if (fileType === "image") {
       if (!file.type.startsWith("image/") && !file.name.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)) {
-        alert("Seleziona un file immagine (JPG, PNG, GIF, WEBP, SVG)");
+        toast.warning("Seleziona un file immagine (JPG, PNG, GIF, WEBP, SVG)");
         return;
       }
     }
@@ -142,7 +145,7 @@ export default function AudioJsonMediaSelector({
           ? 10 * 1024 * 1024
           : 20 * 1024 * 1024;
     if (file.size > maxSize) {
-      alert(`La dimensione del file deve essere inferiore a ${maxSize / 1024 / 1024}MB`);
+      toast.warning(`La dimensione del file deve essere inferiore a ${maxSize / 1024 / 1024}MB`);
       return;
     }
 
@@ -177,15 +180,13 @@ export default function AudioJsonMediaSelector({
 
   async function handleUpload() {
     if (!selectedFile) {
-      setUploadError(
+      toast.warning(
         `Seleziona un file ${fileType === "audio" ? "audio" : "JSON"} prima di caricare`,
       );
       return;
     }
 
     setUploading(true);
-    setUploadError(null);
-    setUploadSuccess(null);
 
     try {
       // Generate filename
@@ -230,7 +231,7 @@ export default function AudioJsonMediaSelector({
         handleUploadUrl: "/api/media/upload-blob",
       });
 
-      setUploadSuccess("File caricato con successo");
+      toast.success("File caricato con successo");
       // Invalida la cache SWR per forzare il refetch
       mutate("/api/media");
       // Seleziona automaticamente il file appena caricato
@@ -243,7 +244,7 @@ export default function AudioJsonMediaSelector({
         fileInputRef.current.value = "";
       }
     } catch (err) {
-      setUploadError(err instanceof Error ? err.message : "Errore durante il caricamento");
+      toast.error("Errore durante il caricamento", err instanceof Error ? err.message : undefined);
     } finally {
       setUploading(false);
     }
@@ -341,12 +342,6 @@ export default function AudioJsonMediaSelector({
                   </div>
                 </div>
               )}
-
-              {uploadError && <div className={`mt-2 ${baseStyles.error}`}>{uploadError}</div>}
-
-              {uploadSuccess && (
-                <div className={`mt-2 ${baseStyles.successMessageGreen}`}>{uploadSuccess}</div>
-              )}
             </div>
           </div>
 
@@ -396,9 +391,7 @@ export default function AudioJsonMediaSelector({
               <div className={baseStyles.loadingText}>Caricamento file {fileTypeLabel}...</div>
             )}
 
-            {error && <div className={baseStyles.error}>{error}</div>}
-
-            {!loading && !error && filteredMediaFiles.length === 0 && (
+            {!loading && !isError && filteredMediaFiles.length === 0 && (
               <div className={styles.empty}>
                 {searchQuery ? (
                   <>
@@ -418,7 +411,7 @@ export default function AudioJsonMediaSelector({
               </div>
             )}
 
-            {!loading && !error && filteredMediaFiles.length > 0 && (
+            {!loading && !isError && filteredMediaFiles.length > 0 && (
               <>
                 <div className={styles.grid}>
                   {visibleFiles.map((file) => (

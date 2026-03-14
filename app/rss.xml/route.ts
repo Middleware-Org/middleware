@@ -3,8 +3,8 @@
  * Generates an RSS 2.0 feed for articles and podcasts
  **************************************************/
 import { getAllArticles, getAllPodcasts } from "@/lib/content";
-import { getAuthorBySlug } from "@/lib/content/authors";
-import { getCategoryBySlug } from "@/lib/content/categories";
+import { getAuthorById } from "@/lib/content/authors";
+import { getCategoryById } from "@/lib/content/categories";
 
 export async function GET() {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://middleware.media";
@@ -19,8 +19,8 @@ export async function GET() {
       description: article.excerpt,
       url: `${baseUrl}/it/articles/${article.slug}`,
       date: new Date(article.date),
-      author: getAuthorBySlug(article.author)?.name || "Middleware",
-      category: getCategoryBySlug(article.category)?.name || "Tecnologia",
+      author: getAuthorById(article.authorId)?.name || "Middleware",
+      category: getCategoryById(article.categoryId)?.name || "Tecnologia",
     })),
     ...podcasts.map((podcast) => ({
       type: "podcast" as const,

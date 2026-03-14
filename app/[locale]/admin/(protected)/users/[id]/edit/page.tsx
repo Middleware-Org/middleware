@@ -4,30 +4,30 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
-import { getUser } from "@/lib/auth/server";
+import { getAdminUser } from "@/lib/auth/server";
 import { getUserById } from "@/lib/github/users";
 import UserFormClient from "../../components/UserFormClient";
 import UserEditSkeleton from "../../components/UserEditSkeleton";
 import styles from "../../styles";
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
+import { withLocale } from "@/lib/i18n/path";
 
 /* **************************************************
  * Types
  **************************************************/
 interface EditUserPageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ locale: string; id: string }>;
 }
 
 /* **************************************************
  * Edit User Page (Server Component)
  **************************************************/
 export default async function EditUserPage({ params }: EditUserPageProps) {
-  const user = await getUser();
+  const { locale, id } = await params;
+  const user = await getAdminUser();
   if (!user) {
-    redirect("/admin/login");
+    redirect(withLocale("/admin", locale));
   }
-
-  const { id } = await params;
   const userData = await getUserById(id);
 
   if (!userData) {
@@ -44,7 +44,7 @@ export default async function EditUserPage({ params }: EditUserPageProps) {
       <main className={styles.main}>
         <div className={styles.header}>
           <h1 className={styles.title}>Modifica Utente: {userData.email}</h1>
-          <Link href="/admin/users" className={styles.backButton}>
+          <Link href={withLocale("/admin/users", locale)} className={styles.backButton}>
             ← Indietro
           </Link>
         </div>
@@ -56,4 +56,3 @@ export default async function EditUserPage({ params }: EditUserPageProps) {
     </SWRPageProvider>
   );
 }
-

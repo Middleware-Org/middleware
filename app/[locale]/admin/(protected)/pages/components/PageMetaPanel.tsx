@@ -10,9 +10,11 @@ import { cn } from "@/lib/utils/classes";
 import { deletePageAction } from "../actions";
 import ConfirmDialog from "@/components/molecules/confirmDialog";
 import styles from "../styles";
-import baseStyles from "../../styles";
 import type { Page } from "@/lib/github/types";
+import { generateSlug } from "@/lib/utils/slug";
 import { mutate } from "swr";
+import { toast } from "@/hooks/use-toast";
+import { useLocalizedPath } from "@/lib/i18n/client";
 
 /* **************************************************
  * Types
@@ -29,21 +31,6 @@ interface PageMetaPanelProps {
 }
 
 /* **************************************************
- * Slug Generation Utility (Client-side)
- **************************************************/
-function generateSlug(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .normalize("NFD") // Normalize to decomposed form for handling accents
-    .replace(/[\u0300-\u036f]/g, "") // Remove diacritics
-    .replace(/[^a-z0-9\s-]/g, "") // Remove special characters except spaces and hyphens
-    .replace(/\s+/g, "-") // Replace spaces with hyphens
-    .replace(/-+/g, "-") // Replace multiple hyphens with single hyphen
-    .replace(/^-|-$/g, ""); // Remove leading/trailing hyphens
-}
-
-/* **************************************************
  * Page Meta Panel Component
  **************************************************/
 export default function PageMetaPanel({
@@ -54,8 +41,8 @@ export default function PageMetaPanel({
   formRef,
 }: PageMetaPanelProps) {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
+  const toLocale = useLocalizedPath();
+  const [isPending] = useTransition();
   const [isDeleting, startDeleteTransition] = useTransition();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   // Use null to indicate "not modified by user", otherwise use the user's custom value
@@ -93,22 +80,19 @@ export default function PageMetaPanel({
   async function handleDeleteConfirm() {
     if (!page) return;
 
-    setError(null);
     setIsDeleteDialogOpen(false);
 
     startDeleteTransition(async () => {
       const result = await deletePageAction(page.slug);
 
       if (!result.success) {
-        setError({
-          message: result.error,
-          type: result.errorType || "error",
-        });
+        toast.actionResult(result, { errorTitle: "Impossibile eliminare pagina" });
       } else {
+        toast.success(result.message || "Pagina eliminata con successo");
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/pages");
         mutate(`/api/pages/${page.slug}`);
-        router.push("/admin/pages");
+        router.push(toLocale("/admin/pages"));
       }
     });
   }
@@ -198,7 +182,7 @@ export default function PageMetaPanel({
           </button>
           <button
             type="button"
-            onClick={() => router.push("/admin/pages")}
+            onClick={() => router.push(toLocale("/admin/pages"))}
             className={styles.cancelButton}
             disabled={isPending}
           >
@@ -217,14 +201,6 @@ export default function PageMetaPanel({
             </div>
           )}
         </div>
-
-        {editing && page && error && (
-          <div
-            className={`mt-4 ${error.type === "warning" ? baseStyles.errorWarning : baseStyles.error}`}
-          >
-            ⚠️ {error.message}
-          </div>
-        )}
       </div>
 
       {/* Delete Confirmation Dialog */}

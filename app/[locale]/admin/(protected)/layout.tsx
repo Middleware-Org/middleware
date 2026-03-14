@@ -2,9 +2,10 @@
  * Imports
  **************************************************/
 import { redirect } from "next/navigation";
-import { getSession } from "@/lib/auth/server";
+import { getUser } from "@/lib/auth/server";
 import { getDictionary } from "@/lib/i18n/utils";
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
+import { withLocale } from "@/lib/i18n/path";
 import type { ReactNode } from "react";
 import Sidebar from "./components/Sidebar";
 import SWRProvider from "@/components/providers/SWRProvider";
@@ -25,19 +26,22 @@ export default async function AdminProtectedLayout({
   children,
   params,
 }: AdminProtectedLayoutProps) {
-  const session = await getSession();
+  const { locale } = await params;
+  const user = await getUser();
 
-  if (!session) {
-    redirect("/admin/login");
+  if (!user) {
+    redirect(withLocale("/admin/login", locale));
   }
 
-  const { locale } = await params;
-  const dict = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
+  const [dict, adminDict] = await Promise.all([
+    getDictionary(locale, TRANSLATION_NAMESPACES.COMMON),
+    getDictionary(locale, TRANSLATION_NAMESPACES.ADMIN),
+  ]);
 
   return (
     <SWRProvider>
       <div className="flex h-screen overflow-hidden">
-        <Sidebar dict={dict} locale={locale} />
+        <Sidebar dict={dict} adminDict={adminDict} locale={locale} currentUserRole={user.role} />
         <main className="flex-1 overflow-auto">{children}</main>
       </div>
       {/* Debug indicator solo in development */}

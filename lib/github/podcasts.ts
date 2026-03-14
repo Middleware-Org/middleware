@@ -10,6 +10,7 @@ import {
 } from "./client";
 import { generateSlug, generateUniqueSlug } from "./utils";
 import type { Podcast } from "./types";
+import { randomUUID } from "crypto";
 
 /* **************************************************
  * Podcasts
@@ -32,6 +33,7 @@ export async function getAllPodcasts(): Promise<Podcast[]> {
         const lastUpdate = (podcast.last_update as string) || podcastDate;
 
         return {
+          id: podcast.id,
           slug: podcast.slug || file.name.replace(".json", ""),
           title: podcast.title,
           description: podcast.description || "",
@@ -39,8 +41,9 @@ export async function getAllPodcasts(): Promise<Podcast[]> {
           last_update: lastUpdate,
           audio: podcast.audio || "",
           audio_chunks: podcast.audio_chunks || "",
-          issue: podcast.issue,
+          issueId: podcast.issueId,
           published: podcast.published ?? false,
+          createdBy: podcast.createdBy,
         } as Podcast;
       } catch {
         return null;
@@ -87,31 +90,33 @@ export async function getPodcastBySlug(slug: string): Promise<Podcast | undefine
       return undefined;
     }
 
-    try {
-      const podcast = JSON.parse(content) as Podcast;
-      const podcastDate = (podcast.date as string) || new Date().toISOString().split("T")[0];
-      const lastUpdate = (podcast.last_update as string) || podcastDate;
+    const podcast = JSON.parse(content) as Podcast;
+    const podcastDate = (podcast.date as string) || new Date().toISOString().split("T")[0];
+    const lastUpdate = (podcast.last_update as string) || podcastDate;
 
-      return {
-        slug: (podcast.slug as string) || slug,
-        title: (podcast.title as string) || "Untitled",
-        description: (podcast.description as string) || "",
-        date: podcastDate,
-        last_update: lastUpdate,
-        audio: (podcast.audio as string) || "",
-        audio_chunks: (podcast.audio_chunks as string) || "",
-        issue: podcast.issue,
-        published: (podcast.published as boolean) ?? false,
-      } as Podcast;
-    } catch {
-      return undefined;
-    }
+    return {
+      id: podcast.id,
+      slug: (podcast.slug as string) || slug,
+      title: (podcast.title as string) || "Untitled",
+      description: (podcast.description as string) || "",
+      date: podcastDate,
+      last_update: lastUpdate,
+      audio: (podcast.audio as string) || "",
+      audio_chunks: (podcast.audio_chunks as string) || "",
+      issueId: podcast.issueId,
+      published: (podcast.published as boolean) ?? false,
+      createdBy: (podcast.createdBy as string) || "",
+    } as Podcast;
   } catch {
     return undefined;
   }
 }
 
-export async function createPodcast(podcast: Omit<Podcast, "slug"> & { slug?: string }) {
+export async function createPodcast(
+  podcast: Omit<Podcast, "slug" | "id"> & { slug?: string; createdBy: string },
+) {
+  const id = randomUUID();
+
   // Generate slug from title if not provided
   const baseSlug = podcast.slug || generateSlug(podcast.title);
 
@@ -121,7 +126,8 @@ export async function createPodcast(podcast: Omit<Podcast, "slug"> & { slug?: st
   const podcastDate = podcast.date || new Date().toISOString().split("T")[0];
   const lastUpdate = podcast.last_update || podcastDate;
 
-  const podcastData = {
+  const podcastData: Record<string, unknown> = {
+    id,
     slug,
     title: podcast.title,
     description: podcast.description || "",
@@ -129,30 +135,31 @@ export async function createPodcast(podcast: Omit<Podcast, "slug"> & { slug?: st
     last_update: lastUpdate,
     audio: podcast.audio || "",
     audio_chunks: podcast.audio_chunks || "",
-    issue: podcast.issue,
     published: podcast.published ?? false,
+    createdBy: podcast.createdBy,
   };
+
+  if (podcast.issueId) {
+    podcastData.issueId = podcast.issueId;
+  }
 
   const filePath = `content/podcasts/${slug}.json`;
   const content = JSON.stringify(podcastData, null, 2);
 
   await createOrUpdateFile(filePath, content, `Create podcast: ${podcast.title}`);
 
-  return { ...podcastData, slug };
+  return { ...podcastData, id, slug } as Podcast;
 }
 
 export async function updatePodcast(
   slug: string,
-  podcast: Partial<Omit<Podcast, "slug">> & { newSlug?: string },
+  podcast: Partial<Omit<Podcast, "slug" | "id" | "createdBy">> & { newSlug?: string },
 ) {
-  // Trova il file reale usando lo stesso metodo di getPodcastBySlug
   const files = await listDirectoryFiles("content/podcasts");
   const jsonFiles = files.filter((f) => f.type === "file" && f.name.endsWith(".json"));
 
-  // Prima cerca per nome file esatto
   let file = jsonFiles.find((f) => f.name === `${slug}.json`);
 
-  // Se non trovato, cerca per slug nel JSON
   if (!file) {
     for (const f of jsonFiles) {
       try {
@@ -188,10 +195,10 @@ export async function updatePodcast(
     finalSlug = await generateUniqueSlug("content/podcasts", baseSlug, ".json", fileSlug);
   }
 
-  // All'aggiornamento, last_update diventa la data e ora corrente
   const currentDateTime = new Date().toISOString();
 
   const updated: Podcast = {
+    id: existing.id,
     slug: finalSlug,
     title: podcast.title ?? existing.title,
     description: podcast.description ?? existing.description,
@@ -199,15 +206,32 @@ export async function updatePodcast(
     last_update: currentDateTime,
     audio: podcast.audio !== undefined ? podcast.audio : existing.audio,
     audio_chunks: podcast.audio_chunks !== undefined ? podcast.audio_chunks : existing.audio_chunks,
-    issue: podcast.issue !== undefined ? podcast.issue : existing.issue,
+    issueId: podcast.issueId !== undefined ? podcast.issueId : existing.issueId,
     published: podcast.published !== undefined ? podcast.published : existing.published,
+    createdBy: existing.createdBy,
   };
 
-  const content = JSON.stringify(updated, null, 2);
+  const podcastData: Record<string, unknown> = {
+    id: updated.id,
+    slug: updated.slug,
+    title: updated.title,
+    description: updated.description,
+    date: updated.date,
+    last_update: updated.last_update,
+    audio: updated.audio,
+    audio_chunks: updated.audio_chunks,
+    published: updated.published,
+    createdBy: updated.createdBy,
+  };
+
+  if (updated.issueId) {
+    podcastData.issueId = updated.issueId;
+  }
+
+  const content = JSON.stringify(podcastData, null, 2);
   const newFilePath = `content/podcasts/${finalSlug}.json`;
   const oldFilePath = `content/podcasts/${fileSlug}.json`;
 
-  // Se lo slug è cambiato, rinomina il file, altrimenti aggiorna normalmente
   if (finalSlug !== fileSlug) {
     await renameFile(
       oldFilePath,

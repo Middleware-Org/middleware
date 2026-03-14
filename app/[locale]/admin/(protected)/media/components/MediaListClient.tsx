@@ -17,6 +17,7 @@ import { TableCheckbox } from "@/components/table/TableCheckbox";
 import { deleteMediaFilesAction } from "../actions";
 import { mutate } from "swr";
 import ConfirmDialog from "@/components/molecules/confirmDialog";
+import { toast } from "@/hooks/use-toast";
 
 /* **************************************************
  * Media List Client Component
@@ -31,7 +32,6 @@ export default function MediaListClient() {
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<{ message: string; type: "error" | "warning" } | null>(null);
   const [deleteMultipleDialog, setDeleteMultipleDialog] = useState<{
     isOpen: boolean;
     count: number;
@@ -142,18 +142,15 @@ export default function MediaListClient() {
   async function handleDeleteMultipleConfirm() {
     if (selectedIds.length === 0) return;
 
-    setError(null);
     setDeleteMultipleDialog({ isOpen: false, count: 0 });
 
     startTransition(async () => {
       const result = await deleteMediaFilesAction(selectedIds);
 
       if (!result.success) {
-        setError({
-          message: result.error,
-          type: result.errorType || "error",
-        });
+        toast.actionResult(result, { errorTitle: "Eliminazione file non completata" });
       } else {
+        toast.success(result.message || "File eliminati con successo");
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/media");
         mutate("/api/github/merge/check");
@@ -173,12 +170,6 @@ export default function MediaListClient() {
 
   return (
     <div className={baseStyles.container}>
-      {error && (
-        <div className={error.type === "warning" ? baseStyles.errorWarning : baseStyles.error}>
-          ⚠️ {error.message}
-        </div>
-      )}
-
       {/* Search and Filter Controls */}
       <div className="mb-6 space-y-4">
         {/* Search Bar and Select All */}

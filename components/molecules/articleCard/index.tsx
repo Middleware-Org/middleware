@@ -1,13 +1,16 @@
+"use client";
+
 /* **************************************************
  * Imports
  **************************************************/
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import type { Article } from "@/.velite";
-import { Play } from "lucide-react";
 import Separator from "@/components/atoms/separetor";
 import { H3, MonoTextBold, MonoTextLight, SerifText } from "@/components/atoms/typography";
-import { getAuthorBySlug, getCategoryBySlug } from "@/lib/content";
+import { getAuthorById, getCategoryById } from "@/lib/content";
 import { CommonDictionary } from "@/lib/i18n/types";
+import { withLocale } from "@/lib/i18n/path";
 import styles from "./styles";
 
 /* **************************************************
@@ -23,12 +26,18 @@ type ArticleCardProps = {
  * ArticleCard
  **************************************************/
 export default function ArticleCard({ article, dict, isPodcast = false }: ArticleCardProps) {
-  const author = getAuthorBySlug(article.author);
-  const category = getCategoryBySlug(article.category);
+  const { locale = "it" } = useParams() as { locale: "it" };
+  const author = getAuthorById(article.authorId);
+  const category = getCategoryById(article.categoryId);
 
   if (!author || !category) return null;
 
-  const articleLink = isPodcast ? `/podcast/${article.slug}` : `/articles/${article.slug}`;
+  const articleLink = withLocale(
+    isPodcast ? `/podcast/${article.slug}` : `/articles/${article.slug}`,
+    locale,
+  );
+  const authorLink = withLocale(`/authors?author=${author.slug}`, locale);
+  const categoryLink = withLocale(`/categories?category=${category.slug}`, locale);
 
   return (
     <article className={styles.article}>
@@ -39,7 +48,7 @@ export default function ArticleCard({ article, dict, isPodcast = false }: Articl
 
         <div className={styles.authorInfo}>
           <MonoTextLight className={styles.authorLabel}>{dict.articleCard.wordsBy}</MonoTextLight>
-          <Link href={`/authors?author=${author.slug}`}>
+          <Link href={authorLink}>
             <MonoTextBold className={styles.authorLink}>{author.name}</MonoTextBold>
           </Link>
         </div>
@@ -58,7 +67,7 @@ export default function ArticleCard({ article, dict, isPodcast = false }: Articl
         </div>
       </section>
       <footer className={styles.footer}>
-        <Link href={`/categories?category=${category.slug}`}>
+        <Link href={categoryLink}>
           <div className={styles.category}>
             <MonoTextLight className={styles.categoryText}>{category.name}</MonoTextLight>
           </div>

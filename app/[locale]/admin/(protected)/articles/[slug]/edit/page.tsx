@@ -14,24 +14,24 @@ import ArticleFormClient from "../../components/ArticleFormClient";
 import ArticleEditSkeleton from "../../components/ArticleEditSkeleton";
 import styles from "../../styles";
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
+import { withLocale } from "@/lib/i18n/path";
 
 /* **************************************************
  * Types
  **************************************************/
 interface EditArticlePageProps {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }
 
 /* **************************************************
  * Edit Article Page (Server Component)
  **************************************************/
 export default async function EditArticlePage({ params }: EditArticlePageProps) {
+  const { locale, slug } = await params;
   const user = await getUser();
   if (!user) {
-    redirect("/admin/login");
+    redirect(withLocale("/admin/login", locale));
   }
-
-  const { slug } = await params;
 
   const [article, categories, authors, issues] = await Promise.all([
     getArticleBySlug(slug),
@@ -57,7 +57,7 @@ export default async function EditArticlePage({ params }: EditArticlePageProps) 
       <div className={cn("h-full flex flex-col", styles.main)}>
         <div className={styles.header}>
           <h1 className={styles.title}>Modifica Articolo: {article.title}</h1>
-          <Link href="/admin/articles" className={styles.backButton}>
+          <Link href={withLocale("/admin/articles", locale)} className={styles.backButton}>
             ← Indietro
           </Link>
         </div>

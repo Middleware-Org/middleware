@@ -1,43 +1,57 @@
-import { cookies } from "next/headers";
+"use client";
+
+import { useEffect, useState } from "react";
 
 import Button from "@/components/atoms/button";
 import { MonoTextLight } from "@/components/atoms/typography";
 import { cn } from "@/lib/utils/classes";
 import Link from "next/link";
 import { CommonDictionary } from "@/lib/i18n/types";
+import { withLocale } from "@/lib/i18n/path";
 
 type PolicyBannerProps = {
   className?: string;
   dict: Pick<CommonDictionary, "banner">;
+  locale: string;
   cookieName?: string;
   maxAgeDays?: number;
 };
 
-export default async function PolicyBanner({
+export default function PolicyBanner({
   className,
   dict,
+  locale,
   cookieName = "policyAccepted",
   maxAgeDays = 180,
 }: PolicyBannerProps) {
-  const cookieStore = cookies();
-  const hasAck = (await cookieStore).get(cookieName);
+  const [hasAck, setHasAck] = useState(true);
 
-  if (hasAck) return null;
+  useEffect(() => {
+    const accepted = document.cookie
+      .split(";")
+      .map((item) => item.trim())
+      .some((item) => item.startsWith(`${cookieName}=`));
 
-  async function accept() {
-    "use server";
-    const cookieStore = cookies();
+    const timeoutId = window.setTimeout(() => {
+      setHasAck(accepted);
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [cookieName]);
+
+  if (hasAck) {
+    return null;
+  }
+
+  function accept() {
     const maxAge = maxAgeDays * 24 * 60 * 60;
+    const secure =
+      typeof window !== "undefined" && window.location.protocol === "https:" ? "; Secure" : "";
 
-    (await cookieStore).set({
-      name: cookieName,
-      value: "1",
-      maxAge,
-      path: "/",
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      httpOnly: false,
-    });
+    document.cookie = `${cookieName}=1; Max-Age=${maxAge}; Path=/; SameSite=Lax${secure}`;
+    setHasAck(true);
   }
 
   return (
@@ -54,26 +68,27 @@ export default async function PolicyBanner({
       <div className="max-w-[1472px] mx-auto flex flex-col gap-3">
         <MonoTextLight className="text-sm">
           {dict.banner.message}{" "}
-          <Link href="/privacy-policy">
+          <Link href={withLocale("/privacy-policy", locale)}>
             <span className="underline">{dict.banner.privacy}</span>
           </Link>{" "}
           &amp;{" "}
-          <Link href="/cookie-policy">
+          <Link href={withLocale("/cookie-policy", locale)}>
             <span className="underline">{dict.banner.cookie}</span>
           </Link>
           .
         </MonoTextLight>
 
-        <form action={accept} className="flex items-center justify-end gap-2">
+        <div className="flex items-center justify-end gap-2">
           <Button
             variants="secondary"
             className="w-fit!"
-            type="submit"
+            type="button"
+            onClick={accept}
             aria-label={dict.banner.accept}
           >
             <MonoTextLight className="text-primary">{dict.banner.accept}</MonoTextLight>
           </Button>
-        </form>
+        </div>
       </div>
     </div>
   );

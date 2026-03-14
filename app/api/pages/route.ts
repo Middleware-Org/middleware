@@ -2,28 +2,34 @@
  * Imports
  **************************************************/
 import { NextResponse } from "next/server";
+import { CACHE_PROFILES, setPrivateCacheHeaders } from "@/lib/api/cache";
 import { getAllPages } from "@/lib/github/pages";
+import { withAuth } from "@/lib/api/withAuth";
+import { apiError } from "@/lib/api/responses";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("API /pages");
 
 /* **************************************************
  * GET /api/pages
  **************************************************/
-export async function GET() {
+export const GET = withAuth(async (user) => {
   try {
     const pages = await getAllPages();
 
-    if (process.env.NODE_ENV === "development") {
-      console.log(`[API] GET /api/pages - Returning ${pages.length} pages`, {
-        timestamp: new Date().toISOString(),
-      });
-    }
+    logger.debug(`GET returning ${pages.length} pages`, {
+      timestamp: new Date().toISOString(),
+      user: user.email,
+    });
 
     const response = NextResponse.json(pages);
     response.headers.set("X-Data-Source", "rest-api");
     response.headers.set("X-Timestamp", new Date().toISOString());
+    setPrivateCacheHeaders(response, CACHE_PROFILES.list);
 
     return response;
   } catch (error) {
-    console.error("[API] GET /api/pages - Error:", error);
-    return NextResponse.json({ error: "Failed to fetch pages" }, { status: 500 });
+    logger.error("GET error", error);
+    return apiError("Failed to fetch pages");
   }
-}
+});

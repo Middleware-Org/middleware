@@ -48,7 +48,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/${locale}/${TRANSLATION_NAMESPACES.PODCAST}`,
+      url: `${baseUrl}/${locale}/podcasts`,
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 0.8,
@@ -58,7 +58,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Route degli articoli
   const articleRoutes: MetadataRoute.Sitemap = articles.map((article) => ({
     url: `${baseUrl}/${locale}/articles/${article.slug}`,
-    lastModified: new Date(article.date),
+    lastModified: new Date(article.last_update || article.date),
     changeFrequency: "monthly" as const,
     priority: 0.9,
   }));
@@ -67,14 +67,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const podcastRoutes: MetadataRoute.Sitemap = podcasts.map((podcast) => ({
     url: `${baseUrl}/${locale}/${TRANSLATION_NAMESPACES.PODCAST}/${podcast.slug}`,
     lastModified: new Date(podcast.last_update || podcast.date),
-      changeFrequency: "monthly" as const,
-      priority: 0.9,
-    }));
+    changeFrequency: "monthly" as const,
+    priority: 0.9,
+  }));
 
   // Route delle issues
   const issueRoutes: MetadataRoute.Sitemap = issues.map((issue) => ({
-    url: `${baseUrl}/${locale}/${TRANSLATION_NAMESPACES.ISSUE}/${issue.slug}`,
-    lastModified: new Date(issue.date),
+    url: `${baseUrl}/${locale}/issues/${issue.slug}`,
+    lastModified: new Date(issue.last_update || issue.date),
     changeFrequency: "monthly" as const,
     priority: 0.8,
   }));

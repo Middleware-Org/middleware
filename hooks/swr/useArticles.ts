@@ -3,8 +3,11 @@
  **************************************************/
 import useSWR from "swr";
 import type { Article } from "@/lib/github/types";
+import { createLogger } from "@/lib/logger";
 import { createFetcher } from "./fetcher";
 import { swrConfig } from "./config";
+
+const logger = createLogger("SWR");
 
 /* **************************************************
  * Fetcher
@@ -21,14 +24,11 @@ export function useArticles() {
     {
       ...swrConfig,
       onSuccess: (data, key) => {
-        // Log quando i dati vengono caricati (potrebbe essere da cache o network)
-        if (process.env.NODE_ENV === "development") {
-          console.log("[SWR] Dati caricati per:", key, {
-            timestamp: new Date().toISOString(),
-            itemsCount: Array.isArray(data) ? data.length : 1,
-            fromCache: !isValidating && data !== undefined,
-          });
-        }
+        logger.debug(`Dati caricati per: ${key}`, {
+          timestamp: new Date().toISOString(),
+          itemsCount: Array.isArray(data) ? data.length : 1,
+          fromCache: !isValidating && data !== undefined,
+        });
       },
     },
   );

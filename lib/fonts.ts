@@ -43,6 +43,6 @@ export const gtAmericaMono = localFont({
   ],
   variable: "--font-gt-america-mono",
   display: "swap",
-  preload: true,
+  preload: false,
   fallback: ["Courier New", "monospace"],
 });

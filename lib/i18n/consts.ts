@@ -1,6 +1,6 @@
 export const TRANSLATION_NAMESPACES = {
   COMMON: "common",
-  HOME: "home",
+  ADMIN: "admin",
   CATEGORIES: "categories",
   AUTHORS: "authors",
   ARCHIVE: "archive",

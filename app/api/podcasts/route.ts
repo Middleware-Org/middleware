@@ -2,8 +2,12 @@
  * Imports
  **************************************************/
 import { NextResponse } from "next/server";
+import { CACHE_PROFILES, setPrivateCacheHeaders } from "@/lib/api/cache";
 import { getUser } from "@/lib/auth/server";
 import { getAllPodcasts } from "@/lib/github/podcasts";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("API /podcasts");
 
 /* **************************************************
  * GET /api/podcasts
@@ -20,10 +24,11 @@ export async function GET() {
     const response = NextResponse.json(podcasts);
     response.headers.set("X-Data-Source", "rest-api");
     response.headers.set("X-Timestamp", new Date().toISOString());
+    setPrivateCacheHeaders(response, CACHE_PROFILES.list);
 
     return response;
   } catch (error) {
-    console.error("Error fetching podcasts:", error);
+    logger.error("Error fetching podcasts", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Failed to fetch podcasts" },
       { status: 500 },

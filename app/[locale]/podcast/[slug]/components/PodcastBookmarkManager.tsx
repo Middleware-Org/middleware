@@ -6,7 +6,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { Bookmark as BookmarkIcon, Minus } from "lucide-react";
 import { cn } from "@/lib/utils/classes";
-import { podcastBookmarksStorage } from "@/lib/storage/podcastBookmarks";
 
 /* **************************************************
  * Types
@@ -15,6 +14,7 @@ interface PodcastBookmarkManagerProps {
   contentContainerSelector: string; // Selettore CSS per il contenitore della trascrizione
   segments?: Array<{ start: number; end: number }>; // Segmenti della trascrizione per mappare tempo a posizione
   bookmarks: Array<{ id: string; time: number }>; // Bookmarks passati come prop (single source of truth)
+  onRemoveBookmark: (id: string) => Promise<void>;
 }
 
 /* **************************************************
@@ -24,6 +24,7 @@ export default function PodcastBookmarkManager({
   contentContainerSelector,
   segments = [],
   bookmarks: bookmarksProp,
+  onRemoveBookmark,
 }: PodcastBookmarkManagerProps) {
   const [bookmarkPositions, setBookmarkPositions] = useState<Map<string, number>>(new Map());
   const [containerRect, setContainerRect] = useState<DOMRect | null>(null);
@@ -159,11 +160,12 @@ export default function PodcastBookmarkManager({
   }, [isInitialized, updateBookmarkPositions]);
 
   // Funzione per eliminare un segnaposto quando si clicca sull'icona
-  const handleBookmarkClick = useCallback(async (bookmarkId: string) => {
-    // Elimina il segnaposto direttamente dallo storage
-    // Il parent (PodcastPlayer) si aggiornerà automaticamente tramite il hook
-    await podcastBookmarksStorage.deleteBookmark(bookmarkId);
-  }, []);
+  const handleBookmarkClick = useCallback(
+    async (bookmarkId: string) => {
+      await onRemoveBookmark(bookmarkId);
+    },
+    [onRemoveBookmark],
+  );
 
   if (!isInitialized || !containerRect) {
     return null;

@@ -7,6 +7,9 @@ import { nextCookies } from "better-auth/next-js";
 import { headers } from "next/headers";
 import { prisma } from "../prisma";
 
+export const CMS_ROLES = ["ADMIN", "EDITOR"] as const;
+export type CmsRole = (typeof CMS_ROLES)[number];
+
 /* ****************************************************************
  * Auth Configuration
  ***************************************************************** */
@@ -43,7 +46,50 @@ export async function getSession() {
   });
 }
 
-export async function getUser() {
+export async function getAuthenticatedUser() {
   const session = await getSession();
-  return session?.user;
+  return session?.user ?? null;
+}
+
+export async function getUser() {
+  const sessionUser = await getAuthenticatedUser();
+  if (!sessionUser) {
+    return null;
+  }
+
+  const dbUser = await prisma.user.findUnique({
+    where: { id: sessionUser.id },
+    select: { role: true },
+  });
+
+  if (!dbUser) {
+    return null;
+  }
+
+  return {
+    ...sessionUser,
+    role: dbUser.role,
+  };
+}
+
+export async function getCmsUser() {
+  const user = await getUser();
+  if (!user) {
+    return null;
+  }
+
+  if (!CMS_ROLES.includes(user.role)) {
+    return null;
+  }
+
+  return user;
+}
+
+export async function getAdminUser() {
+  const user = await getUser();
+  if (!user || user.role !== "ADMIN") {
+    return null;
+  }
+
+  return user;
 }

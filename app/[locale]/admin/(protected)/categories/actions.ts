@@ -3,17 +3,16 @@
  **************************************************/
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { getUser } from "@/lib/auth/server";
+import { getCmsUser } from "@/lib/auth/server";
 import { createCategory, updateCategory, deleteCategory } from "@/lib/github/categories";
 import type { Category } from "@/lib/github/types";
+import type { ActionResult } from "@/lib/actions/types";
+import { revalidateAdminPath } from "@/lib/cache/revalidate";
 
 /* **************************************************
  * Types
  **************************************************/
-export type ActionResult<T = void> =
-  | { success: true; data?: T; message?: string }
-  | { success: false; error: string; errorType?: "error" | "warning" };
+export type { ActionResult };
 
 /* **************************************************
  * Server Actions
@@ -23,7 +22,7 @@ export async function createCategoryAction(
   formData: FormData,
 ): Promise<ActionResult<Category>> {
   try {
-    const user = await getUser();
+    const user = await getCmsUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
@@ -46,7 +45,7 @@ export async function createCategoryAction(
       slug: slug?.trim() || undefined,
     });
 
-    revalidatePath("/admin/categories");
+    revalidateAdminPath("/admin/categories");
     return { success: true, data: category, message: "Category created successfully" };
   } catch (error) {
     return {
@@ -62,7 +61,7 @@ export async function updateCategoryAction(
   formData: FormData,
 ): Promise<ActionResult<Category>> {
   try {
-    const user = await getUser();
+    const user = await getCmsUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
@@ -86,7 +85,7 @@ export async function updateCategoryAction(
       newSlug: newSlug?.trim() || undefined,
     });
 
-    revalidatePath("/admin/categories");
+    revalidateAdminPath("/admin/categories");
     return { success: true, data: category, message: "Category updated successfully" };
   } catch (error) {
     return {
@@ -99,7 +98,7 @@ export async function updateCategoryAction(
 
 export async function deleteCategoryAction(slug: string): Promise<ActionResult> {
   try {
-    const user = await getUser();
+    const user = await getCmsUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
@@ -109,7 +108,7 @@ export async function deleteCategoryAction(slug: string): Promise<ActionResult> 
     }
 
     await deleteCategory(slug);
-    revalidatePath("/admin/categories");
+    revalidateAdminPath("/admin/categories");
 
     return { success: true, message: "Category deleted successfully" };
   } catch (error) {
@@ -128,7 +127,7 @@ export async function deleteCategoriesAction(
   slugs: string[],
 ): Promise<ActionResult<{ deleted: number; failed: number }>> {
   try {
-    const user = await getUser();
+    const user = await getCmsUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
@@ -152,7 +151,7 @@ export async function deleteCategoriesAction(
       }
     }
 
-    revalidatePath("/admin/categories");
+    revalidateAdminPath("/admin/categories");
 
     if (failed > 0) {
       return {

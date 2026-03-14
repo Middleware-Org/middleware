@@ -112,12 +112,8 @@ export async function githubDelete(path: string, body: unknown) {
   return res.json();
 }
 
-export async function getFileSha(
-  path: string,
-  useDevBranch: boolean = true, // Default to dev branch for all operations
-): Promise<string | null> {
+export async function getFileSha(path: string): Promise<string | null> {
   try {
-    // Always use dev branch (useDevBranch is kept for backward compatibility but defaults to true)
     const file = await githubFetch(`contents/${path}?ref=${writeBranch}`);
     return (file.sha as string) || null;
   } catch {
@@ -130,7 +126,7 @@ export async function createOrUpdateFile(
   content: string,
   message: string,
 ): Promise<void> {
-  const sha = await getFileSha(path, true); // Check in dev branch
+  const sha = await getFileSha(path);
   const contentBase64 = Buffer.from(content, "utf-8").toString("base64");
 
   await githubPut(`contents/${path}`, {
@@ -142,7 +138,7 @@ export async function createOrUpdateFile(
 }
 
 export async function deleteFile(path: string, message: string): Promise<void> {
-  const sha = await getFileSha(path, true); // Check in dev branch
+  const sha = await getFileSha(path);
 
   if (!sha) {
     throw new Error(`File ${path} not found`);
@@ -173,7 +169,7 @@ export async function renameFile(
   });
 
   // Elimina il vecchio file
-  const oldSha = await getFileSha(oldPath, true); // Check in dev branch
+  const oldSha = await getFileSha(oldPath);
   if (oldSha) {
     await githubDelete(`contents/${oldPath}`, {
       message: `Rename: ${oldPath} -> ${newPath}`,
@@ -221,7 +217,7 @@ export async function uploadFile(
   }
 
   const filePath = `public/assets/${filename}`;
-  const sha = await getFileSha(filePath, true); // Check in dev branch
+  const sha = await getFileSha(filePath);
 
   await githubPut(`contents/${filePath}`, {
     message: `Upload ${fileType}: ${filename}`,

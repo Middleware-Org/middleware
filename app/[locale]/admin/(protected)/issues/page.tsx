@@ -10,15 +10,17 @@ import IssueListClient from "./components/IssueListClient";
 import IssueListSkeleton from "./components/IssueListSkeleton";
 import styles from "./styles";
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
+import { withLocale } from "@/lib/i18n/path";
 import { Plus, ArrowLeft } from "lucide-react";
 
 /* **************************************************
  * Issues List Page (Server Component)
  **************************************************/
-export default async function IssuesPage() {
+export default async function IssuesPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const user = await getUser();
   if (!user) {
-    redirect("/admin/login");
+    redirect(withLocale("/admin/login", locale));
   }
 
   const issues = await getAllIssues();
@@ -35,7 +37,7 @@ export default async function IssuesPage() {
           <h1 className={styles.title}>Gestione Issues</h1>
           <div className="flex gap-2">
             <Link
-              href="/admin/issues/new"
+              href={withLocale("/admin/issues/new", locale)}
               className={styles.iconButton}
               aria-label="Nuova Issue"
               title="Nuova Issue"
@@ -43,7 +45,7 @@ export default async function IssuesPage() {
               <Plus className="w-4 h-4" />
             </Link>
             <Link
-              href="/admin"
+              href={withLocale("/admin", locale)}
               className={styles.iconButton}
               aria-label="Indietro"
               title="Indietro"

@@ -5,25 +5,28 @@ import type { Article } from "@/.velite";
 import SeparatorWithLogo from "@/components/molecules/SeparatorWithLogo";
 import FormattedDate from "@/components/atoms/date";
 import { ArticleDictionary } from "@/lib/i18n/types";
-import { getCategoryBySlug } from "@/lib/content/categories";
-import { getAuthorBySlug } from "@/lib/content/authors";
-import { getPodcastBySlug } from "@/lib/content/podcasts";
+import { getCategoryById } from "@/lib/content/categories";
+import { getAuthorById } from "@/lib/content/authors";
+import { getPodcastById } from "@/lib/content/podcasts";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getMinText } from "@/lib/utils/text";
 import { Book, Play } from "lucide-react";
 import CitationsSection from "./CitationsSection";
-import BookmarkManager from "./BookmarkManager";
+import BookmarkManagerLazy from "./BookmarkManagerLazy";
 import { marked } from "marked";
+import { sanitizeInlineHtml, sanitizeRichHtml } from "@/lib/security/sanitizeHtml";
+import { withLocale } from "@/lib/i18n/path";
 
 type ArticleProps = {
   article: Article;
   dict: Pick<ArticleDictionary, "page">;
+  locale: string;
 };
 
-export default function Article({ article, dict }: ArticleProps) {
-  const author = getAuthorBySlug(article.author);
-  const category = getCategoryBySlug(article.category);
+export default function Article({ article, dict, locale }: ArticleProps) {
+  const author = getAuthorById(article.authorId);
+  const category = getCategoryById(article.categoryId);
 
   const readingTime = getMinText(article.content);
 
@@ -69,7 +72,7 @@ export default function Article({ article, dict }: ArticleProps) {
       if (text || citationId) {
         citations.push({
           id: citationId,
-          text,
+          text: sanitizeInlineHtml(text),
           index: index + 1,
         });
       }
@@ -111,7 +114,7 @@ export default function Article({ article, dict }: ArticleProps) {
     }
 
     return {
-      processedHtml,
+      processedHtml: sanitizeRichHtml(processedHtml),
       citations,
     };
   };
@@ -119,7 +122,10 @@ export default function Article({ article, dict }: ArticleProps) {
   const { processedHtml, citations } = processCitations(article.content);
 
   // Check if there's a related podcast
-  const relatedPodcast = article.podcast ? getPodcastBySlug(article.podcast) : null;
+  const relatedPodcast = article.podcastId ? getPodcastById(article.podcastId) : null;
+  const authorHref = withLocale(`/authors?author=${author.slug}`, locale);
+  const categoryHref = withLocale(`/categories?category=${category.slug}`, locale);
+  const podcastHref = relatedPodcast ? withLocale(`/podcast/${relatedPodcast.slug}`, locale) : null;
 
   return (
     <article>
@@ -129,7 +135,7 @@ export default function Article({ article, dict }: ArticleProps) {
             <MonoTextLight className="border-b border-secondary lg:pb-2.5 lg:text-lg text-base mb-5">
               {dict.page.wordsBy}
             </MonoTextLight>
-            <Link href={`/authors?author=${author.slug}`}>
+            <Link href={authorHref}>
               <MonoTextBold className="lg:pb-2.5 lg:text-lg text-base mb-5">
                 {author.name}
               </MonoTextBold>
@@ -143,10 +149,7 @@ export default function Article({ article, dict }: ArticleProps) {
             <FormattedDate date={article.date} lang="it" />
           </span>
           {relatedPodcast && (
-            <Link
-              href={`/podcast/${relatedPodcast.slug}`}
-              className="flex items-center gap-2 hover:underline"
-            >
+            <Link href={podcastHref || "#"} className="flex items-center gap-2 hover:underline">
               <Play className="w-4 h-4" />
               <MonoTextLight className="lg:text-[16px] text-[14px]">
                 Ascolta il podcast
@@ -156,7 +159,7 @@ export default function Article({ article, dict }: ArticleProps) {
         </div>
         <Separator className="lg:mt-2.5 lg:mb-2.5 mt-2.5 mb-2.5" />
         <div className="flex justify-between items-center">
-          <Link href={`/categories?category=${category.slug}`}>
+          <Link href={categoryHref}>
             <MonoTextLight className="hover:underline">{category.name}</MonoTextLight>
           </Link>
           <div className="lg:text-[16px] text-[12px] flex items-center gap-2 text-secondary">
@@ -184,7 +187,7 @@ export default function Article({ article, dict }: ArticleProps) {
               className="prose prose-lg max-w-none"
               dangerouslySetInnerHTML={{ __html: processedHtml }}
             ></div>
-            <BookmarkManager articleSlug={article.slug} contentContainerSelector=".prose" />
+            <BookmarkManagerLazy articleSlug={article.slug} contentContainerSelector=".prose" />
           </div>
           <div className="lg:w-1/4 md:w-1/3 w-full lg:flex md:flex hidden">
             <Separator className="lg:flex md:hidden hidden" />

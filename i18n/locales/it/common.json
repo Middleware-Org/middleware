@@ -36,6 +36,15 @@
     "readMore": "Leggi di più",
     "listenPodcast": "Ascolta il podcast"
   },
+  "lists": {
+    "showArticles": "Mostra",
+    "hideArticles": "Nascondi articoli",
+    "articlesSuffix": "articoli",
+    "showAll": "Mostra tutti",
+    "hideAll": "Nascondi tutti",
+    "showIssues": "Mostra uscite",
+    "close": "Chiudi"
+  },
   "footer": {
     "contact": "Contatti & Info",
     "backToTop": "Torna all'inizio",

@@ -16,31 +16,18 @@ import {
 } from "../actions";
 import ConfirmDialog from "@/components/molecules/confirmDialog";
 import styles from "../styles";
-import baseStyles from "../../styles";
 import type { Author } from "@/lib/github/types";
 import { useAuthor } from "@/hooks/swr";
 import { mutate } from "swr";
+import { toast } from "@/hooks/use-toast";
+import { useLocalizedPath } from "@/lib/i18n/client";
+import { generateSlug } from "@/lib/utils/slug";
 
 /* **************************************************
  * Types
  **************************************************/
 interface AuthorFormClientProps {
   authorSlug?: string; // Slug per edit mode
-}
-
-/* **************************************************
- * Slug Generation Utility (Client-side)
- **************************************************/
-function generateSlug(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .normalize("NFD") // Normalize to decomposed form for handling accents
-    .replace(/[\u0300-\u036f]/g, "") // Remove diacritics
-    .replace(/[^a-z0-9\s-]/g, "") // Remove special characters except spaces and hyphens
-    .replace(/\s+/g, "-") // Replace spaces with hyphens
-    .replace(/-+/g, "-") // Replace multiple hyphens with single hyphen
-    .replace(/^-|-$/g, ""); // Remove leading/trailing hyphens
 }
 
 /* **************************************************
@@ -61,6 +48,7 @@ function SubmitButton({ editing }: { editing: boolean }) {
  **************************************************/
 export default function AuthorFormClient({ authorSlug }: AuthorFormClientProps) {
   const router = useRouter();
+  const toLocale = useLocalizedPath();
   const editing = !!authorSlug;
 
   // Usa SWR per ottenere l'autore (cache pre-popolata dal server)
@@ -74,26 +62,29 @@ export default function AuthorFormClient({ authorSlug }: AuthorFormClientProps) 
 
   // State per il campo slug (per poterlo aggiornare dinamicamente)
   const [slugValue, setSlugValue] = useState(author?.slug || "");
-  const [deleteError, setDeleteError] = useState<{
-    message: string;
-    type: "error" | "warning";
-  } | null>(null);
   const [isDeleting, startDeleteTransition] = useTransition();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   // Reset form and navigate on success
   useEffect(() => {
-    if (state?.success) {
-      formRef.current?.reset();
-      // Invalida la cache SWR per forzare il refetch della lista
-      mutate("/api/authors");
-      if (editing && authorSlug) {
-        mutate(`/api/authors/${authorSlug}`);
-      }
-      mutate("/api/github/merge/check");
-      router.push("/admin/authors");
+    if (!state) {
+      return;
     }
-  }, [state, router, editing, authorSlug]);
+
+    if (!state.success) {
+      toast.actionResult(state, { errorTitle: "Operazione non riuscita" });
+      return;
+    }
+
+    toast.success(state.message || (editing ? "Autore aggiornato" : "Autore creato"));
+    formRef.current?.reset();
+    mutate("/api/authors");
+    if (editing && authorSlug) {
+      mutate(`/api/authors/${authorSlug}`);
+    }
+    mutate("/api/github/merge/check");
+    router.push(toLocale("/admin/authors"));
+  }, [state, router, editing, authorSlug, toLocale]);
 
   // Handler per generare lo slug dal nome
   function handleGenerateSlug() {
@@ -117,45 +108,26 @@ export default function AuthorFormClient({ authorSlug }: AuthorFormClientProps) 
   async function handleDeleteConfirm() {
     if (!authorSlug || !author) return;
 
-    setDeleteError(null);
     setIsDeleteDialogOpen(false);
 
     startDeleteTransition(async () => {
       const result = await deleteAuthorAction(authorSlug);
 
       if (!result.success) {
-        setDeleteError({
-          message: result.error,
-          type: result.errorType || "error",
-        });
+        toast.actionResult(result, { errorTitle: "Impossibile eliminare autore" });
       } else {
+        toast.success(result.message || "Autore eliminato con successo");
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/authors");
         mutate(`/api/authors/${authorSlug}`);
         mutate("/api/github/merge/check");
-        router.push("/admin/authors");
+        router.push(toLocale("/admin/authors"));
       }
     });
   }
 
   return (
     <>
-      {state && !state.success && (
-        <div className={state.errorType === "warning" ? styles.errorWarning : styles.error}>
-          {state.error}
-        </div>
-      )}
-
-      {deleteError && (
-        <div className={deleteError.type === "warning" ? styles.errorWarning : styles.error}>
-          ⚠️ {deleteError.message}
-        </div>
-      )}
-
-      {state?.success && state.message && (
-        <div className={baseStyles.successMessageGreen}>{state.message}</div>
-      )}
-
       <form ref={formRef} action={formAction} className={styles.form}>
         <h2 className={styles.formTitle}>{editing ? "Modifica Autore" : "Nuovo Autore"}</h2>
 
@@ -222,7 +194,7 @@ export default function AuthorFormClient({ authorSlug }: AuthorFormClientProps) 
             <>
               <button
                 type="button"
-                onClick={() => router.push("/admin/authors")}
+                onClick={() => router.push(toLocale("/admin/authors"))}
                 className={styles.cancelButton}
               >
                 Annulla

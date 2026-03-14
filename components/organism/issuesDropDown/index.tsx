@@ -26,7 +26,7 @@ interface IssuesDropdownProps {
  * IssuesDropdown
  **************************************************/
 export default function IssuesDropdown({ issues, className }: IssuesDropdownProps) {
-  const { lang = "it" } = useParams() as { lang: "it" };
+  const { locale = "it" } = useParams() as { locale: "it" };
 
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -106,7 +106,7 @@ export default function IssuesDropdown({ issues, className }: IssuesDropdownProp
         )}
         {" | "}
         <span className={styles.issueText}>
-          <FormattedDate date={displayIssue.date} lang={lang} className={styles.issueText} />
+          <FormattedDate date={displayIssue.date} lang={locale} className={styles.issueText} />
         </span>
       </button>
 

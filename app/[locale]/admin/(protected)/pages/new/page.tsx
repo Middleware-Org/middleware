@@ -10,14 +10,16 @@ import PageFormClient from "../components/PageFormClient";
 import PageFormSkeleton from "../components/PageFormSkeleton";
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
 import styles from "../styles";
+import { withLocale } from "@/lib/i18n/path";
 
 /* **************************************************
  * New Page (Server Component)
  **************************************************/
-export default async function NewPagePage() {
+export default async function NewPagePage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const user = await getUser();
   if (!user) {
-    redirect("/admin/login");
+    redirect(withLocale("/admin/login", locale));
   }
 
   return (
@@ -25,7 +27,7 @@ export default async function NewPagePage() {
       <div className={cn("h-full flex flex-col", styles.main)}>
         <div className={styles.header}>
           <h1 className={styles.title}>Nuova Pagina</h1>
-          <Link href="/admin/pages" className={styles.backButton}>
+          <Link href={withLocale("/admin/pages", locale)} className={styles.backButton}>
             ← Indietro
           </Link>
         </div>

@@ -19,10 +19,10 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils/classes";
 import { authClient } from "@/lib/auth/client";
-import { i18nSettings } from "@/lib/i18n/settings";
+import { stripLocalePrefix, withLocale } from "@/lib/i18n/path";
 import Pictogram from "@/components/organism/pictogram";
 import { MonoTextBold } from "@/components/atoms/typography";
-import type { CommonDictionary } from "@/lib/i18n/types";
+import type { AdminDictionary, CommonDictionary } from "@/lib/i18n/types";
 import MergeButton from "./MergeButton";
 import styles from "./styles";
 
@@ -31,7 +31,9 @@ import styles from "./styles";
  **************************************************/
 interface SidebarProps {
   dict: Pick<CommonDictionary, "title">;
+  adminDict: Pick<AdminDictionary, "sidebar" | "mergeButton">;
   locale: string;
+  currentUserRole: "ADMIN" | "EDITOR";
 }
 
 /* **************************************************
@@ -40,47 +42,47 @@ interface SidebarProps {
 const navItems = [
   {
     href: "/admin",
-    label: "Dashboard",
+    labelKey: "dashboard",
     icon: LayoutDashboard,
   },
   {
     href: "/admin/articles",
-    label: "Articoli",
+    labelKey: "articles",
     icon: FileText,
   },
   {
     href: "/admin/podcasts",
-    label: "Podcasts",
+    labelKey: "podcasts",
     icon: Headphones,
   },
   {
     href: "/admin/media",
-    label: "Media",
+    labelKey: "media",
     icon: ImageIcon,
   },
   {
     href: "/admin/issues",
-    label: "Issues",
+    labelKey: "issues",
     icon: BookOpen,
   },
   {
     href: "/admin/pages",
-    label: "Pagine",
+    labelKey: "pages",
     icon: FileCode,
   },
   {
     href: "/admin/categories",
-    label: "Categorie",
+    labelKey: "categories",
     icon: FolderTree,
   },
   {
     href: "/admin/authors",
-    label: "Autori",
+    labelKey: "authors",
     icon: User,
   },
   {
     href: "/admin/users",
-    label: "Utenti",
+    labelKey: "users",
     icon: Users,
   },
 ] as const;
@@ -88,26 +90,22 @@ const navItems = [
 /* **************************************************
  * Sidebar Component
  **************************************************/
-export default function Sidebar({ dict, locale }: SidebarProps) {
+export default function Sidebar({ dict, adminDict, locale, currentUserRole }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
 
   async function handleLogout() {
     await authClient.signOut();
-    router.push("/admin/login");
+    router.push(withLocale("/admin/login", locale));
   }
 
-  // Rimuove il locale dal pathname (es. /it/admin -> /admin)
-  function getPathnameWithoutLocale(path: string): string {
-    const segments = path.split("/").filter(Boolean);
-    // Se il primo segmento è un locale supportato, rimuovilo
-    if (segments.length > 0 && i18nSettings.locales.includes(segments[0])) {
-      return "/" + segments.slice(1).join("/");
+  const pathnameWithoutLocale = stripLocalePrefix(pathname);
+  const visibleNavItems = navItems.filter((item) => {
+    if (item.href === "/admin/users" && currentUserRole !== "ADMIN") {
+      return false;
     }
-    return path;
-  }
-
-  const pathnameWithoutLocale = getPathnameWithoutLocale(pathname);
+    return true;
+  });
 
   return (
     <aside className={styles.sidebar}>
@@ -122,8 +120,7 @@ export default function Sidebar({ dict, locale }: SidebarProps) {
 
       <nav className={styles.nav}>
         <ul className={styles.navList}>
-          {navItems.map((item) => {
-            console.log("item", item);
+          {visibleNavItems.map((item) => {
             const Icon = item.icon;
             const isActive =
               item.href === "/admin"
@@ -134,7 +131,7 @@ export default function Sidebar({ dict, locale }: SidebarProps) {
             return (
               <li key={item.href}>
                 <Link
-                  href={item.href}
+                  href={withLocale(item.href, locale)}
                   className={cn(
                     styles.navItem,
                     isActive ? styles.navItemActive : styles.navItemInactive,
@@ -142,7 +139,7 @@ export default function Sidebar({ dict, locale }: SidebarProps) {
                 >
                   <Icon className={styles.navIcon} />
                   <span className={isActive ? styles.navItemActiveText : styles.navItemText}>
-                    {item.label}
+                    {adminDict.sidebar[item.labelKey]}
                   </span>
                 </Link>
               </li>
@@ -151,12 +148,12 @@ export default function Sidebar({ dict, locale }: SidebarProps) {
         </ul>
       </nav>
 
-      <MergeButton />
+      {currentUserRole === "ADMIN" && <MergeButton dict={adminDict.mergeButton} />}
 
       <div className={styles.footer}>
         <button type="button" onClick={handleLogout} className={styles.logoutButton}>
           <LogOut className={styles.navIcon} />
-          <span>Logout</span>
+          <span>{adminDict.sidebar.logout}</span>
         </button>
       </div>
     </aside>

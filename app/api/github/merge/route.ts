@@ -1,7 +1,12 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { getAdminUser } from "@/lib/auth/server";
+import { createLogger } from "@/lib/logger";
+import { checkRateLimit, createRateLimitResponse, getClientIp } from "@/lib/security/rateLimit";
+
+const logger = createLogger("API /github/merge");
 
 const GITHUB_API_URL = "https://api.github.com";
 const owner = process.env.GITHUB_OWNER!;
@@ -13,8 +18,27 @@ const token = process.env.GITHUB_TOKEN!;
 /* **************************************************
  * Merge develop into main
  **************************************************/
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   try {
+    const ip = getClientIp(request);
+    const rateLimit = await checkRateLimit(`github:merge:${ip}`, {
+      windowMs: 60_000,
+      maxRequests: 5,
+    });
+
+    if (!rateLimit.allowed) {
+      return createRateLimitResponse(rateLimit);
+    }
+
+    const user = await getAdminUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!owner || !repo || !token) {
+      return NextResponse.json({ error: "GitHub configuration missing" }, { status: 500 });
+    }
+
     // First check if there are changes to merge
     const checkUrl = `${GITHUB_API_URL}/repos/${owner}/${repo}/compare/${mainBranch}...${devBranch}`;
     const checkRes = await fetch(checkUrl, {
@@ -57,7 +81,7 @@ export async function POST(request: NextRequest) {
 
     if (!mergeRes.ok) {
       const errorData = await mergeRes.json();
-      console.error("Merge error:", errorData);
+      logger.error("Merge error", errorData);
 
       // Check if it's a merge conflict
       if (mergeRes.status === 409) {
@@ -82,7 +106,7 @@ export async function POST(request: NextRequest) {
       commit: mergeData.commit,
     });
   } catch (error) {
-    console.error("Error merging branches:", error);
+    logger.error("Error merging branches", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

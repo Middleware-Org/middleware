@@ -10,15 +10,17 @@ import ArticleListClient from "./components/ArticleListClient";
 import ArticleListSkeleton from "./components/ArticleListSkeleton";
 import styles from "./styles";
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
+import { withLocale } from "@/lib/i18n/path";
 import { Plus, ArrowLeft } from "lucide-react";
 
 /* **************************************************
  * Articles List Page (Server Component)
  **************************************************/
-export default async function ArticlesPage() {
+export default async function ArticlesPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const user = await getUser();
   if (!user) {
-    redirect("/admin/login");
+    redirect(withLocale("/admin/login", locale));
   }
 
   const articles = await getAllArticles();
@@ -35,7 +37,7 @@ export default async function ArticlesPage() {
           <h1 className={styles.title}>Gestione Articoli</h1>
           <div className="flex gap-2">
             <Link
-              href="/admin/articles/new"
+              href={withLocale("/admin/articles/new", locale)}
               className={styles.iconButton}
               aria-label="Nuovo Articolo"
               title="Nuovo Articolo"
@@ -43,7 +45,7 @@ export default async function ArticlesPage() {
               <Plus className="w-4 h-4" />
             </Link>
             <Link
-              href="/admin"
+              href={withLocale("/admin", locale)}
               className={styles.iconButton}
               aria-label="Indietro"
               title="Indietro"

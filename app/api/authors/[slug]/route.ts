@@ -2,16 +2,17 @@
  * Imports
  **************************************************/
 import { NextResponse } from "next/server";
+import { CACHE_PROFILES, setPrivateCacheHeaders } from "@/lib/api/cache";
 import { getUser } from "@/lib/auth/server";
 import { getAuthorBySlug } from "@/lib/github/authors";
+import { createLogger } from "@/lib/logger";
+
+const logger = createLogger("API /authors/[slug]");
 
 /* **************************************************
  * GET /api/authors/[slug]
  **************************************************/
-export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ slug: string }> },
-) {
+export async function GET(_request: Request, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const user = await getUser();
     if (!user) {
@@ -19,9 +20,8 @@ export async function GET(
     }
 
     const { slug } = await params;
-    
-    // Log per verificare se la richiesta viene fatta (non cache)
-    console.log("[API] GET /api/authors/[slug] - Richiesta REST effettuata", {
+
+    logger.debug("GET richiesta REST effettuata", {
       slug,
       timestamp: new Date().toISOString(),
       user: user.email,
@@ -36,14 +36,14 @@ export async function GET(
     const response = NextResponse.json(author);
     response.headers.set("X-Data-Source", "rest-api");
     response.headers.set("X-Timestamp", new Date().toISOString());
-    
+    setPrivateCacheHeaders(response, CACHE_PROFILES.detail);
+
     return response;
   } catch (error) {
-    console.error("Error fetching author:", error);
+    logger.error("Error fetching author", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Failed to fetch author" },
       { status: 500 },
     );
   }
 }
-

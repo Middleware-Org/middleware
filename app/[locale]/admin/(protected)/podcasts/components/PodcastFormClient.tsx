@@ -14,6 +14,8 @@ import baseStyles from "../../styles";
 import type { Podcast } from "@/lib/github/types";
 import { usePodcast } from "@/hooks/swr";
 import { mutate } from "swr";
+import { toast } from "@/hooks/use-toast";
+import { useLocalizedPath } from "@/lib/i18n/client";
 
 /* **************************************************
  * Types
@@ -27,6 +29,7 @@ interface PodcastFormClientProps {
  **************************************************/
 export default function PodcastFormClient({ podcastSlug }: PodcastFormClientProps) {
   const router = useRouter();
+  const toLocale = useLocalizedPath();
   const editing = !!podcastSlug;
 
   // Usa SWR per ottenere i dati (cache pre-popolata dal server)
@@ -67,17 +70,24 @@ export default function PodcastFormClient({ podcastSlug }: PodcastFormClientProp
 
   // Reset form and navigate on success
   useEffect(() => {
-    if (state?.success) {
-      formRef.current?.reset();
-      // Invalida la cache SWR per forzare il refetch della lista
-      mutate("/api/podcasts");
-      if (editing && podcastSlug) {
-        mutate(`/api/podcasts/${podcastSlug}`);
-      }
-      mutate("/api/github/merge/check");
-      router.push("/admin/podcasts");
+    if (!state) {
+      return;
     }
-  }, [state, router, editing, podcastSlug]);
+
+    if (!state.success) {
+      toast.actionResult(state, { errorTitle: "Operazione non riuscita" });
+      return;
+    }
+
+    toast.success(state.message || (editing ? "Podcast aggiornato" : "Podcast creato"));
+    formRef.current?.reset();
+    mutate("/api/podcasts");
+    if (editing && podcastSlug) {
+      mutate(`/api/podcasts/${podcastSlug}`);
+    }
+    mutate("/api/github/merge/check");
+    router.push(toLocale("/admin/podcasts"));
+  }, [state, router, editing, podcastSlug, toLocale]);
 
   function handleFormDataChange(field: string, value: string | boolean) {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -126,18 +136,6 @@ export default function PodcastFormClient({ podcastSlug }: PodcastFormClientProp
       action={handleAction}
       className={cn(baseStyles.formContainer, "flex flex-col h-full")}
     >
-      {state && !state.success && (
-        <div
-          className={`mb-4 ${state.errorType === "warning" ? baseStyles.errorWarning : baseStyles.error}`}
-        >
-          {state.error}
-        </div>
-      )}
-
-      {state?.success && state.message && (
-        <div className={baseStyles.successMessage}>{state.message}</div>
-      )}
-
       <div className={cn(styles.editorContainer, "flex-1 min-h-0")}>
         {/* Form Content - 3/4 width */}
         <div className={styles.editorWrapper}>
@@ -167,4 +165,3 @@ export default function PodcastFormClient({ podcastSlug }: PodcastFormClientProp
     </form>
   );
 }
-

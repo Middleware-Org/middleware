@@ -68,13 +68,23 @@ export default function LinkModal({ isOpen, onClose, onInsert, currentUrl }: Lin
         className={baseStyles.modalContainer}
         onClick={(e) => e.stopPropagation()}
         style={{ maxWidth: "500px" }}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="link-modal-title"
       >
         <div className={baseStyles.modalHeader}>
           <div className="flex items-center gap-2">
             <LinkIcon className="w-5 h-5 text-secondary" />
-            <h2 className={baseStyles.modalTitle}>Inserisci Link</h2>
+            <h2 id="link-modal-title" className={baseStyles.modalTitle}>
+              Inserisci Link
+            </h2>
           </div>
-          <button type="button" onClick={onClose} className={baseStyles.modalCloseButton}>
+          <button
+            type="button"
+            onClick={onClose}
+            className={baseStyles.modalCloseButton}
+            aria-label="Chiudi finestra inserimento link"
+          >
             <X className="w-5 h-5" />
           </button>
         </div>

@@ -11,6 +11,11 @@ import styles from "./Sidebar/styles";
 import useSWR from "swr";
 import { createFetcher } from "@/hooks/swr/fetcher";
 import { mutate } from "swr";
+import type { AdminDictionary } from "@/lib/i18n/types";
+
+type MergeButtonProps = {
+  dict: AdminDictionary["mergeButton"];
+};
 
 /* **************************************************
  * Fetcher
@@ -24,7 +29,7 @@ const fetcher = createFetcher<{
 /* **************************************************
  * Publish Button Component
  **************************************************/
-export default function MergeButton() {
+export default function MergeButton({ dict }: MergeButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [publishError, setPublishError] = useState<string | null>(null);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -47,7 +52,7 @@ export default function MergeButton() {
 
   const hasChanges = data?.hasChanges || false;
   const aheadBy = data?.aheadBy || 0;
-  const error = checkError ? "Error checking merge status" : publishError;
+  const error = checkError ? dict.checkError : publishError;
 
   function handlePublishClick() {
     if (!hasChanges || isLoading) return;
@@ -72,19 +77,19 @@ export default function MergeButton() {
         setShowSuccessDialog(true);
       } else {
         if (data.conflict) {
-          setPublishError("Conflitto di merge rilevato. Risolvi manualmente.");
+          setPublishError(dict.conflictError);
         } else if (data.alreadyMerged) {
           // Invalidate cache to refresh status
           mutate("/api/github/merge/check");
           setPublishError(null);
         } else {
-          setPublishError(data.error || "Errore durante la pubblicazione");
+          setPublishError(data.error || dict.publishError);
         }
         setIsLoading(false);
       }
     } catch (err) {
       console.error("Error publishing:", err);
-      setPublishError("Errore durante la pubblicazione");
+      setPublishError(dict.publishError);
       setIsLoading(false);
     }
   }
@@ -99,7 +104,7 @@ export default function MergeButton() {
           className={cn(styles.mergeButton, "opacity-50 cursor-not-allowed")}
         >
           <Loader2 className={cn(styles.navIcon, "animate-spin")} />
-          <span>Controllo...</span>
+          <span>{dict.checking}</span>
         </button>
       </div>
     );
@@ -114,7 +119,7 @@ export default function MergeButton() {
           className={cn(styles.mergeButton, "opacity-50 cursor-not-allowed")}
         >
           <Rocket className={styles.navIcon} />
-          <span>Nessuna modifica</span>
+          <span>{dict.noChanges}</span>
         </button>
       </div>
     );
@@ -140,8 +145,8 @@ export default function MergeButton() {
           )}
           <span>
             {isLoading
-              ? "Pubblicando..."
-              : `Pubblica Modifiche ${aheadBy > 0 ? `(${aheadBy})` : ""}`}
+              ? dict.publishing
+              : `${dict.publishChanges} ${aheadBy > 0 ? `(${aheadBy})` : ""}`}
           </span>
         </button>
         {error && <div className="mt-1 text-xs text-red-500 px-4">{error}</div>}
@@ -152,10 +157,10 @@ export default function MergeButton() {
         isOpen={showConfirmDialog}
         onClose={() => setShowConfirmDialog(false)}
         onConfirm={handlePublishConfirm}
-        title="Pubblica modifiche"
-        message={`Sei sicuro di voler pubblicare ${aheadBy} modifiche? Questa azione attiverà il processo di pubblicazione.`}
-        confirmText="Pubblica"
-        cancelText="Annulla"
+        title={dict.confirmTitle}
+        message={dict.confirmMessage.replace("{{count}}", String(aheadBy))}
+        confirmText={dict.confirmButton}
+        cancelText={dict.cancelButton}
         isLoading={isLoading}
       />
 
@@ -164,9 +169,9 @@ export default function MergeButton() {
         isOpen={showSuccessDialog}
         onClose={() => setShowSuccessDialog(false)}
         onConfirm={() => setShowSuccessDialog(false)}
-        title="Pubblicazione completata"
-        message="Le modifiche sono state pubblicate con successo! La pipeline è stata avviata."
-        confirmText="OK"
+        title={dict.successTitle}
+        message={dict.successMessage}
+        confirmText={dict.successButton}
         cancelText=""
       />
     </>

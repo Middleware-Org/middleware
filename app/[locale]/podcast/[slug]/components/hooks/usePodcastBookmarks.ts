@@ -4,7 +4,11 @@
  * Imports
  **************************************************/
 import { useEffect, useState, useCallback } from "react";
-import { PodcastBookmark, podcastBookmarksStorage } from "@/lib/storage/podcastBookmarks";
+import {
+  PODCAST_BOOKMARKS_UPDATED_EVENT,
+  PodcastBookmark,
+  podcastBookmarksStorage,
+} from "@/lib/storage/podcastBookmarks";
 import { Segment } from "../types";
 
 /* **************************************************
@@ -61,6 +65,22 @@ export function usePodcastBookmarks({
       console.error("Errore nel ricaricamento dei segnaposto:", error);
     }
   }, [podcastSlug]);
+
+  useEffect(() => {
+    const handleBookmarksUpdated = (event: Event) => {
+      const customEvent = event as CustomEvent<{ podcastSlug: string }>;
+      if (customEvent.detail?.podcastSlug !== podcastSlug) {
+        return;
+      }
+
+      refreshBookmarks();
+    };
+
+    window.addEventListener(PODCAST_BOOKMARKS_UPDATED_EVENT, handleBookmarksUpdated);
+    return () => {
+      window.removeEventListener(PODCAST_BOOKMARKS_UPDATED_EVENT, handleBookmarksUpdated);
+    };
+  }, [podcastSlug, refreshBookmarks]);
 
   // Verifica se esiste un bookmark nello stesso chunk
   const hasBookmarkInChunk = useCallback(

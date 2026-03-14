@@ -11,24 +11,24 @@ import PodcastFormClient from "../../components/PodcastFormClient";
 import PodcastEditSkeleton from "../../components/PodcastEditSkeleton";
 import styles from "../../styles";
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
+import { withLocale } from "@/lib/i18n/path";
 
 /* **************************************************
  * Types
  **************************************************/
 interface EditPodcastPageProps {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }
 
 /* **************************************************
  * Edit Podcast Page (Server Component)
  **************************************************/
 export default async function EditPodcastPage({ params }: EditPodcastPageProps) {
+  const { locale, slug } = await params;
   const user = await getUser();
   if (!user) {
-    redirect("/admin/login");
+    redirect(withLocale("/admin/login", locale));
   }
-
-  const { slug } = await params;
   const podcast = await getPodcastBySlug(slug);
 
   if (!podcast) {
@@ -45,7 +45,7 @@ export default async function EditPodcastPage({ params }: EditPodcastPageProps) 
       <div className={cn("h-full flex flex-col", styles.main)}>
         <div className={styles.header}>
           <h1 className={styles.title}>Modifica Podcast: {podcast.title}</h1>
-          <Link href="/admin/podcasts" className={styles.backButton}>
+          <Link href={withLocale("/admin/podcasts", locale)} className={styles.backButton}>
             ← Indietro
           </Link>
         </div>
@@ -59,4 +59,3 @@ export default async function EditPodcastPage({ params }: EditPodcastPageProps) 
     </SWRPageProvider>
   );
 }
-

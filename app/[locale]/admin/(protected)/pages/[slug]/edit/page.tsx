@@ -11,21 +11,25 @@ import PageFormClient from "../../components/PageFormClient";
 import PageEditSkeleton from "../../components/PageEditSkeleton";
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
 import styles from "../../styles";
+import { withLocale } from "@/lib/i18n/path";
 
 /* **************************************************
  * Edit Page (Server Component)
  **************************************************/
-export default async function EditPagePage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function EditPagePage({
+  params,
+}: {
+  params: Promise<{ locale: string; slug: string }>;
+}) {
+  const { locale, slug } = await params;
   const user = await getUser();
   if (!user) {
-    redirect("/admin/login");
+    redirect(withLocale("/admin/login", locale));
   }
-
-  const { slug } = await params;
   const page = await getPageBySlug(slug);
 
   if (!page) {
-    redirect("/admin/pages");
+    redirect(withLocale("/admin/pages", locale));
   }
 
   // Pre-popolazione cache SWR con dati SSR
@@ -38,7 +42,7 @@ export default async function EditPagePage({ params }: { params: Promise<{ slug:
       <div className={cn("h-full flex flex-col", styles.main)}>
         <div className={styles.header}>
           <h1 className={styles.title}>Modifica Pagina: {page.slug}</h1>
-          <Link href="/admin/pages" className={styles.backButton}>
+          <Link href={withLocale("/admin/pages", locale)} className={styles.backButton}>
             ← Indietro
           </Link>
         </div>
