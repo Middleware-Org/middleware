@@ -3,7 +3,7 @@
  **************************************************/
 "use server";
 
-import { getUser } from "@/lib/auth/server";
+import { getCmsUser } from "@/lib/auth/server";
 import { createPage, updatePage, deletePage } from "@/lib/github/pages";
 import type { Page } from "@/lib/github/types";
 import type { ActionResult } from "@/lib/actions/types";
@@ -22,7 +22,7 @@ export async function createPageAction(
   formData: FormData,
 ): Promise<ActionResult<Page>> {
   try {
-    const user = await getUser();
+    const user = await getCmsUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
@@ -63,7 +63,7 @@ export async function updatePageAction(
   formData: FormData,
 ): Promise<ActionResult<Page>> {
   try {
-    const user = await getUser();
+    const user = await getCmsUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
@@ -102,7 +102,7 @@ export async function updatePageAction(
 
 export async function deletePageAction(slug: string): Promise<ActionResult> {
   try {
-    const user = await getUser();
+    const user = await getCmsUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
@@ -128,7 +128,7 @@ export async function deletePagesAction(
   slugs: string[],
 ): Promise<ActionResult<{ deleted: number; failed: number }>> {
   try {
-    const user = await getUser();
+    const user = await getCmsUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }

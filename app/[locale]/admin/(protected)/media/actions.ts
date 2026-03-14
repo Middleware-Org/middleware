@@ -3,7 +3,7 @@
  **************************************************/
 "use server";
 
-import { getUser } from "@/lib/auth/server";
+import { getCmsUser } from "@/lib/auth/server";
 import {
   deleteMediaFile,
   uploadMediaFile,
@@ -27,7 +27,7 @@ export async function uploadMediaAction(
   formData: FormData,
 ): Promise<ActionResult<string>> {
   try {
-    const user = await getUser();
+    const user = await getCmsUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
@@ -72,7 +72,7 @@ export async function uploadMediaAction(
 
 export async function deleteMediaAction(filename: string): Promise<ActionResult> {
   try {
-    const user = await getUser();
+    const user = await getCmsUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
@@ -101,7 +101,7 @@ export async function deleteMediaFilesAction(
   filenames: string[],
 ): Promise<ActionResult<{ deleted: number; failed: number }>> {
   try {
-    const user = await getUser();
+    const user = await getCmsUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
@@ -154,7 +154,7 @@ export async function renameMediaAction(
   newFilename: string,
 ): Promise<ActionResult<string>> {
   try {
-    const user = await getUser();
+    const user = await getCmsUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
@@ -181,7 +181,7 @@ export async function renameMediaAction(
 
 export async function getAllMediaAction(): Promise<ActionResult<MediaFile[]>> {
   try {
-    const user = await getUser();
+    const user = await getCmsUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }

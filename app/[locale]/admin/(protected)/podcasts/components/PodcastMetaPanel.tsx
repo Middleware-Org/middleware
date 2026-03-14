@@ -15,6 +15,7 @@ import AudioJsonMediaSelector from "../../articles/components/AudioJsonMediaSele
 import SelectSearch from "../../articles/components/SelectSearch";
 import { mutate } from "swr";
 import { cn } from "@/lib/utils/classes";
+import { generateSlug } from "@/lib/utils/slug";
 import { useIssues } from "@/hooks/swr";
 import { toast } from "@/hooks/use-toast";
 import { useLocalizedPath } from "@/lib/i18n/client";
@@ -36,21 +37,6 @@ interface PodcastMetaPanelProps {
   onFormDataChange: (field: string, value: string | boolean) => void;
   editing: boolean;
   formRef: React.RefObject<HTMLFormElement | null>;
-}
-
-/* **************************************************
- * Slug Generation Utility (Client-side)
- **************************************************/
-function generateSlug(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
 }
 
 export default function PodcastMetaPanel({

@@ -3,7 +3,7 @@
  **************************************************/
 "use server";
 
-import { getUser } from "@/lib/auth/server";
+import { getCmsUser } from "@/lib/auth/server";
 import { createIssue, updateIssue, deleteIssue } from "@/lib/github/issues";
 import { uploadImage } from "@/lib/github/client";
 import type { Issue } from "@/lib/github/types";
@@ -23,7 +23,7 @@ export async function createIssueAction(
   formData: FormData,
 ): Promise<ActionResult<Issue>> {
   try {
-    const user = await getUser();
+    const user = await getCmsUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
@@ -86,7 +86,7 @@ export async function updateIssueAction(
   formData: FormData,
 ): Promise<ActionResult<Issue>> {
   try {
-    const user = await getUser();
+    const user = await getCmsUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
@@ -145,7 +145,7 @@ export async function updateIssueAction(
 
 export async function deleteIssueAction(slug: string): Promise<ActionResult> {
   try {
-    const user = await getUser();
+    const user = await getCmsUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
@@ -174,7 +174,7 @@ export async function deleteIssuesAction(
   slugs: string[],
 ): Promise<ActionResult<{ deleted: number; failed: number }>> {
   try {
-    const user = await getUser();
+    const user = await getCmsUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }

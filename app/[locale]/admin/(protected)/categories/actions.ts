@@ -3,7 +3,7 @@
  **************************************************/
 "use server";
 
-import { getUser } from "@/lib/auth/server";
+import { getCmsUser } from "@/lib/auth/server";
 import { createCategory, updateCategory, deleteCategory } from "@/lib/github/categories";
 import type { Category } from "@/lib/github/types";
 import type { ActionResult } from "@/lib/actions/types";
@@ -22,7 +22,7 @@ export async function createCategoryAction(
   formData: FormData,
 ): Promise<ActionResult<Category>> {
   try {
-    const user = await getUser();
+    const user = await getCmsUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
@@ -61,7 +61,7 @@ export async function updateCategoryAction(
   formData: FormData,
 ): Promise<ActionResult<Category>> {
   try {
-    const user = await getUser();
+    const user = await getCmsUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
@@ -98,7 +98,7 @@ export async function updateCategoryAction(
 
 export async function deleteCategoryAction(slug: string): Promise<ActionResult> {
   try {
-    const user = await getUser();
+    const user = await getCmsUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
@@ -127,7 +127,7 @@ export async function deleteCategoriesAction(
   slugs: string[],
 ): Promise<ActionResult<{ deleted: number; failed: number }>> {
   try {
-    const user = await getUser();
+    const user = await getCmsUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }

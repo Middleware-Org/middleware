@@ -7,6 +7,9 @@ import { nextCookies } from "better-auth/next-js";
 import { headers } from "next/headers";
 import { prisma } from "../prisma";
 
+export const CMS_ROLES = ["ADMIN", "EDITOR"] as const;
+export type CmsRole = (typeof CMS_ROLES)[number];
+
 /* ****************************************************************
  * Auth Configuration
  ***************************************************************** */
@@ -67,6 +70,19 @@ export async function getUser() {
     ...sessionUser,
     role: dbUser.role,
   };
+}
+
+export async function getCmsUser() {
+  const user = await getUser();
+  if (!user) {
+    return null;
+  }
+
+  if (!CMS_ROLES.includes(user.role)) {
+    return null;
+  }
+
+  return user;
 }
 
 export async function getAdminUser() {

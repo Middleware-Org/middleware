@@ -148,7 +148,7 @@ export default function Sidebar({ dict, adminDict, locale, currentUserRole }: Si
         </ul>
       </nav>
 
-      <MergeButton dict={adminDict.mergeButton} />
+      {currentUserRole === "ADMIN" && <MergeButton dict={adminDict.mergeButton} />}
 
       <div className={styles.footer}>
         <button type="button" onClick={handleLogout} className={styles.logoutButton}>

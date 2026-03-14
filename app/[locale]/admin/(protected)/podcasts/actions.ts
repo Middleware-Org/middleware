@@ -3,7 +3,7 @@
  **************************************************/
 "use server";
 
-import { getUser } from "@/lib/auth/server";
+import { getCmsUser } from "@/lib/auth/server";
 import { createPodcast, updatePodcast, deletePodcast } from "@/lib/github/podcasts";
 import type { Podcast } from "@/lib/github/types";
 import type { ActionResult } from "@/lib/actions/types";
@@ -22,7 +22,7 @@ export async function createPodcastAction(
   formData: FormData,
 ): Promise<ActionResult<Podcast>> {
   try {
-    const user = await getUser();
+    const user = await getCmsUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
@@ -73,7 +73,7 @@ export async function updatePodcastAction(
   formData: FormData,
 ): Promise<ActionResult<Podcast>> {
   try {
-    const user = await getUser();
+    const user = await getCmsUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
@@ -120,7 +120,7 @@ export async function updatePodcastAction(
 
 export async function deletePodcastAction(slug: string): Promise<ActionResult> {
   try {
-    const user = await getUser();
+    const user = await getCmsUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
@@ -146,7 +146,7 @@ export async function deletePodcastsAction(
   slugs: string[],
 ): Promise<ActionResult<{ deleted: number; failed: number }>> {
   try {
-    const user = await getUser();
+    const user = await getCmsUser();
     if (!user) {
       return { success: false, error: "Unauthorized", errorType: "error" };
     }
