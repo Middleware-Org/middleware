@@ -1,7 +1,9 @@
 ---
+id: ''
 slug: privacy-policy
 title: Privacy Policy
 excerpt: Spiegazione e elenco della privacy del sito
+createdBy: ''
 ---
 **Ultimo aggiornamento:** 4 agosto 2025
 
