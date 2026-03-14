@@ -3,10 +3,9 @@ id: f2eeff9e-9885-4d19-b010-d191e37af37e
 slug: contesto-e-origini
 title: Contesto e Origini
 date: '2026-02-23'
-last_update: '2026-03-13T09:04:07.021Z'
+last_update: '2026-03-14T14:12:19.802Z'
 authorId: 9e421669-3a18-4bdb-94f9-e0bf8fef86dd
 categoryId: 6dfdddaf-c93c-4f34-8a6d-c3b4eebb0859
-issueId: 3ae30972-293d-440e-ab7c-9ee1c28954a8
 in_evidence: true
 published: true
 excerpt: >-
@@ -15,6 +14,8 @@ excerpt: >-
   strutturato in quattro parti: contesto e origini, genealogia e lessico,
   conricerca e stile della militanza, e infine tracce e ipotesi.
 createdBy: 00000000-0000-0000-0000-000000000001
+issueId: 3ae30972-293d-440e-ab7c-9ee1c28954a8
+podcastId: 9a319165-c463-4793-9ed8-01597fe41533
 ---
 Questa formazione è un esperimento: non ci troviamo di fronte a lezioni frontali in senso assoluto, ma al frutto di un lavoro collettivo in corso d'opera, fatto di letture, riflessioni, dibattito e tentativo di sintesi. Un gruppo di lavoro si è occupato della preparazione dei contenuti con l'intento di aprire momenti di discussione collettiva sui temi affrontati.
 
