@@ -88,12 +88,17 @@ export default function ArticleFormClient({ articleSlug }: ArticleFormClientProp
     editing ? updateArticleAction : createArticleAction,
     null,
   );
+  const handledStateRef = useRef<ActionResult<Article> | null>(null);
 
   // Reset form and navigate on success
   useEffect(() => {
     if (!state) {
       return;
     }
+    if (handledStateRef.current === state) {
+      return;
+    }
+    handledStateRef.current = state;
 
     if (!state.success) {
       toast.actionResult(state, { errorTitle: "Operazione non riuscita" });

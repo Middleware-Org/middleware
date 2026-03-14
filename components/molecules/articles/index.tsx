@@ -21,12 +21,19 @@ type ArticlesProps = {
   issue: Issue;
   disableShowArticles?: boolean;
   dict: Pick<CommonDictionary, "articleCard" | "lists">;
+  orderByArticleId?: Record<string, number>;
 };
 
 /* **************************************************
  * Articles
  **************************************************/
-export default function Articles({ articles, dict, issue, disableShowArticles }: ArticlesProps) {
+export default function Articles({
+  articles,
+  dict,
+  issue,
+  disableShowArticles,
+  orderByArticleId,
+}: ArticlesProps) {
   const [showArticles, setShowArticles] = useState(false);
   const { color } = getTextColor(issue.color);
 
@@ -45,7 +52,12 @@ export default function Articles({ articles, dict, issue, disableShowArticles }:
       <div className={styles.desktop}>
         <div className={styles.grid}>
           {articles.map((article) => (
-            <ArticleCard key={article.slug} article={article} dict={dict} />
+            <ArticleCard
+              key={article.slug}
+              article={article}
+              dict={dict}
+              orderNumber={orderByArticleId?.[article.id]}
+            />
           ))}
         </div>
       </div>
@@ -59,7 +71,12 @@ export default function Articles({ articles, dict, issue, disableShowArticles }:
         >
           <div className={styles.mobileGrid}>
             {articles.map((article) => (
-              <ArticleCard key={article.slug} article={article} dict={dict} />
+              <ArticleCard
+                key={article.slug}
+                article={article}
+                dict={dict}
+                orderNumber={orderByArticleId?.[article.id]}
+              />
             ))}
           </div>
         </div>

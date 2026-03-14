@@ -20,12 +20,18 @@ type ArticleCardProps = {
   article: Article;
   dict: Pick<CommonDictionary, "articleCard">;
   isPodcast?: boolean;
+  orderNumber?: number;
 };
 
 /* **************************************************
  * ArticleCard
  **************************************************/
-export default function ArticleCard({ article, dict, isPodcast = false }: ArticleCardProps) {
+export default function ArticleCard({
+  article,
+  dict,
+  isPodcast = false,
+  orderNumber,
+}: ArticleCardProps) {
   const { locale = "it" } = useParams() as { locale: "it" };
   const author = getAuthorById(article.authorId);
   const category = getCategoryById(article.categoryId);
@@ -43,7 +49,10 @@ export default function ArticleCard({ article, dict, isPodcast = false }: Articl
     <article className={styles.article}>
       <header className={styles.header}>
         <Link href={articleLink}>
-          <H3 className={styles.title}>{article.title}</H3>
+          <H3 className={styles.title}>
+            {orderNumber !== undefined && `#${orderNumber} `}
+            {article.title}
+          </H3>
         </Link>
 
         <div className={styles.authorInfo}>

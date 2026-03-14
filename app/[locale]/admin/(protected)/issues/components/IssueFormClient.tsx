@@ -154,6 +154,7 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
     editing ? updateIssueAction : createIssueAction,
     null,
   );
+  const handledStateRef = useRef<ActionResult<Issue> | null>(null);
 
   const [slugValue, setSlugValue] = useState(issue?.slug || "");
   const [, startDeleteTransition] = useTransition();
@@ -175,6 +176,8 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
 
   useEffect(() => {
     if (!state) return;
+    if (handledStateRef.current === state) return;
+    handledStateRef.current = state;
 
     if (!state.success) {
       toast.actionResult(state, { errorTitle: "Operazione non riuscita" });

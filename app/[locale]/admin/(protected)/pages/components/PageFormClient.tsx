@@ -71,12 +71,17 @@ export default function PageFormClient({ pageSlug }: PageFormClientProps) {
     editing ? updatePageAction : createPageAction,
     null,
   );
+  const handledStateRef = useRef<ActionResult<Page> | null>(null);
 
   // Reset form and navigate on success
   useEffect(() => {
     if (!state) {
       return;
     }
+    if (handledStateRef.current === state) {
+      return;
+    }
+    handledStateRef.current = state;
 
     if (!state.success) {
       toast.actionResult(state, { errorTitle: "Operazione non riuscita" });

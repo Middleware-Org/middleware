@@ -62,10 +62,23 @@ export default async function RootPage({ params }: RootPageProps) {
           otherArticles = otherArticles.slice(1);
         }
 
+        const orderByArticleId = issue.showOrder
+          ? (issue.articlesOrder || []).reduce<Record<string, number>>((acc, articleId, index) => {
+              acc[articleId] = index + 1;
+              return acc;
+            }, {})
+          : undefined;
+
         return (
           <div key={issue.slug} id={`issue-${issue.slug}`} className={styles.issueContainer}>
             <div className={styles.issueCoverContainer}>
-              <Cover issue={issue} articleInEvidence={articleInEvidence} dict={dict} />
+              <Cover
+                issue={issue}
+                articleInEvidence={articleInEvidence}
+                dict={dict}
+                locale={locale}
+                articleInEvidenceOrderNumber={orderByArticleId?.[articleInEvidence.id]}
+              />
             </div>
             <div className={styles.issueArticlesContainer}>
               <Articles
@@ -73,6 +86,7 @@ export default async function RootPage({ params }: RootPageProps) {
                 dict={dict}
                 issue={issue}
                 disableShowArticles={true}
+                orderByArticleId={orderByArticleId}
               />
             </div>
           </div>

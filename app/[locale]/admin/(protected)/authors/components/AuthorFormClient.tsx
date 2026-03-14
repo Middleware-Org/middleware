@@ -55,6 +55,7 @@ export default function AuthorFormClient({ authorSlug }: AuthorFormClientProps) 
     editing ? updateAuthorAction : createAuthorAction,
     null,
   );
+  const handledStateRef = useRef<ActionResult<Author> | null>(null);
 
   // State per il campo slug (per poterlo aggiornare dinamicamente)
   const [slugValue, setSlugValue] = useState(author?.slug || "");
@@ -66,6 +67,10 @@ export default function AuthorFormClient({ authorSlug }: AuthorFormClientProps) 
     if (!state) {
       return;
     }
+    if (handledStateRef.current === state) {
+      return;
+    }
+    handledStateRef.current = state;
 
     if (!state.success) {
       toast.actionResult(state, { errorTitle: "Operazione non riuscita" });

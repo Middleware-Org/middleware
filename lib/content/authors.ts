@@ -3,12 +3,13 @@
  **************************************************/
 import { authors } from "@/.velite";
 
+const safeAuthors = Array.isArray(authors) ? authors : [];
+
 /* **************************************************
  * Authors
  **************************************************/
-export const getAllAuthors = () => authors;
+export const getAllAuthors = () => safeAuthors;
 
-export const getAuthorBySlug = (slug: string) => authors.find((a) => a.slug === slug);
+export const getAuthorBySlug = (slug: string) => safeAuthors.find((a) => a.slug === slug);
 
-export const getAuthorById = (id: string) => authors.find((a) => a.id === id);
-
+export const getAuthorById = (id: string) => safeAuthors.find((a) => a.id === id);

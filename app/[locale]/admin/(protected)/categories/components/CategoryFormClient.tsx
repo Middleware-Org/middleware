@@ -55,6 +55,7 @@ export default function CategoryFormClient({ categorySlug }: CategoryFormClientP
     editing ? updateCategoryAction : createCategoryAction,
     null,
   );
+  const handledStateRef = useRef<ActionResult<Category> | null>(null);
 
   // State per il campo slug (per poterlo aggiornare dinamicamente)
   // Initialize with category slug if available
@@ -67,6 +68,10 @@ export default function CategoryFormClient({ categorySlug }: CategoryFormClientP
     if (!state) {
       return;
     }
+    if (handledStateRef.current === state) {
+      return;
+    }
+    handledStateRef.current = state;
 
     if (!state.success) {
       toast.actionResult(state, { errorTitle: "Operazione non riuscita" });

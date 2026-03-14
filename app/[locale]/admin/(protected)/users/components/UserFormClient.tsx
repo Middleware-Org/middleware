@@ -54,6 +54,7 @@ export default function UserFormClient({ userId }: UserFormClientProps) {
     editing ? updateUserAction : createUserAction,
     null,
   );
+  const handledStateRef = useRef<ActionResult<User> | null>(null);
 
   const [isDeleting, startDeleteTransition] = useTransition();
   const [, startSubmitTransition] = useTransition();
@@ -63,21 +64,27 @@ export default function UserFormClient({ userId }: UserFormClientProps) {
 
   // Reset form and navigate on success
   useEffect(() => {
-    if (state && !state.success) {
+    if (!state) {
+      return;
+    }
+    if (handledStateRef.current === state) {
+      return;
+    }
+    handledStateRef.current = state;
+
+    if (!state.success) {
       toast.actionResult(state, { errorTitle: "Operazione non riuscita" });
       return;
     }
 
-    if (state?.success) {
-      toast.success(state.message || (editing ? "Utente aggiornato" : "Utente creato"));
-      formRef.current?.reset();
-      // Invalida la cache SWR per forzare il refetch della lista
-      mutate("/api/users");
-      if (editing && userId) {
-        mutate(`/api/users/${userId}`);
-      }
-      router.push(toLocale("/admin/users"));
+    toast.success(state.message || (editing ? "Utente aggiornato" : "Utente creato"));
+    formRef.current?.reset();
+    // Invalida la cache SWR per forzare il refetch della lista
+    mutate("/api/users");
+    if (editing && userId) {
+      mutate(`/api/users/${userId}`);
     }
+    router.push(toLocale("/admin/users"));
   }, [state, router, editing, userId, toLocale]);
 
   // Validazione password prima del submit
