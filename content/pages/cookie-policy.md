@@ -1,7 +1,9 @@
 ---
+id: ''
 slug: cookie-policy
 title: Cookie Policy
 excerpt: Spiegazione e elenco dei cookie del sito
+createdBy: ''
 ---
 **Ultimo aggiornamento:** 4 agosto 2025
 
