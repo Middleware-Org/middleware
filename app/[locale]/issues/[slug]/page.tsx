@@ -14,6 +14,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import IssueCover from "./components/IssueCover";
 
+// Enable Incremental Static Regeneration (ISR) - revalidate every hour
+export const revalidate = 3600;
+
 /* **************************************************
  * Types
  **************************************************/

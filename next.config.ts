@@ -7,25 +7,13 @@ const nextConfig: NextConfig = {
     // Configure device sizes for responsive images
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    // Cache optimized images for 1 hour
-    minimumCacheTTL: 3600,
+    // Cache optimized images for 1 day (editorial covers change rarely)
+    minimumCacheTTL: 86400,
     // Domains allowed for remote images
     remotePatterns: [
       {
         protocol: "https",
         hostname: "raw.githubusercontent.com",
-      },
-      {
-        protocol: "https",
-        hostname: "via.placeholder.com",
-      },
-      {
-        protocol: "http",
-        hostname: "localhost",
-      },
-      {
-        protocol: "https",
-        hostname: "localhost",
       },
       // Vercel Blob Storage
       {
@@ -33,6 +21,13 @@ const nextConfig: NextConfig = {
         hostname: "mdmdfxzts3o3uer1.public.blob.vercel-storage.com",
         pathname: "/**",
       },
+      // Local development only
+      ...(process.env.NODE_ENV !== "production"
+        ? [
+            { protocol: "http" as const, hostname: "localhost" },
+            { protocol: "https" as const, hostname: "localhost" },
+          ]
+        : []),
     ],
     // Enable optimization
     unoptimized: false,
