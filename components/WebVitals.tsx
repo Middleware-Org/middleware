@@ -6,7 +6,7 @@
  * Extend the handler to send metrics to a custom
  * analytics endpoint in production when needed.
  **************************************************/
-import { useReportWebVitals } from "next/dist/client/vitals";
+import { useReportWebVitals } from "next/web-vitals";
 
 export function WebVitals() {
   useReportWebVitals((metric) => {
