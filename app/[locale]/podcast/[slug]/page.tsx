@@ -112,6 +112,9 @@ function getPodcastStructuredData(locale: string, slug: string) {
   return [podcastSchema, breadcrumbSchema];
 }
 
+// Enable Incremental Static Regeneration (ISR) - revalidate every hour
+export const revalidate = 3600;
+
 /* **************************************************
  * Generate Static Params
  **************************************************/
