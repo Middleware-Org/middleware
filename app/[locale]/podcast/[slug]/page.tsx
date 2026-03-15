@@ -6,7 +6,7 @@ import { i18nSettings } from "@/lib/i18n/settings";
 import { notFound } from "next/navigation";
 import PodcastPlayer from "./components/PodcastPlayer";
 import type { Metadata } from "next";
-import { getBaseUrl } from "@/lib/utils/metadata";
+import { getBaseUrl, createOpenGraphMetadata, createTwitterMetadata } from "@/lib/utils/metadata";
 import { getGitHubImageUrl } from "@/lib/github/images";
 import StructuredData from "@/components/StructuredData";
 
@@ -33,21 +33,24 @@ export async function generateMetadata({ params }: PodcastPageProps): Promise<Me
 
   const baseUrl = getBaseUrl();
   const podcastUrl = `${baseUrl}/${locale}/podcast/${slug}`;
+  const issue = podcast.issueId ? getIssueById(podcast.issueId) : undefined;
+  const ogImage = issue?.cover ? `${baseUrl}${issue.cover}` : undefined;
 
   return {
     title: podcast.title,
     description: podcast.description,
-    openGraph: {
+    openGraph: createOpenGraphMetadata({
       title: podcast.title,
       description: podcast.description,
       url: podcastUrl,
-      locale: locale,
       type: "website",
-    },
-    twitter: {
+      image: ogImage,
+    }),
+    twitter: createTwitterMetadata({
       title: podcast.title,
       description: podcast.description,
-    },
+      image: ogImage,
+    }),
     alternates: {
       canonical: podcastUrl,
     },

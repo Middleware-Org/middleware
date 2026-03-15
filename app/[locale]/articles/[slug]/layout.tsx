@@ -6,17 +6,10 @@ import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import { getDictionary } from "@/lib/i18n/utils";
 import Menu from "@/components/organism/menu";
 import { MonoTextLight } from "@/components/atoms/typography";
-import { getArticleBySlug, getIssueById, getAuthorById } from "@/lib/content";
+import { getArticleBySlug } from "@/lib/content";
 import { notFound } from "next/navigation";
 import ReadingProgress from "@/components/molecules/ReadingProgress";
 import Footer from "@/components/organism/footer";
-import {
-  getBaseUrl,
-  createOpenGraphMetadata,
-  createTwitterMetadata,
-  createArticleSchema,
-} from "@/lib/utils/metadata";
-import StructuredData from "@/components/StructuredData";
 import AutoScrollText from "@/components/organism/autoScrollText";
 
 /* **************************************************
@@ -25,50 +18,6 @@ import AutoScrollText from "@/components/organism/autoScrollText";
 interface ArticleLayoutProps {
   params: Promise<{ locale: string; slug: string }>;
   children: React.ReactNode;
-}
-
-/* **************************************************
- * Metadata
- **************************************************/
-export async function generateMetadata({ params }: ArticleLayoutProps) {
-  const resolvedParams = await params;
-  const locale = resolvedParams?.locale || "it";
-  const slug = resolvedParams?.slug || "";
-
-  const dictCommon = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
-  const article = getArticleBySlug(slug);
-
-  if (!article) {
-    return null;
-  }
-
-  const issue = article.issueId ? getIssueById(article.issueId) : null;
-  const ogImage = issue?.cover ? `${getBaseUrl()}${issue.cover}` : undefined;
-  const url = `${getBaseUrl()}/${locale}/articles/${article.slug}`;
-  const title = `${dictCommon.meta.title} - ${article.title}`;
-
-  return {
-    title,
-    description: article.excerpt,
-    alternates: {
-      canonical: url,
-      languages: {
-        [locale]: `/${locale}/${TRANSLATION_NAMESPACES.AUTHORS}`,
-      },
-    },
-    openGraph: createOpenGraphMetadata({
-      title: article.title,
-      description: article.excerpt,
-      url,
-      type: "article",
-      image: ogImage,
-    }),
-    twitter: createTwitterMetadata({
-      title: article.title,
-      description: article.excerpt,
-      image: ogImage,
-    }),
-  };
 }
 
 /* **************************************************
@@ -87,24 +36,8 @@ export default async function ArticleLayout({ children, params }: ArticleLayoutP
     notFound();
   }
 
-  const author = getAuthorById(article.authorId);
-  const issue = article.issueId ? getIssueById(article.issueId) : null;
-  const url = `${getBaseUrl()}/${locale}/articles/${article.slug}`;
-  const ogImage = issue?.cover ? `${getBaseUrl()}${issue.cover}` : undefined;
-
-  const articleSchema = createArticleSchema({
-    headline: article.title,
-    datePublished: article.date,
-    dateModified: article.date,
-    authorName: author?.name || "Middleware",
-    url,
-    description: article.excerpt,
-    image: ogImage,
-  });
-
   return (
     <>
-      <StructuredData data={articleSchema} />
       {/* Skip to main content link for keyboard accessibility */}
       <a
         href="#main-content"

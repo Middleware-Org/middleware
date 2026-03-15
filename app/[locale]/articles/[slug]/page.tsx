@@ -55,7 +55,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
       "digitale",
       ...(category ? [category.name] : []),
       ...(author ? [author.name] : []),
-      article.title.split(" ").slice(0, 3),
+      ...article.title.split(" ").slice(0, 3),
     ].join(", "),
     openGraph: {
       title: article.title,
