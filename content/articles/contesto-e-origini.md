@@ -3,16 +3,14 @@ id: f2eeff9e-9885-4d19-b010-d191e37af37e
 slug: contesto-e-origini
 title: Contesto e Origini
 date: '2026-02-23'
-last_update: '2026-03-16T09:58:36.173Z'
+last_update: '2026-03-16T10:00:21.999Z'
 authorId: 9e421669-3a18-4bdb-94f9-e0bf8fef86dd
 categoryId: 6dfdddaf-c93c-4f34-8a6d-c3b4eebb0859
 in_evidence: true
 published: true
 excerpt: >-
-  Questo testo raccoglie i contenuti del primo di quattro incontri di
-  contro-formazione dedicati all'operaismo politico italiano. Il ciclo è
-  strutturato in quattro parti: contesto e origini, genealogia e lessico,
-  conricerca e stile della militanza, e infine tracce e ipotesi.
+  Primo appuntamento di contro-formazione sull'operaismo politico italiano a
+  cura di Middleware.
 createdBy: 00000000-0000-0000-0000-000000000001
 issueId: 3ae30972-293d-440e-ab7c-9ee1c28954a8
 podcastId: 9a319165-c463-4793-9ed8-01597fe41533
