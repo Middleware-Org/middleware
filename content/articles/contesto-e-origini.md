@@ -3,7 +3,7 @@ id: f2eeff9e-9885-4d19-b010-d191e37af37e
 slug: contesto-e-origini
 title: Contesto e Origini
 date: '2026-02-23'
-last_update: '2026-03-16T10:00:21.999Z'
+last_update: '2026-03-16T10:00:24.197Z'
 authorId: 9e421669-3a18-4bdb-94f9-e0bf8fef86dd
 categoryId: 6dfdddaf-c93c-4f34-8a6d-c3b4eebb0859
 in_evidence: true
