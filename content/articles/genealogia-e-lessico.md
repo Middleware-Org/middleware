@@ -3,16 +3,14 @@ id: f3047674-954e-4a6b-a01f-cf7ca9727523
 slug: genealogia-e-lessico
 title: Genealogia e lessico
 date: '2026-03-13'
-last_update: '2026-03-14T14:24:36.899Z'
+last_update: '2026-03-16T10:00:01.931Z'
 authorId: 9e421669-3a18-4bdb-94f9-e0bf8fef86dd
 categoryId: 6dfdddaf-c93c-4f34-8a6d-c3b4eebb0859
 in_evidence: false
 published: true
 excerpt: >-
-  Questo testo raccoglie i contenuti del secondo di quattro incontri di
-  contro-formazione dedicati all’operaismo politico italiano (un ciclo
-  strutturato in quattro parti: contesto e origini, genealogia e lessico,
-  conricerca e stile della militanza, e infine tracce e ipotesi).
+  Secondo appuntamento di contro-formazione sull'operaismo politico italiano a
+  cura di Middleware.
 createdBy: 00000000-0000-0000-0000-000000000001
 issueId: 3ae30972-293d-440e-ab7c-9ee1c28954a8
 podcastId: 9625a885-03e2-42ca-8736-d1f2474bdfb0
