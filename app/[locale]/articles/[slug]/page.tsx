@@ -187,7 +187,10 @@ export async function generateStaticParams() {
 export default async function ArticlePage({ params }: ArticlePageProps) {
   const { locale, slug } = await params;
 
-  const dict = await getDictionary(locale, TRANSLATION_NAMESPACES.ARTICLE);
+  const [dict, commonDict] = await Promise.all([
+    getDictionary(locale, TRANSLATION_NAMESPACES.ARTICLE),
+    getDictionary(locale, TRANSLATION_NAMESPACES.COMMON),
+  ]);
 
   const article = getArticleBySlug(slug);
 
@@ -198,7 +201,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   return (
     <div>
       <StructuredData id={`article-ld-${slug}`} data={getArticleStructuredData(locale, slug)} />
-      <Article article={article} dict={dict} locale={locale} />
+      <Article article={article} dict={dict} commonDict={commonDict} locale={locale} />
     </div>
   );
 }

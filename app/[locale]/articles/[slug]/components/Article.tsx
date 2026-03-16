@@ -4,16 +4,19 @@ import { cn } from "@/lib/utils/classes";
 import type { Article } from "@/.velite";
 import SeparatorWithLogo from "@/components/molecules/SeparatorWithLogo";
 import FormattedDate from "@/components/atoms/date";
-import { ArticleDictionary } from "@/lib/i18n/types";
+import { ArticleDictionary, CommonDictionary } from "@/lib/i18n/types";
 import { getCategoryById } from "@/lib/content/categories";
 import { getAuthorById } from "@/lib/content/authors";
 import { getPodcastById } from "@/lib/content/podcasts";
+import { getIssueById } from "@/lib/content/issues";
+import { getArticlesByIssue } from "@/lib/content/articles";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getMinText } from "@/lib/utils/text";
 import { Book, Play } from "lucide-react";
 import CitationsSection from "./CitationsSection";
 import BookmarkManagerLazy from "./BookmarkManagerLazy";
+import ArticleCard from "@/components/molecules/articleCard";
 import { marked } from "marked";
 import { sanitizeInlineHtml, sanitizeRichHtml } from "@/lib/security/sanitizeHtml";
 import { withLocale } from "@/lib/i18n/path";
@@ -21,10 +24,11 @@ import { withLocale } from "@/lib/i18n/path";
 type ArticleProps = {
   article: Article;
   dict: Pick<ArticleDictionary, "page">;
+  commonDict: Pick<CommonDictionary, "articleCard">;
   locale: string;
 };
 
-export default function Article({ article, dict, locale }: ArticleProps) {
+export default function Article({ article, dict, commonDict, locale }: ArticleProps) {
   const author = getAuthorById(article.authorId);
   const category = getCategoryById(article.categoryId);
 
@@ -123,6 +127,14 @@ export default function Article({ article, dict, locale }: ArticleProps) {
 
   // Check if there's a related podcast
   const relatedPodcast = article.podcastId ? getPodcastById(article.podcastId) : null;
+
+  // Get other articles from the same issue
+  const relatedArticles = (() => {
+    if (!article.issueId) return [];
+    const issue = getIssueById(article.issueId);
+    if (!issue) return [];
+    return getArticlesByIssue(issue.slug).filter((a) => a.slug !== article.slug);
+  })();
   const authorHref = withLocale(`/authors?author=${author.slug}`, locale);
   const categoryHref = withLocale(`/categories?category=${category.slug}`, locale);
   const podcastHref = relatedPodcast ? withLocale(`/podcast/${relatedPodcast.slug}`, locale) : null;
@@ -207,6 +219,20 @@ export default function Article({ article, dict, locale }: ArticleProps) {
           <div className="lg:w-1/4 lg:flex hidden"></div>
         </div>
       </footer>
+      {relatedArticles.length > 0 && (
+        <>
+          <div className="max-w-[1472px] mx-auto lg:px-10 md:px-4 px-4">
+            <Separator />
+          </div>
+          <section className="max-w-[1472px] mx-auto lg:px-10 md:px-4 px-4 pb-10 pt-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {relatedArticles.map((relatedArticle) => (
+                <ArticleCard key={relatedArticle.slug} article={relatedArticle} dict={commonDict} />
+              ))}
+            </div>
+          </section>
+        </>
+      )}
     </article>
   );
 }
