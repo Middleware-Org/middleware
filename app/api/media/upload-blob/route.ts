@@ -9,6 +9,8 @@ import { checkRateLimit, createRateLimitResponse, getClientIp } from "@/lib/secu
 
 const logger = createLogger("API /media/upload-blob");
 const ALLOWED_PATHNAME_REGEX = /^media\/[a-zA-Z0-9._-]{1,120}$/;
+const ALLOWED_EXTENSION_REGEX = /\.(jpe?g|png|gif|webp|mp3|wav|json)$/i;
+const MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024;
 
 /* **************************************************
  * Direct Blob Upload API Route
@@ -50,6 +52,10 @@ export async function POST(request: NextRequest) {
         // Extract filename from pathname (should be "media/filename.ext")
         const filename = pathname.replace("media/", "");
 
+        if (!ALLOWED_EXTENSION_REGEX.test(filename)) {
+          throw new Error("Unsupported file extension");
+        }
+
         // Determine file type from extension
         let fileType: "image" | "audio" | "json" = "image";
         if (filename.match(/\.(mp3|wav)$/i)) {
@@ -66,6 +72,7 @@ export async function POST(request: NextRequest) {
               : fileType === "audio"
                 ? ["audio/mpeg", "audio/wav", "audio/mp3"]
                 : ["application/json"],
+          maximumSizeInBytes: MAX_FILE_SIZE_BYTES,
           addRandomSuffix: false,
           pathname: pathname, // Use the pathname provided by the client
         };

@@ -18,6 +18,12 @@ const ALLOWED_MIME_TYPES = new Set([
   "application/json",
 ]);
 
+function estimateBase64SizeBytes(value: string): number {
+  const base64Data = (value.includes(",") ? value.split(",")[1] : value).replace(/\s/g, "");
+  const padding = base64Data.endsWith("==") ? 2 : base64Data.endsWith("=") ? 1 : 0;
+  return Math.floor((base64Data.length * 3) / 4) - padding;
+}
+
 /* **************************************************
  * Media Upload API Route
  *
@@ -71,7 +77,20 @@ export async function POST(request: NextRequest) {
       fileBase64 = `data:${mimeType};base64,${buffer.toString("base64")}`;
     } else {
       // Already a base64 string
-      fileBase64 = fileInput as string;
+      if (typeof fileInput !== "string") {
+        return NextResponse.json({ error: "Invalid file payload" }, { status: 400 });
+      }
+
+      const mimeMatch = fileInput.match(/^data:([^;]+);base64,/);
+      if (mimeMatch && !ALLOWED_MIME_TYPES.has(mimeMatch[1])) {
+        return NextResponse.json({ error: "Unsupported file type" }, { status: 400 });
+      }
+
+      if (estimateBase64SizeBytes(fileInput) > MAX_FILE_SIZE_BYTES) {
+        return NextResponse.json({ error: "File too large" }, { status: 413 });
+      }
+
+      fileBase64 = fileInput;
     }
 
     const filePath = await uploadMediaFile(fileBase64, filename?.trim() || undefined, fileType);

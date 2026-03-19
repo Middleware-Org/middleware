@@ -19,6 +19,9 @@ senza introdurre nuovi ambienti e senza attività di deploy/rollback.
 - [x] Verifica formatting: `npm run format`.
 - [x] Build produzione locale: `npm run build`.
 - [x] Avvio runtime locale su build: `npm run start`.
+- [x] Configurate esclusioni per evitare check su file non target:
+  - `eslint.config.mjs`: ignore di `.velite/**` e `**/*.md`
+  - `.prettierignore`: ignore di `.velite/**` e `**/*.md`
 
 ## 2) Qualità codice applicativa
 
@@ -28,12 +31,13 @@ senza introdurre nuovi ambienti e senza attività di deploy/rollback.
 - [ ] Verificare che i moduli non mescolino responsabilità non correlate.
 - [ ] Verificare che le route API restituiscano `NextResponse.json(...)` con status espliciti.
 - [ ] Verificare che gli errori siano gestiti con `try/catch` e messaggi safe.
-- [ ] Verificare che non ci siano log rumorosi o contenenti dati sensibili.
+- [x] Verificare che non ci siano log rumorosi o contenenti dati sensibili.
+  - completata rimozione log frontend/SWR e sostituzione con toast dove necessario
 
 ## 3) Performance build/runtime (solo verifiche locali)
 
-- [ ] Analizzare output di `npm run build` e annotare pagine/routes più pesanti.
-- [ ] Controllare warning su bundle size o chunking e aprire task se fuori soglia.
+- [x] Analizzare output di `npm run build` e annotare pagine/routes più pesanti.
+- [x] Controllare warning su bundle size o chunking e aprire task se fuori soglia.
 - [ ] Verificare presenza di caching coerente su API (`CACHE_PROFILES`, header cache).
 - [ ] Verificare che i componenti siano Server Components di default quando possibile.
 - [ ] Verificare uso mirato di `"use client"` solo dove necessaria interattività.
@@ -72,11 +76,13 @@ senza introdurre nuovi ambienti e senza attività di deploy/rollback.
 
 ## 4) Sicurezza e robustezza del codice
 
-- [ ] Verificare che nessun secret/token sia hardcoded nel codice.
-- [ ] Verificare che `.env*` sia ignorato correttamente e non incluso nei commit.
-- [ ] Validare header sicurezza definiti in `next.config.ts` (CSP, HSTS, ecc.).
-- [ ] Verificare autorizzazioni server-side su endpoint admin/protetti.
-- [ ] Verificare che upload/media gestiscano limiti e tipi file ammessi.
+- [x] Verificare che nessun secret/token sia hardcoded nel codice.
+- [x] Verificare che `.env*` sia ignorato correttamente e non incluso nei commit.
+- [x] Validare header sicurezza definiti in `next.config.ts` (CSP, HSTS, ecc.).
+- [x] Verificare autorizzazioni server-side su endpoint admin/protetti.
+- [x] Verificare che upload/media gestiscano limiti e tipi file ammessi.
+  - `app/api/media/upload/route.ts`: validazione MIME + limite 50MB anche per payload base64
+  - `app/api/media/upload-blob/route.ts`: estensioni consentite + `maximumSizeInBytes` 50MB
 
 ## 5) Database e consistenza Prisma
 
@@ -88,14 +94,14 @@ senza introdurre nuovi ambienti e senza attività di deploy/rollback.
 
 ## 6) Integrazioni e contenuti
 
-- [ ] Verificare che la pipeline `velite` giri durante dev/build senza errori.
+- [x] Verificare che la pipeline `velite` giri durante dev/build senza errori.
 - [ ] Verificare che i moduli `lib/github/*` gestiscano errori e timeout in modo safe.
 - [ ] Verificare che i fallback lato API/UI siano presenti quando GitHub o Blob falliscono.
 - [ ] Verificare coerenza dei tipi condivisi (`lib/github/types`) tra fetcher, hook e route.
 
 ## 7) Criteri di uscita (go/no-go tecnico)
 
-- [ ] Tutti i gate (`lint`, `typecheck`, `format`, `build`) sono verdi.
-- [ ] Nessun warning critico non giustificato nell'output build.
+- [x] Tutti i gate (`lint`, `typecheck`, `format`, `build`) sono verdi.
+- [x] Nessun warning critico non giustificato nell'output build.
 - [ ] Nessun rischio alto aperto su sicurezza, performance o gestione errori.
 - [ ] Eventuali debiti tecnici residui sono tracciati con task chiari e priorità.
