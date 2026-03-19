@@ -20,4 +20,3 @@ export const useIssuesList = create<IssuesListState>((set) => ({
   toggleOpen: () => set((state) => ({ isOpen: !state.isOpen })),
   closeOpen: () => set({ isOpen: false }),
 }));
-

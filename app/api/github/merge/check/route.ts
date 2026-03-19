@@ -15,6 +15,16 @@ const mainBranch = process.env.GITHUB_BRANCH || "main";
 const devBranch = process.env.GITHUB_DEV_BRANCH || "develop";
 const token = process.env.GITHUB_TOKEN!;
 
+function noStoreJson(body: unknown, init?: ResponseInit) {
+  return NextResponse.json(body, {
+    ...init,
+    headers: {
+      "Cache-Control": "no-store",
+      ...(init?.headers ?? {}),
+    },
+  });
+}
+
 /* **************************************************
  * Check if there are commits to merge from develop to main
  **************************************************/
@@ -32,11 +42,11 @@ export async function GET(request: Request) {
 
     const user = await getAdminUser();
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return noStoreJson({ error: "Unauthorized" }, { status: 401 });
     }
 
     if (!owner || !repo || !token) {
-      return NextResponse.json({ error: "GitHub configuration missing" }, { status: 500 });
+      return noStoreJson({ error: "GitHub configuration missing" }, { status: 500 });
     }
 
     // Get the latest commit SHA for both branches
@@ -58,7 +68,7 @@ export async function GET(request: Request) {
     ]);
 
     if (!mainBranchData.ok || !devBranchData.ok) {
-      return NextResponse.json({ error: "Failed to fetch branch information" }, { status: 500 });
+      return noStoreJson({ error: "Failed to fetch branch information" }, { status: 500 });
     }
 
     const mainBranchInfo = await mainBranchData.json();
@@ -79,13 +89,13 @@ export async function GET(request: Request) {
     });
 
     if (!compareRes.ok) {
-      return NextResponse.json({ error: "Failed to compare branches" }, { status: 500 });
+      return noStoreJson({ error: "Failed to compare branches" }, { status: 500 });
     }
 
     const compareData = await compareRes.json();
     const aheadBy = compareData.ahead_by || 0;
 
-    return NextResponse.json({
+    return noStoreJson({
       hasChanges: aheadBy > 0,
       aheadBy,
       mainSha,
@@ -94,6 +104,6 @@ export async function GET(request: Request) {
     });
   } catch (error) {
     logger.error("Error checking merge status", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return noStoreJson({ error: "Internal server error" }, { status: 500 });
   }
 }

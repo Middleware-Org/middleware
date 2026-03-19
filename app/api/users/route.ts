@@ -2,6 +2,7 @@
  * Imports
  **************************************************/
 import { NextResponse } from "next/server";
+import { CACHE_PROFILES, setPrivateCacheHeaders } from "@/lib/api/cache";
 import { getAdminUser } from "@/lib/auth/server";
 import { getAllUsers } from "@/lib/github/users";
 import { createLogger } from "@/lib/logger";
@@ -26,8 +27,7 @@ export async function GET() {
     const users = await getAllUsers();
 
     const response = NextResponse.json(users);
-    response.headers.set("X-Data-Source", "rest-api");
-    response.headers.set("X-Timestamp", new Date().toISOString());
+    setPrivateCacheHeaders(response, CACHE_PROFILES.list);
 
     return response;
   } catch (error) {

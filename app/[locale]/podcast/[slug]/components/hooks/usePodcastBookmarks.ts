@@ -10,6 +10,7 @@ import {
   podcastBookmarksStorage,
 } from "@/lib/storage/podcastBookmarks";
 import { Segment } from "../types";
+import { toast } from "@/hooks/use-toast";
 
 /* **************************************************
  * Types
@@ -47,7 +48,10 @@ export function usePodcastBookmarks({
         const savedBookmarks = await podcastBookmarksStorage.getBookmarks(podcastSlug);
         setBookmarks(savedBookmarks);
       } catch (error) {
-        console.error("Errore nel caricamento dei segnaposto:", error);
+        toast.error(
+          "Errore nel caricamento dei segnaposto",
+          error instanceof Error ? error.message : undefined,
+        );
       } finally {
         setIsLoading(false);
       }
@@ -62,7 +66,10 @@ export function usePodcastBookmarks({
       const savedBookmarks = await podcastBookmarksStorage.getBookmarks(podcastSlug);
       setBookmarks(savedBookmarks);
     } catch (error) {
-      console.error("Errore nel ricaricamento dei segnaposto:", error);
+      toast.error(
+        "Errore nel ricaricamento dei segnaposto",
+        error instanceof Error ? error.message : undefined,
+      );
     }
   }, [podcastSlug]);
 
@@ -130,7 +137,10 @@ export function usePodcastBookmarks({
         setBookmarks((prev) => [...prev, newBookmark].sort((a, b) => a.time - b.time));
         return true;
       } catch (error) {
-        console.error("Errore nell'aggiunta del segnaposto:", error);
+        toast.error(
+          "Errore nell'aggiunta del segnaposto",
+          error instanceof Error ? error.message : undefined,
+        );
         return false;
       }
     },
@@ -144,7 +154,10 @@ export function usePodcastBookmarks({
       // Aggiorna lo stato locale
       setBookmarks((prev) => prev.filter((b) => b.id !== id));
     } catch (error) {
-      console.error("Errore nella rimozione del segnaposto:", error);
+      toast.error(
+        "Errore nella rimozione del segnaposto",
+        error instanceof Error ? error.message : undefined,
+      );
       throw error;
     }
   }, []);

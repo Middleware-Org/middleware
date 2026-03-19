@@ -64,4 +64,3 @@ export async function initI18nServer(
 
   return i18nInstance;
 }
-

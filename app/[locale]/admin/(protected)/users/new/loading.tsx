@@ -9,4 +9,3 @@ import UserFormSkeleton from "../components/UserFormSkeleton";
 export default function Loading() {
   return <UserFormSkeleton />;
 }
-

@@ -15,6 +15,7 @@ import { Segment } from "./types";
 import styles from "./PodcastPlayerStyles";
 import { usePodcastBookmarks } from "./hooks/usePodcastBookmarks";
 import { getGitHubMediaUrl } from "@/lib/github/images";
+import { toast } from "@/hooks/use-toast";
 
 /* **************************************************
  * Types
@@ -93,7 +94,10 @@ export default function PodcastPlayer({ podcast, issue }: PodcastPlayerProps) {
           setSegments(data);
         })
         .catch((err) => {
-          console.error("Failed to load audio segments:", err);
+          toast.error(
+            "Impossibile caricare i segmenti audio",
+            err instanceof Error ? err.message : undefined,
+          );
         });
     }
   }, [podcast.audio_chunks]);

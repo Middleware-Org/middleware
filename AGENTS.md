@@ -1,158 +1,165 @@
 # AGENTS.md
 
 Agent guide for this repository (`middleware`).
-Use this as the default operating manual for coding agents.
+Use this as the default operating manual for coding agents working in this codebase.
 
 ## 1) Project Snapshot
 
-- Stack: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4, Prisma, SWR, Zustand.
-- Package manager: `npm` (`package-lock.json` is present).
-- Content sources: local generated content (`.velite`) and GitHub-backed content APIs under `lib/github`.
-- App structure: route handlers in `app/api/**/route.ts`, pages/layouts in `app/**/page.tsx` and `layout.tsx`.
-- Auth and protected admin behavior are server-enforced in actions and API handlers.
+- Framework/app stack: Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4.
+- Data/state stack: Prisma, SWR, Zustand.
+- Content pipeline: `velite` generation + GitHub-backed content modules in `lib/github/*`.
+- Package manager: `npm` (`package-lock.json` is present and authoritative).
+- Key app layout: routes in `app/**`, API handlers in `app/api/**/route.ts`.
+- Auth and admin protections are enforced server-side (actions + API handlers).
 
-## 2) Cursor/Copilot Rules
+## 2) Cursor and Copilot Rule Files
 
 - `.cursorrules`: not found.
 - `.cursor/rules/`: not found.
 - `.github/copilot-instructions.md`: not found.
-- If these files are added later, treat them as higher-priority repository instructions and update this file.
+- If any of these files are added later, treat them as higher-priority instructions and update this document.
 
 ## 3) Setup and Environment
 
-- Install deps: `npm install`
-- Generate Prisma client (also runs in `postinstall`): `npm run postinstall`
-- Required env vars are referenced in code (example: `GITHUB_OWNER`, `GITHUB_REPO`, `GITHUB_TOKEN`, `MIDDLEWARE_PRISMA_DATABASE_URL`).
-- Do not commit secrets from `.env`.
+- Install dependencies: `npm install`.
+- Prisma client generation runs in `postinstall`: `npm run postinstall`.
+- Dev command also generates Prisma client and Velite content: `npm run dev`.
+- Expected env vars are referenced in code (examples):
+  - `GITHUB_OWNER`
+  - `GITHUB_REPO`
+  - `GITHUB_TOKEN`
+  - `MIDDLEWARE_PRISMA_DATABASE_URL`
+- Never commit secrets from `.env*` files.
 
-## 4) Build, Lint, Typecheck, Test Commands
+## 4) Build, Lint, Typecheck, and Test Commands
 
-### Core Commands
+### Core Project Commands
 
-- Dev server: `npm run dev`
-- Production build: `npm run build`
+- Run dev server: `npm run dev`
+- Build for production: `npm run build`
 - Start production server: `npm run start`
-- Lint whole repo: `npm run lint`
-- Auto-fix lint: `npm run lint:fix`
-- Typecheck: `npm run typecheck`
-- Prettier check: `npm run format`
-- Prettier write: `npm run format:fix`
-- Full local cleanup pass: `npm run beauty`
+- Lint all files: `npm run lint`
+- Lint and auto-fix: `npm run lint:fix`
+- Type-check the project: `npm run typecheck`
+- Check formatting: `npm run format`
+- Write formatting changes: `npm run format:fix`
+- Local cleanup pass (lint fix + format fix): `npm run beauty`
 
-### Database / Prisma
+### Prisma / Database Commands
 
-- Push schema to DB: `npm run db:push`
-- Create/apply migration in dev: `npm run db:migrate`
-- Prisma Studio: `npm run db:studio`
+- Push schema to database: `npm run db:push`
+- Create/apply dev migration: `npm run db:migrate`
+- Open Prisma Studio: `npm run db:studio`
+- Run role migration utility: `npm run roles:migrate`
 
-### Single-file / Targeted Checks
+### Targeted / Single-File Checks
 
-- Lint a single file: `npm run lint -- app/api/articles/route.ts`
-- Lint a directory: `npm run lint -- app/api`
+- Lint one file: `npm run lint -- app/api/articles/route.ts`
+- Lint one directory: `npm run lint -- app/api`
 - Format-check one file: `npx prettier --check app/api/articles/route.ts`
-- Format one file in place: `npx prettier --write app/api/articles/route.ts`
-- Typecheck one file: not supported directly via project script (run full `npm run typecheck`).
+- Format one file: `npx prettier --write app/api/articles/route.ts`
+- Type-check one file: not supported by project scripts; run full `npm run typecheck`.
 
-### Tests (Current State)
+### Tests (Current Repository State)
 
-- There is currently no `test` script in `package.json`.
-- No test runner config (Jest/Vitest/Playwright/Cypress) was found.
-- No `*.test.*` / `*.spec.*` files were found.
-- Single-test command is therefore **not available yet** in current repo state.
+- There is no `test` script in `package.json` at the moment.
+- No test runner config (Vitest/Jest/Playwright/Cypress) is present.
+- No `*.test.*` or `*.spec.*` files were found.
+- Result: there is currently no available “run single test” command.
 
-### If/When Tests Are Added
+### If/When a Test Runner Is Added
 
-- Add a `test` script to `package.json` and document exact commands here.
-- Prefer documenting both full and single-test forms, for example (Vitest):
-  - All tests: `npx vitest run`
-  - Single file: `npx vitest run path/to/file.test.ts`
-  - Single test name: `npx vitest run path/to/file.test.ts -t "test name"`
+- Add explicit test scripts to `package.json` and update this section immediately.
+- Document both full-suite and single-test invocation forms.
+- Example Vitest command set:
+  - all tests: `npx vitest run`
+  - single file: `npx vitest run path/to/file.test.ts`
+  - single test by name: `npx vitest run path/to/file.test.ts -t "test name"`
 
 ## 5) Code Style and Conventions
 
 ### Language and Typing
 
-- Use TypeScript for all new app/library code.
-- Keep `strict`-compatible code (`tsconfig.json` has `strict: true`).
-- Prefer explicit domain types over `any`.
+- Write new app/library code in TypeScript.
+- Keep code compatible with `strict: true` (`tsconfig.json`).
+- Prefer explicit domain models/types over `any`.
 - Use `import type` for type-only imports.
-- Narrow unknown errors with `error instanceof Error` before using `.message`.
+- Narrow unknown errors before property access (for example `error instanceof Error`).
 
-### Imports and Module Paths
+### Imports and Module Boundaries
 
-- Prefer path alias `@/` for intra-repo imports outside local siblings.
-- Use relative imports for same-folder modules (for example `./styles`).
-- Keep imports grouped logically:
+- Prefer `@/` path alias for non-local imports.
+- Use relative imports for same-folder modules (`./x`).
+- Keep imports grouped in this order:
   1. framework/third-party,
   2. internal alias imports,
   3. relative imports.
-- Keep one responsibility per module where practical (especially in `lib/github/*`).
+- Keep modules focused; avoid mixing unrelated responsibilities in one file.
 
-### Formatting
+### Formatting and Linting
 
-- Prettier is authoritative:
-  - semicolons: on
-  - quotes: double
-  - trailing commas: all
-  - tab width: 2
-  - print width: 100
-  - arrow parens: always
-- Run `npm run format` and `npm run lint` before finishing substantial changes.
-
-### ESLint
-
-- ESLint extends Next core-web-vitals + TypeScript + Prettier compatibility.
-- Do not reintroduce formatting rules that conflict with Prettier.
-- Respect Next.js App Router conventions and server/client boundaries.
+- Prettier config (`prettier.config.mjs`) is authoritative:
+  - `semi: true`
+  - `singleQuote: false`
+  - `trailingComma: "all"`
+  - `tabWidth: 2`
+  - `printWidth: 100`
+  - `arrowParens: "always"`
+- ESLint config (`eslint.config.mjs`) extends:
+  - `eslint-config-next/core-web-vitals`
+  - `eslint-config-next/typescript`
+  - `eslint-config-prettier`
+- Do not add formatting rules that conflict with Prettier.
 
 ### Naming Conventions
 
-- React components: PascalCase (files often `index.tsx` in component folders).
-- Hooks: camelCase with `use` prefix (for example `useArticles`, `useTableState`).
-- Zustand stores exposed as hooks commonly use `useX` naming.
+- React components: PascalCase.
+- Hooks: camelCase with `use` prefix (`useArticles`, `useMedia`, etc.).
 - Utility functions/variables: camelCase.
-- Route segment folders: Next.js style (`[slug]`, `(group)`, `[locale]`).
-- Keep existing API/content field naming when bound to external schemas (snake_case fields may be intentional).
+- Route segment folders: Next.js dynamic/segment conventions (`[slug]`, `(group)`, `[locale]`).
+- Preserve external schema naming when required (including snake_case fields).
 
-### React / Next.js Patterns
+### Next.js and React Patterns
 
-- Default to Server Components; add `"use client"` only when required.
-- Use `"use server"` server actions for privileged mutations.
-- In API route handlers, use `NextResponse.json(...)` with explicit HTTP status codes.
-- Revalidate affected paths after mutations when needed (`revalidatePath`).
-- Follow existing params typing pattern in routes/pages (some handlers use promised `params` in Next 16).
+- Prefer Server Components by default.
+- Add `"use client"` only where browser interactivity/state requires it.
+- Use `"use server"` for privileged server actions.
+- In route handlers, return `NextResponse.json(...)` with explicit status codes.
+- Follow existing Next 16 parameter typing patterns in routes/pages (some handlers type `params` as `Promise<...>`).
+- Revalidate paths after mutations when needed (`revalidatePath`).
 
-### State and Data Fetching
+### Data Fetching and State
 
-- SWR hooks live under `hooks/swr/*`; keep fetcher logic centralized.
-- For client cache consistency, return stable shapes from hooks (`data`, loading/error flags, mutate).
-- Zustand is used for lightweight UI state; keep stores minimal and focused.
+- SWR hooks live under `hooks/swr/*`; keep fetcher behavior centralized.
+- Return stable, predictable hook shapes (`data` + loading/error flags + `mutate`).
+- Keep Zustand stores minimal and domain-focused.
 
 ### Error Handling and Logging
 
-- Use `try/catch` in route handlers and server actions.
-- Return user-safe error payloads; avoid leaking secrets/tokens.
-- Prefer consistent error envelopes in actions (`{ success: false, error, errorType }`).
-- Logging is allowed (especially in development), but keep it purposeful and avoid noisy logs in production paths.
+- Wrap API handlers and server actions in `try/catch` when failures are possible.
+- Return safe error responses; never leak tokens, secrets, or internal credentials.
+- Prefer consistent error envelopes in actions (`success`, `error`, `errorType`).
+- Keep logs meaningful and avoid excessive noise in production paths.
 
-### Prisma and Database
+### Prisma and Database Practices
 
-- Prisma schema lives in `prisma/schema.prisma`.
-- Generated client path is customized (`lib/generated/prisma`).
-- Reuse the shared Prisma singleton pattern in `lib/prisma.ts`; do not instantiate many clients.
-- After schema changes, run migration/push commands and ensure generated client is up to date.
+- Prisma schema location: `prisma/schema.prisma`.
+- Generated Prisma client is in `lib/generated/prisma/client`.
+- Reuse the singleton client in `lib/prisma.ts`; do not instantiate many Prisma clients.
+- After schema changes, run migration/push flows and ensure client generation is up to date.
 
 ### UI and Styling
 
-- Tailwind utility classes are common; a local `cn(...)` helper is used to compose class strings.
-- Many components colocate style objects in `styles.ts`; follow local folder patterns.
-- Preserve existing design language and component architecture (`atoms`, `molecules`, `organism`).
+- Tailwind utilities are the primary styling mechanism.
+- Use existing helpers/patterns (for example `cn(...)`) when composing class names.
+- Follow existing component organization patterns in this repo.
 
 ## 6) Agent Execution Checklist
 
-- Read nearby files before editing; match existing conventions first.
-- Keep diffs focused; avoid opportunistic refactors unless requested.
-- Run, at minimum, `npm run lint` and `npm run typecheck` after non-trivial changes.
-- If you changed formatting-sensitive files, run `npm run format` (or targeted prettier command).
-- If tests are introduced later, run full and relevant single-test commands before handoff.
-- Update this AGENTS.md when tooling or conventions materially change.
+- Read nearby files first and match local conventions.
+- Keep diffs narrowly scoped to the requested change.
+- Avoid opportunistic refactors unless explicitly requested.
+- After non-trivial edits, run at least: `npm run lint` and `npm run typecheck`.
+- If formatting-sensitive files changed, run `npm run format` (or targeted Prettier checks).
+- Since tests are not currently configured, do not claim test execution; report that limitation clearly.
+- Update this AGENTS.md when scripts, tooling, or conventions materially change.

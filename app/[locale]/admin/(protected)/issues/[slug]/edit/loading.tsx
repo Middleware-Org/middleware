@@ -9,4 +9,3 @@ import IssueEditSkeleton from "../../components/IssueEditSkeleton";
 export default function Loading() {
   return <IssueEditSkeleton />;
 }
-

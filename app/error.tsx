@@ -7,6 +7,7 @@
 import { useEffect } from "react";
 import { MonoTextBold, SerifText } from "@/components/atoms/typography";
 import Button from "@/components/atoms/button";
+import { toast } from "@/hooks/use-toast";
 
 interface ErrorProps {
   error: Error & { digest?: string };
@@ -15,17 +16,14 @@ interface ErrorProps {
 
 export default function Error({ error, reset }: ErrorProps) {
   useEffect(() => {
-    // Log error to error reporting service
-    console.error("Application error:", error);
+    toast.error("Si è verificato un errore inaspettato", error.message);
   }, [error]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-primary px-4">
       <div className="max-w-2xl w-full text-center">
         <div className="mb-8">
-          <SerifText className="text-6xl md:text-8xl font-bold text-secondary mb-4">
-            Ops!
-          </SerifText>
+          <SerifText className="text-6xl md:text-8xl font-bold text-secondary mb-4">Ops!</SerifText>
           <MonoTextBold className="text-xl md:text-2xl text-secondary mb-6">
             Qualcosa è andato storto
           </MonoTextBold>

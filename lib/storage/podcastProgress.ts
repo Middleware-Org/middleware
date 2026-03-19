@@ -47,7 +47,6 @@ class PodcastProgressStorage {
 
     // Verifica che IndexedDB sia disponibile
     if (!window.indexedDB) {
-      console.error("PodcastProgressStorage: IndexedDB non è disponibile su questo browser");
       throw new Error("IndexedDB non disponibile");
     }
 
@@ -72,7 +71,6 @@ class PodcastProgressStorage {
         throw new Error("Database non inizializzato correttamente");
       }
     } catch (error) {
-      console.error("Errore nell'inizializzazione del database:", error);
       this.db = null; // Reset per permettere un nuovo tentativo
       throw error;
     }
@@ -86,8 +84,7 @@ class PodcastProgressStorage {
     if (!this.db) {
       try {
         await this.init();
-      } catch (error) {
-        console.error("Errore nell'inizializzazione del database per getProgress:", error);
+      } catch {
         return null;
       }
     }
@@ -100,8 +97,7 @@ class PodcastProgressStorage {
     try {
       const progress = await this.db.get("podcastProgress", podcastId);
       return progress || null;
-    } catch (error) {
-      console.error(`Errore nel recupero del progresso per ${podcastId}:`, error);
+    } catch {
       return null;
     }
   }
@@ -120,8 +116,7 @@ class PodcastProgressStorage {
     if (!this.db) {
       try {
         await this.init();
-      } catch (error) {
-        console.error("Errore nell'inizializzazione del database durante il salvataggio:", error);
+      } catch {
         return;
       }
     }
@@ -169,8 +164,7 @@ class PodcastProgressStorage {
       await this.db.put("podcastProgress", progress);
       this.lastSavedTime = currentTime;
       this.lastSavedProgress = progressPercentage;
-    } catch (error) {
-      console.error(`Errore nel salvataggio del progresso per ${podcastId}:`, error);
+    } catch {
       // Su mobile, a volte IndexedDB può fallire silenziosamente
       // Proviamo a reinizializzare il database
       try {
@@ -194,9 +188,7 @@ class PodcastProgressStorage {
           // Se il retry fallisce, ripristina il vecchio db
           this.db = oldDb;
         }
-      } catch (retryError) {
-        console.error(`Errore nel retry del salvataggio per ${podcastId}:`, retryError);
-      }
+      } catch {}
     } finally {
       this.pendingSave = false;
       if (this.pendingSaveTimeout) {
@@ -228,9 +220,7 @@ class PodcastProgressStorage {
       // (almeno 1 secondo o 1% di progresso)
       if (timeDifference >= 1 || progressDifference >= 1) {
         this.saveProgress(podcastId, currentTime, totalTime, progressPercentage, false).catch(
-          (error) => {
-            console.error("Errore nel salvataggio automatico:", error);
-          },
+          () => {},
         );
       }
     }, this.saveIntervalMs);
@@ -264,7 +254,6 @@ class PodcastProgressStorage {
       try {
         await this.init();
       } catch (error) {
-        console.error("Errore nell'inizializzazione del database per saveImmediately:", error);
         throw error;
       }
     }
@@ -294,9 +283,7 @@ class PodcastProgressStorage {
 
     try {
       await this.db.delete("podcastProgress", podcastId);
-    } catch (error) {
-      console.error(`Errore nella rimozione del progresso per ${podcastId}:`, error);
-    }
+    } catch {}
   }
 
   /**
@@ -313,8 +300,7 @@ class PodcastProgressStorage {
 
     try {
       return await this.db.getAll("podcastProgress");
-    } catch (error) {
-      console.error("Errore nel recupero di tutti i progressi:", error);
+    } catch {
       return [];
     }
   }

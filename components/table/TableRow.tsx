@@ -35,4 +35,3 @@ export const TableRow = forwardRef<HTMLTableRowElement, TableRowProps>(
 );
 
 TableRow.displayName = "TableRow";
-

@@ -38,13 +38,8 @@ export default function FormattedDate({ date, lang = "it", className }: Formatte
 
   return (
     <>
-      <MonoTextLight className={cn("md:hidden", className)}>
-        {mobileDate}
-      </MonoTextLight>
-      <MonoTextLight className={cn("hidden md:inline", className)}>
-        {desktopDate}
-      </MonoTextLight>
+      <MonoTextLight className={cn("md:hidden", className)}>{mobileDate}</MonoTextLight>
+      <MonoTextLight className={cn("hidden md:inline", className)}>{desktopDate}</MonoTextLight>
     </>
   );
 }
-

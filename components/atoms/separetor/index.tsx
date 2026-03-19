@@ -25,7 +25,5 @@ export default function Separator({
   const orientationClass =
     orientation === "horizontal" ? styles.orientationHorizontal : styles.orientationVertical;
 
-  return (
-    <div className={cn(styles.base, sizeClass, orientationClass, className)} />
-  );
+  return <div className={cn(styles.base, sizeClass, orientationClass, className)} />;
 }

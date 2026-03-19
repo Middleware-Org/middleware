@@ -4,6 +4,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { toast } from "@/hooks/use-toast";
 import styles from "./styles";
 
 /* **************************************************
@@ -19,7 +20,7 @@ interface ErrorProps {
  **************************************************/
 export default function PodcastsError({ error, reset }: ErrorProps) {
   useEffect(() => {
-    console.error("Podcasts error:", error);
+    toast.error("Errore nella pagina podcast", error.message);
   }, [error]);
 
   return (
@@ -32,4 +33,3 @@ export default function PodcastsError({ error, reset }: ErrorProps) {
     </div>
   );
 }
-

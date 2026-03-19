@@ -5,6 +5,7 @@
  * Catches errors in the root layout
  **************************************************/
 import { useEffect } from "react";
+import { toast } from "@/hooks/use-toast";
 
 interface GlobalErrorProps {
   error: Error & { digest?: string };
@@ -13,7 +14,7 @@ interface GlobalErrorProps {
 
 export default function GlobalError({ error, reset }: GlobalErrorProps) {
   useEffect(() => {
-    console.error("Global application error:", error);
+    toast.error("Si è verificato un errore critico", error.message);
   }, [error]);
 
   return (
@@ -30,9 +31,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
           }}
         >
           <div style={{ maxWidth: "600px", textAlign: "center" }}>
-            <h1 style={{ fontSize: "3rem", color: "#000", marginBottom: "1rem" }}>
-              Ops!
-            </h1>
+            <h1 style={{ fontSize: "3rem", color: "#000", marginBottom: "1rem" }}>Ops!</h1>
             <p style={{ fontSize: "1.25rem", color: "#000", marginBottom: "2rem" }}>
               Si è verificato un errore critico. Riprova a ricaricare la pagina.
             </p>

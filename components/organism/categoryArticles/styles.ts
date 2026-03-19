@@ -17,4 +17,3 @@ const styles = {
  * Export
  **************************************************/
 export default styles;
-

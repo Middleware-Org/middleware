@@ -7,6 +7,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { Bookmark, bookmarksStorage } from "@/lib/storage/bookmarks";
 import { Bookmark as BookmarkIcon, Minus } from "lucide-react";
 import { cn } from "@/lib/utils/classes";
+import { toast } from "@/hooks/use-toast";
 
 /* **************************************************
  * Types
@@ -42,7 +43,10 @@ export default function BookmarkManager({
         setBookmarks(savedBookmarks);
         setIsInitialized(true);
       } catch (error) {
-        console.error("Errore nell'inizializzazione dei segnalibri:", error);
+        toast.error(
+          "Errore nell'inizializzazione dei segnalibri",
+          error instanceof Error ? error.message : undefined,
+        );
         setIsInitialized(true);
       }
     }

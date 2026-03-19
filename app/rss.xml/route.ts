@@ -69,7 +69,7 @@ ${items
       <enclosure url="${item.audio}" type="audio/mpeg" />`
           : ""
       }
-    </item>`
+    </item>`,
   )
   .join("\n")}
   </channel>

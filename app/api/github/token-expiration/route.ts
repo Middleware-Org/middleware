@@ -11,6 +11,16 @@ const logger = createLogger("API /github/token-expiration");
 const GITHUB_API_URL = "https://api.github.com";
 const token = process.env.GITHUB_TOKEN!;
 
+function noStoreJson(body: unknown, init?: ResponseInit) {
+  return NextResponse.json(body, {
+    ...init,
+    headers: {
+      "Cache-Control": "no-store",
+      ...(init?.headers ?? {}),
+    },
+  });
+}
+
 /* **************************************************
  * GitHub Token Expiration API Route
  *
@@ -32,11 +42,11 @@ export async function GET(request: Request) {
 
     const user = await getAdminUser();
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return noStoreJson({ error: "Unauthorized" }, { status: 401 });
     }
 
     if (!token) {
-      return NextResponse.json({ error: "GitHub token not configured" }, { status: 500 });
+      return noStoreJson({ error: "GitHub token not configured" }, { status: 500 });
     }
 
     const res = await fetch(`${GITHUB_API_URL}/user`, {
@@ -52,16 +62,13 @@ export async function GET(request: Request) {
         status: res.status,
         body: await res.text(),
       });
-      return NextResponse.json(
-        { error: "Failed to check token expiration" },
-        { status: res.status },
-      );
+      return noStoreJson({ error: "Failed to check token expiration" }, { status: res.status });
     }
 
     const expirationHeader = res.headers.get("github-authentication-token-expiration");
 
     if (!expirationHeader) {
-      return NextResponse.json({
+      return noStoreJson({
         expirationDate: null,
         daysUntilExpiration: null,
         isExpiringSoon: false,
@@ -77,13 +84,13 @@ export async function GET(request: Request) {
     // Consider "expiring soon" if less than 2 weeks (14 days)
     const isExpiringSoon = daysUntilExpiration < 14;
 
-    return NextResponse.json({
+    return noStoreJson({
       expirationDate: expirationDate.toISOString(),
       daysUntilExpiration,
       isExpiringSoon,
     });
   } catch (error) {
     logger.error("Error checking GitHub token expiration", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return noStoreJson({ error: "Internal server error" }, { status: 500 });
   }
 }

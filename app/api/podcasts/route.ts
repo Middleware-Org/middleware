@@ -22,8 +22,6 @@ export async function GET() {
     const podcasts = await getAllPodcasts();
 
     const response = NextResponse.json(podcasts);
-    response.headers.set("X-Data-Source", "rest-api");
-    response.headers.set("X-Timestamp", new Date().toISOString());
     setPrivateCacheHeaders(response, CACHE_PROFILES.list);
 
     return response;

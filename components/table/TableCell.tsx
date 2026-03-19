@@ -24,4 +24,3 @@ export function TableCell({ children, className, colSpan }: TableCellProps) {
     </td>
   );
 }
-

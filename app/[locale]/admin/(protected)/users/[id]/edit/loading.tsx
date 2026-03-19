@@ -9,4 +9,3 @@ import UserEditSkeleton from "../../components/UserEditSkeleton";
 export default function Loading() {
   return <UserEditSkeleton />;
 }
-

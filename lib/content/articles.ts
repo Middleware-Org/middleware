@@ -24,7 +24,9 @@ export const getArticlesByIssue = (issueSlug: string) => {
   const orderedIds = issue.articlesOrder || [];
 
   const articleMap = new Map(issueArticles.map((a) => [a.id, a]));
-  const ordered = orderedIds.map((id) => articleMap.get(id)).filter(Boolean) as typeof issueArticles;
+  const ordered = orderedIds
+    .map((id) => articleMap.get(id))
+    .filter(Boolean) as typeof issueArticles;
   const unordered = issueArticles.filter((a) => !orderedIds.includes(a.id));
 
   return [...ordered, ...unordered];

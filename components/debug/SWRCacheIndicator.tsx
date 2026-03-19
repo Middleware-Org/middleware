@@ -32,9 +32,7 @@ export default function SWRCacheIndicator() {
           };
         });
         setCacheState(entries);
-      } catch (error) {
-        console.error("[SWR Cache Indicator] Error reading cache:", error);
-      }
+      } catch {}
     };
 
     // Aggiorna immediatamente

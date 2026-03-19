@@ -9,4 +9,3 @@ import CategoryFormSkeleton from "../components/CategoryFormSkeleton";
 export default function Loading() {
   return <CategoryFormSkeleton />;
 }
-

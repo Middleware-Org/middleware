@@ -20,4 +20,3 @@ export const swrConfig: SWRConfiguration = {
   errorRetryCount: 3,
   errorRetryInterval: 5000,
 };
-

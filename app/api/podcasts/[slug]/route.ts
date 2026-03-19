@@ -34,8 +34,6 @@ export async function GET(_request: Request, { params }: RouteParams) {
     }
 
     const response = NextResponse.json(podcast);
-    response.headers.set("X-Data-Source", "rest-api");
-    response.headers.set("X-Timestamp", new Date().toISOString());
     setPrivateCacheHeaders(response, CACHE_PROFILES.detail);
 
     return response;

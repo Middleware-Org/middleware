@@ -34,8 +34,6 @@ export async function GET(_request: Request, { params }: { params: Promise<{ slu
     }
 
     const response = NextResponse.json(category);
-    response.headers.set("X-Data-Source", "rest-api");
-    response.headers.set("X-Timestamp", new Date().toISOString());
     setPrivateCacheHeaders(response, CACHE_PROFILES.detail);
 
     return response;

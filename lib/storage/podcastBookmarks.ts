@@ -58,7 +58,6 @@ class PodcastBookmarksStorage {
 
     // Verifica che IndexedDB sia disponibile
     if (!window.indexedDB) {
-      console.error("PodcastBookmarksStorage: IndexedDB non è disponibile su questo browser");
       throw new Error("IndexedDB non disponibile");
     }
 
@@ -84,7 +83,6 @@ class PodcastBookmarksStorage {
         throw new Error("Database non inizializzato correttamente");
       }
     } catch (error) {
-      console.error("Errore nell'inizializzazione del database:", error);
       this.db = null;
       throw error;
     }
@@ -97,8 +95,7 @@ class PodcastBookmarksStorage {
     if (!this.db) {
       try {
         await this.init();
-      } catch (error) {
-        console.error("Errore nell'inizializzazione del database per getBookmarks:", error);
+      } catch {
         return [];
       }
     }
@@ -115,8 +112,7 @@ class PodcastBookmarksStorage {
       );
       // Ordina per tempo (dall'inizio alla fine)
       return bookmarks.sort((a, b) => a.time - b.time);
-    } catch (error) {
-      console.error(`Errore nel recupero dei segnaposto per ${podcastSlug}:`, error);
+    } catch {
       return [];
     }
   }
@@ -131,7 +127,6 @@ class PodcastBookmarksStorage {
       try {
         await this.init();
       } catch (error) {
-        console.error("Errore nell'inizializzazione del database durante il salvataggio:", error);
         throw error;
       }
     }
@@ -151,7 +146,6 @@ class PodcastBookmarksStorage {
       this.emitBookmarksUpdated(newBookmark.podcastSlug);
       return newBookmark;
     } catch (error) {
-      console.error("Errore nel salvataggio del segnaposto:", error);
       throw error;
     }
   }
@@ -163,8 +157,7 @@ class PodcastBookmarksStorage {
     if (!this.db) {
       try {
         await this.init();
-      } catch (error) {
-        console.error("Errore nell'inizializzazione del database durante l'eliminazione:", error);
+      } catch {
         return;
       }
     }
@@ -180,7 +173,6 @@ class PodcastBookmarksStorage {
         this.emitBookmarksUpdated(existing.podcastSlug);
       }
     } catch (error) {
-      console.error(`Errore nella rimozione del segnaposto ${bookmarkId}:`, error);
       throw error;
     }
   }
@@ -192,8 +184,7 @@ class PodcastBookmarksStorage {
     if (!this.db) {
       try {
         await this.init();
-      } catch (error) {
-        console.error("Errore nell'inizializzazione del database durante l'eliminazione:", error);
+      } catch {
         return;
       }
     }
@@ -214,7 +205,6 @@ class PodcastBookmarksStorage {
       await Promise.all(deletePromises);
       this.emitBookmarksUpdated(podcastSlug);
     } catch (error) {
-      console.error(`Errore nella rimozione dei segnaposto per ${podcastSlug}:`, error);
       throw error;
     }
   }

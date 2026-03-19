@@ -23,8 +23,6 @@ export const GET = withAuth(async (user) => {
     });
 
     const response = NextResponse.json(pages);
-    response.headers.set("X-Data-Source", "rest-api");
-    response.headers.set("X-Timestamp", new Date().toISOString());
     setPrivateCacheHeaders(response, CACHE_PROFILES.list);
 
     return response;

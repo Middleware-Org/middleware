@@ -2,6 +2,7 @@
  * Imports
  **************************************************/
 import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "@/hooks/use-toast";
 import { podcastProgressStorage } from "@/lib/storage/podcastProgress";
 
 /* **************************************************
@@ -70,11 +71,17 @@ export function useAudioPlayer({
               }
             }
           } catch (error) {
-            console.error("Errore nel ripristino anticipato:", error);
+            toast.error(
+              "Errore nel ripristino del progresso",
+              error instanceof Error ? error.message : undefined,
+            );
           }
         }
       } catch (error) {
-        console.error("Errore nell'inizializzazione dello storage:", error);
+        toast.error(
+          "Errore nell'inizializzazione dello storage",
+          error instanceof Error ? error.message : undefined,
+        );
       }
     };
 
@@ -123,9 +130,7 @@ export function useAudioPlayer({
           const progressPercentage = (newTime / audio.duration) * 100;
           podcastProgressStorage
             .saveProgress(podcastId, newTime, audio.duration, progressPercentage, false)
-            .catch((error) => {
-              console.error("Errore nel salvataggio durante timeupdate:", error);
-            });
+            .catch(() => {});
         }
       }
 
@@ -167,7 +172,10 @@ export function useAudioPlayer({
               }
             }
           } catch (error) {
-            console.error("Errore nel ripristino del progresso:", error);
+            toast.error(
+              "Errore nel ripristino del progresso",
+              error instanceof Error ? error.message : undefined,
+            );
           }
         }
       }
@@ -191,7 +199,10 @@ export function useAudioPlayer({
             progressPercentage,
           );
         } catch (error) {
-          console.error("Errore nel salvataggio dopo pause:", error);
+          toast.error(
+            "Errore nel salvataggio del progresso",
+            error instanceof Error ? error.message : undefined,
+          );
         }
       }
     };
@@ -262,7 +273,10 @@ export function useAudioPlayer({
       audio.playbackRate = playbackRate;
       if (wasPlaying) {
         audio.play().catch((error) => {
-          console.error("Error playing audio after rate change:", error);
+          toast.error(
+            "Errore nella riproduzione audio",
+            error instanceof Error ? error.message : undefined,
+          );
         });
       }
     }
@@ -301,7 +315,10 @@ export function useAudioPlayer({
             progressPercentage,
           );
         } catch (error) {
-          console.error("Errore nel salvataggio dopo forward:", error);
+          toast.error(
+            "Errore nel salvataggio del progresso",
+            error instanceof Error ? error.message : undefined,
+          );
         }
       }
     }
@@ -326,7 +343,10 @@ export function useAudioPlayer({
             progressPercentage,
           );
         } catch (error) {
-          console.error("Errore nel salvataggio dopo backward:", error);
+          toast.error(
+            "Errore nel salvataggio del progresso",
+            error instanceof Error ? error.message : undefined,
+          );
         }
       }
     }
@@ -352,7 +372,10 @@ export function useAudioPlayer({
               progressPercentage,
             );
           } catch (error) {
-            console.error("Errore nel salvataggio dopo seek:", error);
+            toast.error(
+              "Errore nel salvataggio del progresso",
+              error instanceof Error ? error.message : undefined,
+            );
           }
         }
       }

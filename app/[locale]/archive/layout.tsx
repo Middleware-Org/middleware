@@ -7,11 +7,7 @@ import { getDictionary } from "@/lib/i18n/utils";
 import Menu from "@/components/organism/menu";
 import { MonoTextLight } from "@/components/atoms/typography";
 import Footer from "@/components/organism/footer";
-import {
-  getBaseUrl,
-  createOpenGraphMetadata,
-  createTwitterMetadata,
-} from "@/lib/utils/metadata";
+import { getBaseUrl, createOpenGraphMetadata, createTwitterMetadata } from "@/lib/utils/metadata";
 
 /* **************************************************
  * Types

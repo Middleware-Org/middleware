@@ -42,7 +42,6 @@ class BookmarksStorage {
 
     // Verifica che IndexedDB sia disponibile
     if (!window.indexedDB) {
-      console.error("BookmarksStorage: IndexedDB non è disponibile su questo browser");
       throw new Error("IndexedDB non disponibile");
     }
 
@@ -67,7 +66,6 @@ class BookmarksStorage {
         throw new Error("Database non inizializzato correttamente");
       }
     } catch (error) {
-      console.error("Errore nell'inizializzazione del database:", error);
       this.db = null;
       throw error;
     }
@@ -80,8 +78,7 @@ class BookmarksStorage {
     if (!this.db) {
       try {
         await this.init();
-      } catch (error) {
-        console.error("Errore nell'inizializzazione del database per getBookmarks:", error);
+      } catch {
         return [];
       }
     }
@@ -94,8 +91,7 @@ class BookmarksStorage {
       const bookmarks = await this.db.getAllFromIndex("bookmarks", "by-articleSlug", articleSlug);
       // Ordina per offsetTop (dall'alto verso il basso)
       return bookmarks.sort((a, b) => a.offsetTop - b.offsetTop);
-    } catch (error) {
-      console.error(`Errore nel recupero dei segnalibri per ${articleSlug}:`, error);
+    } catch {
       return [];
     }
   }
@@ -108,7 +104,6 @@ class BookmarksStorage {
       try {
         await this.init();
       } catch (error) {
-        console.error("Errore nell'inizializzazione del database durante il salvataggio:", error);
         throw error;
       }
     }
@@ -127,7 +122,6 @@ class BookmarksStorage {
       await this.db.put("bookmarks", newBookmark);
       return newBookmark;
     } catch (error) {
-      console.error("Errore nel salvataggio del segnalibro:", error);
       throw error;
     }
   }
@@ -139,8 +133,7 @@ class BookmarksStorage {
     if (!this.db) {
       try {
         await this.init();
-      } catch (error) {
-        console.error("Errore nell'inizializzazione del database durante l'eliminazione:", error);
+      } catch {
         return;
       }
     }
@@ -152,7 +145,6 @@ class BookmarksStorage {
     try {
       await this.db.delete("bookmarks", bookmarkId);
     } catch (error) {
-      console.error(`Errore nella rimozione del segnalibro ${bookmarkId}:`, error);
       throw error;
     }
   }
@@ -164,8 +156,7 @@ class BookmarksStorage {
     if (!this.db) {
       try {
         await this.init();
-      } catch (error) {
-        console.error("Errore nell'inizializzazione del database durante l'eliminazione:", error);
+      } catch {
         return;
       }
     }
@@ -179,7 +170,6 @@ class BookmarksStorage {
       const deletePromises = bookmarks.map((bookmark) => this.db!.delete("bookmarks", bookmark.id));
       await Promise.all(deletePromises);
     } catch (error) {
-      console.error(`Errore nella rimozione dei segnalibri per ${articleSlug}:`, error);
       throw error;
     }
   }

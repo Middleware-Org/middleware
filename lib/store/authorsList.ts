@@ -20,4 +20,3 @@ export const useAuthorsList = create<AuthorsListState>((set) => ({
   toggleOpen: () => set((state) => ({ isOpen: !state.isOpen })),
   closeOpen: () => set({ isOpen: false }),
 }));
-

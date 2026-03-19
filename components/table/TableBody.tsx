@@ -18,4 +18,3 @@ interface TableBodyProps {
 export function TableBody({ children, className }: TableBodyProps) {
   return <tbody className={cn("divide-y divide-gray-200", className)}>{children}</tbody>;
 }
-

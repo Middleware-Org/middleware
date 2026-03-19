@@ -27,8 +27,6 @@ export async function GET() {
     const authors = await getAllAuthors();
 
     const response = NextResponse.json(authors);
-    response.headers.set("X-Data-Source", "rest-api");
-    response.headers.set("X-Timestamp", new Date().toISOString());
     setPrivateCacheHeaders(response, CACHE_PROFILES.list);
 
     return response;

@@ -2,12 +2,9 @@
  * Imports
  **************************************************/
 import useSWR from "swr";
-import { createLogger } from "@/lib/logger";
 import { createFetcher } from "./fetcher";
 import { swrConfig } from "./config";
 import type { Page } from "@/lib/github/types";
-
-const logger = createLogger("SWR");
 
 /* **************************************************
  * Types
@@ -31,9 +28,6 @@ export function usePages(initialData?: Page[]): UsePagesResponse {
   const { data, error, isLoading } = useSWR<Page[]>("/api/pages", createFetcher<Page[]>("pages"), {
     ...swrConfig,
     fallbackData: initialData,
-    onSuccess: (data) => {
-      logger.debug(`usePages - Data loaded: ${Array.isArray(data) ? data.length : 1} pages`);
-    },
   });
 
   return {
@@ -50,9 +44,6 @@ export function usePage(slug: string | null, initialData?: Page): UsePageRespons
     {
       ...swrConfig,
       fallbackData: initialData,
-      onSuccess: () => {
-        logger.debug(`usePage - Data loaded for slug: ${slug}`);
-      },
     },
   );
 

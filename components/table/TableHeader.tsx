@@ -17,10 +17,5 @@ interface TableHeaderProps {
  * Table Header Component
  **************************************************/
 export function TableHeader({ children, className }: TableHeaderProps) {
-  return (
-    <thead className={cn(styles.header, className)}>
-      {children}
-    </thead>
-  );
+  return <thead className={cn(styles.header, className)}>{children}</thead>;
 }
-

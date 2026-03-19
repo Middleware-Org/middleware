@@ -14,7 +14,7 @@ const VercelAnalytics = dynamic(
   {
     ssr: false,
     loading: () => null,
-  }
+  },
 );
 
 // Dynamically import SpeedInsights with no SSR (client-side only)
@@ -23,7 +23,7 @@ const VercelSpeedInsights = dynamic(
   {
     ssr: false,
     loading: () => null,
-  }
+  },
 );
 
 export default function Analytics() {

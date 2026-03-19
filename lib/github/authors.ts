@@ -1,7 +1,13 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { createOrUpdateFile, deleteFile, getFileContent, listDirectoryFiles, renameFile } from "./client";
+import {
+  createOrUpdateFile,
+  deleteFile,
+  getFileContent,
+  listDirectoryFiles,
+  renameFile,
+} from "./client";
 import { getAllArticles } from "./articles";
 import { generateSlug, generateUniqueSlug } from "./utils";
 import type { Author } from "./types";
@@ -112,7 +118,12 @@ export async function updateAuthor(
   const oldFilePath = `content/authors/${slug}.json`;
 
   if (finalSlug !== slug) {
-    await renameFile(oldFilePath, newFilePath, content, `Rename author: ${updated.name} (${slug} -> ${finalSlug})`);
+    await renameFile(
+      oldFilePath,
+      newFilePath,
+      content,
+      `Rename author: ${updated.name} (${slug} -> ${finalSlug})`,
+    );
   } else {
     await createOrUpdateFile(newFilePath, content, `Update author: ${updated.name}`);
   }

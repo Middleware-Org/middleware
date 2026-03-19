@@ -12,6 +12,7 @@ import useSWR from "swr";
 import { createFetcher } from "@/hooks/swr/fetcher";
 import { mutate } from "swr";
 import type { AdminDictionary } from "@/lib/i18n/types";
+import { toast } from "@/hooks/use-toast";
 
 type MergeButtonProps = {
   dict: AdminDictionary["mergeButton"];
@@ -88,8 +89,8 @@ export default function MergeButton({ dict }: MergeButtonProps) {
         setIsLoading(false);
       }
     } catch (err) {
-      console.error("Error publishing:", err);
       setPublishError(dict.publishError);
+      toast.error(dict.publishError, err instanceof Error ? err.message : undefined);
       setIsLoading(false);
     }
   }

@@ -20,4 +20,3 @@ export const useMenu = create<MenuState>((set) => ({
   toggleMenu: () => set((state) => ({ isOpen: !state.isOpen })),
   closeMenu: () => set({ isOpen: false }),
 }));
-

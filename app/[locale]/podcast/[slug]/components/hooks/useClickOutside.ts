@@ -41,4 +41,3 @@ export function useClickOutside({ isOpen, refs, onClose }: UseClickOutsideProps)
     };
   }, [isOpen, refs, onClose]);
 }
-

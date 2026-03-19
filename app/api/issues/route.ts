@@ -27,8 +27,6 @@ export async function GET() {
     const issues = await getAllIssues();
 
     const response = NextResponse.json(issues);
-    response.headers.set("X-Data-Source", "rest-api");
-    response.headers.set("X-Timestamp", new Date().toISOString());
     setPrivateCacheHeaders(response, CACHE_PROFILES.list);
 
     return response;

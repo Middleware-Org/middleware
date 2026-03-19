@@ -54,4 +54,3 @@ export function SortableHeader({
     </th>
   );
 }
-

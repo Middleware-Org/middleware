@@ -9,4 +9,3 @@ import AuthorFormSkeleton from "../components/AuthorFormSkeleton";
 export default function Loading() {
   return <AuthorFormSkeleton />;
 }
-

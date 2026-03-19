@@ -56,7 +56,10 @@ export default function Footer({ dict }: FooterProps) {
                   {dict.footer[link.label as keyof typeof dict.footer]}
                 </MonoTextBold>
                 {index < footerLinks.length - 1 && (
-                  <span className="text-secondary text-[14px] hidden md:block lg:block" aria-hidden="true">
+                  <span
+                    className="text-secondary text-[14px] hidden md:block lg:block"
+                    aria-hidden="true"
+                  >
                     |
                   </span>
                 )}

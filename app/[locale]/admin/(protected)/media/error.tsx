@@ -6,6 +6,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { toast } from "@/hooks/use-toast";
 import { withLocale } from "@/lib/i18n/path";
 import styles from "./styles";
 
@@ -25,7 +26,7 @@ export default function Error({ error, reset }: ErrorProps) {
   const dashboardHref = withLocale("/admin", locale);
 
   useEffect(() => {
-    console.error("Media page error:", error);
+    toast.error("Errore nella pagina media", error.message);
   }, [error]);
 
   return (
