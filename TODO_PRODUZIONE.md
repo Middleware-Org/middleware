@@ -12,7 +12,7 @@ senza introdurre nuovi ambienti e senza attività di deploy/rollback.
   - File chiave: `PageFormClient`, `PodcastFormClient`, `IssueFormClient`, `PageMetaPanel`, `PodcastMetaPanel`, `ArticleMetaPanel`.
 - [x] [P1] Uniformare tutte le conferme delete su `ConfirmDialog` (eliminare `window.confirm`).
   - File noti: `AuthorDeleteButton`, `CategoryDeleteButton`, `IssueDeleteButton`.
-- [ ] [P1] Correggere inconsistenze copy IT/EN/plurali in admin (`No image`, `podcasts`, copy dashboard/error).
+- [x] [P1] Correggere inconsistenze copy IT/EN/plurali in admin (`No image`, `podcasts`, copy dashboard/error).
 - [x] [P1] Hardening sicurezza generazione password in admin users: sostituire `Math.random()` con `crypto.getRandomValues`.
 
 Stato avanzamento P1 (aggiornato):
@@ -20,12 +20,19 @@ Stato avanzamento P1 (aggiornato):
 - [x] Conferme delete migrate a `ConfirmDialog` in area admin (`AuthorDeleteButton`, `CategoryDeleteButton`, `IssueDeleteButton`).
 - [x] Generazione password sicura migrata a API crittografica browser (`crypto.getRandomValues`) con shuffle Fisher-Yates.
 - [x] Eliminato uso di `querySelector` in area admin protected (form/panel principali + form author/category).
+- [x] Inconsistenze copy IT/EN/plurali sistemate nei componenti admin principali.
 
 ### P2 (priorità bassa/media)
 
 - [ ] [P2] Ridurre duplicazione dei `*ListClient` CRUD con estrazione base condivisa (hook/componente headless per search/sort/selection/pagination/bulk actions).
 - [ ] [P2] Ridurre duplicazione degli style object admin (`authors/categories/users/issues`) e consolidare stili sidebar in un unico modulo.
-- [ ] [P2] Estrarre error boundary admin riusabile per ridurre copy/paste tra `*/error.tsx`.
+- [x] [P2] Estrarre error boundary admin riusabile per ridurre copy/paste tra `*/error.tsx`.
+
+Stato avanzamento P2 (aggiornato):
+
+- [x] Error boundary admin consolidata in componente riusabile (`(protected)/components/AdminErrorView.tsx`) e applicata a `articles/authors/categories/issues/media/podcasts/users`.
+- [ ] Resta aperta la riduzione duplicazione `*ListClient` CRUD.
+- [ ] Resta aperto il consolidamento style object admin.
 
 ## Debiti residui (non bloccanti)
 

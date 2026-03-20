@@ -123,9 +123,9 @@ export default function IssueMetaPanel({
       const result = await deleteIssueAction(issueSlug);
 
       if (!result.success) {
-        toast.actionResult(result, { errorTitle: "Impossibile eliminare issue" });
+        toast.actionResult(result, { errorTitle: adminFormCopy.deleteButtons.deleteIssueError });
       } else {
-        toast.success(result.message || "Issue eliminata con successo");
+        toast.success(result.message || adminFormCopy.deleteButtons.deleteIssueSuccess);
         mutate("/api/issues");
         mutate(`/api/issues/${issueSlug}`);
         mutate("/api/github/merge/check");
