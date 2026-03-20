@@ -4,10 +4,12 @@
  * Imports
  **************************************************/
 import Link from "next/link";
-import Pictogram from "@/components/organism/pictogram";
+
 import { MonoTextBold } from "@/components/atoms/typography";
-import type { CommonDictionary } from "@/lib/i18n/types";
+import Pictogram from "@/components/organism/pictogram";
 import { useLocalizedPath } from "@/lib/i18n/client";
+import type { CommonDictionary } from "@/lib/i18n/types";
+
 import styles from "./styles";
 
 /* **************************************************

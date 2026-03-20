@@ -3,11 +3,10 @@
  **************************************************/
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState, useTransition, useCallback, useMemo } from "react";
+import type {
+  DragEndEvent} from "@dnd-kit/core";
 import {
   DndContext,
-  DragEndEvent,
   closestCenter,
   useSensor,
   useSensors,
@@ -20,18 +19,22 @@ import {
   arrayMove,
   sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
-import { deleteIssueAction } from "../actions";
-import { SortableTableRow } from "@/components/table/SortableTableRow";
-import { TableCell } from "@/components/table";
-import ConfirmDialog from "@/components/molecules/confirmDialog";
-import styles from "../styles";
-import type { Issue } from "@/lib/github/types";
-import type { Article } from "@/lib/github/types";
-import { useArticles } from "@/hooks/swr";
+import { useRouter } from "next/navigation";
+import { useState, useTransition, useCallback, useMemo } from "react";
 import { mutate } from "swr";
+
+import ConfirmDialog from "@/components/molecules/confirmDialog";
+import { TableCell } from "@/components/table";
+import { SortableTableRow } from "@/components/table/SortableTableRow";
+import { useArticles } from "@/hooks/swr";
 import { toast } from "@/hooks/use-toast";
+import type { Article } from "@/lib/github/types";
+import type { Issue } from "@/lib/github/types";
 import { useLocalizedPath } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils/classes";
+
+import { deleteIssueAction } from "../actions";
+import styles from "../styles";
 
 /* **************************************************
  * Types

@@ -3,11 +3,13 @@
  **************************************************/
 "use client";
 
-import { useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useEffect } from "react";
+
 import { toast } from "@/hooks/use-toast";
 import { withLocale } from "@/lib/i18n/path";
+
 import styles from "./styles";
 
 /* **************************************************

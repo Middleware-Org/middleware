@@ -3,14 +3,17 @@
 /* **************************************************
  * Imports
  **************************************************/
+import Link from "next/link";
 import { usePathname } from "next/navigation";
+
 import { MonoTextLight } from "@/components/atoms/typography";
 import { headerLinks } from "@/lib/data/links";
-import { cn } from "@/lib/utils/classes";
-import Link from "next/link";
-import styles from "./styles";
-import type { CommonDictionary } from "@/lib/i18n/types";
 import { useLocalizedPath } from "@/lib/i18n/client";
+import type { CommonDictionary } from "@/lib/i18n/types";
+import { cn } from "@/lib/utils/classes";
+
+import styles from "./styles";
+
 
 /* **************************************************
  * Types

@@ -1,17 +1,20 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { Suspense } from "react";
+import { Plus, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
+
+import SWRPageProvider from "@/components/providers/SWRPageProvider";
 import { getAdminUser } from "@/lib/auth/server";
 import { getAllUsers } from "@/lib/github/users";
+import { withLocale } from "@/lib/i18n/path";
+
 import UserListClient from "./components/UserListClient";
 import UserListSkeleton from "./components/UserListSkeleton";
 import styles from "./styles";
-import SWRPageProvider from "@/components/providers/SWRPageProvider";
-import { withLocale } from "@/lib/i18n/path";
-import { Plus, ArrowLeft } from "lucide-react";
+
 
 /* **************************************************
  * Users List Page (Server Component)

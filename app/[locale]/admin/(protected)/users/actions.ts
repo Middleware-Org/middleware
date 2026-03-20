@@ -3,11 +3,11 @@
  **************************************************/
 "use server";
 
+import type { ActionResult } from "@/lib/actions/types";
 import { getAdminUser } from "@/lib/auth/server";
+import { revalidateAdminPath } from "@/lib/cache/revalidate";
 import { createUser, updateUser, deleteUser } from "@/lib/github/users";
 import type { User } from "@/lib/github/users";
-import type { ActionResult } from "@/lib/actions/types";
-import { revalidateAdminPath } from "@/lib/cache/revalidate";
 
 function parseRole(value: FormDataEntryValue | null): "ADMIN" | "EDITOR" {
   return value === "ADMIN" ? "ADMIN" : "EDITOR";

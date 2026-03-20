@@ -1,13 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import Button from "@/components/atoms/button";
 import { MonoTextLight } from "@/components/atoms/typography";
-import { cn } from "@/lib/utils/classes";
-import Link from "next/link";
-import { CommonDictionary } from "@/lib/i18n/types";
 import { withLocale } from "@/lib/i18n/path";
+import type { CommonDictionary } from "@/lib/i18n/types";
+import { cn } from "@/lib/utils/classes";
 
 type PolicyBannerProps = {
   className?: string;

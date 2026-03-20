@@ -3,9 +3,11 @@
  **************************************************/
 "use client";
 
-import { useState, useRef, useEffect, useMemo } from "react";
 import { Search, X, ChevronDown } from "lucide-react";
+import { useState, useRef, useEffect, useMemo } from "react";
+
 import { cn } from "@/lib/utils/classes";
+
 import baseStyles from "../../styles";
 import styles from "../styles";
 

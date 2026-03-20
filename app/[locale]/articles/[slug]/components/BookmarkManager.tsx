@@ -3,11 +3,13 @@
  **************************************************/
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
-import { Bookmark, bookmarksStorage } from "@/lib/storage/bookmarks";
 import { Bookmark as BookmarkIcon, Minus } from "lucide-react";
-import { cn } from "@/lib/utils/classes";
+import { useEffect, useState, useRef, useCallback } from "react";
+
 import { toast } from "@/hooks/use-toast";
+import type { Bookmark} from "@/lib/storage/bookmarks";
+import { bookmarksStorage } from "@/lib/storage/bookmarks";
+import { cn } from "@/lib/utils/classes";
 
 /* **************************************************
  * Types

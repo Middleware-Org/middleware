@@ -2,9 +2,9 @@
  * Imports
  **************************************************/
 import "@/globals.css";
-import { getBaseUrl, createOpenGraphMetadata, createTwitterMetadata } from "@/lib/utils/metadata";
-import { editorFont, gtAmericaMono } from "@/lib/fonts";
 import Toaster from "@/components/ui/sonner";
+import { editorFont, gtAmericaMono } from "@/lib/fonts";
+import { getBaseUrl, createOpenGraphMetadata, createTwitterMetadata } from "@/lib/utils/metadata";
 
 /* **************************************************
  * Types

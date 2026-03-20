@@ -1,14 +1,15 @@
 /* **************************************************
  * Imports
  **************************************************/
-import path from "path";
+import type { i18n as I18NextInstance, InitOptions } from "i18next";
+import { createInstance } from "i18next";
 import Backend from "i18next-fs-backend";
-import { createInstance, i18n as I18NextInstance, InitOptions } from "i18next";
+import path from "path";
 
 import { AVAILABLE_NAMESPACES, DEFAULT_NAMESPACE } from "./consts";
-import { TranslationNamespace } from "./types";
-import { normalizeNamespaces } from "./utils";
 import { i18nSettings } from "./settings";
+import type { TranslationNamespace } from "./types";
+import { normalizeNamespaces } from "./utils";
 
 /* **************************************************
  * Constants

@@ -3,7 +3,8 @@
  **************************************************/
 "use client";
 
-import { DndContext, DragEndEvent, closestCenter } from "@dnd-kit/core";
+import type { DragEndEvent} from "@dnd-kit/core";
+import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import type { ReactNode } from "react";
 

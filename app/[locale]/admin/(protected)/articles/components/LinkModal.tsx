@@ -3,8 +3,9 @@
  **************************************************/
 "use client";
 
-import { useState, useEffect, useRef } from "react";
 import { Link as LinkIcon, X } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+
 import baseStyles from "../../styles";
 
 /* **************************************************

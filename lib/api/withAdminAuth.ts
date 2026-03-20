@@ -1,5 +1,5 @@
-import { getAdminUser } from "@/lib/auth/server";
 import { apiUnauthorized } from "@/lib/api/responses";
+import { getAdminUser } from "@/lib/auth/server";
 
 type AdminUser = NonNullable<Awaited<ReturnType<typeof getAdminUser>>>;
 

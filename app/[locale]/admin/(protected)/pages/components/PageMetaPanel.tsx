@@ -3,18 +3,23 @@
  **************************************************/
 "use client";
 
+import { Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition, useEffect } from "react";
-import { Sparkles } from "lucide-react";
-import { cn } from "@/lib/utils/classes";
-import { deletePageAction } from "../actions";
-import ConfirmDialog from "@/components/molecules/confirmDialog";
-import styles from "../styles";
-import type { Page } from "@/lib/github/types";
-import { generateSlug } from "@/lib/utils/slug";
 import { mutate } from "swr";
+
+import ConfirmDialog from "@/components/molecules/confirmDialog";
 import { toast } from "@/hooks/use-toast";
+import type { Page } from "@/lib/github/types";
 import { useLocalizedPath } from "@/lib/i18n/client";
+import { cn } from "@/lib/utils/classes";
+import { generateSlug } from "@/lib/utils/slug";
+
+import { deletePageAction } from "../actions";
+import styles from "../styles";
+
+
+
 
 /* **************************************************
  * Types

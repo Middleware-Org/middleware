@@ -1,10 +1,11 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { MetadataRoute } from "next";
+import type { MetadataRoute } from "next";
+
 import { getAllArticles, getAllIssues, getAllPages, getAllPodcasts } from "@/lib/content";
-import { i18nSettings } from "@/lib/i18n/settings";
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
+import { i18nSettings } from "@/lib/i18n/settings";
 
 /* **************************************************
  * Sitemap

@@ -3,8 +3,6 @@
  **************************************************/
 "use client";
 
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   FolderTree,
@@ -17,12 +15,16 @@ import {
   Headphones,
   User,
 } from "lucide-react";
-import { cn } from "@/lib/utils/classes";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+
+import { MonoTextBold } from "@/components/atoms/typography";
+import Pictogram from "@/components/organism/pictogram";
 import { authClient } from "@/lib/auth/client";
 import { stripLocalePrefix, withLocale } from "@/lib/i18n/path";
-import Pictogram from "@/components/organism/pictogram";
-import { MonoTextBold } from "@/components/atoms/typography";
 import type { AdminDictionary, CommonDictionary } from "@/lib/i18n/types";
+import { cn } from "@/lib/utils/classes";
+
 import MergeButton from "./MergeButton";
 import styles from "./styles";
 

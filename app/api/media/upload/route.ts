@@ -1,7 +1,9 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest} from "next/server";
+import { NextResponse } from "next/server";
+
 import { getUser } from "@/lib/auth/server";
 import { uploadMediaFile } from "@/lib/github/media";
 import { checkRateLimit, createRateLimitResponse, getClientIp } from "@/lib/security/rateLimit";

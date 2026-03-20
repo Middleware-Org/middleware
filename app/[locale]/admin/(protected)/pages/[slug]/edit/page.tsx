@@ -1,17 +1,20 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
+
+import SWRPageProvider from "@/components/providers/SWRPageProvider";
 import { getUser } from "@/lib/auth/server";
 import { getPageBySlug } from "@/lib/github/pages";
-import { cn } from "@/lib/utils/classes";
-import PageFormClient from "../../components/PageFormClient";
-import PageEditSkeleton from "../../components/PageEditSkeleton";
-import SWRPageProvider from "@/components/providers/SWRPageProvider";
-import styles from "../../styles";
 import { withLocale } from "@/lib/i18n/path";
+import { cn } from "@/lib/utils/classes";
+
+import PageEditSkeleton from "../../components/PageEditSkeleton";
+import PageFormClient from "../../components/PageFormClient";
+import styles from "../../styles";
+
 
 /* **************************************************
  * Edit Page (Server Component)

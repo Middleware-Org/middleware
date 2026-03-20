@@ -3,21 +3,23 @@
  **************************************************/
 "use client";
 
+import { Sparkles } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
-import { useRouter } from "next/navigation";
-import { Sparkles } from "lucide-react";
-import type { ActionResult } from "@/lib/actions/types";
-import { createAuthorAction, updateAuthorAction, deleteAuthorAction } from "../actions";
-import ConfirmDialog from "@/components/molecules/confirmDialog";
-import styles from "../styles";
-import type { Author } from "@/lib/github/types";
-import { useAuthor } from "@/hooks/swr";
 import { mutate } from "swr";
+
+import ConfirmDialog from "@/components/molecules/confirmDialog";
+import { useAuthor } from "@/hooks/swr";
 import { toast } from "@/hooks/use-toast";
+import type { ActionResult } from "@/lib/actions/types";
+import type { Author } from "@/lib/github/types";
 import { useLocalizedPath } from "@/lib/i18n/client";
 import { generateSlug } from "@/lib/utils/slug";
+
+import { createAuthorAction, updateAuthorAction, deleteAuthorAction } from "../actions";
+import styles from "../styles";
 
 /* **************************************************
  * Types

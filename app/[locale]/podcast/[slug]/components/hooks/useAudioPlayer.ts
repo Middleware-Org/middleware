@@ -2,6 +2,7 @@
  * Imports
  **************************************************/
 import { useCallback, useEffect, useRef, useState } from "react";
+
 import { toast } from "@/hooks/use-toast";
 import { podcastProgressStorage } from "@/lib/storage/podcastProgress";
 

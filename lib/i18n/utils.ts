@@ -3,6 +3,7 @@
  **************************************************/
 import { DEFAULT_NAMESPACE } from "@/lib/i18n/consts";
 import type { DictionaryByNamespace, TranslationNamespace } from "@/lib/i18n/types";
+
 import { i18nSettings } from "./settings";
 
 /* **************************************************

@@ -4,18 +4,21 @@
  * Imports
  **************************************************/
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Podcast, Issue } from "@/.velite";
-import { useAudioPlayer } from "./hooks/useAudioPlayer";
-import { useTranscriptScroll } from "./hooks/useTranscriptScroll";
-import PodcastHeader from "./PodcastHeader";
-import ProgressBar from "./ProgressBar";
-import PlayerControls from "./PlayerControls";
-import Transcript from "./Transcript";
-import { Segment } from "./types";
-import styles from "./PodcastPlayerStyles";
-import { usePodcastBookmarks } from "./hooks/usePodcastBookmarks";
-import { getGitHubMediaUrl } from "@/lib/github/images";
+
 import { toast } from "@/hooks/use-toast";
+import { getGitHubMediaUrl } from "@/lib/github/images";
+
+import type { Podcast, Issue } from "@/.velite";
+
+import { useAudioPlayer } from "./hooks/useAudioPlayer";
+import { usePodcastBookmarks } from "./hooks/usePodcastBookmarks";
+import { useTranscriptScroll } from "./hooks/useTranscriptScroll";
+import PlayerControls from "./PlayerControls";
+import PodcastHeader from "./PodcastHeader";
+import styles from "./PodcastPlayerStyles";
+import ProgressBar from "./ProgressBar";
+import Transcript from "./Transcript";
+import type { Segment } from "./types";
 
 /* **************************************************
  * Types

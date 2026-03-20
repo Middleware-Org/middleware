@@ -4,11 +4,14 @@
 "use client";
 
 import { useState } from "react";
+
 import Button from "@/components/atoms/button";
 import { MonoTextLight } from "@/components/atoms/typography";
 import ArticleCard from "@/components/molecules/articleCard";
+import type { AuthorsDictionary, CommonDictionary } from "@/lib/i18n/types";
+
 import type { Article, Author } from "@/.velite";
-import { AuthorsDictionary, CommonDictionary } from "@/lib/i18n/types";
+
 import styles from "./styles";
 
 /* **************************************************

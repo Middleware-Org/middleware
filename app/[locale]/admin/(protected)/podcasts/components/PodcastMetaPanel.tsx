@@ -3,22 +3,24 @@
  **************************************************/
 "use client";
 
+import { Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition, useEffect } from "react";
-import { Sparkles } from "lucide-react";
-import { deletePodcastAction } from "../actions";
-import ConfirmDialog from "@/components/molecules/confirmDialog";
-import styles from "../styles";
-import baseStyles from "../../styles";
-import type { Podcast } from "@/lib/github/types";
-import AudioJsonMediaSelector from "../../articles/components/AudioJsonMediaSelector";
-import SelectSearch from "../../articles/components/SelectSearch";
 import { mutate } from "swr";
-import { cn } from "@/lib/utils/classes";
-import { generateSlug } from "@/lib/utils/slug";
+
+import ConfirmDialog from "@/components/molecules/confirmDialog";
 import { useIssues } from "@/hooks/swr";
 import { toast } from "@/hooks/use-toast";
+import type { Podcast } from "@/lib/github/types";
 import { useLocalizedPath } from "@/lib/i18n/client";
+import { cn } from "@/lib/utils/classes";
+import { generateSlug } from "@/lib/utils/slug";
+
+import AudioJsonMediaSelector from "../../articles/components/AudioJsonMediaSelector";
+import SelectSearch from "../../articles/components/SelectSearch";
+import baseStyles from "../../styles";
+import { deletePodcastAction } from "../actions";
+import styles from "../styles";
 
 /* **************************************************
  * Types

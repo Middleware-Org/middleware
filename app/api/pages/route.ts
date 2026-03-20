@@ -2,10 +2,11 @@
  * Imports
  **************************************************/
 import { NextResponse } from "next/server";
+
 import { CACHE_PROFILES, setPrivateCacheHeaders } from "@/lib/api/cache";
-import { getAllPages } from "@/lib/github/pages";
-import { withAuth } from "@/lib/api/withAuth";
 import { apiError } from "@/lib/api/responses";
+import { withAuth } from "@/lib/api/withAuth";
+import { getAllPages } from "@/lib/github/pages";
 import { createLogger } from "@/lib/logger";
 
 const logger = createLogger("API /pages");

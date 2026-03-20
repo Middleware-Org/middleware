@@ -2,16 +2,21 @@
  * Imports
  **************************************************/
 import Link from "next/link";
+
+import FormattedDate from "@/components/atoms/date";
 import Separator from "@/components/atoms/separetor";
 import { H3, MonoTextBold, MonoTextLight, SerifText } from "@/components/atoms/typography";
-import { cn } from "@/lib/utils/classes";
-import { getTextColor } from "@/lib/utils/color";
-import FormattedDate from "@/components/atoms/date";
-import styles from "./styles";
-import type { Article, Issue } from "@/.velite";
-import { CommonDictionary } from "@/lib/i18n/types";
 import { getAuthorById, getCategoryById } from "@/lib/content";
 import { withLocale } from "@/lib/i18n/path";
+import type { CommonDictionary } from "@/lib/i18n/types";
+import { cn } from "@/lib/utils/classes";
+import { getTextColor } from "@/lib/utils/color";
+
+import type { Article, Issue } from "@/.velite";
+
+import styles from "./styles";
+
+
 
 /* **************************************************
  * Types

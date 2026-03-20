@@ -1,25 +1,30 @@
+import { Book, Play } from "lucide-react";
+import { marked } from "marked";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+
+import FormattedDate from "@/components/atoms/date";
 import Separator from "@/components/atoms/separetor";
 import { H1, H2, MonoTextBold, MonoTextLight } from "@/components/atoms/typography";
-import { cn } from "@/lib/utils/classes";
-import type { Article } from "@/.velite";
-import SeparatorWithLogo from "@/components/molecules/SeparatorWithLogo";
-import FormattedDate from "@/components/atoms/date";
-import { ArticleDictionary, CommonDictionary } from "@/lib/i18n/types";
-import { getCategoryById } from "@/lib/content/categories";
-import { getAuthorById } from "@/lib/content/authors";
-import { getPodcastById } from "@/lib/content/podcasts";
-import { getIssueById } from "@/lib/content/issues";
-import { getArticlesByIssue } from "@/lib/content/articles";
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import { getMinText } from "@/lib/utils/text";
-import { Book, Play } from "lucide-react";
-import CitationsSection from "./CitationsSection";
-import BookmarkManagerLazy from "./BookmarkManagerLazy";
 import ArticleCard from "@/components/molecules/articleCard";
-import { marked } from "marked";
-import { sanitizeInlineHtml, sanitizeRichHtml } from "@/lib/security/sanitizeHtml";
+import SeparatorWithLogo from "@/components/molecules/SeparatorWithLogo";
+import { getArticlesByIssue } from "@/lib/content/articles";
+import { getAuthorById } from "@/lib/content/authors";
+import { getCategoryById } from "@/lib/content/categories";
+import { getIssueById } from "@/lib/content/issues";
+import { getPodcastById } from "@/lib/content/podcasts";
 import { withLocale } from "@/lib/i18n/path";
+import type { ArticleDictionary, CommonDictionary } from "@/lib/i18n/types";
+import { sanitizeInlineHtml, sanitizeRichHtml } from "@/lib/security/sanitizeHtml";
+import { cn } from "@/lib/utils/classes";
+import { getMinText } from "@/lib/utils/text";
+
+import type { Article } from "@/.velite";
+
+
+import BookmarkManagerLazy from "./BookmarkManagerLazy";
+import CitationsSection from "./CitationsSection";
+
 
 type ArticleProps = {
   article: Article;

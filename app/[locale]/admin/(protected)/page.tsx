@@ -2,10 +2,8 @@
  * Imports
  **************************************************/
 import Link from "next/link";
+
 import { getUser } from "@/lib/auth/server";
-import { getDictionary } from "@/lib/i18n/utils";
-import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
-import { withLocale } from "@/lib/i18n/path";
 import {
   getAllIssues,
   getAllArticles,
@@ -16,6 +14,10 @@ import {
   getAllUsers,
 } from "@/lib/github";
 import { getAllMediaFiles } from "@/lib/github/media";
+import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
+import { withLocale } from "@/lib/i18n/path";
+import { getDictionary } from "@/lib/i18n/utils";
+
 import TokenExpirationBanner from "./components/TokenExpirationBanner";
 import styles from "./styles";
 

@@ -1,16 +1,19 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { Suspense } from "react";
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
+import { Suspense } from "react";
+
+import SWRPageProvider from "@/components/providers/SWRPageProvider";
 import { getUser } from "@/lib/auth/server";
 import { getCategoryBySlug } from "@/lib/github/categories";
-import CategoryFormClient from "../../components/CategoryFormClient";
-import CategoryEditSkeleton from "../../components/CategoryEditSkeleton";
-import styles from "../../styles";
-import SWRPageProvider from "@/components/providers/SWRPageProvider";
 import { withLocale } from "@/lib/i18n/path";
+
+import CategoryEditSkeleton from "../../components/CategoryEditSkeleton";
+import CategoryFormClient from "../../components/CategoryFormClient";
+import styles from "../../styles";
+
 
 /* **************************************************
  * Types

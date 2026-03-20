@@ -5,6 +5,7 @@
  * Catches errors in the root layout
  **************************************************/
 import { useEffect } from "react";
+
 import { toast } from "@/hooks/use-toast";
 
 interface GlobalErrorProps {

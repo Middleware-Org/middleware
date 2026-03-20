@@ -1,16 +1,18 @@
 /* **************************************************
  * Imports
  **************************************************/
+import type { Metadata } from "next";
+
+import AutoScroll from "@/components/AutoScroll";
+import Issue from "@/components/organism/issue";
 import IssuesList from "@/components/organism/issuesList";
 import MobileIssuesToggle from "@/components/organism/mobileIssuesToggle";
 import { getAllIssues } from "@/lib/content";
-import { getDictionary } from "@/lib/i18n/utils";
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
-import Issue from "@/components/organism/issue";
+import { getDictionary } from "@/lib/i18n/utils";
 import { cn } from "@/lib/utils/classes";
-import AutoScroll from "@/components/AutoScroll";
 import { getBaseUrl } from "@/lib/utils/metadata";
-import type { Metadata } from "next";
+
 
 /* **************************************************
  * Types

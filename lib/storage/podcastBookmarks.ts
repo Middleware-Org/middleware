@@ -1,4 +1,5 @@
-import { openDB, DBSchema, IDBPDatabase } from "idb";
+import type { DBSchema, IDBPDatabase } from "idb";
+import { openDB } from "idb";
 
 export const PODCAST_BOOKMARKS_UPDATED_EVENT = "podcast-bookmarks-updated";
 

@@ -1,17 +1,20 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { Suspense } from "react";
+import { Plus, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
+
+import SWRPageProvider from "@/components/providers/SWRPageProvider";
 import { getUser } from "@/lib/auth/server";
 import { getAllCategories } from "@/lib/github/categories";
+import { withLocale } from "@/lib/i18n/path";
+
 import CategoryListClient from "./components/CategoryListClient";
 import CategoryListSkeleton from "./components/CategoryListSkeleton";
 import styles from "./styles";
-import SWRPageProvider from "@/components/providers/SWRPageProvider";
-import { withLocale } from "@/lib/i18n/path";
-import { Plus, ArrowLeft } from "lucide-react";
+
 
 /* **************************************************
  * Categories List Page (Server Component)

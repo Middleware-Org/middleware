@@ -1,16 +1,18 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
+
+import SWRPageProvider from "@/components/providers/SWRPageProvider";
 import { getUser } from "@/lib/auth/server";
+import { withLocale } from "@/lib/i18n/path";
 import { cn } from "@/lib/utils/classes";
+
 import PodcastFormClient from "../components/PodcastFormClient";
 import PodcastFormSkeleton from "../components/PodcastFormSkeleton";
 import styles from "../styles";
-import SWRPageProvider from "@/components/providers/SWRPageProvider";
-import { withLocale } from "@/lib/i18n/path";
 
 /* **************************************************
  * New Podcast Page (Server Component)

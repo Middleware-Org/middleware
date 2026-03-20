@@ -1,18 +1,18 @@
 /* **************************************************
  * Imports
  **************************************************/
+import Analytics from "@/components/Analytics";
+import PolicyBanner from "@/components/organism/banner";
+import StructuredData from "@/components/StructuredData";
+import { WebVitals } from "@/components/WebVitals";
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import { getDictionary } from "@/lib/i18n/utils";
-import Analytics from "@/components/Analytics";
-import { WebVitals } from "@/components/WebVitals";
-import PolicyBanner from "@/components/organism/banner";
 import {
   getBaseUrl,
   createOpenGraphMetadata,
   createTwitterMetadata,
   createOrganizationSchema,
 } from "@/lib/utils/metadata";
-import StructuredData from "@/components/StructuredData";
 
 /* **************************************************
  * Types

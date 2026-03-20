@@ -2,12 +2,14 @@
  * Imports
  **************************************************/
 import Link from "next/link";
-import { getDictionary } from "@/lib/i18n/utils";
-import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
-import Pictogram from "@/components/organism/pictogram";
+
 import { MonoTextBold } from "@/components/atoms/typography";
-import type { CommonDictionary } from "@/lib/i18n/types";
+import Pictogram from "@/components/organism/pictogram";
+import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import { withLocale } from "@/lib/i18n/path";
+import type { CommonDictionary } from "@/lib/i18n/types";
+import { getDictionary } from "@/lib/i18n/utils";
+
 import LoginForm from "./LoginForm";
 import styles from "./styles";
 

@@ -5,11 +5,15 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { MonoTextLight } from "@/components/atoms/typography";
+
 import Separator from "@/components/atoms/separetor";
-import { cn } from "@/lib/utils/classes";
-import type { Category } from "@/.velite";
+import { MonoTextLight } from "@/components/atoms/typography";
 import { useCategoriesList } from "@/lib/store/categoriesList";
+import { cn } from "@/lib/utils/classes";
+
+import type { Category } from "@/.velite";
+
+
 import styles from "./styles";
 
 /* **************************************************

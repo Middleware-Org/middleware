@@ -2,9 +2,10 @@
  * Imports
  **************************************************/
 import { cn } from "@/lib/utils/classes";
-import { TypographyProps } from "./types";
+
 import { editorBold, editorRegular, gtAmericaMonoBold, gtAmericaMonoLight } from "./fonts";
 import styles from "./styles";
+import type { TypographyProps } from "./types";
 
 /* **************************************************
  * Components

@@ -3,16 +3,18 @@
  **************************************************/
 "use client";
 
-import { useState } from "react";
 import { Rocket, Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils/classes";
-import ConfirmDialog from "@/components/molecules/confirmDialog";
-import styles from "./Sidebar/styles";
+import { useState } from "react";
 import useSWR from "swr";
-import { createFetcher } from "@/hooks/swr/fetcher";
 import { mutate } from "swr";
-import type { AdminDictionary } from "@/lib/i18n/types";
+
+import ConfirmDialog from "@/components/molecules/confirmDialog";
+import { createFetcher } from "@/hooks/swr/fetcher";
 import { toast } from "@/hooks/use-toast";
+import type { AdminDictionary } from "@/lib/i18n/types";
+import { cn } from "@/lib/utils/classes";
+
+import styles from "./Sidebar/styles";
 
 type MergeButtonProps = {
   dict: AdminDictionary["mergeButton"];

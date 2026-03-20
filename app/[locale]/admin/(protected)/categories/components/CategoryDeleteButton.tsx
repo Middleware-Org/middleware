@@ -5,12 +5,14 @@
 
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
-import { deleteCategoryAction } from "../actions";
-import styles from "../styles";
-import { useCategory } from "@/hooks/swr";
 import { mutate } from "swr";
+
+import { useCategory } from "@/hooks/swr";
 import { toast } from "@/hooks/use-toast";
 import { useLocalizedPath } from "@/lib/i18n/client";
+
+import { deleteCategoryAction } from "../actions";
+import styles from "../styles";
 
 /* **************************************************
  * Types

@@ -5,8 +5,10 @@
  **************************************************/
 import Image from "next/image";
 import Link from "next/link";
-import { cn } from "@/lib/utils/classes";
+
 import { useLocalizedPath } from "@/lib/i18n/client";
+import { cn } from "@/lib/utils/classes";
+
 import styles from "./styles";
 
 /* **************************************************

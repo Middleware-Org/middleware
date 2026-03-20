@@ -3,17 +3,19 @@
  **************************************************/
 "use client";
 
-import { useState, useTransition, useEffect, useCallback } from "react";
 import { X, Trash2, Save } from "lucide-react";
-import Image from "next/image";
 import { Music, FileJson } from "lucide-react";
-import { deleteMediaAction, renameMediaAction } from "../actions";
+import Image from "next/image";
+import { useState, useTransition, useEffect, useCallback } from "react";
 import { mutate } from "swr";
-import { cn } from "@/lib/utils/classes";
+
 import ConfirmDialog from "@/components/molecules/confirmDialog";
-import styles from "../styles";
-import type { MediaFile } from "@/lib/github/media";
 import { toast } from "@/hooks/use-toast";
+import type { MediaFile } from "@/lib/github/media";
+import { cn } from "@/lib/utils/classes";
+
+import { deleteMediaAction, renameMediaAction } from "../actions";
+import styles from "../styles";
 
 /* **************************************************
  * Types

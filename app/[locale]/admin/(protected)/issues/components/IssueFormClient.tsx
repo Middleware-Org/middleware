@@ -3,25 +3,27 @@
  **************************************************/
 "use client";
 
+import { Sparkles } from "lucide-react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useMemo, useTransition } from "react";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
-import { useRouter } from "next/navigation";
-import { Sparkles } from "lucide-react";
-import type { ActionResult } from "@/lib/actions/types";
-import { createIssueAction, updateIssueAction } from "../actions";
-import { getGitHubImageUrl } from "@/lib/github/images";
-import styles from "../styles";
-import type { Issue } from "@/lib/github/types";
-import Image from "next/image";
-import { useIssue } from "@/hooks/swr";
-import AudioJsonMediaSelector from "../../articles/components/AudioJsonMediaSelector";
-import IssueMetaPanel from "./IssueMetaPanel";
 import { mutate } from "swr";
+
+import { useIssue } from "@/hooks/swr";
 import { toast } from "@/hooks/use-toast";
+import type { ActionResult } from "@/lib/actions/types";
+import { getGitHubImageUrl } from "@/lib/github/images";
+import type { Issue } from "@/lib/github/types";
 import { useLocalizedPath } from "@/lib/i18n/client";
-import { generateSlug } from "@/lib/utils/slug";
 import { cn } from "@/lib/utils/classes";
+import { generateSlug } from "@/lib/utils/slug";
+
+import IssueMetaPanel from "./IssueMetaPanel";
+import AudioJsonMediaSelector from "../../articles/components/AudioJsonMediaSelector";
+import { createIssueAction, updateIssueAction } from "../actions";
+import styles from "../styles";
 
 /* **************************************************
  * Types

@@ -1,12 +1,15 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { MonoTextLight } from "@/components/atoms/typography";
 import Separator from "@/components/atoms/separetor";
+import { MonoTextLight } from "@/components/atoms/typography";
 import { SerifTextBold } from "@/components/atoms/typography";
-import type { Issue } from "@/.velite";
-import { CommonDictionary } from "@/lib/i18n/types";
 import { getPodcastsByIssue } from "@/lib/content";
+import type { CommonDictionary } from "@/lib/i18n/types";
+
+import type { Issue } from "@/.velite";
+
+
 import IssuePodcasts from "../issuePodcasts";
 import styles from "./styles";
 

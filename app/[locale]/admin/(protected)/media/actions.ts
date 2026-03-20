@@ -3,7 +3,9 @@
  **************************************************/
 "use server";
 
+import type { ActionResult } from "@/lib/actions/types";
 import { getCmsUser } from "@/lib/auth/server";
+import { revalidateAdminPath } from "@/lib/cache/revalidate";
 import {
   deleteMediaFile,
   uploadMediaFile,
@@ -11,8 +13,6 @@ import {
   getAllMediaFiles,
   type MediaFile,
 } from "@/lib/github/media";
-import type { ActionResult } from "@/lib/actions/types";
-import { revalidateAdminPath } from "@/lib/cache/revalidate";
 
 /* **************************************************
  * Server Actions

@@ -2,11 +2,12 @@
  * Imports
  **************************************************/
 import { getAllIssues, getArticlesByIssue } from "@/lib/content";
-import { cn } from "@/lib/utils/classes";
-import ArchiveScrollWrapper from "./components/ArchiveScrollWrapper";
-import ArchiveIssueCard from "./components/ArchiveIssueCard";
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import { getDictionary } from "@/lib/i18n/utils";
+import { cn } from "@/lib/utils/classes";
+
+import ArchiveIssueCard from "./components/ArchiveIssueCard";
+import ArchiveScrollWrapper from "./components/ArchiveScrollWrapper";
 
 /* **************************************************
  * Types

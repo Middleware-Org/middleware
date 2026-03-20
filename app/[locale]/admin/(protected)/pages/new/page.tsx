@@ -1,16 +1,19 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
+
+import SWRPageProvider from "@/components/providers/SWRPageProvider";
 import { getUser } from "@/lib/auth/server";
+import { withLocale } from "@/lib/i18n/path";
 import { cn } from "@/lib/utils/classes";
+
 import PageFormClient from "../components/PageFormClient";
 import PageFormSkeleton from "../components/PageFormSkeleton";
-import SWRPageProvider from "@/components/providers/SWRPageProvider";
 import styles from "../styles";
-import { withLocale } from "@/lib/i18n/path";
+
 
 /* **************************************************
  * New Page (Server Component)

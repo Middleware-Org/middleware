@@ -3,17 +3,19 @@
 /* **************************************************
  * Imports
  **************************************************/
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
-import Link from "next/link";
 import FocusLock from "react-focus-lock";
-import { CommonDictionary } from "@/lib/i18n/types";
-import { cn } from "@/lib/utils/classes";
-import { useMenu } from "@/lib/store";
+
+import Separator from "@/components/atoms/separetor";
+import { MonoTextBold, MonoTextLight } from "@/components/atoms/typography";
 import { headerLinks, menuItems } from "@/lib/data/links";
 import { useLocalizedPath } from "@/lib/i18n/client";
-import { MonoTextBold, MonoTextLight } from "@/components/atoms/typography";
-import Separator from "@/components/atoms/separetor";
+import type { CommonDictionary } from "@/lib/i18n/types";
+import { useMenu } from "@/lib/store";
+import { cn } from "@/lib/utils/classes";
+
 import Pictogram from "../pictogram";
 import styles from "./styles";
 

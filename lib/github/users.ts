@@ -1,9 +1,10 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { randomUUID } from "crypto";
-import { prisma } from "@/lib/prisma";
 import { hashPassword } from "better-auth/crypto";
+import { randomUUID } from "crypto";
+
+import { prisma } from "@/lib/prisma";
 
 /* **************************************************
  * Types

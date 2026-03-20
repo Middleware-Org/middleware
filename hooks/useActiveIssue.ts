@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Issue } from "@/.velite";
+
+import type { Issue } from "@/.velite";
 
 export function useActiveIssue(issues: Issue[]) {
   const [activeIssue, setActiveIssue] = useState<Issue | null>(

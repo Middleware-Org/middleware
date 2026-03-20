@@ -1,6 +1,7 @@
-import { Page } from "@/.velite";
-import { H1 } from "@/components/atoms/typography";
 import Separator from "@/components/atoms/separetor";
+import { H1 } from "@/components/atoms/typography";
+
+import type { Page } from "@/.velite";
 
 type Props = {
   page: Page;

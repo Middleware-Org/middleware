@@ -3,8 +3,10 @@
  **************************************************/
 "use client";
 
-import { cn } from "@/lib/utils/classes";
 import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+
+import { cn } from "@/lib/utils/classes";
+
 import styles from "./styles";
 
 /* **************************************************

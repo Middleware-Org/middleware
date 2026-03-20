@@ -1,19 +1,21 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
+
+import SWRPageProvider from "@/components/providers/SWRPageProvider";
 import { getUser } from "@/lib/auth/server";
-import { getAllCategories } from "@/lib/github/categories";
 import { getAllAuthors } from "@/lib/github/authors";
+import { getAllCategories } from "@/lib/github/categories";
 import { getAllIssues } from "@/lib/github/issues";
+import { withLocale } from "@/lib/i18n/path";
 import { cn } from "@/lib/utils/classes";
+
 import ArticleFormClient from "../components/ArticleFormClient";
 import ArticleFormSkeleton from "../components/ArticleFormSkeleton";
 import styles from "../styles";
-import SWRPageProvider from "@/components/providers/SWRPageProvider";
-import { withLocale } from "@/lib/i18n/path";
 
 /* **************************************************
  * New Article Page (Server Component)

@@ -3,7 +3,8 @@
  * Generates custom OG images for articles with title and metadata
  **************************************************/
 import { ImageResponse } from "@vercel/og";
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
+
 import { createLogger } from "@/lib/logger";
 
 const logger = createLogger("API /og");

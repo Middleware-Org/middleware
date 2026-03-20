@@ -2,9 +2,11 @@
  * Imports
  **************************************************/
 import useSWR from "swr";
-import { createFetcher } from "./fetcher";
-import { swrConfig } from "./config";
+
 import type { Page } from "@/lib/github/types";
+
+import { swrConfig } from "./config";
+import { createFetcher } from "./fetcher";
 
 /* **************************************************
  * Types

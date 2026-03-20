@@ -1,15 +1,18 @@
 /* **************************************************
  * Imports
  **************************************************/
+import { notFound } from "next/navigation";
+
+import { MonoTextLight } from "@/components/atoms/typography";
+import AutoScrollText from "@/components/organism/autoScrollText";
+import Footer from "@/components/organism/footer";
 import Header from "@/components/organism/header";
+import Menu from "@/components/organism/menu";
+import { getPodcastBySlug } from "@/lib/content";
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import { getDictionary } from "@/lib/i18n/utils";
-import Menu from "@/components/organism/menu";
-import { MonoTextLight } from "@/components/atoms/typography";
-import { getPodcastBySlug } from "@/lib/content";
-import { notFound } from "next/navigation";
-import Footer from "@/components/organism/footer";
-import AutoScrollText from "@/components/organism/autoScrollText";
+
+
 
 /* **************************************************
  * Types

@@ -3,11 +3,11 @@
  **************************************************/
 "use server";
 
+import type { ActionResult } from "@/lib/actions/types";
 import { getCmsUser } from "@/lib/auth/server";
+import { revalidateAdminPath } from "@/lib/cache/revalidate";
 import { createAuthor, updateAuthor, deleteAuthor } from "@/lib/github/authors";
 import type { Author } from "@/lib/github/types";
-import type { ActionResult } from "@/lib/actions/types";
-import { revalidateAdminPath } from "@/lib/cache/revalidate";
 
 /* **************************************************
  * Server Actions

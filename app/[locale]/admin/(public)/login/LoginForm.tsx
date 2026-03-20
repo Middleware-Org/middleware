@@ -3,11 +3,13 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+
 import { authClient } from "@/lib/auth/client";
 import { withLocale } from "@/lib/i18n/path";
 import type { AdminDictionary } from "@/lib/i18n/types";
+
 import styles from "./styles";
 
 /* **************************************************

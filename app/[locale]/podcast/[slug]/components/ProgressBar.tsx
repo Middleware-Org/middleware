@@ -4,8 +4,9 @@
  * Imports
  **************************************************/
 import { MonoTextLight } from "@/components/atoms/typography";
-import { formatTime } from "./utils/formatTime";
+
 import styles from "./PodcastPlayerStyles";
+import { formatTime } from "./utils/formatTime";
 
 /* **************************************************
  * Types

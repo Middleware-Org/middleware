@@ -2,9 +2,10 @@
  * Imports
  **************************************************/
 import { redirect } from "next/navigation";
+import type { ReactNode } from "react";
+
 import { getUser } from "@/lib/auth/server";
 import { withLocale } from "@/lib/i18n/path";
-import type { ReactNode } from "react";
 
 /* **************************************************
  * Types

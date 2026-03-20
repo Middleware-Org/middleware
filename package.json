@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "npx prisma generate --no-engine && npx velite && next dev",
     "build": "prisma generate --no-engine && npx velite && next build",
+    "prepare": "husky",
     "postinstall": "prisma generate --no-engine",
     "start": "next start",
     "lint": "eslint .",
@@ -67,11 +68,19 @@
     "eslint": "^9",
     "eslint-config-next": "16.0.7",
     "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.6",
     "prettier": "^3.7.4",
     "prisma": "^6.19.0",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "^5",
     "velite": "^0.3.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --max-warnings=0"
+    ]
   }
 }

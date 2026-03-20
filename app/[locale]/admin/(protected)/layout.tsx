@@ -2,13 +2,16 @@
  * Imports
  **************************************************/
 import { redirect } from "next/navigation";
+import type { ReactNode } from "react";
+
+import SWRProvider from "@/components/providers/SWRProvider";
 import { getUser } from "@/lib/auth/server";
-import { getDictionary } from "@/lib/i18n/utils";
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import { withLocale } from "@/lib/i18n/path";
-import type { ReactNode } from "react";
+import { getDictionary } from "@/lib/i18n/utils";
+
 import Sidebar from "./components/Sidebar";
-import SWRProvider from "@/components/providers/SWRProvider";
+
 //import SWRCacheIndicator from "@/components/debug/SWRCacheIndicator";
 
 /* **************************************************

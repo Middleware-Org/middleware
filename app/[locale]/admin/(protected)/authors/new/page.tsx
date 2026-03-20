@@ -1,15 +1,17 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
+
+import SWRPageProvider from "@/components/providers/SWRPageProvider";
 import { getUser } from "@/lib/auth/server";
+import { withLocale } from "@/lib/i18n/path";
+
 import AuthorFormClient from "../components/AuthorFormClient";
 import AuthorFormSkeleton from "../components/AuthorFormSkeleton";
 import styles from "../styles";
-import SWRPageProvider from "@/components/providers/SWRPageProvider";
-import { withLocale } from "@/lib/i18n/path";
 
 /* **************************************************
  * New Author Page (Server Component)

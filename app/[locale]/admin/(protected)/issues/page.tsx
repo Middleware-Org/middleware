@@ -1,17 +1,20 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { Suspense } from "react";
+import { Plus, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
+
+import SWRPageProvider from "@/components/providers/SWRPageProvider";
 import { getUser } from "@/lib/auth/server";
 import { getAllIssues } from "@/lib/github/issues";
+import { withLocale } from "@/lib/i18n/path";
+
 import IssueListClient from "./components/IssueListClient";
 import IssueListSkeleton from "./components/IssueListSkeleton";
 import styles from "./styles";
-import SWRPageProvider from "@/components/providers/SWRPageProvider";
-import { withLocale } from "@/lib/i18n/path";
-import { Plus, ArrowLeft } from "lucide-react";
+
 
 /* **************************************************
  * Issues List Page (Server Component)

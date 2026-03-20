@@ -1,16 +1,17 @@
 /* **************************************************
  * Imports
  **************************************************/
-import Link from "next/link";
 import { headers } from "next/headers";
+import Link from "next/link";
+
+import Button from "@/components/atoms/button";
+import { SerifText, MonoTextLight } from "@/components/atoms/typography";
+import Footer from "@/components/organism/footer";
 import Header from "@/components/organism/header";
 import Menu from "@/components/organism/menu";
-import Footer from "@/components/organism/footer";
-import { SerifText, MonoTextLight } from "@/components/atoms/typography";
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
-import { getDictionary } from "@/lib/i18n/utils";
 import { i18nSettings } from "@/lib/i18n/settings";
-import Button from "@/components/atoms/button";
+import { getDictionary } from "@/lib/i18n/utils";
 import { cn } from "@/lib/utils/classes";
 
 /* **************************************************

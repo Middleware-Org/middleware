@@ -1,12 +1,15 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { MonoTextLight } from "@/components/atoms/typography";
 import Separator from "@/components/atoms/separetor";
+import { MonoTextLight } from "@/components/atoms/typography";
 import { SerifTextBold } from "@/components/atoms/typography";
-import type { Author } from "@/.velite";
-import { AuthorsDictionary, CommonDictionary } from "@/lib/i18n/types";
 import { getArticlesByAuthorSlug } from "@/lib/content";
+import type { AuthorsDictionary, CommonDictionary } from "@/lib/i18n/types";
+
+import type { Author } from "@/.velite";
+
+
 import AuthorArticles from "../authorArticles";
 import styles from "./styles";
 

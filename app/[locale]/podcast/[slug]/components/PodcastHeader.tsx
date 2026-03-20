@@ -4,10 +4,13 @@
  * Imports
  **************************************************/
 import Image from "next/image";
+
 import { SerifText } from "@/components/atoms/typography";
-import { Podcast, Issue } from "@/.velite";
-import styles from "./PodcastPlayerStyles";
 import { getGitHubImageUrl } from "@/lib/github/images";
+
+import type { Podcast, Issue } from "@/.velite";
+
+import styles from "./PodcastPlayerStyles";
 
 /* **************************************************
  * Types

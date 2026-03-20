@@ -2,6 +2,7 @@
  * Imports
  **************************************************/
 import { NextResponse } from "next/server";
+
 import { CACHE_PROFILES, setPrivateCacheHeaders } from "@/lib/api/cache";
 import { getAdminUser } from "@/lib/auth/server";
 import { getAllUsers } from "@/lib/github/users";

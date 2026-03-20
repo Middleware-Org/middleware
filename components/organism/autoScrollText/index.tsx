@@ -1,7 +1,8 @@
 "use client";
 
-import React, { ReactNode, useEffect, useRef } from "react";
 import { motion, useAnimation } from "framer-motion";
+import type { ReactNode} from "react";
+import React, { useEffect, useRef } from "react";
 
 type AutoScrollTextProps = {
   children: ReactNode;

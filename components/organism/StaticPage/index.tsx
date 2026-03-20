@@ -1,4 +1,5 @@
-import { Page } from "@/.velite";
+import type { Page } from "@/.velite";
+
 import StaticPageBody from "./StaticPageBody";
 import StaticPageFooter from "./StaticPageFooter";
 import StaticPageHeader from "./StaticPageHeader";

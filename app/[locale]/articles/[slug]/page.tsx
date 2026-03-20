@@ -1,15 +1,19 @@
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+
+import StructuredData from "@/components/StructuredData";
 import { getArticleBySlug, getAllArticles } from "@/lib/content";
 import { getAuthorById } from "@/lib/content/authors";
 import { getCategoryById } from "@/lib/content/categories";
 import { getIssueById } from "@/lib/content/issues";
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
-import { getDictionary } from "@/lib/i18n/utils";
 import { i18nSettings } from "@/lib/i18n/settings";
+import { getDictionary } from "@/lib/i18n/utils";
 import { getBaseUrl } from "@/lib/utils/metadata";
-import { notFound } from "next/navigation";
+
 import Article from "./components/Article";
-import StructuredData from "@/components/StructuredData";
-import type { Metadata } from "next";
+
+
 
 interface ArticlePageProps {
   params: Promise<{ locale: string; slug: string }>;

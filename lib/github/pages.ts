@@ -1,7 +1,9 @@
 /* **************************************************
  * Imports
  **************************************************/
+import { randomUUID } from "crypto";
 import matter from "gray-matter";
+
 import {
   createOrUpdateFile,
   deleteFile,
@@ -9,9 +11,8 @@ import {
   listDirectoryFiles,
   renameFile,
 } from "./client";
-import { generateSlug, generateUniqueSlug } from "./utils";
 import type { Page } from "./types";
-import { randomUUID } from "crypto";
+import { generateSlug, generateUniqueSlug } from "./utils";
 
 /* **************************************************
  * Pages

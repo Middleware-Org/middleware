@@ -3,9 +3,11 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { useState, useCallback } from "react";
 import { RefreshCw, Eye, EyeOff } from "lucide-react";
+import { useState, useCallback } from "react";
+
 import { cn } from "@/lib/utils/classes";
+
 import styles from "./PasswordInputStyles";
 
 /* **************************************************

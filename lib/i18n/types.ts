@@ -1,15 +1,16 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { TRANSLATION_NAMESPACES } from "./consts";
-import commonIt from "@/i18n/locales/it/common.json";
-import adminIt from "@/i18n/locales/it/admin.json";
-import categoriesIt from "@/i18n/locales/it/categories.json";
-import authorsIt from "@/i18n/locales/it/authors.json";
-import archiveIt from "@/i18n/locales/it/archive.json";
-import issueIt from "@/i18n/locales/it/issue.json";
-import articleIt from "@/i18n/locales/it/article.json";
-import podcastIt from "@/i18n/locales/it/podcast.json";
+import type adminIt from "@/i18n/locales/it/admin.json";
+import type archiveIt from "@/i18n/locales/it/archive.json";
+import type articleIt from "@/i18n/locales/it/article.json";
+import type authorsIt from "@/i18n/locales/it/authors.json";
+import type categoriesIt from "@/i18n/locales/it/categories.json";
+import type commonIt from "@/i18n/locales/it/common.json";
+import type issueIt from "@/i18n/locales/it/issue.json";
+import type podcastIt from "@/i18n/locales/it/podcast.json";
+
+import type { TRANSLATION_NAMESPACES } from "./consts";
 
 /* **************************************************
  * Types

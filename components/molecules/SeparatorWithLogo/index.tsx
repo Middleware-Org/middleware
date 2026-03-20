@@ -1,5 +1,5 @@
-import Pictogram from "@/components/organism/pictogram";
 import Separator from "@/components/atoms/separetor";
+import Pictogram from "@/components/organism/pictogram";
 
 export default function SeparatorWithLogo() {
   return (

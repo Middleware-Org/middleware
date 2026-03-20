@@ -3,21 +3,23 @@
  **************************************************/
 "use client";
 
-import { useState, useMemo, useEffect, useRef, useTransition } from "react";
 import { Music, FileJson, Search, X, Trash2 } from "lucide-react";
-import styles from "../styles";
-import baseStyles from "../../styles";
 import Image from "next/image";
-import { useMedia } from "@/hooks/swr";
-import { cn } from "@/lib/utils/classes";
-import type { MediaFile } from "@/lib/github/media";
-import MediaDialog from "./MediaDialog";
-import { useTableSelection } from "@/hooks/useTableSelection";
-import { TableCheckbox } from "@/components/table/TableCheckbox";
-import { deleteMediaFilesAction } from "../actions";
+import { useState, useMemo, useEffect, useRef, useTransition } from "react";
 import { mutate } from "swr";
+
 import ConfirmDialog from "@/components/molecules/confirmDialog";
+import { TableCheckbox } from "@/components/table/TableCheckbox";
+import { useMedia } from "@/hooks/swr";
 import { toast } from "@/hooks/use-toast";
+import { useTableSelection } from "@/hooks/useTableSelection";
+import type { MediaFile } from "@/lib/github/media";
+import { cn } from "@/lib/utils/classes";
+
+import { deleteMediaFilesAction } from "../actions";
+import MediaDialog from "./MediaDialog";
+import baseStyles from "../../styles";
+import styles from "../styles";
 
 /* **************************************************
  * Media List Client Component

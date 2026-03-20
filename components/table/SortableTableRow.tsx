@@ -6,10 +6,13 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical } from "lucide-react";
-import { TableRow } from "./TableRow";
-import { TableCell } from "./TableCell";
-import { cn } from "@/lib/utils/classes";
 import type { ReactNode } from "react";
+
+import { cn } from "@/lib/utils/classes";
+
+import { TableCell } from "./TableCell";
+import { TableRow } from "./TableRow";
+
 
 /* **************************************************
  * Types

@@ -3,16 +3,19 @@
 /* **************************************************
  * Imports
  **************************************************/
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
+
+import Button from "@/components/atoms/button";
+import FormattedDate from "@/components/atoms/date";
 import { MonoTextLight } from "@/components/atoms/typography";
 import { useActiveIssue } from "@/hooks/useActiveIssue";
 import { cn } from "@/lib/utils/classes";
-import FormattedDate from "@/components/atoms/date";
-import Button from "@/components/atoms/button";
+
+import type { Issue } from "@/.velite";
+
 import styles from "./styles";
-import { Issue } from "@/.velite";
 
 /* **************************************************
  * Types

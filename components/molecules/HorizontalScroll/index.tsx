@@ -1,7 +1,7 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { useLayoutEffect, useRef, useState } from "react";
 
 type HorizontalScrollProps = {
   children: React.ReactNode;

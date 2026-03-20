@@ -1,10 +1,11 @@
 /* **************************************************
  * Imports
  **************************************************/
+import { toNextJsHandler } from "better-auth/next-js";
+import { NextResponse } from "next/server";
+
 import { auth } from "@/lib/auth/server";
 import { checkRateLimit, createRateLimitResponse, getClientIp } from "@/lib/security/rateLimit";
-import { NextResponse } from "next/server";
-import { toNextJsHandler } from "better-auth/next-js";
 
 /* **************************************************
  * Auth API Route

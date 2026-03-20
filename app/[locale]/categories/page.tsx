@@ -1,14 +1,14 @@
 /* **************************************************
  * Imports
  **************************************************/
+import AutoScroll from "@/components/AutoScroll";
 import CategoriesList from "@/components/organism/categoriesList";
+import Category from "@/components/organism/category";
 import MobileCategoriesToggle from "@/components/organism/mobileCategoriesToogle";
 import { getAllCategories } from "@/lib/content";
-import { getDictionary } from "@/lib/i18n/utils";
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
-import Category from "@/components/organism/category";
+import { getDictionary } from "@/lib/i18n/utils";
 import { cn } from "@/lib/utils/classes";
-import AutoScroll from "@/components/AutoScroll";
 
 /* **************************************************
  * Types

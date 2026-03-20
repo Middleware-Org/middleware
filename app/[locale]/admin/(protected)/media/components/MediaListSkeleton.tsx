@@ -2,8 +2,9 @@
  * Imports
  **************************************************/
 import { cn } from "@/lib/utils/classes";
-import styles from "../styles";
+
 import baseStyles from "../../styles";
+import styles from "../styles";
 
 /* **************************************************
  * Media Page Skeleton (unified)

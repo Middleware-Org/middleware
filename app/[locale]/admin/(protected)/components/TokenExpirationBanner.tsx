@@ -4,10 +4,11 @@
 "use client";
 
 import { AlertTriangle } from "lucide-react";
-import { cn } from "@/lib/utils/classes";
 import useSWR from "swr";
+
 import { createFetcher } from "@/hooks/swr/fetcher";
 import type { AdminDictionary } from "@/lib/i18n/types";
+import { cn } from "@/lib/utils/classes";
 
 type TokenExpirationBannerProps = {
   locale: string;

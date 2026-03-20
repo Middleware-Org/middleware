@@ -1,15 +1,17 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
+
+import SWRPageProvider from "@/components/providers/SWRPageProvider";
 import { getUser } from "@/lib/auth/server";
+import { withLocale } from "@/lib/i18n/path";
+
 import CategoryFormClient from "../components/CategoryFormClient";
 import CategoryFormSkeleton from "../components/CategoryFormSkeleton";
 import styles from "../styles";
-import SWRPageProvider from "@/components/providers/SWRPageProvider";
-import { withLocale } from "@/lib/i18n/path";
 
 /* **************************************************
  * New Category Page (Server Component)

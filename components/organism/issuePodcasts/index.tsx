@@ -4,11 +4,14 @@
 "use client";
 
 import { useState } from "react";
+
 import Button from "@/components/atoms/button";
 import { MonoTextLight } from "@/components/atoms/typography";
 import PodcastCard from "@/components/molecules/podcastCard";
+import type { CommonDictionary } from "@/lib/i18n/types";
+
 import type { Podcast, Issue } from "@/.velite";
-import { CommonDictionary } from "@/lib/i18n/types";
+
 import styles from "./styles";
 
 /* **************************************************

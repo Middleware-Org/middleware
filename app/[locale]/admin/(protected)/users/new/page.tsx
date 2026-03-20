@@ -1,15 +1,17 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
+
+import SWRPageProvider from "@/components/providers/SWRPageProvider";
 import { getAdminUser } from "@/lib/auth/server";
+import { withLocale } from "@/lib/i18n/path";
+
 import UserFormClient from "../components/UserFormClient";
 import UserFormSkeleton from "../components/UserFormSkeleton";
 import styles from "../styles";
-import SWRPageProvider from "@/components/providers/SWRPageProvider";
-import { withLocale } from "@/lib/i18n/path";
 
 /* **************************************************
  * New User Page (Server Component)

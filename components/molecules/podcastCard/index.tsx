@@ -4,11 +4,14 @@
  * Imports
  **************************************************/
 import Link from "next/link";
-import type { Podcast } from "@/.velite";
+
 import Separator from "@/components/atoms/separetor";
 import { H3, MonoTextBold, SerifText } from "@/components/atoms/typography";
 import { useLocalizedPath } from "@/lib/i18n/client";
-import { CommonDictionary } from "@/lib/i18n/types";
+import type { CommonDictionary } from "@/lib/i18n/types";
+
+import type { Podcast } from "@/.velite";
+
 import styles from "../articleCard/styles";
 
 /* **************************************************

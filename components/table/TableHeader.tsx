@@ -1,8 +1,10 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { cn } from "@/lib/utils/classes";
 import type { ReactNode } from "react";
+
+import { cn } from "@/lib/utils/classes";
+
 import styles from "./styles";
 
 /* **************************************************

@@ -3,18 +3,20 @@
  **************************************************/
 "use client";
 
-import { useState, useRef, useMemo, useEffect } from "react";
 import { upload } from "@vercel/blob/client";
 import { Search, X } from "lucide-react";
 import Image from "next/image";
-import baseStyles from "../../styles";
-import styles from "../../media/styles";
-import { useMedia } from "@/hooks/swr";
+import { useState, useRef, useMemo, useEffect } from "react";
 import { mutate } from "swr";
-import { cn } from "@/lib/utils/classes";
-import type { MediaFile } from "@/lib/github/media";
-import MediaDialog from "../../media/components/MediaDialog";
+
+import { useMedia } from "@/hooks/swr";
 import { toast } from "@/hooks/use-toast";
+import type { MediaFile } from "@/lib/github/media";
+import { cn } from "@/lib/utils/classes";
+
+import MediaDialog from "../../media/components/MediaDialog";
+import styles from "../../media/styles";
+import baseStyles from "../../styles";
 
 /* **************************************************
  * Types

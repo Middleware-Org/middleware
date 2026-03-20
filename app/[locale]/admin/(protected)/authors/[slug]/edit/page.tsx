@@ -1,16 +1,19 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { Suspense } from "react";
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
+import { Suspense } from "react";
+
+import SWRPageProvider from "@/components/providers/SWRPageProvider";
 import { getUser } from "@/lib/auth/server";
 import { getAuthorBySlug } from "@/lib/github/authors";
-import AuthorFormClient from "../../components/AuthorFormClient";
-import AuthorEditSkeleton from "../../components/AuthorEditSkeleton";
-import styles from "../../styles";
-import SWRPageProvider from "@/components/providers/SWRPageProvider";
 import { withLocale } from "@/lib/i18n/path";
+
+import AuthorEditSkeleton from "../../components/AuthorEditSkeleton";
+import AuthorFormClient from "../../components/AuthorFormClient";
+import styles from "../../styles";
+
 
 /* **************************************************
  * Types

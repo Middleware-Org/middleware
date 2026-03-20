@@ -1,6 +1,6 @@
 import { initI18nServer } from "./config";
+import type { TranslationNamespace } from "./types";
 import { normalizeNamespaces } from "./utils";
-import { TranslationNamespace } from "./types";
 
 export async function getTranslation(
   locale: string,

@@ -3,12 +3,15 @@
  **************************************************/
 "use client";
 
+import { Hash, Pencil, Trash2, X } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState, useTransition, useMemo, useEffect, Fragment } from "react";
-import { Hash, Pencil, Trash2, X } from "lucide-react";
-import { deleteIssueAction, deleteIssuesAction } from "../actions";
-import { useTableState } from "@/hooks/useTableState";
-import { useTableSelection } from "@/hooks/useTableSelection";
+import { mutate } from "swr";
+
+import ConfirmDialog from "@/components/molecules/confirmDialog";
+import { Pagination } from "@/components/pagination";
+import { SearchInput } from "@/components/search";
 import {
   Table,
   TableHeader,
@@ -21,19 +24,18 @@ import {
   ItemsPerPageSelector,
 } from "@/components/table";
 import { TableCheckbox } from "@/components/table/TableCheckbox";
-import { SearchInput } from "@/components/search";
-import { Pagination } from "@/components/pagination";
-import ConfirmDialog from "@/components/molecules/confirmDialog";
-import { cn } from "@/lib/utils/classes";
-import styles from "../styles";
-import baseStyles from "../../styles";
-import type { Issue } from "@/lib/github/types";
-import Image from "next/image";
 import { useIssues } from "@/hooks/swr";
-import { mutate } from "swr";
-import { getGitHubImageUrl } from "@/lib/github/images";
 import { toast } from "@/hooks/use-toast";
+import { useTableSelection } from "@/hooks/useTableSelection";
+import { useTableState } from "@/hooks/useTableState";
+import { getGitHubImageUrl } from "@/lib/github/images";
+import type { Issue } from "@/lib/github/types";
 import { useLocalizedPath } from "@/lib/i18n/client";
+import { cn } from "@/lib/utils/classes";
+
+import baseStyles from "../../styles";
+import { deleteIssueAction, deleteIssuesAction } from "../actions";
+import styles from "../styles";
 
 /* **************************************************
  * Column Configuration

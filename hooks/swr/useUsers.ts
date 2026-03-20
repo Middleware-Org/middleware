@@ -2,9 +2,11 @@
  * Imports
  **************************************************/
 import useSWR from "swr";
+
 import type { User } from "@/lib/github/users";
-import { createFetcher } from "./fetcher";
+
 import { swrConfig } from "./config";
+import { createFetcher } from "./fetcher";
 
 /* **************************************************
  * Fetcher

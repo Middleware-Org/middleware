@@ -1,17 +1,20 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { Article } from "@/.velite";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+
 import ArticleInEvidenceCard from "@/components/molecules/articleInEvidenceCard";
 import Articles from "@/components/molecules/articles";
 import { getArticlesByIssue, getIssueBySlug, getAllIssues } from "@/lib/content";
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
-import { getDictionary } from "@/lib/i18n/utils";
 import { i18nSettings } from "@/lib/i18n/settings";
+import { getDictionary } from "@/lib/i18n/utils";
 import { cn } from "@/lib/utils/classes";
 import { getBaseUrl } from "@/lib/utils/metadata";
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+
+import type { Article } from "@/.velite";
+
 import IssueCover from "./components/IssueCover";
 
 // Enable Incremental Static Regeneration (ISR) - revalidate every hour

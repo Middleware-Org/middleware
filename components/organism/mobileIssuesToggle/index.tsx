@@ -3,16 +3,20 @@
  **************************************************/
 "use client";
 
-import Button from "@/components/atoms/button";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { MonoTextLight } from "@/components/atoms/typography";
+
+import Button from "@/components/atoms/button";
 import Separator from "@/components/atoms/separetor";
-import { cn } from "@/lib/utils/classes";
-import type { Issue } from "@/.velite";
-import styles from "./styles";
-import { useIssuesList } from "@/lib/store/issuesList";
+import { MonoTextLight } from "@/components/atoms/typography";
 import type { CommonDictionary } from "@/lib/i18n/types";
+import { useIssuesList } from "@/lib/store/issuesList";
+import { cn } from "@/lib/utils/classes";
+
+import type { Issue } from "@/.velite";
+
+import styles from "./styles";
+
 
 /* **************************************************
  * Types

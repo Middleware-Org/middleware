@@ -4,12 +4,15 @@
  * Imports
  **************************************************/
 import { useState } from "react";
-import type { Article, Issue } from "@/.velite";
+
 import Button from "@/components/atoms/button";
 import { MonoTextLight } from "@/components/atoms/typography";
-import { CommonDictionary } from "@/lib/i18n/types";
+import type { CommonDictionary } from "@/lib/i18n/types";
 import { cn } from "@/lib/utils/classes";
 import { getTextColor } from "@/lib/utils/color";
+
+import type { Article, Issue } from "@/.velite";
+
 import ArticleCard from "../articleCard";
 import styles from "./styles";
 

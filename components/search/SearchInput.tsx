@@ -3,8 +3,9 @@
  **************************************************/
 "use client";
 
-import { cn } from "@/lib/utils/classes";
 import { Search } from "lucide-react";
+
+import { cn } from "@/lib/utils/classes";
 
 /* **************************************************
  * Types

@@ -3,19 +3,22 @@
  **************************************************/
 "use client";
 
+import Image from "@tiptap/extension-image";
+import Link from "@tiptap/extension-link";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import Link from "@tiptap/extension-link";
-import Image from "@tiptap/extension-image";
-import { useEffect, useCallback, useState } from "react";
-import { marked } from "marked";
-import TurndownService from "turndown";
 import { Link as LinkIcon, Image as ImageIcon, Quote } from "lucide-react";
-import MediaSelector from "./MediaSelector";
-import LinkModal from "./LinkModal";
-import CitationModal from "./CitationModal";
-import { Citation } from "./CitationExtension";
+import { marked } from "marked";
+import { useEffect, useCallback, useState } from "react";
+import TurndownService from "turndown";
+
 import { getGitHubImageUrl } from "@/lib/github/images";
+
+import { Citation } from "./CitationExtension";
+import CitationModal from "./CitationModal";
+import LinkModal from "./LinkModal";
+import MediaSelector from "./MediaSelector";
+
 
 /* **************************************************
  * Types

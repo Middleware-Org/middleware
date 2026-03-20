@@ -1,4 +1,5 @@
 import { revalidatePath } from "next/cache";
+
 import { i18nSettings } from "@/lib/i18n/settings";
 
 function normalizePath(path: string): string {

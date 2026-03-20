@@ -1,12 +1,13 @@
 /* **************************************************
  * Imports
  **************************************************/
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+
 import StaticPage from "@/components/organism/StaticPage";
 import { getPageBySlug, getAllPages } from "@/lib/content";
 import { i18nSettings } from "@/lib/i18n/settings";
 import { getBaseUrl } from "@/lib/utils/metadata";
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 
 /* **************************************************
  * Types

@@ -4,9 +4,10 @@
  * Imports
  **************************************************/
 import { SerifText } from "@/components/atoms/typography";
-import { Segment } from "./types";
-import styles from "./PodcastPlayerStyles";
+
 import PodcastBookmarkManager from "./PodcastBookmarkManager";
+import styles from "./PodcastPlayerStyles";
+import type { Segment } from "./types";
 
 /* **************************************************
  * Types

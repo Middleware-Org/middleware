@@ -1,7 +1,7 @@
 "use client";
 
-import { cn } from "@/lib/utils/classes";
 import HorizontalScroll from "@/components/molecules/HorizontalScroll";
+import { cn } from "@/lib/utils/classes";
 
 type ArchiveScrollWrapperProps = {
   children: React.ReactNode;

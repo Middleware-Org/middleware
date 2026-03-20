@@ -5,13 +5,18 @@
  **************************************************/
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import type { Article } from "@/.velite";
+
 import Separator from "@/components/atoms/separetor";
 import { H3, MonoTextBold, MonoTextLight, SerifText } from "@/components/atoms/typography";
-import type { CommonDictionary } from "@/lib/i18n/types";
-import { withLocale } from "@/lib/i18n/path";
-import styles from "./styles";
 import { getAuthorById, getCategoryById } from "@/lib/content";
+import { withLocale } from "@/lib/i18n/path";
+import type { CommonDictionary } from "@/lib/i18n/types";
+
+import type { Article } from "@/.velite";
+
+import styles from "./styles";
+
+
 
 /* **************************************************
  * Types

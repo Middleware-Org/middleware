@@ -1,7 +1,8 @@
-import { Page } from "@/.velite";
-import { H2 } from "@/components/atoms/typography";
 import Separator from "@/components/atoms/separetor";
+import { H2 } from "@/components/atoms/typography";
 import { sanitizeRichHtml } from "@/lib/security/sanitizeHtml";
+
+import type { Page } from "@/.velite";
 
 type Props = {
   page: Page;

@@ -5,15 +5,17 @@
  **************************************************/
 import Image from "next/image";
 import Link from "next/link";
+
 import Separator from "@/components/atoms/separetor";
 import { MonoTextBold, MonoTextLight, SerifText } from "@/components/atoms/typography";
-import { lightenColor, getTextColor } from "@/lib/utils/color";
-import { Article, Issue } from "@/.velite";
-import { CommonDictionary } from "@/lib/i18n/types";
 import { getAuthorById, getCategoryById } from "@/lib/content";
-import { cn } from "@/lib/utils/classes";
 import { getGitHubImageUrl } from "@/lib/github/images";
 import { useLocalizedPath } from "@/lib/i18n/client";
+import type { CommonDictionary } from "@/lib/i18n/types";
+import { cn } from "@/lib/utils/classes";
+import { lightenColor, getTextColor } from "@/lib/utils/color";
+
+import type { Article, Issue } from "@/.velite";
 
 /* **************************************************
  * Types

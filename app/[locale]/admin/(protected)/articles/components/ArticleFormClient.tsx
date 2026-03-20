@@ -3,21 +3,25 @@
  **************************************************/
 "use client";
 
+import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useActionState } from "react";
-import { useRouter } from "next/navigation";
-import dynamic from "next/dynamic";
-import { cn } from "@/lib/utils/classes";
+import { mutate } from "swr";
+
+import { useArticle, useAuthors, useCategories, useIssues } from "@/hooks/swr";
+import { toast } from "@/hooks/use-toast";
 import type { ActionResult } from "@/lib/actions/types";
+import type { Article } from "@/lib/github/types";
+import { useLocalizedPath } from "@/lib/i18n/client";
+import { cn } from "@/lib/utils/classes";
+
 import { createArticleAction, updateArticleAction } from "../actions";
 import ArticleMetaPanel from "./ArticleMetaPanel";
-import styles from "../styles";
 import baseStyles from "../../styles";
-import type { Article } from "@/lib/github/types";
-import { useArticle, useAuthors, useCategories, useIssues } from "@/hooks/swr";
-import { mutate } from "swr";
-import { toast } from "@/hooks/use-toast";
-import { useLocalizedPath } from "@/lib/i18n/client";
+import styles from "../styles";
+
+
 // Import dinamico per evitare problemi SSR con Tiptap
 const MarkdownEditor = dynamic(() => import("./MarkdownEditor"), {
   ssr: false,

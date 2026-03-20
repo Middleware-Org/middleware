@@ -4,13 +4,17 @@
  * Imports
  **************************************************/
 import { useEffect, useState, useCallback } from "react";
+
+import { toast } from "@/hooks/use-toast";
+import type {
+  PodcastBookmark} from "@/lib/storage/podcastBookmarks";
 import {
   PODCAST_BOOKMARKS_UPDATED_EVENT,
-  PodcastBookmark,
   podcastBookmarksStorage,
 } from "@/lib/storage/podcastBookmarks";
-import { Segment } from "../types";
-import { toast } from "@/hooks/use-toast";
+
+import type { Segment } from "../types";
+
 
 /* **************************************************
  * Types

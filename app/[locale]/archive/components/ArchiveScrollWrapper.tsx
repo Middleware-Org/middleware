@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { cn } from "@/lib/utils/classes";
+
 import HorizontalScroll from "@/components/molecules/HorizontalScroll";
+import { cn } from "@/lib/utils/classes";
 
 type ArchiveScrollWrapperProps = {
   children: React.ReactNode;

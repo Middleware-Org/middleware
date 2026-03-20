@@ -3,13 +3,15 @@
  **************************************************/
 import Link from "next/link";
 import { redirect } from "next/navigation";
+
+import SWRPageProvider from "@/components/providers/SWRPageProvider";
 import { getUser } from "@/lib/auth/server";
 import { getAllMediaFiles } from "@/lib/github/media";
+import { withLocale } from "@/lib/i18n/path";
+
 import MediaListClient from "./components/MediaListClient";
 import MediaUploadClient from "./components/MediaUploadClient";
 import styles from "./styles";
-import { withLocale } from "@/lib/i18n/path";
-import SWRPageProvider from "@/components/providers/SWRPageProvider";
 
 /* **************************************************
  * Media Page (Server Component)

@@ -2,6 +2,7 @@
  * Imports
  **************************************************/
 import { generateSlug } from "@/lib/utils/slug";
+
 import { listDirectoryFiles } from "./client";
 
 export { generateSlug };

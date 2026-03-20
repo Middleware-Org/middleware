@@ -3,9 +3,10 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { cn } from "@/lib/utils/classes";
-import { useMenu } from "@/lib/store";
 import type { CommonDictionary } from "@/lib/i18n/types";
+import { useMenu } from "@/lib/store";
+import { cn } from "@/lib/utils/classes";
+
 import styles from "./styles";
 
 /* **************************************************

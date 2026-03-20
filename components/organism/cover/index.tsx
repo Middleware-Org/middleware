@@ -2,15 +2,18 @@
  * Imports
  **************************************************/
 import Image from "next/image";
-import { MonoTextLight } from "@/components/atoms/typography";
-import FormattedDate from "@/components/atoms/date";
-import styles from "./styles";
-import ArticleInEvidenceCard from "@/components/molecules/articleInEvidenceCard";
-import { CommonDictionary } from "@/lib/i18n/types";
-import type { Article, Issue } from "@/.velite";
 import Link from "next/link";
+
+import FormattedDate from "@/components/atoms/date";
+import { MonoTextLight } from "@/components/atoms/typography";
+import ArticleInEvidenceCard from "@/components/molecules/articleInEvidenceCard";
 import { getGitHubImageUrl } from "@/lib/github/images";
 import { withLocale } from "@/lib/i18n/path";
+import type { CommonDictionary } from "@/lib/i18n/types";
+
+import type { Article, Issue } from "@/.velite";
+
+import styles from "./styles";
 
 /* **************************************************
  * Types

@@ -3,11 +3,13 @@
  **************************************************/
 "use client";
 
-import { useRef, useState } from "react";
 import { upload } from "@vercel/blob/client";
-import styles from "../styles";
 import Image from "next/image";
+import { useRef, useState } from "react";
+
 import { toast } from "@/hooks/use-toast";
+
+import styles from "../styles";
 
 /* **************************************************
  * Media Upload Client Component

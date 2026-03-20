@@ -1,17 +1,19 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { Suspense } from "react";
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
+import { Suspense } from "react";
+
+import SWRPageProvider from "@/components/providers/SWRPageProvider";
 import { getUser } from "@/lib/auth/server";
 import { getPodcastBySlug } from "@/lib/github/podcasts";
-import { cn } from "@/lib/utils/classes";
-import PodcastFormClient from "../../components/PodcastFormClient";
-import PodcastEditSkeleton from "../../components/PodcastEditSkeleton";
-import styles from "../../styles";
-import SWRPageProvider from "@/components/providers/SWRPageProvider";
 import { withLocale } from "@/lib/i18n/path";
+import { cn } from "@/lib/utils/classes";
+
+import PodcastEditSkeleton from "../../components/PodcastEditSkeleton";
+import PodcastFormClient from "../../components/PodcastFormClient";
+import styles from "../../styles";
 
 /* **************************************************
  * Types

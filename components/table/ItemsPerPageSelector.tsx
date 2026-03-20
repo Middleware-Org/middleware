@@ -3,8 +3,8 @@
  **************************************************/
 "use client";
 
-import { cn } from "@/lib/utils/classes";
 import baseStyles from "@/app/[locale]/admin/(protected)/styles";
+import { cn } from "@/lib/utils/classes";
 
 /* **************************************************
  * Types

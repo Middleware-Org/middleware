@@ -1,7 +1,8 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { useEffect, RefObject } from "react";
+import type { RefObject } from "react";
+import { useEffect } from "react";
 
 /* **************************************************
  * Types

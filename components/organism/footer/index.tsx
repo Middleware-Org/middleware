@@ -1,11 +1,12 @@
 "use client";
 
+import Link from "next/link";
+
 import Separator from "@/components/atoms/separetor";
 import { H2, MonoTextBold, MonoTextLight } from "@/components/atoms/typography";
 import { footerLinks } from "@/lib/data/links";
-import { CommonDictionary } from "@/lib/i18n/types";
+import type { CommonDictionary } from "@/lib/i18n/types";
 import { scrollToTop } from "@/lib/utils/window";
-import Link from "next/link";
 
 type FooterProps = {
   dict: Pick<CommonDictionary, "footer">;

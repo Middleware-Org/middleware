@@ -1,17 +1,18 @@
 /* **************************************************
  * Imports
  **************************************************/
+import { notFound } from "next/navigation";
+
+import { MonoTextLight } from "@/components/atoms/typography";
+import AutoScrollText from "@/components/organism/autoScrollText";
+import Footer from "@/components/organism/footer";
 import Header from "@/components/organism/header";
+import Menu from "@/components/organism/menu";
+import "@/globals.css";
+import { getPageBySlug } from "@/lib/content";
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import { getDictionary } from "@/lib/i18n/utils";
-import "@/globals.css";
-import Menu from "@/components/organism/menu";
-import { MonoTextLight } from "@/components/atoms/typography";
-import { notFound } from "next/navigation";
-import { getPageBySlug } from "@/lib/content";
-import Footer from "@/components/organism/footer";
 import { getBaseUrl, createOpenGraphMetadata, createTwitterMetadata } from "@/lib/utils/metadata";
-import AutoScrollText from "@/components/organism/autoScrollText";
 
 /* **************************************************
  * Types

@@ -3,12 +3,14 @@
  **************************************************/
 import Image from "next/image";
 import Link from "next/link";
+
 import { SerifText } from "@/components/atoms/typography";
-import { lightenColor } from "@/lib/utils/color";
-import { Issue } from "@/.velite";
-import { cn } from "@/lib/utils/classes";
 import { getGitHubImageUrl } from "@/lib/github/images";
 import { withLocale } from "@/lib/i18n/path";
+import { cn } from "@/lib/utils/classes";
+import { lightenColor } from "@/lib/utils/color";
+
+import type { Issue } from "@/.velite";
 
 /* **************************************************
  * Types

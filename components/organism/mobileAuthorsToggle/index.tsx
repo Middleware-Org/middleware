@@ -3,15 +3,18 @@
  **************************************************/
 "use client";
 
-import Button from "@/components/atoms/button";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { MonoTextLight } from "@/components/atoms/typography";
+
+import Button from "@/components/atoms/button";
 import Separator from "@/components/atoms/separetor";
-import { AuthorsDictionary } from "@/lib/i18n/types";
+import { MonoTextLight } from "@/components/atoms/typography";
+import type { AuthorsDictionary } from "@/lib/i18n/types";
 import { useAuthorsList } from "@/lib/store/authorsList";
 import { cn } from "@/lib/utils/classes";
+
 import type { Author } from "@/.velite";
+
 import styles from "./styles";
 
 /* **************************************************

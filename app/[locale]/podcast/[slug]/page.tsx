@@ -1,14 +1,18 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { getAllPodcasts, getPodcastBySlug, getIssueById } from "@/lib/content";
-import { i18nSettings } from "@/lib/i18n/settings";
-import { notFound } from "next/navigation";
-import PodcastPlayer from "./components/PodcastPlayer";
 import type { Metadata } from "next";
-import { getBaseUrl, createOpenGraphMetadata, createTwitterMetadata } from "@/lib/utils/metadata";
-import { getGitHubImageUrl } from "@/lib/github/images";
+import { notFound } from "next/navigation";
+
 import StructuredData from "@/components/StructuredData";
+import { getAllPodcasts, getPodcastBySlug, getIssueById } from "@/lib/content";
+import { getGitHubImageUrl } from "@/lib/github/images";
+import { i18nSettings } from "@/lib/i18n/settings";
+import { getBaseUrl, createOpenGraphMetadata, createTwitterMetadata } from "@/lib/utils/metadata";
+
+import PodcastPlayer from "./components/PodcastPlayer";
+
+
 
 /* **************************************************
  * Types

@@ -2,9 +2,11 @@
  * Imports
  **************************************************/
 import useSWR from "swr";
+
 import type { MediaFile } from "@/lib/github/media";
-import { createFetcher } from "./fetcher";
+
 import { swrConfig } from "./config";
+import { createFetcher } from "./fetcher";
 
 /* **************************************************
  * Fetcher

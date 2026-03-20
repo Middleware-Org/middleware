@@ -4,11 +4,13 @@
  * Imports
  **************************************************/
 import { Rewind, FastForward, Pause, Play, Bookmark, BookmarkCheck } from "lucide-react";
-import Button from "@/components/atoms/button";
-import VerticalRange from "./VerticalRange";
-import styles from "./PodcastPlayerStyles";
-import { useClickOutside } from "./hooks/useClickOutside";
 import { useRef } from "react";
+
+import Button from "@/components/atoms/button";
+
+import { useClickOutside } from "./hooks/useClickOutside";
+import styles from "./PodcastPlayerStyles";
+import VerticalRange from "./VerticalRange";
 
 /* **************************************************
  * Types

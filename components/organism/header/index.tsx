@@ -3,11 +3,12 @@
 /* **************************************************
  * Imports
  **************************************************/
-import Logo from "@/components/organism/logo";
 import Hamburger from "@/components/organism/hamburger";
+import Logo from "@/components/organism/logo";
 import Nav from "@/components/organism/nav";
-import styles from "./styles";
 import type { CommonDictionary } from "@/lib/i18n/types";
+
+import styles from "./styles";
 
 /* **************************************************
  * Types

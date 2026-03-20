@@ -5,8 +5,9 @@
  * Catches and handles React errors gracefully
  **************************************************/
 import { useEffect } from "react";
-import { MonoTextBold, SerifText } from "@/components/atoms/typography";
+
 import Button from "@/components/atoms/button";
+import { MonoTextBold, SerifText } from "@/components/atoms/typography";
 import { toast } from "@/hooks/use-toast";
 
 interface ErrorProps {

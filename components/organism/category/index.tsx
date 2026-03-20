@@ -1,12 +1,15 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { MonoTextLight } from "@/components/atoms/typography";
 import Separator from "@/components/atoms/separetor";
+import { MonoTextLight } from "@/components/atoms/typography";
 import { SerifTextBold } from "@/components/atoms/typography";
-import type { Category } from "@/.velite";
-import { CategoriesDictionary, CommonDictionary } from "@/lib/i18n/types";
 import { getArticlesByCategorySlug } from "@/lib/content";
+import type { CategoriesDictionary, CommonDictionary } from "@/lib/i18n/types";
+
+import type { Category } from "@/.velite";
+
+
 import CategoryArticles from "../categoryArticles";
 import styles from "./styles";
 
