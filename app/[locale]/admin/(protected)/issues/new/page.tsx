@@ -7,7 +7,9 @@ import { Suspense } from "react";
 
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
 import { getUser } from "@/lib/auth/server";
+import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import { withLocale } from "@/lib/i18n/path";
+import { getDictionary } from "@/lib/i18n/utils";
 
 import IssueFormClient from "../components/IssueFormClient";
 import IssueFormSkeleton from "../components/IssueFormSkeleton";
@@ -22,14 +24,15 @@ export default async function NewIssuePage({ params }: { params: Promise<{ local
   if (!user) {
     redirect(withLocale("/admin/login", locale));
   }
+  const adminDict = await getDictionary(locale, TRANSLATION_NAMESPACES.ADMIN);
 
   return (
     <SWRPageProvider fallback={{}}>
       <main className={styles.main}>
         <div className={styles.header}>
-          <h1 className={styles.title}>Nuova Issue</h1>
+          <h1 className={styles.title}>{adminDict.resourcePages.issues.new}</h1>
           <Link href={withLocale("/admin/issues", locale)} className={styles.backButton}>
-            ← Indietro
+            ← {adminDict.resourcePages.issues.back}
           </Link>
         </div>
 

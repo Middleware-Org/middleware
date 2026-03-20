@@ -6,6 +6,8 @@
 import { Link as LinkIcon, X } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
+import { adminModalCopy } from "../../components/adminModalCopy";
+import { useDialogFocusTrap } from "../../components/useDialogFocusTrap";
 import baseStyles from "../../styles";
 
 /* **************************************************
@@ -24,15 +26,20 @@ interface LinkModalProps {
 export default function LinkModal({ isOpen, onClose, onInsert, currentUrl }: LinkModalProps) {
   const [url, setUrl] = useState(currentUrl || "");
   const inputRef = useRef<HTMLInputElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isOpen) {
-      setTimeout(() => {
+      const animationFrameId = requestAnimationFrame(() => {
         setUrl(currentUrl || "");
         inputRef.current?.focus();
-      }, 0);
+      });
+
+      return () => cancelAnimationFrame(animationFrameId);
     }
   }, [isOpen, currentUrl]);
+
+  useDialogFocusTrap(isOpen, modalRef, onClose);
 
   function handleSubmit() {
     if (url.trim()) {
@@ -66,6 +73,8 @@ export default function LinkModal({ isOpen, onClose, onInsert, currentUrl }: Lin
   return (
     <div className={baseStyles.modalOverlay} onClick={onClose}>
       <div
+        ref={modalRef}
+        tabIndex={-1}
         className={baseStyles.modalContainer}
         onClick={(e) => e.stopPropagation()}
         style={{ maxWidth: "500px" }}
@@ -77,14 +86,14 @@ export default function LinkModal({ isOpen, onClose, onInsert, currentUrl }: Lin
           <div className="flex items-center gap-2">
             <LinkIcon className="w-5 h-5 text-secondary" />
             <h2 id="link-modal-title" className={baseStyles.modalTitle}>
-              Inserisci Link
+              {adminModalCopy.linkModal.title}
             </h2>
           </div>
           <button
             type="button"
             onClick={onClose}
             className={baseStyles.modalCloseButton}
-            aria-label="Chiudi finestra inserimento link"
+            aria-label={adminModalCopy.linkModal.closeAria}
           >
             <X className="w-5 h-5" />
           </button>
@@ -105,7 +114,7 @@ export default function LinkModal({ isOpen, onClose, onInsert, currentUrl }: Lin
                 handleKeyDown(e);
                 handleEnterKey(e);
               }}
-              placeholder="https://example.com"
+              placeholder={adminModalCopy.linkModal.urlPlaceholder}
               className={baseStyles.input}
               autoFocus
             />
@@ -113,7 +122,7 @@ export default function LinkModal({ isOpen, onClose, onInsert, currentUrl }: Lin
 
           <div className="flex gap-2 justify-end">
             <button type="button" onClick={onClose} className={baseStyles.cancelButton}>
-              Annulla
+              {adminModalCopy.common.cancel}
             </button>
             <button
               type="button"
@@ -121,7 +130,7 @@ export default function LinkModal({ isOpen, onClose, onInsert, currentUrl }: Lin
               disabled={!url.trim()}
               className={baseStyles.submitButton}
             >
-              Inserisci
+              {adminModalCopy.linkModal.insert}
             </button>
           </div>
         </div>

@@ -16,12 +16,10 @@ import type { ActionResult } from "@/lib/actions/types";
 import type { User } from "@/lib/github/users";
 import { useLocalizedPath } from "@/lib/i18n/client";
 
-import { createUserAction, updateUserAction, deleteUserAction } from "../actions";
 import PasswordInput, { isPasswordStrongEnough } from "./PasswordInput";
+import { adminFormCopy } from "../../components/adminFormCopy";
+import { createUserAction, updateUserAction, deleteUserAction } from "../actions";
 import styles from "../styles";
-
-
-
 
 /* **************************************************
  * Types
@@ -202,8 +200,8 @@ export default function UserFormClient({ userId }: UserFormClientProps) {
             className={styles.input}
             required
           >
-            <option value="EDITOR">Editor</option>
-            <option value="ADMIN">Admin</option>
+            <option value="EDITOR">{adminFormCopy.userForm.roleEditor}</option>
+            <option value="ADMIN">{adminFormCopy.userForm.roleAdmin}</option>
           </select>
         </div>
 

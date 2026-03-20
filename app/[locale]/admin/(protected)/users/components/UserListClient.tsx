@@ -31,6 +31,7 @@ import type { ApiUser } from "@/lib/github/types";
 import { useLocalizedPath } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils/classes";
 
+import { adminListCopy } from "../../components/adminListCopy";
 import baseStyles from "../../styles";
 import { deleteUserAction, deleteUsersAction } from "../actions";
 import styles from "../styles";
@@ -137,9 +138,9 @@ export default function UserListClient() {
       const result = await deleteUserAction(id);
 
       if (!result.success) {
-        toast.actionResult(result, { errorTitle: "Impossibile eliminare utente" });
+        toast.actionResult(result, { errorTitle: adminListCopy.users.deleteErrorTitle });
       } else {
-        toast.success(result.message || "Utente eliminato con successo");
+        toast.success(result.message || adminListCopy.users.deleteSuccess);
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/users");
         clearSelection();
@@ -161,9 +162,9 @@ export default function UserListClient() {
       const result = await deleteUsersAction(selectedIds);
 
       if (!result.success) {
-        toast.actionResult(result, { errorTitle: "Eliminazione multipla non completata" });
+        toast.actionResult(result, { errorTitle: adminListCopy.users.deleteManyErrorTitle });
       } else {
-        toast.success(result.message || "Utenti eliminati con successo");
+        toast.success(result.message || adminListCopy.users.deleteManySuccess);
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/users");
         clearSelection();
@@ -200,8 +201,8 @@ export default function UserListClient() {
                 onClick={() => handleEdit(user)}
                 className={styles.iconButton}
                 disabled={isPending}
-                aria-label="Modifica"
-                title="Modifica"
+                aria-label={adminListCopy.common.edit}
+                title={adminListCopy.common.edit}
               >
                 <Pencil className="w-4 h-4" />
               </button>
@@ -209,8 +210,8 @@ export default function UserListClient() {
                 onClick={() => handleDeleteClick(user)}
                 className={cn(styles.iconButton, styles.iconButtonDanger)}
                 disabled={isPending}
-                aria-label="Elimina"
-                title="Elimina"
+                aria-label={adminListCopy.common.delete}
+                title={adminListCopy.common.delete}
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -226,7 +227,7 @@ export default function UserListClient() {
   if (isLoading && users.length === 0) {
     return (
       <div className={baseStyles.container}>
-        <div className={baseStyles.loadingText}>Caricamento utenti...</div>
+        <div className={baseStyles.loadingText}>{adminListCopy.users.loading}</div>
       </div>
     );
   }
@@ -240,7 +241,7 @@ export default function UserListClient() {
             <SearchInput
               value={search}
               onChange={setSearch}
-              placeholder="Cerca per email o nome..."
+              placeholder={adminListCopy.common.searchUserPlaceholder}
             />
           </div>
           <ColumnSelector
@@ -251,7 +252,7 @@ export default function UserListClient() {
           <ItemsPerPageSelector value={itemsPerPage} onChange={setItemsPerPage} />
           <div
             className="flex items-center h-[34px] gap-1.5 px-2 py-1 border border-secondary"
-            title={`${totalItems} ${totalItems === 1 ? "utente" : "utenti"}`}
+            title={`${totalItems} ${totalItems === 1 ? adminListCopy.users.singular : adminListCopy.users.plural}`}
           >
             <Hash className="h-4 w-4 text-secondary/60" />
             <span className="text-xs text-secondary/80">{totalItems}</span>
@@ -269,7 +270,7 @@ export default function UserListClient() {
                   checked={isAllSelected}
                   indeterminate={isIndeterminate}
                   onChange={toggleSelectAll}
-                  ariaLabel="Seleziona tutti"
+                  ariaLabel={adminListCopy.common.selectAll}
                 />
               </th>
               {visibleColumnConfigs.map((column) => {
@@ -300,7 +301,7 @@ export default function UserListClient() {
                   colSpan={visibleColumnConfigs.length + 1}
                   className={baseStyles.tableEmptyCell}
                 >
-                  Nessun utente trovato
+                  {adminListCopy.users.empty}
                 </TableCell>
               </TableRow>
             ) : (
@@ -333,14 +334,17 @@ export default function UserListClient() {
       {selectedCount > 0 && (
         <div className="mt-4 flex items-center gap-2 p-3 bg-tertiary/10 border border-tertiary rounded">
           <span className="text-sm text-secondary">
-            {selectedCount} {selectedCount === 1 ? "utente selezionato" : "utenti selezionati"}
+            {selectedCount}{" "}
+            {selectedCount === 1
+              ? adminListCopy.users.selectedSingular
+              : adminListCopy.users.selectedPlural}
           </span>
           <button
             onClick={handleDeleteMultipleClick}
             disabled={isPending}
             className={cn(styles.iconButton, styles.iconButtonDanger, "ml-auto")}
-            aria-label="Elimina selezionati"
-            title="Elimina selezionati"
+            aria-label={adminListCopy.common.deleteSelected}
+            title={adminListCopy.common.deleteSelected}
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -348,8 +352,8 @@ export default function UserListClient() {
             onClick={clearSelection}
             disabled={isPending}
             className={cn(styles.iconButton)}
-            aria-label="Deseleziona tutto"
-            title="Deseleziona tutto"
+            aria-label={adminListCopy.common.deselectAll}
+            title={adminListCopy.common.deselectAll}
           >
             <X className="w-4 h-4" />
           </button>
@@ -362,10 +366,10 @@ export default function UserListClient() {
           isOpen={deleteDialog.isOpen}
           onClose={() => setDeleteDialog({ isOpen: false, user: null })}
           onConfirm={handleDeleteConfirm}
-          title="Elimina Utente"
-          message={`Sei sicuro di voler eliminare l'utente "${deleteDialog.user.email}"? Questa azione non può essere annullata.`}
-          confirmText="Elimina"
-          cancelText="Annulla"
+          title={adminListCopy.users.deleteDialogTitle}
+          message={adminListCopy.users.deleteDialogMessage(deleteDialog.user.email)}
+          confirmText={adminListCopy.users.deleteDialogConfirm}
+          cancelText={adminListCopy.common.cancel}
           confirmButtonClassName={styles.deleteButton}
           isLoading={isPending}
         />
@@ -376,10 +380,10 @@ export default function UserListClient() {
         isOpen={deleteMultipleDialog.isOpen}
         onClose={() => setDeleteMultipleDialog({ isOpen: false, count: 0 })}
         onConfirm={handleDeleteMultipleConfirm}
-        title="Elimina Utenti"
-        message={`Sei sicuro di voler eliminare ${deleteMultipleDialog.count} utent${deleteMultipleDialog.count === 1 ? "e" : "i"}? Questa azione non può essere annullata.`}
-        confirmText="Elimina"
-        cancelText="Annulla"
+        title={adminListCopy.users.deleteManyDialogTitle}
+        message={adminListCopy.users.deleteManyDialogMessage(deleteMultipleDialog.count)}
+        confirmText={adminListCopy.users.deleteDialogConfirm}
+        cancelText={adminListCopy.common.cancel}
         confirmButtonClassName={styles.deleteButton}
         isLoading={isPending}
       />

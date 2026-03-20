@@ -16,11 +16,11 @@ import type { Article } from "@/lib/github/types";
 import { useLocalizedPath } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils/classes";
 
+import { adminFormCopy } from "../../components/adminFormCopy";
 import { createArticleAction, updateArticleAction } from "../actions";
 import ArticleMetaPanel from "./ArticleMetaPanel";
 import baseStyles from "../../styles";
 import styles from "../styles";
-
 
 // Import dinamico per evitare problemi SSR con Tiptap
 const MarkdownEditor = dynamic(() => import("./MarkdownEditor"), {
@@ -28,7 +28,7 @@ const MarkdownEditor = dynamic(() => import("./MarkdownEditor"), {
   loading: () => (
     <div className="flex flex-col h-full">
       <div className="flex-1 min-h-0 border border-secondary p-4 bg-primary">
-        <div className="animate-pulse text-secondary/60">Caricamento editor...</div>
+        <div className="animate-pulse text-secondary/60">{adminFormCopy.common.editorLoading}</div>
       </div>
     </div>
   ),

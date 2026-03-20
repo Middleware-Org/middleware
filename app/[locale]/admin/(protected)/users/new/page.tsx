@@ -7,7 +7,9 @@ import { Suspense } from "react";
 
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
 import { getAdminUser } from "@/lib/auth/server";
+import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import { withLocale } from "@/lib/i18n/path";
+import { getDictionary } from "@/lib/i18n/utils";
 
 import UserFormClient from "../components/UserFormClient";
 import UserFormSkeleton from "../components/UserFormSkeleton";
@@ -22,14 +24,15 @@ export default async function NewUserPage({ params }: { params: Promise<{ locale
   if (!user) {
     redirect(withLocale("/admin", locale));
   }
+  const adminDict = await getDictionary(locale, TRANSLATION_NAMESPACES.ADMIN);
 
   return (
     <SWRPageProvider fallback={{}}>
       <main className={styles.main}>
         <div className={styles.header}>
-          <h1 className={styles.title}>Nuovo Utente</h1>
+          <h1 className={styles.title}>{adminDict.resourcePages.users.new}</h1>
           <Link href={withLocale("/admin/users", locale)} className={styles.backButton}>
-            ← Indietro
+            ← {adminDict.resourcePages.users.back}
           </Link>
         </div>
 

@@ -9,6 +9,7 @@ import { useRef, useState } from "react";
 
 import { toast } from "@/hooks/use-toast";
 
+import { adminFormCopy } from "../../components/adminFormCopy";
 import styles from "../styles";
 
 /* **************************************************
@@ -41,8 +42,8 @@ export default function MediaUploadClient() {
       detectedType = "json";
     } else {
       toast.warning(
-        "Formato non supportato",
-        "Usa immagini (JPG, PNG, GIF, WEBP), audio (MP3, WAV) o JSON.",
+        adminFormCopy.mediaUpload.unsupportedFormatTitle,
+        adminFormCopy.mediaUpload.unsupportedFormatMessage,
       );
       return;
     }
@@ -91,7 +92,7 @@ export default function MediaUploadClient() {
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!selectedFile) {
-      toast.warning("Seleziona un file prima di caricare");
+      toast.warning(adminFormCopy.mediaUpload.selectFileBeforeUpload);
       return;
     }
 
@@ -144,18 +145,16 @@ export default function MediaUploadClient() {
       });
 
       // Success - invalidate cache and reset form
-      toast.success("File caricato con successo");
+      toast.success(adminFormCopy.mediaUpload.uploadSuccess);
       // Invalida la cache SWR per forzare il refetch
       const { mutate } = await import("swr");
       mutate("/api/media");
       mutate("/api/github/merge/check");
-      setTimeout(() => {
-        handleRemove();
-        formRef.current?.reset();
-      }, 100);
+      handleRemove();
+      formRef.current?.reset();
     } catch (error) {
       toast.error(
-        "Errore durante il caricamento",
+        adminFormCopy.mediaUpload.uploadErrorTitle,
         error instanceof Error ? error.message : undefined,
       );
     } finally {
@@ -208,9 +207,9 @@ export default function MediaUploadClient() {
       } catch (err) {
         return (
           <div className="p-4 border border-secondary bg-primary">
-            <p className="text-sm text-secondary">File JSON selezionato</p>
+            <p className="text-sm text-secondary">{adminFormCopy.mediaUpload.jsonSelected}</p>
             <p className="text-xs text-secondary/60 mt-1">
-              {err instanceof Error ? err.message : "Errore nel parsing"}
+              {err instanceof Error ? err.message : adminFormCopy.mediaUpload.jsonParseError}
             </p>
           </div>
         );
@@ -221,11 +220,11 @@ export default function MediaUploadClient() {
 
   return (
     <div className={styles.form}>
-      <h2 className={styles.formTitle}>Carica Nuovo File</h2>
+      <h2 className={styles.formTitle}>{adminFormCopy.mediaUpload.title}</h2>
 
       <form ref={formRef} onSubmit={handleSubmit}>
         <div className={styles.field}>
-          <label className={styles.label}>File *</label>
+          <label className={styles.label}>{adminFormCopy.mediaUpload.fileLabel}</label>
           <input
             ref={fileInputRef}
             type="file"
@@ -234,7 +233,19 @@ export default function MediaUploadClient() {
             className="hidden"
             required
           />
-          <div onClick={handleClick} className={styles.imageUpload}>
+          <div
+            onClick={handleClick}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                handleClick();
+              }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label={adminFormCopy.mediaUpload.selectFileToUpload}
+            className={styles.imageUpload}
+          >
             {preview ? (
               <div>
                 {renderPreview()}
@@ -247,7 +258,7 @@ export default function MediaUploadClient() {
                     }}
                     className="px-3 py-1 text-sm bg-secondary/10 hover:bg-secondary/20"
                   >
-                    Cambia file
+                    {adminFormCopy.mediaUpload.changeFile}
                   </button>
                   <button
                     type="button"
@@ -257,15 +268,17 @@ export default function MediaUploadClient() {
                     }}
                     className="px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200"
                   >
-                    Rimuovi
+                    {adminFormCopy.mediaUpload.remove}
                   </button>
                 </div>
               </div>
             ) : (
               <div className="text-center py-8">
-                <p className="text-secondary/80 mb-2">Clicca per selezionare un file</p>
+                <p className="text-secondary/80 mb-2">
+                  {adminFormCopy.mediaUpload.clickToSelectFile}
+                </p>
                 <p className="text-sm text-secondary/60">
-                  Immagini (JPG, PNG, GIF, WEBP), Audio (MP3, WAV) o JSON
+                  {adminFormCopy.mediaUpload.fileTypesHint}
                 </p>
               </div>
             )}
@@ -275,7 +288,7 @@ export default function MediaUploadClient() {
         {preview && (
           <div className={styles.field}>
             <label htmlFor="filename" className={styles.label}>
-              Nome file (opzionale)
+              {adminFormCopy.mediaUpload.filenameOptional}
             </label>
             <input
               id="filename"
@@ -284,10 +297,10 @@ export default function MediaUploadClient() {
               value={filename}
               onChange={(e) => setFilename(e.target.value)}
               className={styles.input}
-              placeholder="auto-generato se vuoto"
+              placeholder={adminFormCopy.mediaUpload.autoGeneratedPlaceholder}
             />
             <p className="text-xs text-secondary/60 mt-1">
-              Se lasciato vuoto, verrà generato un nome univoco automaticamente
+              {adminFormCopy.mediaUpload.filenameHelp}
             </p>
           </div>
         )}
@@ -295,7 +308,9 @@ export default function MediaUploadClient() {
         {preview && (
           <div className="mt-4">
             <button type="submit" disabled={isPending} className={styles.submitButton}>
-              {isPending ? "Caricamento..." : "Carica File"}
+              {isPending
+                ? adminFormCopy.mediaUpload.uploading
+                : adminFormCopy.mediaUpload.uploadFile}
             </button>
           </div>
         )}

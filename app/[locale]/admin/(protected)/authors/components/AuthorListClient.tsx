@@ -31,6 +31,7 @@ import type { Author } from "@/lib/github/types";
 import { useLocalizedPath } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils/classes";
 
+import { adminListCopy } from "../../components/adminListCopy";
 import baseStyles from "../../styles";
 import { deleteAuthorAction, deleteAuthorsAction } from "../actions";
 import styles from "../styles";
@@ -136,9 +137,9 @@ export default function AuthorListClient() {
       const result = await deleteAuthorAction(slug);
 
       if (!result.success) {
-        toast.actionResult(result, { errorTitle: "Impossibile eliminare autore" });
+        toast.actionResult(result, { errorTitle: adminListCopy.authors.deleteErrorTitle });
       } else {
-        toast.success(result.message || "Autore eliminato con successo");
+        toast.success(result.message || adminListCopy.authors.deleteSuccess);
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/authors");
         mutate("/api/github/merge/check");
@@ -161,9 +162,9 @@ export default function AuthorListClient() {
       const result = await deleteAuthorsAction(selectedIds);
 
       if (!result.success) {
-        toast.actionResult(result, { errorTitle: "Eliminazione multipla non completata" });
+        toast.actionResult(result, { errorTitle: adminListCopy.authors.deleteManyErrorTitle });
       } else {
-        toast.success(result.message || "Autori eliminati con successo");
+        toast.success(result.message || adminListCopy.authors.deleteManySuccess);
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/authors");
         mutate("/api/github/merge/check");
@@ -194,8 +195,8 @@ export default function AuthorListClient() {
                 onClick={() => handleEdit(author)}
                 className={styles.iconButton}
                 disabled={isPending}
-                aria-label="Modifica"
-                title="Modifica"
+                aria-label={adminListCopy.common.edit}
+                title={adminListCopy.common.edit}
               >
                 <Pencil className="w-4 h-4" />
               </button>
@@ -203,8 +204,8 @@ export default function AuthorListClient() {
                 onClick={() => handleDeleteClick(author)}
                 className={cn(styles.iconButton, styles.iconButtonDanger)}
                 disabled={isPending}
-                aria-label="Elimina"
-                title="Elimina"
+                aria-label={adminListCopy.common.delete}
+                title={adminListCopy.common.delete}
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -220,7 +221,7 @@ export default function AuthorListClient() {
   if (isLoading && authors.length === 0) {
     return (
       <div className={baseStyles.container}>
-        <div className={baseStyles.loadingText}>Caricamento autori...</div>
+        <div className={baseStyles.loadingText}>{adminListCopy.authors.loading}</div>
       </div>
     );
   }
@@ -234,7 +235,7 @@ export default function AuthorListClient() {
             <SearchInput
               value={search}
               onChange={setSearch}
-              placeholder="Cerca per nome, slug o descrizione..."
+              placeholder={adminListCopy.common.searchAuthorPlaceholder}
             />
           </div>
           <ColumnSelector
@@ -245,7 +246,7 @@ export default function AuthorListClient() {
           <ItemsPerPageSelector value={itemsPerPage} onChange={setItemsPerPage} />
           <div
             className="flex items-center h-[34px] gap-1.5 px-2 py-1 border border-secondary"
-            title={`${totalItems} ${totalItems === 1 ? "autore" : "autori"}`}
+            title={`${totalItems} ${totalItems === 1 ? adminListCopy.authors.singular : adminListCopy.authors.plural}`}
           >
             <Hash className="h-4 w-4 text-secondary/60" />
             <span className="text-xs text-secondary/80">{totalItems}</span>
@@ -263,7 +264,7 @@ export default function AuthorListClient() {
                   checked={isAllSelected}
                   indeterminate={isIndeterminate}
                   onChange={toggleSelectAll}
-                  ariaLabel="Seleziona tutti"
+                  ariaLabel={adminListCopy.common.selectAll}
                 />
               </th>
               {visibleColumnConfigs.map((column) => {
@@ -294,7 +295,7 @@ export default function AuthorListClient() {
                   colSpan={visibleColumnConfigs.length + 1}
                   className={baseStyles.tableEmptyCell}
                 >
-                  Nessun autore trovato
+                  {adminListCopy.authors.empty}
                 </TableCell>
               </TableRow>
             ) : (
@@ -327,14 +328,17 @@ export default function AuthorListClient() {
       {selectedCount > 0 && (
         <div className="mt-4 flex items-center gap-2 p-3 bg-tertiary/10 border border-tertiary rounded">
           <span className="text-sm text-secondary">
-            {selectedCount} {selectedCount === 1 ? "autore selezionato" : "autori selezionati"}
+            {selectedCount}{" "}
+            {selectedCount === 1
+              ? adminListCopy.authors.selectedSingular
+              : adminListCopy.authors.selectedPlural}
           </span>
           <button
             onClick={handleDeleteMultipleClick}
             disabled={isPending}
             className={cn(styles.iconButton, styles.iconButtonDanger, "ml-auto")}
-            aria-label="Elimina selezionati"
-            title="Elimina selezionati"
+            aria-label={adminListCopy.common.deleteSelected}
+            title={adminListCopy.common.deleteSelected}
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -342,8 +346,8 @@ export default function AuthorListClient() {
             onClick={clearSelection}
             disabled={isPending}
             className={cn(styles.iconButton)}
-            aria-label="Deseleziona tutto"
-            title="Deseleziona tutto"
+            aria-label={adminListCopy.common.deselectAll}
+            title={adminListCopy.common.deselectAll}
           >
             <X className="w-4 h-4" />
           </button>
@@ -356,10 +360,10 @@ export default function AuthorListClient() {
           isOpen={deleteDialog.isOpen}
           onClose={() => setDeleteDialog({ isOpen: false, author: null })}
           onConfirm={handleDeleteConfirm}
-          title="Elimina Autore"
-          message={`Sei sicuro di voler eliminare l'autore "${deleteDialog.author.name}"? Questa azione non può essere annullata.`}
-          confirmText="Elimina"
-          cancelText="Annulla"
+          title={adminListCopy.authors.deleteDialogTitle}
+          message={adminListCopy.authors.deleteDialogMessage(deleteDialog.author.name)}
+          confirmText={adminListCopy.authors.deleteDialogConfirm}
+          cancelText={adminListCopy.common.cancel}
           confirmButtonClassName={styles.deleteButton}
           isLoading={isPending}
         />
@@ -370,10 +374,10 @@ export default function AuthorListClient() {
         isOpen={deleteMultipleDialog.isOpen}
         onClose={() => setDeleteMultipleDialog({ isOpen: false, count: 0 })}
         onConfirm={handleDeleteMultipleConfirm}
-        title="Elimina Autori"
-        message={`Sei sicuro di voler eliminare ${deleteMultipleDialog.count} autor${deleteMultipleDialog.count === 1 ? "e" : "i"}? Questa azione non può essere annullata.`}
-        confirmText="Elimina"
-        cancelText="Annulla"
+        title={adminListCopy.authors.deleteManyDialogTitle}
+        message={adminListCopy.authors.deleteManyDialogMessage(deleteMultipleDialog.count)}
+        confirmText={adminListCopy.authors.deleteDialogConfirm}
+        cancelText={adminListCopy.common.cancel}
         confirmButtonClassName={styles.deleteButton}
         isLoading={isPending}
       />

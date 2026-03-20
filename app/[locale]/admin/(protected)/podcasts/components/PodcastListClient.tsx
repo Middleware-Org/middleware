@@ -31,6 +31,7 @@ import type { Podcast } from "@/lib/github/types";
 import { useLocalizedPath } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils/classes";
 
+import { adminListCopy } from "../../components/adminListCopy";
 import baseStyles from "../../styles";
 import { deletePodcastAction, deletePodcastsAction } from "../actions";
 import styles from "../styles";
@@ -133,9 +134,9 @@ export default function PodcastListClient() {
       const result = await deletePodcastAction(slug);
 
       if (!result.success) {
-        toast.actionResult(result, { errorTitle: "Impossibile eliminare podcast" });
+        toast.actionResult(result, { errorTitle: adminListCopy.podcasts.deleteErrorTitle });
       } else {
-        toast.success(result.message || "Podcast eliminato con successo");
+        toast.success(result.message || adminListCopy.podcasts.deleteSuccess);
         mutate("/api/podcasts");
         mutate("/api/github/merge/check");
         clearSelection();
@@ -157,9 +158,9 @@ export default function PodcastListClient() {
       const result = await deletePodcastsAction(selectedIds);
 
       if (!result.success) {
-        toast.actionResult(result, { errorTitle: "Eliminazione multipla non completata" });
+        toast.actionResult(result, { errorTitle: adminListCopy.podcasts.deleteManyErrorTitle });
       } else {
-        toast.success(result.message || "Podcast eliminati con successo");
+        toast.success(result.message || adminListCopy.podcasts.deleteManySuccess);
         mutate("/api/podcasts");
         mutate("/api/github/merge/check");
         clearSelection();
@@ -185,9 +186,13 @@ export default function PodcastListClient() {
         return (
           <TableCell>
             {podcast.published ? (
-              <span className="px-2 py-1 text-xs bg-green-100 text-green-700">Sì</span>
+              <span className="px-2 py-1 text-xs bg-green-100 text-green-700">
+                {adminListCopy.podcasts.yes}
+              </span>
             ) : (
-              <span className="px-2 py-1 text-xs bg-secondary/10 text-secondary/60">No</span>
+              <span className="px-2 py-1 text-xs bg-secondary/10 text-secondary/60">
+                {adminListCopy.podcasts.no}
+              </span>
             )}
           </TableCell>
         );
@@ -199,8 +204,8 @@ export default function PodcastListClient() {
                 onClick={() => handleEdit(podcast)}
                 className={styles.iconButton}
                 disabled={isPending}
-                aria-label="Modifica"
-                title="Modifica"
+                aria-label={adminListCopy.common.edit}
+                title={adminListCopy.common.edit}
               >
                 <Pencil className="w-4 h-4" />
               </button>
@@ -208,8 +213,8 @@ export default function PodcastListClient() {
                 onClick={() => handleDeleteClick(podcast)}
                 className={cn(styles.iconButton, styles.iconButtonDanger)}
                 disabled={isPending}
-                aria-label="Elimina"
-                title="Elimina"
+                aria-label={adminListCopy.common.delete}
+                title={adminListCopy.common.delete}
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -225,7 +230,7 @@ export default function PodcastListClient() {
   if (isLoading && podcasts.length === 0) {
     return (
       <div className={baseStyles.container}>
-        <div className={baseStyles.loadingText}>Caricamento podcasts...</div>
+        <div className={baseStyles.loadingText}>{adminListCopy.podcasts.loading}</div>
       </div>
     );
   }
@@ -239,7 +244,7 @@ export default function PodcastListClient() {
             <SearchInput
               value={search}
               onChange={setSearch}
-              placeholder="Cerca per titolo, slug o descrizione..."
+              placeholder={adminListCopy.common.searchPodcastPlaceholder}
             />
           </div>
           <ColumnSelector
@@ -250,7 +255,7 @@ export default function PodcastListClient() {
           <ItemsPerPageSelector value={itemsPerPage} onChange={setItemsPerPage} />
           <div
             className="flex items-center h-[34px] gap-1.5 px-2 py-1 border border-secondary"
-            title={`${totalItems} ${totalItems === 1 ? "podcast" : "podcasts"}`}
+            title={`${totalItems} ${totalItems === 1 ? adminListCopy.podcasts.singular : adminListCopy.podcasts.plural}`}
           >
             <Hash className="h-4 w-4 text-secondary/60" />
             <span className="text-xs text-secondary/80">{totalItems}</span>
@@ -268,7 +273,7 @@ export default function PodcastListClient() {
                   checked={isAllSelected}
                   indeterminate={isIndeterminate}
                   onChange={toggleSelectAll}
-                  ariaLabel="Seleziona tutti"
+                  ariaLabel={adminListCopy.common.selectAll}
                 />
               </th>
               {visibleColumnConfigs.map((column) => {
@@ -299,7 +304,7 @@ export default function PodcastListClient() {
                   colSpan={visibleColumnConfigs.length + 1}
                   className={baseStyles.tableEmptyCell}
                 >
-                  Nessun podcast trovato
+                  {adminListCopy.podcasts.empty}
                 </TableCell>
               </TableRow>
             ) : (
@@ -332,14 +337,17 @@ export default function PodcastListClient() {
       {selectedCount > 0 && (
         <div className="mt-4 flex items-center gap-2 p-3 bg-tertiary/10 border border-tertiary rounded">
           <span className="text-sm text-secondary">
-            {selectedCount} {selectedCount === 1 ? "podcast selezionato" : "podcasts selezionati"}
+            {selectedCount}{" "}
+            {selectedCount === 1
+              ? adminListCopy.podcasts.selectedSingular
+              : adminListCopy.podcasts.selectedPlural}
           </span>
           <button
             onClick={handleDeleteMultipleClick}
             disabled={isPending}
             className={cn(styles.iconButton, styles.iconButtonDanger, "ml-auto")}
-            aria-label="Elimina selezionati"
-            title="Elimina selezionati"
+            aria-label={adminListCopy.common.deleteSelected}
+            title={adminListCopy.common.deleteSelected}
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -347,8 +355,8 @@ export default function PodcastListClient() {
             onClick={clearSelection}
             disabled={isPending}
             className={cn(styles.iconButton)}
-            aria-label="Deseleziona tutto"
-            title="Deseleziona tutto"
+            aria-label={adminListCopy.common.deselectAll}
+            title={adminListCopy.common.deselectAll}
           >
             <X className="w-4 h-4" />
           </button>
@@ -361,10 +369,10 @@ export default function PodcastListClient() {
           isOpen={deleteDialog.isOpen}
           onClose={() => setDeleteDialog({ isOpen: false, podcast: null })}
           onConfirm={handleDeleteConfirm}
-          title="Elimina Podcast"
-          message={`Sei sicuro di voler eliminare il podcast "${deleteDialog.podcast.title}"? Questa azione non può essere annullata.`}
-          confirmText="Elimina"
-          cancelText="Annulla"
+          title={adminListCopy.podcasts.deleteDialogTitle}
+          message={adminListCopy.podcasts.deleteDialogMessage(deleteDialog.podcast.title)}
+          confirmText={adminListCopy.podcasts.deleteDialogConfirm}
+          cancelText={adminListCopy.common.cancel}
           confirmButtonClassName={styles.deleteButton}
           isLoading={isPending}
         />
@@ -375,10 +383,10 @@ export default function PodcastListClient() {
         isOpen={deleteMultipleDialog.isOpen}
         onClose={() => setDeleteMultipleDialog({ isOpen: false, count: 0 })}
         onConfirm={handleDeleteMultipleConfirm}
-        title="Elimina Podcasts"
-        message={`Sei sicuro di voler eliminare ${deleteMultipleDialog.count} podcasts? Questa azione non può essere annullata.`}
-        confirmText="Elimina"
-        cancelText="Annulla"
+        title={adminListCopy.podcasts.deleteManyDialogTitle}
+        message={adminListCopy.podcasts.deleteManyDialogMessage(deleteMultipleDialog.count)}
+        confirmText={adminListCopy.podcasts.deleteDialogConfirm}
+        cancelText={adminListCopy.common.cancel}
         confirmButtonClassName={styles.deleteButton}
         isLoading={isPending}
       />

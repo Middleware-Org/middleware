@@ -10,7 +10,9 @@ import { getUser } from "@/lib/auth/server";
 import { getAllAuthors } from "@/lib/github/authors";
 import { getAllCategories } from "@/lib/github/categories";
 import { getAllIssues } from "@/lib/github/issues";
+import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import { withLocale } from "@/lib/i18n/path";
+import { getDictionary } from "@/lib/i18n/utils";
 import { cn } from "@/lib/utils/classes";
 
 import ArticleFormClient from "../components/ArticleFormClient";
@@ -32,6 +34,7 @@ export default async function NewArticlePage({ params }: { params: Promise<{ loc
     getAllAuthors(),
     getAllIssues(),
   ]);
+  const adminDict = await getDictionary(locale, TRANSLATION_NAMESPACES.ADMIN);
 
   // Pre-popolazione cache SWR con dati SSR
   const swrFallback = {
@@ -44,9 +47,9 @@ export default async function NewArticlePage({ params }: { params: Promise<{ loc
     <SWRPageProvider fallback={swrFallback}>
       <div className={cn("h-full flex flex-col", styles.main)}>
         <div className={styles.header}>
-          <h1 className={styles.title}>Nuovo Articolo</h1>
+          <h1 className={styles.title}>{adminDict.resourcePages.articles.new}</h1>
           <Link href={withLocale("/admin/articles", locale)} className={styles.backButton}>
-            ← Indietro
+            ← {adminDict.resourcePages.articles.back}
           </Link>
         </div>
 

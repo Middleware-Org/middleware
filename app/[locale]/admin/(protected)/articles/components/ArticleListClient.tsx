@@ -31,11 +31,11 @@ import type { Article } from "@/lib/github/types";
 import { useLocalizedPath } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils/classes";
 
+import { adminListCopy } from "../../components/adminListCopy";
 import { deleteArticleAction, deleteArticlesAction } from "../actions";
 import SelectSearch, { type SelectSearchOption } from "./SelectSearch";
 import baseStyles from "../../styles";
 import styles from "../styles";
-
 
 /* **************************************************
  * Column Configuration
@@ -148,7 +148,7 @@ export default function ArticleListClient() {
   // Prepare options for SelectSearch components
   const issueOptions: SelectSearchOption[] = useMemo(() => {
     return [
-      { value: "", label: "Tutte le issue" },
+      { value: "", label: adminListCopy.articles.allIssues },
       ...issues.map((issue) => ({
         value: issue.id,
         label: issue.title,
@@ -158,7 +158,7 @@ export default function ArticleListClient() {
 
   const categoryOptions: SelectSearchOption[] = useMemo(() => {
     return [
-      { value: "", label: "Tutte le categorie" },
+      { value: "", label: adminListCopy.articles.allCategories },
       ...categories.map((category) => ({
         value: category.id,
         label: category.name,
@@ -168,7 +168,7 @@ export default function ArticleListClient() {
 
   const authorOptions: SelectSearchOption[] = useMemo(() => {
     return [
-      { value: "", label: "Tutti gli autori" },
+      { value: "", label: adminListCopy.articles.allAuthors },
       ...authors.map((author) => ({
         value: author.id,
         label: author.name,
@@ -228,9 +228,9 @@ export default function ArticleListClient() {
       const result = await deleteArticleAction(slug);
 
       if (!result.success) {
-        toast.actionResult(result, { errorTitle: "Impossibile eliminare articolo" });
+        toast.actionResult(result, { errorTitle: adminListCopy.articles.deleteErrorTitle });
       } else {
-        toast.success(result.message || "Articolo eliminato con successo");
+        toast.success(result.message || adminListCopy.articles.deleteSuccess);
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/articles");
         mutate("/api/github/merge/check");
@@ -253,9 +253,9 @@ export default function ArticleListClient() {
       const result = await deleteArticlesAction(selectedIds);
 
       if (!result.success) {
-        toast.actionResult(result, { errorTitle: "Eliminazione multipla non completata" });
+        toast.actionResult(result, { errorTitle: adminListCopy.articles.deleteManyErrorTitle });
       } else {
-        toast.success(result.message || "Articoli eliminati con successo");
+        toast.success(result.message || adminListCopy.articles.deleteManySuccess);
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/articles");
         mutate("/api/github/merge/check");
@@ -291,9 +291,13 @@ export default function ArticleListClient() {
         return (
           <TableCell>
             {article.in_evidence ? (
-              <span className="px-2 py-1 text-xs bg-green-100 text-green-700">Sì</span>
+              <span className="px-2 py-1 text-xs bg-green-100 text-green-700">
+                {adminListCopy.articles.yes}
+              </span>
             ) : (
-              <span className="px-2 py-1 text-xs bg-secondary/10 text-secondary/60">No</span>
+              <span className="px-2 py-1 text-xs bg-secondary/10 text-secondary/60">
+                {adminListCopy.articles.no}
+              </span>
             )}
           </TableCell>
         );
@@ -305,8 +309,8 @@ export default function ArticleListClient() {
                 onClick={() => handleEdit(article)}
                 className={styles.iconButton}
                 disabled={isPending}
-                aria-label="Modifica"
-                title="Modifica"
+                aria-label={adminListCopy.common.edit}
+                title={adminListCopy.common.edit}
               >
                 <Pencil className="w-4 h-4" />
               </button>
@@ -314,8 +318,8 @@ export default function ArticleListClient() {
                 onClick={() => handleDeleteClick(article)}
                 className={cn(styles.iconButton, styles.iconButtonDanger)}
                 disabled={isPending}
-                aria-label="Elimina"
-                title="Elimina"
+                aria-label={adminListCopy.common.delete}
+                title={adminListCopy.common.delete}
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -331,7 +335,7 @@ export default function ArticleListClient() {
   if (isLoading && articles.length === 0) {
     return (
       <div className={baseStyles.container}>
-        <div className={baseStyles.loadingText}>Caricamento articoli...</div>
+        <div className={baseStyles.loadingText}>{adminListCopy.articles.loading}</div>
       </div>
     );
   }
@@ -345,13 +349,13 @@ export default function ArticleListClient() {
             <SearchInput
               value={search}
               onChange={setSearch}
-              placeholder="Cerca per titolo, slug o excerpt..."
+              placeholder={adminListCopy.articles.searchPlaceholder}
             />
           </div>
           <div className="relative" ref={filtersRef}>
             <button
               onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-              title="Filtri avanzati"
+              title={adminListCopy.articles.advancedFilters}
               className={cn(
                 "flex items-center justify-center p-2 border border-secondary h-[34px] relative",
                 "hover:bg-tertiary/10 focus:outline-none focus:ring-2 focus:ring-tertiary",
@@ -371,7 +375,9 @@ export default function ArticleListClient() {
               <div className="absolute right-0 mt-2 w-80 bg-primary border border-secondary shadow-lg z-50">
                 <div className="p-4 border-b border-secondary">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-semibold text-secondary">Filtri Avanzati</h3>
+                    <h3 className="text-sm font-semibold text-secondary">
+                      {adminListCopy.articles.advancedFiltersTitle}
+                    </h3>
                     <button
                       onClick={() => setIsFiltersOpen(false)}
                       className="text-secondary/60 hover:text-secondary transition-colors"
@@ -384,34 +390,34 @@ export default function ArticleListClient() {
                   {/* Issue Filter */}
                   <SelectSearch
                     id="filter-issueId"
-                    label="Issue"
+                    label={adminListCopy.articles.issueFilter}
                     value={(filters.issueId as string) || ""}
                     options={issueOptions}
                     onChange={(value) => setFilter("issueId", value || null)}
-                    placeholder="Seleziona un'issue"
-                    emptyMessage="Nessuna issue disponibile"
+                    placeholder={adminListCopy.articles.issuePlaceholder}
+                    emptyMessage={adminListCopy.articles.emptyIssueFilter}
                   />
 
                   {/* Category Filter */}
                   <SelectSearch
                     id="filter-categoryId"
-                    label="Categoria"
+                    label={adminListCopy.articles.categoryFilter}
                     value={(filters.categoryId as string) || ""}
                     options={categoryOptions}
                     onChange={(value) => setFilter("categoryId", value || null)}
-                    placeholder="Seleziona una categoria"
-                    emptyMessage="Nessuna categoria disponibile"
+                    placeholder={adminListCopy.articles.categoryPlaceholder}
+                    emptyMessage={adminListCopy.articles.emptyCategoryFilter}
                   />
 
                   {/* Author Filter */}
                   <SelectSearch
                     id="filter-authorId"
-                    label="Autore"
+                    label={adminListCopy.articles.authorFilter}
                     value={(filters.authorId as string) || ""}
                     options={authorOptions}
                     onChange={(value) => setFilter("authorId", value || null)}
-                    placeholder="Seleziona un autore"
-                    emptyMessage="Nessun autore disponibile"
+                    placeholder={adminListCopy.articles.authorPlaceholder}
+                    emptyMessage={adminListCopy.articles.emptyAuthorFilter}
                   />
 
                   {activeFiltersCount > 0 && (
@@ -419,7 +425,7 @@ export default function ArticleListClient() {
                       onClick={handleClearAllFilters}
                       className="w-full px-3 py-2 text-sm text-secondary/60 hover:text-secondary border border-secondary hover:border-tertiary transition-all duration-150"
                     >
-                      Rimuovi tutti i filtri
+                      {adminListCopy.articles.clearAllFilters}
                     </button>
                   )}
                 </div>
@@ -434,7 +440,7 @@ export default function ArticleListClient() {
           <ItemsPerPageSelector value={itemsPerPage} onChange={setItemsPerPage} />
           <div
             className="flex items-center h-[34px] gap-1.5 px-2 py-1 border border-secondary"
-            title={`${totalItems} ${totalItems === 1 ? "articolo" : "articoli"}`}
+            title={`${totalItems} ${totalItems === 1 ? adminListCopy.articles.singular : adminListCopy.articles.plural}`}
           >
             <Hash className="h-4 w-4 text-secondary/60" />
             <span className="text-xs text-secondary/80">{totalItems}</span>
@@ -456,7 +462,7 @@ export default function ArticleListClient() {
                   <button
                     onClick={() => handleClearFilter(key)}
                     className="text-secondary/60 hover:text-secondary transition-colors"
-                    title="Rimuovi filtro"
+                    title={adminListCopy.articles.clearFilter}
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -477,7 +483,7 @@ export default function ArticleListClient() {
                   checked={isAllSelected}
                   indeterminate={isIndeterminate}
                   onChange={toggleSelectAll}
-                  ariaLabel="Seleziona tutti"
+                  ariaLabel={adminListCopy.common.selectAll}
                 />
               </th>
               {visibleColumnConfigs.map((column) => {
@@ -508,7 +514,7 @@ export default function ArticleListClient() {
                   colSpan={visibleColumnConfigs.length + 1}
                   className={baseStyles.tableEmptyCell}
                 >
-                  Nessun articolo trovato
+                  {adminListCopy.articles.empty}
                 </TableCell>
               </TableRow>
             ) : (
@@ -541,14 +547,17 @@ export default function ArticleListClient() {
       {selectedCount > 0 && (
         <div className="mt-4 flex items-center gap-2 p-3 bg-tertiary/10 border border-tertiary rounded">
           <span className="text-sm text-secondary">
-            {selectedCount} {selectedCount === 1 ? "articolo selezionato" : "articoli selezionati"}
+            {selectedCount}{" "}
+            {selectedCount === 1
+              ? adminListCopy.articles.selectedSingular
+              : adminListCopy.articles.selectedPlural}
           </span>
           <button
             onClick={handleDeleteMultipleClick}
             disabled={isPending}
             className={cn(styles.iconButton, styles.iconButtonDanger, "ml-auto")}
-            aria-label="Elimina selezionati"
-            title="Elimina selezionati"
+            aria-label={adminListCopy.common.deleteSelected}
+            title={adminListCopy.common.deleteSelected}
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -556,8 +565,8 @@ export default function ArticleListClient() {
             onClick={clearSelection}
             disabled={isPending}
             className={cn(styles.iconButton)}
-            aria-label="Deseleziona tutto"
-            title="Deseleziona tutto"
+            aria-label={adminListCopy.common.deselectAll}
+            title={adminListCopy.common.deselectAll}
           >
             <X className="w-4 h-4" />
           </button>
@@ -570,10 +579,10 @@ export default function ArticleListClient() {
           isOpen={deleteDialog.isOpen}
           onClose={() => setDeleteDialog({ isOpen: false, article: null })}
           onConfirm={handleDeleteConfirm}
-          title="Elimina Articolo"
-          message={`Sei sicuro di voler eliminare l'articolo "${deleteDialog.article.title}"? Questa azione non può essere annullata.`}
-          confirmText="Elimina"
-          cancelText="Annulla"
+          title={adminListCopy.articles.deleteDialogTitle}
+          message={adminListCopy.articles.deleteDialogMessage(deleteDialog.article.title)}
+          confirmText={adminListCopy.common.delete}
+          cancelText={adminListCopy.common.cancel}
           confirmButtonClassName={styles.deleteButton}
           isLoading={isPending}
         />
@@ -584,10 +593,10 @@ export default function ArticleListClient() {
         isOpen={deleteMultipleDialog.isOpen}
         onClose={() => setDeleteMultipleDialog({ isOpen: false, count: 0 })}
         onConfirm={handleDeleteMultipleConfirm}
-        title="Elimina Articoli"
-        message={`Sei sicuro di voler eliminare ${deleteMultipleDialog.count} articoli? Questa azione non può essere annullata.`}
-        confirmText="Elimina"
-        cancelText="Annulla"
+        title={adminListCopy.articles.deleteManyDialogTitle}
+        message={adminListCopy.articles.deleteManyDialogMessage(deleteMultipleDialog.count)}
+        confirmText={adminListCopy.common.delete}
+        cancelText={adminListCopy.common.cancel}
         confirmButtonClassName={styles.deleteButton}
         isLoading={isPending}
       />

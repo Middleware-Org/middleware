@@ -7,7 +7,9 @@ import { Suspense } from "react";
 
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
 import { getUser } from "@/lib/auth/server";
+import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import { withLocale } from "@/lib/i18n/path";
+import { getDictionary } from "@/lib/i18n/utils";
 import { cn } from "@/lib/utils/classes";
 
 import PodcastFormClient from "../components/PodcastFormClient";
@@ -23,14 +25,15 @@ export default async function NewPodcastPage({ params }: { params: Promise<{ loc
   if (!user) {
     redirect(withLocale("/admin/login", locale));
   }
+  const adminDict = await getDictionary(locale, TRANSLATION_NAMESPACES.ADMIN);
 
   return (
     <SWRPageProvider fallback={{}}>
       <div className={cn("h-full flex flex-col", styles.main)}>
         <div className={styles.header}>
-          <h1 className={styles.title}>Nuovo Podcast</h1>
+          <h1 className={styles.title}>{adminDict.resourcePages.podcasts.new}</h1>
           <Link href={withLocale("/admin/podcasts", locale)} className={styles.backButton}>
-            ← Indietro
+            ← {adminDict.resourcePages.podcasts.back}
           </Link>
         </div>
 

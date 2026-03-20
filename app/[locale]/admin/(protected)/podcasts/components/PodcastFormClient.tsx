@@ -15,13 +15,11 @@ import type { Podcast } from "@/lib/github/types";
 import { useLocalizedPath } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils/classes";
 
+import { adminFormCopy } from "../../components/adminFormCopy";
 import { createPodcastAction, updatePodcastAction } from "../actions";
 import PodcastMetaPanel from "./PodcastMetaPanel";
 import baseStyles from "../../styles";
 import styles from "../styles";
-
-
-
 
 /* **************************************************
  * Types
@@ -90,7 +88,7 @@ export default function PodcastFormClient({ podcastSlug }: PodcastFormClientProp
       published: podcast.published ?? false,
     };
 
-    const timeoutId = setTimeout(() => {
+    const animationFrameId = requestAnimationFrame(() => {
       setFormData((prev) => {
         if (
           prev.title === next.title &&
@@ -106,9 +104,9 @@ export default function PodcastFormClient({ podcastSlug }: PodcastFormClientProp
 
         return next;
       });
-    }, 0);
+    });
 
-    return () => clearTimeout(timeoutId);
+    return () => cancelAnimationFrame(animationFrameId);
   }, [podcast]);
 
   // Reset form and navigate on success
@@ -204,14 +202,14 @@ export default function PodcastFormClient({ podcastSlug }: PodcastFormClientProp
         <div className={styles.editorWrapper}>
           <div className="flex flex-col h-full">
             <label htmlFor="description" className={styles.editorLabel}>
-              Descrizione
+              {adminFormCopy.podcast.description}
             </label>
             <textarea
               id="description"
               value={formData.description}
               onChange={(e) => handleFormDataChange("description", e.target.value)}
               className={cn(styles.textarea, "flex-1 min-h-0")}
-              placeholder="Inserisci la descrizione del podcast..."
+              placeholder={adminFormCopy.podcast.descriptionPlaceholder}
             />
           </div>
         </div>

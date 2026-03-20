@@ -18,7 +18,7 @@ import { Citation } from "./CitationExtension";
 import CitationModal from "./CitationModal";
 import LinkModal from "./LinkModal";
 import MediaSelector from "./MediaSelector";
-
+import { adminFormCopy } from "../../components/adminFormCopy";
 
 /* **************************************************
  * Types
@@ -171,7 +171,9 @@ export default function MarkdownEditor({ value, onChange, label }: MarkdownEdito
       <div className="flex flex-col h-full">
         {label && <label className="block mb-2 text-sm font-medium text-secondary">{label}</label>}
         <div className="flex-1 min-h-0 border border-secondary p-4 bg-primary">
-          <div className="animate-pulse text-secondary/60">Caricamento editor...</div>
+          <div className="animate-pulse text-secondary/60">
+            {adminFormCopy.common.editorLoading}
+          </div>
         </div>
       </div>
     );

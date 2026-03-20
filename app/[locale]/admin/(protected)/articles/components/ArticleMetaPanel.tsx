@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils/classes";
 import { generateSlug } from "@/lib/utils/slug";
 
 import SelectSearch from "./SelectSearch";
+import { adminFormCopy } from "../../components/adminFormCopy";
 import baseStyles from "../../styles";
 import { deleteArticleAction } from "../actions";
 import styles from "../styles";
@@ -107,9 +108,9 @@ export default function ArticleMetaPanel({
       const result = await deleteArticleAction(article.slug);
 
       if (!result.success) {
-        toast.actionResult(result, { errorTitle: "Impossibile eliminare articolo" });
+        toast.actionResult(result, { errorTitle: adminFormCopy.article.deleteErrorTitle });
       } else {
-        toast.success(result.message || "Articolo eliminato con successo");
+        toast.success(result.message || adminFormCopy.article.deleteSuccess);
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/articles");
         mutate(`/api/articles/${article.slug}`);
@@ -122,11 +123,11 @@ export default function ArticleMetaPanel({
     <div className={styles.metaPanel}>
       {/* Scrollable Metadata Section */}
       <div className={cn(styles.metaCard, "flex-1 overflow-y-auto min-h-0")}>
-        <h3 className={styles.metaCardTitle}>Metadati</h3>
+        <h3 className={styles.metaCardTitle}>{adminFormCopy.common.metadata}</h3>
 
         <div className={styles.field}>
           <label htmlFor="title" className={styles.label}>
-            Titolo *
+            {adminFormCopy.article.title}
           </label>
           <input
             id="title"
@@ -140,7 +141,7 @@ export default function ArticleMetaPanel({
 
         <div className={styles.field}>
           <label htmlFor="newSlug" className={styles.label}>
-            Slug {editing ? "(modificabile)" : "(opzionale)"}
+            {editing ? adminFormCopy.common.slugEditable : adminFormCopy.common.slugOptional}
           </label>
           <div className="relative">
             <input
@@ -152,7 +153,9 @@ export default function ArticleMetaPanel({
                 setSlugValue(e.target.value);
               }}
               placeholder={
-                editing ? article?.slug || "auto-generato se vuoto" : "auto-generato se vuoto"
+                editing
+                  ? article?.slug || adminFormCopy.common.slugAuto
+                  : adminFormCopy.common.slugAuto
               }
               className={styles.input}
             />
@@ -160,7 +163,7 @@ export default function ArticleMetaPanel({
               type="button"
               onClick={handleGenerateSlug}
               className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 hover:bg-tertiary/10 transition-colors duration-150"
-              title="Genera slug dal titolo"
+              title={adminFormCopy.common.generateSlug}
             >
               <Sparkles className="w-4 h-4 text-secondary" />
             </button>
@@ -170,7 +173,7 @@ export default function ArticleMetaPanel({
 
         <div className={styles.field}>
           <label htmlFor="date" className={styles.label}>
-            Data *
+            {adminFormCopy.article.date}
           </label>
           <input
             id="date"
@@ -184,48 +187,48 @@ export default function ArticleMetaPanel({
 
         <SelectSearch
           id="authorId"
-          label="Autore"
+          label={adminFormCopy.article.author}
           value={formData.authorId}
           options={authors.map((author) => ({
             value: author.id,
             label: author.name,
           }))}
           onChange={(value) => onFormDataChange("authorId", value)}
-          placeholder="Seleziona un autore"
+          placeholder={adminFormCopy.article.authorPlaceholder}
           required
         />
 
         <SelectSearch
           id="categoryId"
-          label="Categoria"
+          label={adminFormCopy.article.category}
           value={formData.categoryId}
           options={categories.map((category) => ({
             value: category.id,
             label: category.name,
           }))}
           onChange={(value) => onFormDataChange("categoryId", value)}
-          placeholder="Seleziona una categoria"
+          placeholder={adminFormCopy.article.categoryPlaceholder}
           required
         />
 
         <SelectSearch
           id="issueId"
-          label="Issue"
+          label={adminFormCopy.article.issue}
           value={formData.issueId}
           options={[
-            { value: "", label: "Nessuna issue" },
+            { value: "", label: adminFormCopy.article.noIssue },
             ...issues.map((issue) => ({
               value: issue.id,
               label: issue.title,
             })),
           ]}
           onChange={(value) => onFormDataChange("issueId", value)}
-          placeholder="Seleziona un'issue"
+          placeholder={adminFormCopy.article.issuePlaceholder}
         />
 
         <div className={styles.field}>
           <label htmlFor="excerpt" className={styles.label}>
-            Excerpt
+            {adminFormCopy.article.excerpt}
           </label>
           <textarea
             id="excerpt"
@@ -244,7 +247,7 @@ export default function ArticleMetaPanel({
               onChange={(e) => onFormDataChange("published", e.target.checked)}
               className={styles.checkbox}
             />
-            <span className={styles.label}>Pubblicato</span>
+            <span className={styles.label}>{adminFormCopy.article.published}</span>
           </label>
         </div>
 
@@ -256,29 +259,29 @@ export default function ArticleMetaPanel({
               onChange={(e) => onFormDataChange("in_evidence", e.target.checked)}
               className={styles.checkbox}
             />
-            <span className={styles.label}>In evidenza</span>
+            <span className={styles.label}>{adminFormCopy.article.featured}</span>
           </label>
         </div>
 
         <SelectSearch
           id="podcastId"
-          label="Podcast (opzionale)"
+          label={adminFormCopy.article.podcastOptional}
           value={formData.podcastId || ""}
           options={[
-            { value: "", label: "Nessun podcast" },
+            { value: "", label: adminFormCopy.article.noPodcast },
             ...podcasts.map((podcast) => ({
               value: podcast.id,
               label: podcast.title,
             })),
           ]}
           onChange={(value) => onFormDataChange("podcastId", value || "")}
-          placeholder="Seleziona un podcast"
+          placeholder={adminFormCopy.article.podcastPlaceholder}
         />
       </div>
 
       {/* Fixed Actions Section - Always Visible */}
       <div className={cn(styles.metaCard, "shrink-0")}>
-        <h3 className={styles.metaCardTitle}>Azioni</h3>
+        <h3 className={styles.metaCardTitle}>{adminFormCopy.common.actions}</h3>
         <div className={styles.formActions}>
           <button
             type="button"
@@ -288,7 +291,11 @@ export default function ArticleMetaPanel({
             className={styles.submitButton}
             disabled={isPending}
           >
-            {isPending ? "Salvataggio..." : editing ? "Aggiorna" : "Crea"}
+            {isPending
+              ? adminFormCopy.common.save
+              : editing
+                ? adminFormCopy.common.update
+                : adminFormCopy.common.create}
           </button>
           <button
             type="button"
@@ -296,7 +303,7 @@ export default function ArticleMetaPanel({
             className={styles.cancelButton}
             disabled={isPending}
           >
-            Annulla
+            {adminFormCopy.common.cancel}
           </button>
           {editing && (
             <div className="flex justify-end w-full">
@@ -306,7 +313,7 @@ export default function ArticleMetaPanel({
                 className={styles.deleteButton}
                 disabled={isDeleting}
               >
-                Elimina
+                {adminFormCopy.common.delete}
               </button>
             </div>
           )}
@@ -319,10 +326,10 @@ export default function ArticleMetaPanel({
           isOpen={isDeleteDialogOpen}
           onClose={() => setIsDeleteDialogOpen(false)}
           onConfirm={handleDeleteConfirm}
-          title="Elimina Articolo"
-          message={`Sei sicuro di voler eliminare l'articolo "${article.title}"? Questa azione non può essere annullata.`}
-          confirmText="Elimina"
-          cancelText="Annulla"
+          title={adminFormCopy.article.deleteDialogTitle}
+          message={adminFormCopy.article.deleteDialogMessage(article.title)}
+          confirmText={adminFormCopy.common.delete}
+          cancelText={adminFormCopy.common.cancel}
           confirmButtonClassName={styles.deleteButton}
           isLoading={isDeleting}
         />

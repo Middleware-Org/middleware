@@ -3,8 +3,31 @@
 Checklist operativa limitata a ciò che puoi verificare direttamente in questo repository,
 senza introdurre nuovi ambienti e senza attività di deploy/rollback.
 
+## Frontend Admin - Anti-pattern (audit 2026-03-20)
 
-Debiti residui (non bloccanti):
+
+### P1 (priorità media)
+
+- [ ] [P1] Rimuovere `querySelector` dai form client admin e passare a stato typed + hidden inputs controllati/serializer `FormData` esplicito.
+  - File chiave: `PageFormClient`, `PodcastFormClient`, `IssueFormClient`, `PageMetaPanel`, `PodcastMetaPanel`, `ArticleMetaPanel`.
+- [x] [P1] Uniformare tutte le conferme delete su `ConfirmDialog` (eliminare `window.confirm`).
+  - File noti: `AuthorDeleteButton`, `CategoryDeleteButton`, `IssueDeleteButton`.
+- [ ] [P1] Correggere inconsistenze copy IT/EN/plurali in admin (`No image`, `podcasts`, copy dashboard/error).
+- [x] [P1] Hardening sicurezza generazione password in admin users: sostituire `Math.random()` con `crypto.getRandomValues`.
+
+Stato avanzamento P1 (aggiornato):
+
+- [x] Conferme delete migrate a `ConfirmDialog` in area admin (`AuthorDeleteButton`, `CategoryDeleteButton`, `IssueDeleteButton`).
+- [x] Generazione password sicura migrata a API crittografica browser (`crypto.getRandomValues`) con shuffle Fisher-Yates.
+- [ ] Resta aperta la riduzione uso `querySelector` nei form client admin (task strutturale ancora da completare).
+
+### P2 (priorità bassa/media)
+
+- [ ] [P2] Ridurre duplicazione dei `*ListClient` CRUD con estrazione base condivisa (hook/componente headless per search/sort/selection/pagination/bulk actions).
+- [ ] [P2] Ridurre duplicazione degli style object admin (`authors/categories/users/issues`) e consolidare stili sidebar in un unico modulo.
+- [ ] [P2] Estrarre error boundary admin riusabile per ridurre copy/paste tra `*/error.tsx`.
+
+## Debiti residui (non bloccanti)
 
 - [ ] [P2] Uniformare timeout anche nelle route `app/api/github/*` con `fetch` diretto (`merge`, `merge/check`, `token-expiration`, `image`).
 - [ ] [P2] Ridurre il logging di payload errore raw da GitHub in `lib/github/client.ts` mantenendo status/code.

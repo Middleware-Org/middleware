@@ -18,6 +18,7 @@ import { generateSlug } from "@/lib/utils/slug";
 
 import AudioJsonMediaSelector from "../../articles/components/AudioJsonMediaSelector";
 import SelectSearch from "../../articles/components/SelectSearch";
+import { adminFormCopy } from "../../components/adminFormCopy";
 import baseStyles from "../../styles";
 import { deletePodcastAction } from "../actions";
 import styles from "../styles";
@@ -89,9 +90,9 @@ export default function PodcastMetaPanel({
       const result = await deletePodcastAction(podcast.slug);
 
       if (!result.success) {
-        toast.actionResult(result, { errorTitle: "Impossibile eliminare podcast" });
+        toast.actionResult(result, { errorTitle: adminFormCopy.podcast.deleteErrorTitle });
       } else {
-        toast.success(result.message || "Podcast eliminato con successo");
+        toast.success(result.message || adminFormCopy.podcast.deleteSuccess);
         mutate("/api/podcasts");
         mutate(`/api/podcasts/${podcast.slug}`);
         router.push(toLocale("/admin/podcasts"));
@@ -103,11 +104,11 @@ export default function PodcastMetaPanel({
     <div className={styles.metaPanel}>
       {/* Scrollable Metadata Section */}
       <div className={cn(styles.metaCard, "flex-1 overflow-y-auto min-h-0")}>
-        <h3 className={styles.metaCardTitle}>Metadati</h3>
+        <h3 className={styles.metaCardTitle}>{adminFormCopy.common.metadata}</h3>
 
         <div className={styles.field}>
           <label htmlFor="title" className={styles.label}>
-            Titolo *
+            {adminFormCopy.podcast.title}
           </label>
           <input
             id="title"
@@ -121,7 +122,7 @@ export default function PodcastMetaPanel({
 
         <div className={styles.field}>
           <label htmlFor="newSlug" className={styles.label}>
-            Slug {editing ? "(modificabile)" : "(opzionale)"}
+            {editing ? adminFormCopy.common.slugEditable : adminFormCopy.common.slugOptional}
           </label>
           <div className="relative">
             <input
@@ -133,7 +134,9 @@ export default function PodcastMetaPanel({
                 setSlugValue(e.target.value);
               }}
               placeholder={
-                editing ? podcast?.slug || "auto-generato se vuoto" : "auto-generato se vuoto"
+                editing
+                  ? podcast?.slug || adminFormCopy.common.slugAuto
+                  : adminFormCopy.common.slugAuto
               }
               className={styles.input}
             />
@@ -141,7 +144,7 @@ export default function PodcastMetaPanel({
               type="button"
               onClick={handleGenerateSlug}
               className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 hover:bg-tertiary/10 transition-colors duration-150"
-              title="Genera slug dal titolo"
+              title={adminFormCopy.common.generateSlug}
             >
               <Sparkles className="w-4 h-4 text-secondary" />
             </button>
@@ -151,7 +154,7 @@ export default function PodcastMetaPanel({
 
         <div className={styles.field}>
           <label htmlFor="date" className={styles.label}>
-            Data *
+            {adminFormCopy.podcast.date}
           </label>
           <input
             id="date"
@@ -165,7 +168,7 @@ export default function PodcastMetaPanel({
 
         <div className={styles.field}>
           <label htmlFor="audio" className={styles.label}>
-            Audio *
+            {adminFormCopy.podcast.audio}
           </label>
           <div className={baseStyles.buttonGroup}>
             <input
@@ -173,7 +176,7 @@ export default function PodcastMetaPanel({
               type="text"
               value={formData.audio || ""}
               onChange={(e) => onFormDataChange("audio", e.target.value)}
-              placeholder="Nessun file audio selezionato"
+              placeholder={adminFormCopy.podcast.noAudioSelected}
               className={styles.input}
               readOnly
               required
@@ -183,7 +186,7 @@ export default function PodcastMetaPanel({
               onClick={() => setIsAudioSelectorOpen(true)}
               className={styles.submitButton}
             >
-              Seleziona
+              {adminFormCopy.podcast.select}
             </button>
             {formData.audio && (
               <button
@@ -191,7 +194,7 @@ export default function PodcastMetaPanel({
                 onClick={() => onFormDataChange("audio", "")}
                 className={styles.cancelButton}
               >
-                Rimuovi
+                {adminFormCopy.podcast.remove}
               </button>
             )}
           </div>
@@ -199,7 +202,7 @@ export default function PodcastMetaPanel({
 
         <div className={styles.field}>
           <label htmlFor="audio_chunks" className={styles.label}>
-            JSON Chunk Audio *
+            {adminFormCopy.podcast.audioChunks}
           </label>
           <div className={baseStyles.buttonGroup}>
             <input
@@ -207,7 +210,7 @@ export default function PodcastMetaPanel({
               type="text"
               value={formData.audio_chunks || ""}
               onChange={(e) => onFormDataChange("audio_chunks", e.target.value)}
-              placeholder="Nessun file JSON selezionato"
+              placeholder={adminFormCopy.podcast.noJsonSelected}
               className={styles.input}
               readOnly
               required
@@ -217,7 +220,7 @@ export default function PodcastMetaPanel({
               onClick={() => setIsAudioChunksSelectorOpen(true)}
               className={styles.submitButton}
             >
-              Seleziona
+              {adminFormCopy.podcast.select}
             </button>
             {formData.audio_chunks && (
               <button
@@ -225,7 +228,7 @@ export default function PodcastMetaPanel({
                 onClick={() => onFormDataChange("audio_chunks", "")}
                 className={styles.cancelButton}
               >
-                Rimuovi
+                {adminFormCopy.podcast.remove}
               </button>
             )}
           </div>
@@ -239,23 +242,23 @@ export default function PodcastMetaPanel({
               onChange={(e) => onFormDataChange("published", e.target.checked)}
               className={styles.checkbox}
             />
-            <span className={styles.label}>Pubblicato</span>
+            <span className={styles.label}>{adminFormCopy.podcast.published}</span>
           </label>
         </div>
 
         <SelectSearch
           id="issue"
-          label="Numero (opzionale)"
+          label={adminFormCopy.podcast.numberOptional}
           value={formData.issue || ""}
           options={[
-            { value: "", label: "Nessun numero" },
+            { value: "", label: adminFormCopy.podcast.noNumber },
             ...issues.map((issue) => ({
               value: issue.slug,
               label: issue.title,
             })),
           ]}
           onChange={(value) => onFormDataChange("issue", value || "")}
-          placeholder="Seleziona un numero"
+          placeholder={adminFormCopy.podcast.numberPlaceholder}
         />
       </div>
 
@@ -267,7 +270,7 @@ export default function PodcastMetaPanel({
           onFormDataChange("audio", fileUrl);
         }}
         fileType="audio"
-        title="Seleziona Audio"
+        title={adminFormCopy.podcast.selectAudioModalTitle}
       />
 
       {/* Audio Chunks JSON Selector Modal */}
@@ -278,12 +281,12 @@ export default function PodcastMetaPanel({
           onFormDataChange("audio_chunks", fileUrl);
         }}
         fileType="json"
-        title="Seleziona JSON Chunk Audio"
+        title={adminFormCopy.podcast.selectAudioJsonModalTitle}
       />
 
       {/* Fixed Actions Section - Always Visible */}
       <div className={cn(styles.metaCard, "shrink-0")}>
-        <h3 className={styles.metaCardTitle}>Azioni</h3>
+        <h3 className={styles.metaCardTitle}>{adminFormCopy.common.actions}</h3>
         <div className={styles.formActions}>
           <button
             type="button"
@@ -293,7 +296,11 @@ export default function PodcastMetaPanel({
             className={styles.submitButton}
             disabled={isPending}
           >
-            {isPending ? "Salvataggio..." : editing ? "Aggiorna" : "Crea"}
+            {isPending
+              ? adminFormCopy.common.save
+              : editing
+                ? adminFormCopy.common.update
+                : adminFormCopy.common.create}
           </button>
           <button
             type="button"
@@ -301,7 +308,7 @@ export default function PodcastMetaPanel({
             className={styles.cancelButton}
             disabled={isPending}
           >
-            Annulla
+            {adminFormCopy.common.cancel}
           </button>
           {editing && (
             <div className="flex justify-end w-full">
@@ -311,7 +318,7 @@ export default function PodcastMetaPanel({
                 className={styles.deleteButton}
                 disabled={isDeleting}
               >
-                Elimina
+                {adminFormCopy.common.delete}
               </button>
             </div>
           )}
@@ -324,10 +331,10 @@ export default function PodcastMetaPanel({
           isOpen={isDeleteDialogOpen}
           onClose={() => setIsDeleteDialogOpen(false)}
           onConfirm={handleDeleteConfirm}
-          title="Elimina Podcast"
-          message={`Sei sicuro di voler eliminare il podcast "${podcast.title}"? Questa azione non può essere annullata.`}
-          confirmText="Elimina"
-          cancelText="Annulla"
+          title={adminFormCopy.podcast.deleteDialogTitle}
+          message={adminFormCopy.podcast.deleteDialogMessage(podcast.title)}
+          confirmText={adminFormCopy.common.delete}
+          cancelText={adminFormCopy.common.cancel}
           confirmButtonClassName={styles.deleteButton}
           isLoading={isDeleting}
         />

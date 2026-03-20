@@ -62,5 +62,58 @@
     "oneDay": "1 giorno",
     "manyDays": "giorni",
     "in": "tra"
+  },
+  "resourcePages": {
+    "articles": {
+      "title": "Gestione Articoli",
+      "new": "Nuovo Articolo",
+      "back": "Indietro"
+    },
+    "authors": {
+      "title": "Gestione Autori",
+      "new": "Nuovo Autore",
+      "back": "Indietro"
+    },
+    "categories": {
+      "title": "Gestione Categorie",
+      "new": "Nuova Categoria",
+      "back": "Indietro"
+    },
+    "issues": {
+      "title": "Gestione Issues",
+      "new": "Nuova Issue",
+      "back": "Indietro"
+    },
+    "media": {
+      "title": "Gestione Media",
+      "back": "Indietro",
+      "uploadedFiles": "File Caricati"
+    },
+    "pages": {
+      "title": "Gestione Pagine",
+      "new": "Nuova Pagina",
+      "back": "Indietro",
+      "loading": "Caricamento pagine..."
+    },
+    "podcasts": {
+      "title": "Gestione Podcast",
+      "new": "Nuovo Podcast",
+      "back": "Indietro"
+    },
+    "users": {
+      "title": "Gestione Utenti",
+      "new": "Nuovo Utente",
+      "back": "Indietro"
+    }
+  },
+  "error": {
+    "title": "Errore",
+    "genericHeading": "Qualcosa e andato storto!",
+    "retry": "Riprova",
+    "back": "Indietro",
+    "backToDashboard": "Torna alla Dashboard",
+    "usersPage": "Errore nella pagina utenti",
+    "issuesPage": "Errore nella pagina issue",
+    "mediaPage": "Errore nella pagina media"
   }
 }

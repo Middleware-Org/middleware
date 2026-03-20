@@ -3,8 +3,7 @@
  **************************************************/
 "use client";
 
-import type {
-  DragEndEvent} from "@dnd-kit/core";
+import type { DragEndEvent } from "@dnd-kit/core";
 import {
   DndContext,
   closestCenter,
@@ -33,6 +32,7 @@ import type { Issue } from "@/lib/github/types";
 import { useLocalizedPath } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils/classes";
 
+import { adminFormCopy } from "../../components/adminFormCopy";
 import { deleteIssueAction } from "../actions";
 import styles from "../styles";
 
@@ -145,7 +145,7 @@ export default function IssueMetaPanel({
       />
       {/* Settings Card */}
       <div className={styles.metaCard}>
-        <h3 className={styles.metaCardTitle}>Impostazioni</h3>
+        <h3 className={styles.metaCardTitle}>{adminFormCopy.issue.settings}</h3>
         <div className={styles.field}>
           <label className="flex items-center gap-2 cursor-pointer">
             <input
@@ -154,18 +154,18 @@ export default function IssueMetaPanel({
               onChange={(e) => onShowOrderChange(e.target.checked)}
               className={styles.checkbox}
             />
-            <span className={styles.label}>Mostra numerazione articoli</span>
+            <span className={styles.label}>{adminFormCopy.issue.showNumbering}</span>
           </label>
         </div>
       </div>
 
       {/* Articles Order Card */}
       <div className={cn(styles.metaCard, "flex-1 overflow-y-auto min-h-0")}>
-        <h3 className={styles.metaCardTitle}>Articoli ({effectiveOrder.length})</h3>
+        <h3 className={styles.metaCardTitle}>
+          {adminFormCopy.issue.articles} ({effectiveOrder.length})
+        </h3>
         {effectiveOrder.length === 0 ? (
-          <p className="text-sm text-secondary/60">
-            Nessun articolo in questa issue. Assegna articoli dalla loro pagina di modifica.
-          </p>
+          <p className="text-sm text-secondary/60">{adminFormCopy.issue.noArticlesInIssue}</p>
         ) : (
           <DndContext
             sensors={sensors}
@@ -197,21 +197,21 @@ export default function IssueMetaPanel({
 
       {/* Actions Card */}
       <div className={cn(styles.metaCard, "shrink-0")}>
-        <h3 className={styles.metaCardTitle}>Azioni</h3>
+        <h3 className={styles.metaCardTitle}>{adminFormCopy.issue.actions}</h3>
         <div className={styles.formActions}>
           <button
             type="button"
             onClick={() => formRef.current?.requestSubmit()}
             className={styles.submitButton}
           >
-            Aggiorna
+            {adminFormCopy.common.update}
           </button>
           <button
             type="button"
             onClick={() => router.push(toLocale("/admin/issues"))}
             className={styles.cancelButton}
           >
-            Annulla
+            {adminFormCopy.common.cancel}
           </button>
           <div className="flex justify-end w-full">
             <button
@@ -220,7 +220,7 @@ export default function IssueMetaPanel({
               className={styles.deleteButton}
               disabled={isDeleting}
             >
-              Elimina
+              {adminFormCopy.common.delete}
             </button>
           </div>
         </div>
@@ -231,10 +231,10 @@ export default function IssueMetaPanel({
         isOpen={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={handleDeleteConfirm}
-        title="Elimina Issue"
-        message={`Sei sicuro di voler eliminare l'issue "${issue.title}"? Questa azione non può essere annullata.`}
-        confirmText="Elimina"
-        cancelText="Annulla"
+        title={adminFormCopy.issue.deleteDialogTitle}
+        message={adminFormCopy.issue.deleteDialogMessage(issue.title)}
+        confirmText={adminFormCopy.common.delete}
+        cancelText={adminFormCopy.common.cancel}
         confirmButtonClassName={styles.deleteButton}
         isLoading={isDeleting}
       />

@@ -14,6 +14,8 @@ import { toast } from "@/hooks/use-toast";
 import type { ApiMediaFile } from "@/lib/github/types";
 import { cn } from "@/lib/utils/classes";
 
+import { adminModalCopy } from "../../components/adminModalCopy";
+import { useDialogFocusTrap } from "../../components/useDialogFocusTrap";
 import MediaDialog from "../../media/components/MediaDialog";
 import styles from "../../media/styles";
 import baseStyles from "../../styles";
@@ -43,6 +45,7 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
   const [selectedFileForDialog, setSelectedFileForDialog] = useState<ApiMediaFile | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   // Usa SWR per caricare i media files con cache, filtra solo immagini
   const { mediaFiles: allMediaFiles = [], isLoading: loading, isError } = useMedia();
@@ -65,9 +68,7 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
 
   // Reset visible count when search changes
   useEffect(() => {
-    setTimeout(() => {
-      setVisibleCount(ITEMS_PER_PAGE);
-    }, 0);
+    setVisibleCount(ITEMS_PER_PAGE);
   }, [searchQuery]);
 
   // Get visible files
@@ -104,9 +105,11 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
 
   useEffect(() => {
     if (isError) {
-      toast.error("Impossibile caricare i file media");
+      toast.error(adminModalCopy.mediaSelector.loadError);
     }
   }, [isError]);
+
+  useDialogFocusTrap(isOpen, modalRef, onClose);
 
   function handleSelect(imageUrl: string) {
     onSelect(imageUrl);
@@ -130,13 +133,13 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
 
     // Validate file type
     if (!file.type.startsWith("image/")) {
-      toast.warning("Seleziona un file immagine");
+      toast.warning(adminModalCopy.mediaSelector.selectImageWarning);
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      toast.warning("La dimensione dell'immagine deve essere inferiore a 5MB");
+      toast.warning(adminModalCopy.mediaSelector.sizeWarning);
       return;
     }
 
@@ -171,7 +174,7 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
 
   async function handleUpload() {
     if (!selectedFile) {
-      toast.warning("Seleziona un'immagine prima di caricare");
+      toast.warning(adminModalCopy.mediaSelector.selectBeforeUpload);
       return;
     }
 
@@ -199,7 +202,7 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
         handleUploadUrl: "/api/media/upload-blob",
       });
 
-      toast.success("Immagine caricata con successo");
+      toast.success(adminModalCopy.mediaSelector.uploadSuccess);
       // Invalida la cache SWR per forzare il refetch
       mutate("/api/media");
       mutate("/api/github/merge/check");
@@ -213,7 +216,10 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
         fileInputRef.current.value = "";
       }
     } catch (err) {
-      toast.error("Errore durante il caricamento", err instanceof Error ? err.message : undefined);
+      toast.error(
+        adminModalCopy.mediaSelector.uploadError,
+        err instanceof Error ? err.message : undefined,
+      );
     } finally {
       setUploading(false);
     }
@@ -221,13 +227,29 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
 
   if (!isOpen) return null;
 
+  const modalTitleId = "media-selector-title";
+
   return (
     <div className={baseStyles.modalOverlay}>
-      <div className={baseStyles.modalContainer}>
+      <div
+        ref={modalRef}
+        tabIndex={-1}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={modalTitleId}
+        className={baseStyles.modalContainer}
+      >
         {/* Header */}
         <div className={baseStyles.modalHeader}>
-          <h2 className={baseStyles.modalTitle}>Seleziona Immagine</h2>
-          <button type="button" onClick={onClose} className={baseStyles.modalCloseButton}>
+          <h2 id={modalTitleId} className={baseStyles.modalTitle}>
+            {adminModalCopy.mediaSelector.title}
+          </h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className={baseStyles.modalCloseButton}
+            aria-label={adminModalCopy.mediaSelector.closeAria}
+          >
             ×
           </button>
         </div>
@@ -236,7 +258,9 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
         <div className={baseStyles.modalContent}>
           {/* Upload Section */}
           <div className="mb-6 p-4 border-b border-secondary">
-            <h3 className="text-sm font-semibold text-secondary mb-3">Carica Nuova Immagine</h3>
+            <h3 className="text-sm font-semibold text-secondary mb-3">
+              {adminModalCopy.mediaSelector.uploadTitle}
+            </h3>
             <div>
               <input
                 ref={fileInputRef}
@@ -251,7 +275,7 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
                   <div className={styles.imagePreview}>
                     <Image
                       src={preview}
-                      alt="Preview"
+                      alt={adminModalCopy.mediaSelector.previewAlt}
                       className={styles.imagePreviewImg}
                       width={800}
                       height={500}
@@ -263,7 +287,7 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
                       type="text"
                       value={filename}
                       onChange={(e) => setFilename(e.target.value)}
-                      placeholder="Nome file (opzionale)"
+                      placeholder={adminModalCopy.common.fileNameOptional}
                       className={styles.input}
                     />
                     <button
@@ -272,7 +296,7 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
                       disabled={uploading}
                       className={styles.submitButton}
                     >
-                      {uploading ? "Caricamento..." : "Carica"}
+                      {uploading ? adminModalCopy.common.uploading : adminModalCopy.common.upload}
                     </button>
                     <button
                       type="button"
@@ -280,17 +304,31 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
                       className={styles.cancelButton}
                       disabled={uploading}
                     >
-                      Annulla
+                      {adminModalCopy.common.cancel}
                     </button>
                   </div>
                 </div>
               ) : (
-                <div onClick={handleClick} className={styles.imageUpload}>
+                <div
+                  onClick={handleClick}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      handleClick();
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={adminModalCopy.mediaSelector.selectUploadAria}
+                  className={styles.imageUpload}
+                >
                   <div className="text-center py-8">
                     <p className={baseStyles.textSecondary}>
-                      Clicca per selezionare un&apos;immagine
+                      {adminModalCopy.mediaSelector.clickToSelect}
                     </p>
-                    <p className="text-sm text-secondary/60 mt-2">JPG, PNG, GIF o WEBP (max 5MB)</p>
+                    <p className="text-sm text-secondary/60 mt-2">
+                      {adminModalCopy.mediaSelector.formatsHint}
+                    </p>
                   </div>
                 </div>
               )}
@@ -299,7 +337,9 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
 
           {/* Media List */}
           <div>
-            <h3 className="text-sm font-semibold text-secondary mb-3">Immagini Disponibili</h3>
+            <h3 className="text-sm font-semibold text-secondary mb-3">
+              {adminModalCopy.mediaSelector.availableImages}
+            </h3>
 
             {/* Search Bar */}
             <div className="relative mb-4">
@@ -308,7 +348,7 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Cerca immagini per nome..."
+                placeholder={adminModalCopy.mediaSelector.searchPlaceholder}
                 className={cn(styles.input, "pl-10 pr-10")}
               />
               {searchQuery && (
@@ -316,7 +356,7 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
                   type="button"
                   onClick={() => setSearchQuery("")}
                   className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-secondary/10 transition-colors"
-                  title="Pulisci ricerca"
+                  title={adminModalCopy.common.clearSearch}
                 >
                   <X className="w-4 h-4 text-secondary" />
                 </button>
@@ -326,25 +366,27 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
             {/* Results count */}
             <div className="text-sm text-secondary/60 mb-4">
               {filteredFiles.length === 0 ? (
-                "Nessuna immagine trovata"
+                adminModalCopy.mediaSelector.noImagesFound
               ) : (
                 <>
-                  Mostrando {visibleFiles.length} di {filteredFiles.length} immagini
+                  {adminModalCopy.mediaSelector.showing} {visibleFiles.length}{" "}
+                  {adminModalCopy.mediaSelector.of} {filteredFiles.length}{" "}
+                  {adminModalCopy.mediaSelector.images}
                   {allMediaFiles.length !== filteredFiles.length &&
-                    ` (su ${allMediaFiles.filter((f) => f.type === "image").length} totali)`}
+                    ` (${adminModalCopy.mediaSelector.of} ${allMediaFiles.filter((f) => f.type === "image").length} ${adminModalCopy.mediaSelector.totalSuffix})`}
                 </>
               )}
             </div>
 
             {loading && filteredFiles.length === 0 && (
-              <div className={baseStyles.loadingText}>Caricamento immagini...</div>
+              <div className={baseStyles.loadingText}>{adminModalCopy.mediaSelector.loading}</div>
             )}
 
             {!loading && !isError && filteredFiles.length === 0 && (
               <div className={styles.empty}>
-                <p>Nessuna immagine disponibile.</p>
+                <p>{adminModalCopy.mediaSelector.noImageAvailable}</p>
                 <p className={baseStyles.emptyStateText}>
-                  Carica la prima immagine usando il form sopra.
+                  {adminModalCopy.mediaSelector.noImageHint}
                 </p>
               </div>
             )}
@@ -386,7 +428,7 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
                             handleFileClick(file, e);
                           }}
                         >
-                          Gestisci
+                          {adminModalCopy.mediaSelector.manage}
                         </button>
                       </div>
                     </div>
@@ -402,7 +444,7 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
                   >
                     <div className="flex items-center gap-2 text-sm text-secondary/60">
                       <div className="w-4 h-4 border-2 border-secondary/30 border-t-secondary/80 rounded-full animate-spin" />
-                      <span>Caricamento altre immagini...</span>
+                      <span>{adminModalCopy.mediaSelector.loadingMore}</span>
                     </div>
                   </div>
                 )}
@@ -414,7 +456,7 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
         {/* Footer */}
         <div className={baseStyles.modalFooter}>
           <button type="button" onClick={onClose} className={baseStyles.cancelButton}>
-            Annulla
+            {adminModalCopy.common.cancel}
           </button>
         </div>
       </div>

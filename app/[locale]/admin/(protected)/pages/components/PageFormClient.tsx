@@ -16,12 +16,11 @@ import type { Page } from "@/lib/github/types";
 import { useLocalizedPath } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils/classes";
 
+import { adminFormCopy } from "../../components/adminFormCopy";
 import { createPageAction, updatePageAction } from "../actions";
 import PageMetaPanel from "./PageMetaPanel";
 import baseStyles from "../../styles";
 import styles from "../styles";
-
-
 
 // Import dinamico per evitare problemi SSR con Tiptap
 const MarkdownEditor = dynamic(() => import("../../articles/components/MarkdownEditor"), {
@@ -29,7 +28,7 @@ const MarkdownEditor = dynamic(() => import("../../articles/components/MarkdownE
   loading: () => (
     <div className="flex flex-col h-full">
       <div className="flex-1 min-h-0 border border-secondary p-4 bg-primary">
-        <div className="animate-pulse text-secondary/60">Caricamento editor...</div>
+        <div className="animate-pulse text-secondary/60">{adminFormCopy.common.editorLoading}</div>
       </div>
     </div>
   ),
@@ -105,15 +104,15 @@ export default function PageFormClient({ pageSlug }: PageFormClientProps) {
   // Aggiorna lo stato quando la pagina viene caricata
   useEffect(() => {
     if (page) {
-      const timeoutId = setTimeout(() => {
+      const animationFrameId = requestAnimationFrame(() => {
         setContent(page.content);
         setFormData({
           title: page.title || "",
           excerpt: page.excerpt || "",
         });
-      }, 0);
+      });
 
-      return () => clearTimeout(timeoutId);
+      return () => cancelAnimationFrame(animationFrameId);
     }
   }, [page]);
 

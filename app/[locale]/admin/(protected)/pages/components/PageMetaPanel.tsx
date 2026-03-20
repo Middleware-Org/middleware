@@ -15,11 +15,9 @@ import { useLocalizedPath } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils/classes";
 import { generateSlug } from "@/lib/utils/slug";
 
+import { adminFormCopy } from "../../components/adminFormCopy";
 import { deletePageAction } from "../actions";
 import styles from "../styles";
-
-
-
 
 /* **************************************************
  * Types
@@ -91,9 +89,9 @@ export default function PageMetaPanel({
       const result = await deletePageAction(page.slug);
 
       if (!result.success) {
-        toast.actionResult(result, { errorTitle: "Impossibile eliminare pagina" });
+        toast.actionResult(result, { errorTitle: adminFormCopy.page.deleteErrorTitle });
       } else {
-        toast.success(result.message || "Pagina eliminata con successo");
+        toast.success(result.message || adminFormCopy.page.deleteSuccess);
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/pages");
         mutate(`/api/pages/${page.slug}`);
@@ -106,12 +104,12 @@ export default function PageMetaPanel({
     <div className={styles.metaPanel}>
       {/* Scrollable Metadata Section */}
       <div className={cn(styles.metaCard, "flex-1 overflow-y-auto min-h-0")}>
-        <h3 className={styles.metaCardTitle}>Metadati</h3>
+        <h3 className={styles.metaCardTitle}>{adminFormCopy.common.metadata}</h3>
 
         {/* Title */}
         <div className={styles.field}>
           <label htmlFor="title" className={styles.label}>
-            Titolo *
+            {adminFormCopy.page.title}
           </label>
           <input
             id="title"
@@ -120,7 +118,7 @@ export default function PageMetaPanel({
             onChange={(e) => onFormDataChange("title", e.target.value)}
             className={styles.input}
             required
-            placeholder="Titolo della pagina"
+            placeholder={adminFormCopy.page.titlePlaceholder}
           />
           <input type="hidden" name="title" value={formData.title} />
         </div>
@@ -128,7 +126,7 @@ export default function PageMetaPanel({
         {/* Excerpt */}
         <div className={styles.field}>
           <label htmlFor="excerpt" className={styles.label}>
-            Excerpt
+            {adminFormCopy.page.excerpt}
           </label>
           <textarea
             id="excerpt"
@@ -136,7 +134,7 @@ export default function PageMetaPanel({
             onChange={(e) => onFormDataChange("excerpt", e.target.value)}
             className={styles.textarea}
             rows={3}
-            placeholder="Breve descrizione della pagina"
+            placeholder={adminFormCopy.page.excerptPlaceholder}
           />
           <input type="hidden" name="excerpt" value={formData.excerpt} />
         </div>
@@ -144,7 +142,7 @@ export default function PageMetaPanel({
         {/* Slug field */}
         <div className={styles.field}>
           <label htmlFor={editing ? "newSlug" : "slug"} className={styles.label}>
-            Slug {editing ? "(modificabile)" : "(opzionale)"}
+            {editing ? adminFormCopy.common.slugEditable : adminFormCopy.common.slugOptional}
           </label>
           {editing && <input type="hidden" name="slug" value={page?.slug} />}
           <div className="relative">
@@ -156,14 +154,16 @@ export default function PageMetaPanel({
               onChange={(e) => setSlugValue(e.target.value)}
               className={styles.input}
               placeholder={
-                editing ? page?.slug || "auto-generato se vuoto" : "auto-generato se vuoto"
+                editing
+                  ? page?.slug || adminFormCopy.common.slugAuto
+                  : adminFormCopy.common.slugAuto
               }
             />
             <button
               type="button"
               onClick={handleGenerateSlug}
               className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 hover:bg-tertiary/10 transition-colors duration-150"
-              title="Genera slug dal titolo"
+              title={adminFormCopy.common.generateSlug}
             >
               <Sparkles className="w-4 h-4 text-secondary" />
             </button>
@@ -173,7 +173,7 @@ export default function PageMetaPanel({
 
       {/* Fixed Actions Section */}
       <div className={cn(styles.metaCard, "shrink-0")}>
-        <h3 className={styles.metaCardTitle}>Azioni</h3>
+        <h3 className={styles.metaCardTitle}>{adminFormCopy.common.actions}</h3>
         <div className={styles.formActions}>
           <button
             type="button"
@@ -183,7 +183,11 @@ export default function PageMetaPanel({
             className={styles.submitButton}
             disabled={isPending}
           >
-            {isPending ? "Salvataggio..." : editing ? "Aggiorna" : "Crea"}
+            {isPending
+              ? adminFormCopy.common.save
+              : editing
+                ? adminFormCopy.common.update
+                : adminFormCopy.common.create}
           </button>
           <button
             type="button"
@@ -191,7 +195,7 @@ export default function PageMetaPanel({
             className={styles.cancelButton}
             disabled={isPending}
           >
-            Annulla
+            {adminFormCopy.common.cancel}
           </button>
           {editing && (
             <div className="flex justify-end w-full">
@@ -201,7 +205,7 @@ export default function PageMetaPanel({
                 className={styles.deleteButton}
                 disabled={isDeleting}
               >
-                Elimina
+                {adminFormCopy.common.delete}
               </button>
             </div>
           )}
@@ -214,10 +218,10 @@ export default function PageMetaPanel({
           isOpen={isDeleteDialogOpen}
           onClose={() => setIsDeleteDialogOpen(false)}
           onConfirm={handleDeleteConfirm}
-          title="Elimina Pagina"
-          message={`Sei sicuro di voler eliminare la pagina "${page.title || page.slug}"? Questa azione non può essere annullata.`}
-          confirmText="Elimina"
-          cancelText="Annulla"
+          title={adminFormCopy.page.deleteDialogTitle}
+          message={adminFormCopy.page.deleteDialogMessage(page.title || page.slug)}
+          confirmText={adminFormCopy.common.delete}
+          cancelText={adminFormCopy.common.cancel}
           confirmButtonClassName={styles.deleteButton}
           isLoading={isDeleting}
         />

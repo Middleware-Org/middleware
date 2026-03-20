@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 
 import styles from "./styles";
+import { adminErrorCopy } from "../components/adminErrorCopy";
 
 /* **************************************************
  * Types
@@ -22,15 +23,15 @@ interface ErrorProps {
  **************************************************/
 export default function PodcastsError({ error, reset }: ErrorProps) {
   useEffect(() => {
-    toast.error("Errore nella pagina podcast", error.message);
+    toast.error(adminErrorCopy.pages.podcasts, error.message);
   }, [error]);
 
   return (
     <div className={styles.error}>
-      <h2>Qualcosa è andato storto!</h2>
+      <h2>{adminErrorCopy.genericHeading}</h2>
       <p>{error.message}</p>
       <button onClick={reset} className={styles.submitButton}>
-        Riprova
+        {adminErrorCopy.retry}
       </button>
     </div>
   );

@@ -22,6 +22,7 @@ import { generateSlug } from "@/lib/utils/slug";
 
 import IssueMetaPanel from "./IssueMetaPanel";
 import AudioJsonMediaSelector from "../../articles/components/AudioJsonMediaSelector";
+import { adminFormCopy } from "../../components/adminFormCopy";
 import { createIssueAction, updateIssueAction } from "../actions";
 import styles from "../styles";
 
@@ -40,7 +41,11 @@ function SubmitButton({ editing }: { editing: boolean }) {
 
   return (
     <button type="submit" disabled={pending} className={styles.submitButton}>
-      {pending ? "Salvataggio..." : editing ? "Aggiorna" : "Crea"}
+      {pending
+        ? adminFormCopy.common.save
+        : editing
+          ? adminFormCopy.common.update
+          : adminFormCopy.common.create}
     </button>
   );
 }
@@ -84,13 +89,26 @@ function ImageUpload({
 
   return (
     <div>
-      <label className={styles.label}>Cover Image *</label>
-      <div onClick={handleClick} className={styles.imageUpload} style={{ cursor: "pointer" }}>
+      <label className={styles.label}>{adminFormCopy.issue.coverImage}</label>
+      <div
+        onClick={handleClick}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            handleClick();
+          }
+        }}
+        role="button"
+        tabIndex={0}
+        aria-label={adminFormCopy.issue.selectCoverImage}
+        className={styles.imageUpload}
+        style={{ cursor: "pointer" }}
+      >
         {preview ? (
           <div className={styles.imagePreview}>
             <Image
               src={preview}
-              alt="Preview"
+              alt={adminFormCopy.issue.previewAlt}
               className={styles.imagePreviewImg}
               width={800}
               height={500}
@@ -105,23 +123,21 @@ function ImageUpload({
                 }}
                 className="px-3 py-1 text-sm bg-secondary/10 hover:bg-secondary/20"
               >
-                Cambia immagine
+                {adminFormCopy.issue.changeImage}
               </button>
               <button
                 type="button"
                 onClick={handleRemove}
                 className="px-3 py-1 text-sm bg-red-100 text-red-700 hover:bg-red-200"
               >
-                Rimuovi
+                {adminFormCopy.issue.remove}
               </button>
             </div>
           </div>
         ) : (
           <div className="text-center py-8">
-            <p className="text-secondary/80 mb-2">Clicca per selezionare un&apos;immagine</p>
-            <p className="text-sm text-secondary/60">
-              Scegli da media esistenti o carica una nuova
-            </p>
+            <p className="text-secondary/80 mb-2">{adminFormCopy.issue.clickToSelect}</p>
+            <p className="text-sm text-secondary/60">{adminFormCopy.issue.selectOrUpload}</p>
           </div>
         )}
       </div>
@@ -131,7 +147,7 @@ function ImageUpload({
         onClose={() => setIsImageSelectorOpen(false)}
         onSelect={handleSelectFromMedia}
         fileType="image"
-        title="Seleziona Immagine di Copertina"
+        title={adminFormCopy.issue.coverModalTitle}
       />
     </div>
   );
@@ -182,11 +198,14 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
     handledStateRef.current = state;
 
     if (!state.success) {
-      toast.actionResult(state, { errorTitle: "Operazione non riuscita" });
+      toast.actionResult(state, { errorTitle: adminFormCopy.issue.operationErrorTitle });
       return;
     }
 
-    toast.success(state.message || (editing ? "Issue aggiornata" : "Issue creata"));
+    toast.success(
+      state.message ||
+        (editing ? adminFormCopy.issue.updateSuccess : adminFormCopy.issue.createSuccess),
+    );
     formRef.current?.reset();
     mutate("/api/issues");
     if (editing && issueSlug) {
@@ -221,7 +240,7 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
 
       <div className={styles.field}>
         <label htmlFor="title" className={styles.label}>
-          Titolo *
+          {adminFormCopy.issue.title}
         </label>
         <input
           id="title"
@@ -235,7 +254,7 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
 
       <div className={styles.field}>
         <label htmlFor="description" className={styles.label}>
-          Descrizione *
+          {adminFormCopy.issue.description}
         </label>
         <textarea
           id="description"
@@ -253,7 +272,7 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
 
       <div className={styles.field}>
         <label htmlFor="color" className={styles.label}>
-          Colore *
+          {adminFormCopy.issue.color}
         </label>
         <input
           id="color"
@@ -267,7 +286,7 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
 
       <div className={styles.field}>
         <label htmlFor="date" className={styles.label}>
-          Data *
+          {adminFormCopy.issue.date}
         </label>
         <input
           id="date"
@@ -287,13 +306,13 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
             defaultChecked={issue?.published ?? false}
             className="w-4 h-4"
           />
-          <span className={styles.label}>Pubblicato</span>
+          <span className={styles.label}>{adminFormCopy.issue.published}</span>
         </label>
       </div>
 
       <div className={styles.field}>
         <label htmlFor={editing ? "newSlug" : "slug"} className={styles.label}>
-          Slug {editing ? "(modificabile)" : "(opzionale)"}
+          {editing ? adminFormCopy.common.slugEditable : adminFormCopy.common.slugOptional}
         </label>
         <div className="relative">
           <input
@@ -304,14 +323,14 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
             onChange={(e) => setSlugValue(e.target.value)}
             className={styles.input}
             placeholder={
-              editing ? issue?.slug || "auto-generato se vuoto" : "auto-generato se vuoto"
+              editing ? issue?.slug || adminFormCopy.common.slugAuto : adminFormCopy.common.slugAuto
             }
           />
           <button
             type="button"
             onClick={handleGenerateSlug}
             className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 hover:bg-tertiary/10 transition-colors duration-150"
-            title="Genera slug dal titolo"
+            title={adminFormCopy.common.generateSlug}
           >
             <Sparkles className="w-4 h-4 text-secondary" />
           </button>
@@ -329,7 +348,7 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
                 onChange={(e) => setShowOrder(e.target.checked)}
                 className="w-4 h-4"
               />
-              <span className={styles.label}>Mostra numerazione articoli</span>
+              <span className={styles.label}>{adminFormCopy.issue.showNumbering}</span>
             </label>
           </div>
 
@@ -340,7 +359,7 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
               onClick={() => router.push(toLocale("/admin/issues"))}
               className={styles.cancelButton}
             >
-              Annulla
+              {adminFormCopy.common.cancel}
             </button>
           </div>
         </>
@@ -357,7 +376,7 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
           action={formAction}
           className={cn(styles.form, "flex-1")}
         >
-          <h2 className={styles.formTitle}>Modifica Issue</h2>
+          <h2 className={styles.formTitle}>{adminFormCopy.issue.editTitle}</h2>
           {formContent}
         </form>
         <IssueMetaPanel
@@ -374,7 +393,9 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
 
   return (
     <form ref={formRef} action={formAction} className={styles.form}>
-      <h2 className={styles.formTitle}>{editing ? "Modifica Issue" : "Nuova Issue"}</h2>
+      <h2 className={styles.formTitle}>
+        {editing ? adminFormCopy.issue.editTitle : adminFormCopy.issue.createTitle}
+      </h2>
       {formContent}
     </form>
   );

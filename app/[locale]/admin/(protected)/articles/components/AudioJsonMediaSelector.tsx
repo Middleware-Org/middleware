@@ -13,6 +13,8 @@ import { useMedia } from "@/hooks/swr";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils/classes";
 
+import { adminModalCopy } from "../../components/adminModalCopy";
+import { useDialogFocusTrap } from "../../components/useDialogFocusTrap";
 import styles from "../../media/styles";
 import baseStyles from "../../styles";
 
@@ -47,6 +49,7 @@ export default function AudioJsonMediaSelector({
   const [searchQuery, setSearchQuery] = useState("");
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   // Usa SWR per caricare i media files con cache
   const { mediaFiles: allMediaFiles = [], isLoading: loading, isError } = useMedia();
@@ -69,9 +72,7 @@ export default function AudioJsonMediaSelector({
 
   // Reset visible count when search changes
   useEffect(() => {
-    setTimeout(() => {
-      setVisibleCount(ITEMS_PER_PAGE);
-    }, 0);
+    setVisibleCount(ITEMS_PER_PAGE);
   }, [searchQuery]);
 
   // Get visible files
@@ -108,9 +109,11 @@ export default function AudioJsonMediaSelector({
 
   useEffect(() => {
     if (isError) {
-      toast.error("Impossibile caricare i file media");
+      toast.error(adminModalCopy.audioJsonSelector.loadError);
     }
   }, [isError]);
+
+  useDialogFocusTrap(isOpen, modalRef, onClose);
 
   function handleSelect(fileUrl: string) {
     onSelect(fileUrl);
@@ -124,17 +127,17 @@ export default function AudioJsonMediaSelector({
     // Validate file type
     if (fileType === "audio") {
       if (!file.type.startsWith("audio/") && !file.name.match(/\.(mp3|wav)$/i)) {
-        toast.warning("Seleziona un file audio (MP3 o WAV)");
+        toast.warning(adminModalCopy.audioJsonSelector.invalidAudio);
         return;
       }
     } else if (fileType === "json") {
       if (file.type !== "application/json" && !file.name.endsWith(".json")) {
-        toast.warning("Seleziona un file JSON");
+        toast.warning(adminModalCopy.audioJsonSelector.invalidJson);
         return;
       }
     } else if (fileType === "image") {
       if (!file.type.startsWith("image/") && !file.name.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)) {
-        toast.warning("Seleziona un file immagine (JPG, PNG, GIF, WEBP, SVG)");
+        toast.warning(adminModalCopy.audioJsonSelector.invalidImage);
         return;
       }
     }
@@ -147,7 +150,7 @@ export default function AudioJsonMediaSelector({
           ? 10 * 1024 * 1024
           : 20 * 1024 * 1024;
     if (file.size > maxSize) {
-      toast.warning(`La dimensione del file deve essere inferiore a ${maxSize / 1024 / 1024}MB`);
+      toast.warning(adminModalCopy.audioJsonSelector.sizeWarning(maxSize / 1024 / 1024));
       return;
     }
 
@@ -182,9 +185,7 @@ export default function AudioJsonMediaSelector({
 
   async function handleUpload() {
     if (!selectedFile) {
-      toast.warning(
-        `Seleziona un file ${fileType === "audio" ? "audio" : "JSON"} prima di caricare`,
-      );
+      toast.warning(adminModalCopy.audioJsonSelector.selectBeforeUpload(fileTypeLabel));
       return;
     }
 
@@ -233,7 +234,7 @@ export default function AudioJsonMediaSelector({
         handleUploadUrl: "/api/media/upload-blob",
       });
 
-      toast.success("File caricato con successo");
+      toast.success(adminModalCopy.audioJsonSelector.uploadSuccess);
       // Invalida la cache SWR per forzare il refetch
       mutate("/api/media");
       // Seleziona automaticamente il file appena caricato
@@ -246,13 +247,18 @@ export default function AudioJsonMediaSelector({
         fileInputRef.current.value = "";
       }
     } catch (err) {
-      toast.error("Errore durante il caricamento", err instanceof Error ? err.message : undefined);
+      toast.error(
+        adminModalCopy.audioJsonSelector.uploadError,
+        err instanceof Error ? err.message : undefined,
+      );
     } finally {
       setUploading(false);
     }
   }
 
   if (!isOpen) return null;
+
+  const modalTitleId = "audio-json-selector-title";
 
   const acceptTypes =
     fileType === "audio"
@@ -264,11 +270,25 @@ export default function AudioJsonMediaSelector({
 
   return (
     <div className={baseStyles.modalOverlay}>
-      <div className={baseStyles.modalContainer}>
+      <div
+        ref={modalRef}
+        tabIndex={-1}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={modalTitleId}
+        className={baseStyles.modalContainer}
+      >
         {/* Header */}
         <div className={baseStyles.modalHeader}>
-          <h2 className={baseStyles.modalTitle}>{title}</h2>
-          <button type="button" onClick={onClose} className={baseStyles.modalCloseButton}>
+          <h2 id={modalTitleId} className={baseStyles.modalTitle}>
+            {title}
+          </h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className={baseStyles.modalCloseButton}
+            aria-label={adminModalCopy.audioJsonSelector.closeAria}
+          >
             ×
           </button>
         </div>
@@ -278,7 +298,7 @@ export default function AudioJsonMediaSelector({
           {/* Upload Section */}
           <div className="mb-6 p-4 border-b border-secondary">
             <h3 className="text-sm font-semibold text-secondary mb-3">
-              Carica Nuovo File {fileTypeLabel.toUpperCase()}
+              {adminModalCopy.audioJsonSelector.uploadTitle(fileTypeLabel.toUpperCase())}
             </h3>
             <div>
               <input
@@ -293,13 +313,14 @@ export default function AudioJsonMediaSelector({
                 <div className="relative">
                   <div className="p-4 border border-secondary bg-primary">
                     <p className="text-sm text-secondary">
-                      File selezionato: {fileInputRef.current?.files?.[0]?.name || "file"}
+                      {adminModalCopy.audioJsonSelector.selectedFile}{" "}
+                      {fileInputRef.current?.files?.[0]?.name || "file"}
                     </p>
                     <p className="text-xs text-secondary/60 mt-1">
-                      Dimensione:{" "}
+                      {adminModalCopy.audioJsonSelector.fileSize}{" "}
                       {fileInputRef.current?.files?.[0]
                         ? `${(fileInputRef.current.files[0].size / 1024 / 1024).toFixed(2)} MB`
-                        : "N/A"}
+                        : adminModalCopy.audioJsonSelector.notAvailable}
                     </p>
                   </div>
                   <div className={`mt-2 ${baseStyles.buttonGroup}`}>
@@ -307,7 +328,7 @@ export default function AudioJsonMediaSelector({
                       type="text"
                       value={filename}
                       onChange={(e) => setFilename(e.target.value)}
-                      placeholder="Nome file (opzionale)"
+                      placeholder={adminModalCopy.common.fileNameOptional}
                       className={styles.input}
                     />
                     <button
@@ -316,7 +337,7 @@ export default function AudioJsonMediaSelector({
                       disabled={uploading}
                       className={styles.submitButton}
                     >
-                      {uploading ? "Caricamento..." : "Carica"}
+                      {uploading ? adminModalCopy.common.uploading : adminModalCopy.common.upload}
                     </button>
                     <button
                       type="button"
@@ -324,22 +345,30 @@ export default function AudioJsonMediaSelector({
                       className={styles.cancelButton}
                       disabled={uploading}
                     >
-                      Annulla
+                      {adminModalCopy.common.cancel}
                     </button>
                   </div>
                 </div>
               ) : (
-                <div onClick={handleClick} className={styles.imageUpload}>
+                <div
+                  onClick={handleClick}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      handleClick();
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={adminModalCopy.audioJsonSelector.selectUploadAria(fileTypeLabel)}
+                  className={styles.imageUpload}
+                >
                   <div className="text-center py-8">
                     <p className={baseStyles.textSecondary}>
-                      Clicca per selezionare un file {fileTypeLabel}
+                      {adminModalCopy.audioJsonSelector.clickToSelect(fileTypeLabel)}
                     </p>
                     <p className="text-sm text-secondary/60 mt-2">
-                      {fileType === "audio"
-                        ? "Audio (MP3, WAV)"
-                        : fileType === "json"
-                          ? "JSON"
-                          : "Immagine (JPG, PNG, GIF, WEBP, SVG)"}
+                      {adminModalCopy.audioJsonSelector.typeHint(fileType)}
                     </p>
                   </div>
                 </div>
@@ -350,7 +379,7 @@ export default function AudioJsonMediaSelector({
           {/* Media List */}
           <div>
             <h3 className="text-sm font-semibold text-secondary mb-3">
-              File {fileTypeLabel.toUpperCase()} Disponibili
+              {adminModalCopy.audioJsonSelector.availableFiles(fileTypeLabel.toUpperCase())}
             </h3>
 
             {/* Search Bar */}
@@ -360,7 +389,7 @@ export default function AudioJsonMediaSelector({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={`Cerca file ${fileTypeLabel}...`}
+                placeholder={adminModalCopy.audioJsonSelector.searchPlaceholder(fileTypeLabel)}
                 className={cn(styles.input, "pl-10 pr-10")}
               />
               {searchQuery && (
@@ -368,7 +397,7 @@ export default function AudioJsonMediaSelector({
                   type="button"
                   onClick={() => setSearchQuery("")}
                   className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-secondary/10 transition-colors"
-                  title="Pulisci ricerca"
+                  title={adminModalCopy.common.clearSearch}
                 >
                   <X className="w-4 h-4 text-secondary" />
                 </button>
@@ -378,35 +407,39 @@ export default function AudioJsonMediaSelector({
             {/* Results count */}
             <div className="text-sm text-secondary/60 mb-4">
               {filteredMediaFiles.length === 0 ? (
-                "Nessun file trovato"
+                adminModalCopy.audioJsonSelector.noFilesFound
               ) : (
                 <>
-                  Mostrando {visibleFiles.length} di {filteredMediaFiles.length} file
+                  {adminModalCopy.audioJsonSelector.showing} {visibleFiles.length}{" "}
+                  {adminModalCopy.audioJsonSelector.of} {filteredMediaFiles.length}{" "}
+                  {adminModalCopy.audioJsonSelector.files}
                   {allMediaFiles.filter((f) => f.type === fileType).length !==
                     filteredMediaFiles.length &&
-                    ` (su ${allMediaFiles.filter((f) => f.type === fileType).length} totali)`}
+                    ` (${adminModalCopy.audioJsonSelector.of} ${allMediaFiles.filter((f) => f.type === fileType).length} ${adminModalCopy.audioJsonSelector.totalSuffix})`}
                 </>
               )}
             </div>
 
             {loading && filteredMediaFiles.length === 0 && (
-              <div className={baseStyles.loadingText}>Caricamento file {fileTypeLabel}...</div>
+              <div className={baseStyles.loadingText}>
+                {adminModalCopy.audioJsonSelector.loading(fileTypeLabel)}
+              </div>
             )}
 
             {!loading && !isError && filteredMediaFiles.length === 0 && (
               <div className={styles.empty}>
                 {searchQuery ? (
                   <>
-                    <p>Nessun file corrisponde alla ricerca &quot;{searchQuery}&quot;</p>
+                    <p>{adminModalCopy.audioJsonSelector.noSearchResult(searchQuery)}</p>
                     <p className={baseStyles.emptyStateText}>
-                      Prova a modificare i termini di ricerca.
+                      {adminModalCopy.audioJsonSelector.noSearchHint}
                     </p>
                   </>
                 ) : (
                   <>
-                    <p>Nessun file {fileTypeLabel} disponibile.</p>
+                    <p>{adminModalCopy.audioJsonSelector.noFileAvailable(fileTypeLabel)}</p>
                     <p className={baseStyles.emptyStateText}>
-                      Carica il primo file usando il form sopra.
+                      {adminModalCopy.audioJsonSelector.noFileHint}
                     </p>
                   </>
                 )}
@@ -455,7 +488,7 @@ export default function AudioJsonMediaSelector({
                   >
                     <div className="flex items-center gap-2 text-sm text-secondary/60">
                       <div className="w-4 h-4 border-2 border-secondary/30 border-t-secondary/80 animate-spin" />
-                      <span>Caricamento altri file...</span>
+                      <span>{adminModalCopy.common.loadingMoreFiles}</span>
                     </div>
                   </div>
                 )}
@@ -467,7 +500,7 @@ export default function AudioJsonMediaSelector({
         {/* Footer */}
         <div className={baseStyles.modalFooter}>
           <button type="button" onClick={onClose} className={baseStyles.cancelButton}>
-            Annulla
+            {adminModalCopy.common.cancel}
           </button>
         </div>
       </div>

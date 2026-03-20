@@ -16,6 +16,7 @@ import { useTableSelection } from "@/hooks/useTableSelection";
 import type { ApiMediaFile } from "@/lib/github/types";
 import { cn } from "@/lib/utils/classes";
 
+import { adminListCopy } from "../../components/adminListCopy";
 import { deleteMediaFilesAction } from "../actions";
 import MediaDialog from "./MediaDialog";
 import baseStyles from "../../styles";
@@ -65,13 +66,6 @@ export default function MediaListClient() {
 
     return filtered;
   }, [mediaFiles, searchQuery, filterType]);
-
-  // Reset visible count when filters change
-  useEffect(() => {
-    setTimeout(() => {
-      setVisibleCount(ITEMS_PER_PAGE);
-    }, 0);
-  }, [searchQuery, filterType]);
 
   // Get visible files
   const visibleFiles = useMemo(() => {
@@ -150,9 +144,9 @@ export default function MediaListClient() {
       const result = await deleteMediaFilesAction(selectedIds);
 
       if (!result.success) {
-        toast.actionResult(result, { errorTitle: "Eliminazione file non completata" });
+        toast.actionResult(result, { errorTitle: adminListCopy.media.deleteManyErrorTitle });
       } else {
-        toast.success(result.message || "File eliminati con successo");
+        toast.success(result.message || adminListCopy.media.deleteManySuccess);
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/media");
         mutate("/api/github/merge/check");
@@ -165,7 +159,7 @@ export default function MediaListClient() {
   if (isLoading && mediaFiles.length === 0) {
     return (
       <div className={baseStyles.container}>
-        <div className={baseStyles.loadingText}>Caricamento file media...</div>
+        <div className={baseStyles.loadingText}>{adminListCopy.media.loading}</div>
       </div>
     );
   }
@@ -181,16 +175,22 @@ export default function MediaListClient() {
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Cerca file per nome..."
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setVisibleCount(ITEMS_PER_PAGE);
+              }}
+              placeholder={adminListCopy.media.searchPlaceholder}
               className={cn(styles.input, "pl-10 pr-10")}
             />
             {searchQuery && (
               <button
                 type="button"
-                onClick={() => setSearchQuery("")}
+                onClick={() => {
+                  setSearchQuery("");
+                  setVisibleCount(ITEMS_PER_PAGE);
+                }}
                 className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-secondary/10 transition-colors"
-                title="Pulisci ricerca"
+                title={adminListCopy.media.clearSearch}
               >
                 <X className="w-4 h-4 text-secondary" />
               </button>
@@ -202,22 +202,27 @@ export default function MediaListClient() {
                 checked={isAllSelected}
                 indeterminate={isIndeterminate}
                 onChange={toggleSelectAll}
-                ariaLabel="Seleziona tutti"
+                ariaLabel={adminListCopy.media.selectAllLabel}
               />
-              <span className="text-sm text-secondary/60">Seleziona tutti</span>
+              <span className="text-sm text-secondary/60">
+                {adminListCopy.media.selectAllLabel}
+              </span>
             </div>
           )}
         </div>
 
         {/* Type Filter */}
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-sm text-secondary/80">Filtra per tipo:</span>
+          <span className="text-sm text-secondary/80">{adminListCopy.media.filterByType}</span>
           <div className="flex gap-2">
             {(["all", "image", "audio", "json"] as const).map((type) => (
               <button
                 key={type}
                 type="button"
-                onClick={() => setFilterType(type)}
+                onClick={() => {
+                  setFilterType(type);
+                  setVisibleCount(ITEMS_PER_PAGE);
+                }}
                 className={cn(
                   "px-3 py-1 text-sm border transition-all duration-150",
                   filterType === type
@@ -226,12 +231,12 @@ export default function MediaListClient() {
                 )}
               >
                 {type === "all"
-                  ? "Tutti"
+                  ? adminListCopy.media.filterAll
                   : type === "image"
-                    ? "Immagini"
+                    ? adminListCopy.media.filterImages
                     : type === "audio"
-                      ? "Audio"
-                      : "JSON"}
+                      ? adminListCopy.media.filterAudio
+                      : adminListCopy.media.filterJson}
               </button>
             ))}
           </div>
@@ -241,10 +246,11 @@ export default function MediaListClient() {
               onClick={() => {
                 setSearchQuery("");
                 setFilterType("all");
+                setVisibleCount(ITEMS_PER_PAGE);
               }}
               className="px-3 py-1 text-sm text-secondary/60 hover:text-secondary border border-secondary hover:border-tertiary transition-all duration-150"
             >
-              Reset filtri
+              {adminListCopy.media.resetFilters}
             </button>
           )}
         </div>
@@ -252,11 +258,13 @@ export default function MediaListClient() {
         {/* Results count */}
         <div className="text-sm text-secondary/60">
           {filteredFiles.length === 0 ? (
-            "Nessun file trovato"
+            adminListCopy.media.noFileFound
           ) : (
             <>
-              Mostrando {visibleFiles.length} di {filteredFiles.length} file
-              {mediaFiles.length !== filteredFiles.length && ` (su ${mediaFiles.length} totali)`}
+              {adminListCopy.media.showing} {visibleFiles.length} {adminListCopy.media.of}{" "}
+              {filteredFiles.length} {adminListCopy.media.files}
+              {mediaFiles.length !== filteredFiles.length &&
+                ` (${adminListCopy.media.of} ${mediaFiles.length} ${adminListCopy.media.totalSuffix})`}
             </>
           )}
         </div>
@@ -264,16 +272,14 @@ export default function MediaListClient() {
 
       {mediaFiles.length === 0 ? (
         <div className={styles.empty}>
-          <p>Nessun file trovato.</p>
-          <p className={baseStyles.emptyStateText}>
-            Carica il tuo primo file usando il form sopra.
-          </p>
+          <p>{adminListCopy.media.emptyTitle}</p>
+          <p className={baseStyles.emptyStateText}>{adminListCopy.media.emptyDescription}</p>
         </div>
       ) : filteredFiles.length === 0 ? (
         <div className={styles.empty}>
-          <p>Nessun file corrisponde ai filtri selezionati.</p>
+          <p>{adminListCopy.media.filteredEmptyTitle}</p>
           <p className={baseStyles.emptyStateText}>
-            Prova a modificare la ricerca o il filtro tipo.
+            {adminListCopy.media.filteredEmptyDescription}
           </p>
         </div>
       ) : (
@@ -282,7 +288,10 @@ export default function MediaListClient() {
           {selectedCount > 0 && (
             <div className="mb-4 flex items-center gap-2 p-3 bg-tertiary/10 border border-tertiary rounded">
               <span className="text-sm text-secondary">
-                {selectedCount} {selectedCount === 1 ? "file selezionato" : "file selezionati"}
+                {selectedCount}{" "}
+                {selectedCount === 1
+                  ? adminListCopy.media.selectedSingular
+                  : adminListCopy.media.selectedPlural}
               </span>
               <button
                 onClick={handleDeleteMultipleClick}
@@ -292,11 +301,11 @@ export default function MediaListClient() {
                   "focus:outline-none focus:ring-2 focus:ring-tertiary transition-all duration-150",
                   "disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2",
                 )}
-                aria-label="Elimina selezionati"
-                title="Elimina selezionati"
+                aria-label={adminListCopy.media.deleteSelected}
+                title={adminListCopy.media.deleteSelected}
               >
                 <Trash2 className="w-4 h-4" />
-                Elimina
+                {adminListCopy.media.deleteButton}
               </button>
               <button
                 onClick={clearSelection}
@@ -306,11 +315,11 @@ export default function MediaListClient() {
                   "transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-tertiary",
                   "disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2",
                 )}
-                aria-label="Deseleziona tutto"
-                title="Deseleziona tutto"
+                aria-label={adminListCopy.common.deselectAll}
+                title={adminListCopy.common.deselectAll}
               >
                 <X className="w-4 h-4" />
-                Annulla
+                {adminListCopy.media.cancelSelection}
               </button>
             </div>
           )}
@@ -372,10 +381,10 @@ export default function MediaListClient() {
         isOpen={deleteMultipleDialog.isOpen}
         onClose={() => setDeleteMultipleDialog({ isOpen: false, count: 0 })}
         onConfirm={handleDeleteMultipleConfirm}
-        title="Elimina File"
-        message={`Sei sicuro di voler eliminare ${deleteMultipleDialog.count} file? Questa azione non può essere annullata.`}
-        confirmText="Elimina"
-        cancelText="Annulla"
+        title={adminListCopy.media.deleteDialogTitle}
+        message={adminListCopy.media.deleteDialogMessage(deleteMultipleDialog.count)}
+        confirmText={adminListCopy.media.deleteButton}
+        cancelText={adminListCopy.common.cancel}
         confirmButtonClassName={styles.deleteButton}
         isLoading={isPending}
       />

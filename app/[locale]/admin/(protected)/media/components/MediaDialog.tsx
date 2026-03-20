@@ -6,7 +6,7 @@
 import { X, Trash2, Save } from "lucide-react";
 import { Music, FileJson } from "lucide-react";
 import Image from "next/image";
-import { useState, useTransition, useEffect, useCallback } from "react";
+import { useState, useTransition, useEffect, useCallback, useRef } from "react";
 import { mutate } from "swr";
 
 import ConfirmDialog from "@/components/molecules/confirmDialog";
@@ -14,6 +14,8 @@ import { toast } from "@/hooks/use-toast";
 import type { ApiMediaFile } from "@/lib/github/types";
 import { cn } from "@/lib/utils/classes";
 
+import { adminModalCopy } from "../../components/adminModalCopy";
+import { useDialogFocusTrap } from "../../components/useDialogFocusTrap";
 import { deleteMediaAction, renameMediaAction } from "../actions";
 import styles from "../styles";
 
@@ -34,6 +36,7 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
   const [newFilename, setNewFilename] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [jsonContent, setJsonContent] = useState<string | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   const handleClose = useCallback(() => {
     if (!isPending) {
@@ -42,19 +45,11 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
     }
   }, [isPending, onClose]);
 
-  // Handle ESC key to close
-  useEffect(() => {
-    if (!isOpen) return;
-
-    function handleEscape(e: KeyboardEvent) {
-      if (e.key === "Escape" && !isPending && !showDeleteConfirm) {
-        handleClose();
-      }
+  useDialogFocusTrap(isOpen, dialogRef, () => {
+    if (!isPending && !showDeleteConfirm) {
+      handleClose();
     }
-
-    document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
-  }, [isOpen, isPending, showDeleteConfirm, onClose, handleClose]);
+  });
 
   // Prevent body scroll when dialog is open
   useEffect(() => {
@@ -74,10 +69,10 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
     if (file) {
       // Remove extension for editing
       const nameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
-      setTimeout(() => {
+      const animationFrameId = requestAnimationFrame(() => {
         setNewFilename(nameWithoutExt);
         setJsonContent(null);
-      }, 0);
+      });
 
       // Load JSON content if it's a JSON file
       if (file.type === "json") {
@@ -87,22 +82,26 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
             setJsonContent(JSON.stringify(data, null, 2));
           })
           .catch(() => {
-            setJsonContent("Errore nel caricamento del contenuto JSON");
+            setJsonContent(adminModalCopy.mediaSelector.uploadError);
           });
       }
+
+      return () => cancelAnimationFrame(animationFrameId);
     }
   }, [file]);
 
   if (!isOpen || !file) return null;
 
+  const dialogTitleId = "media-dialog-title";
+
   async function handleRename() {
     if (!file) {
-      toast.error("Nessun file selezionato");
+      toast.error(adminModalCopy.mediaDialog.noFileSelected);
       return;
     }
 
     if (!newFilename.trim()) {
-      toast.warning("Il nome del file non puo essere vuoto");
+      toast.warning(adminModalCopy.mediaDialog.emptyFileName);
       return;
     }
 
@@ -120,9 +119,9 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
       const result = await renameMediaAction(file.name, finalFilename);
 
       if (!result.success) {
-        toast.actionResult(result, { errorTitle: "Impossibile rinominare file" });
+        toast.actionResult(result, { errorTitle: adminModalCopy.mediaDialog.renameErrorTitle });
       } else {
-        toast.success(result.message || "File rinominato con successo");
+        toast.success(result.message || adminModalCopy.mediaDialog.renameSuccess);
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/media");
         mutate("/api/github/merge/check");
@@ -140,9 +139,9 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
       const result = await deleteMediaAction(file.name);
 
       if (!result.success) {
-        toast.actionResult(result, { errorTitle: "Impossibile eliminare file" });
+        toast.actionResult(result, { errorTitle: adminModalCopy.mediaDialog.deleteErrorTitle });
       } else {
-        toast.success(result.message || "File eliminato con successo");
+        toast.success(result.message || adminModalCopy.mediaDialog.deleteSuccess);
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/media");
         mutate("/api/github/merge/check");
@@ -171,6 +170,11 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
         onClick={(e) => e.stopPropagation()}
       >
         <div
+          ref={dialogRef}
+          tabIndex={-1}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={dialogTitleId}
           className={cn(
             "bg-primary border border-secondary max-w-4xl w-full max-h-[90vh] overflow-hidden",
             "flex flex-col shadow-lg",
@@ -178,12 +182,14 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
         >
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-secondary">
-            <h2 className="text-xl font-semibold">Gestisci File</h2>
+            <h2 id={dialogTitleId} className="text-xl font-semibold">
+              {adminModalCopy.mediaDialog.title}
+            </h2>
             <button
               onClick={handleClose}
               disabled={isPending}
               className="p-1 hover:bg-secondary/10 transition-colors disabled:opacity-50"
-              aria-label="Chiudi"
+              aria-label={adminModalCopy.common.close}
             >
               <X className="w-5 h-5" />
             </button>
@@ -193,7 +199,9 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
             {/* Preview */}
             <div>
-              <h3 className="text-sm font-medium text-secondary mb-2">Anteprima</h3>
+              <h3 className="text-sm font-medium text-secondary mb-2">
+                {adminModalCopy.mediaDialog.preview}
+              </h3>
               <div className="border border-secondary bg-secondary/5 p-4">
                 {file.type === "image" ? (
                   <div className="relative w-full h-64 flex items-center justify-center">
@@ -236,21 +244,27 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
 
             {/* File Info */}
             <div>
-              <h3 className="text-sm font-medium text-secondary mb-2">Informazioni File</h3>
+              <h3 className="text-sm font-medium text-secondary mb-2">
+                {adminModalCopy.mediaDialog.fileInfo}
+              </h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-secondary/60">Nome attuale:</span>
+                  <span className="text-secondary/60">
+                    {adminModalCopy.mediaDialog.currentName}
+                  </span>
                   <span className="text-secondary font-mono">{file.name}</span>
                 </div>
                 {file.size && (
                   <div className="flex justify-between">
-                    <span className="text-secondary/60">Dimensione:</span>
+                    <span className="text-secondary/60">{adminModalCopy.mediaDialog.size}</span>
                     <span className="text-secondary">{(file.size / 1024).toFixed(2)} KB</span>
                   </div>
                 )}
                 {file.uploadedAt && (
                   <div className="flex justify-between">
-                    <span className="text-secondary/60">Caricato il:</span>
+                    <span className="text-secondary/60">
+                      {adminModalCopy.mediaDialog.uploadedAt}
+                    </span>
                     <span className="text-secondary">
                       {new Date(file.uploadedAt).toLocaleDateString("it-IT")}
                     </span>
@@ -262,7 +276,7 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
             {/* Rename */}
             <div>
               <label htmlFor="filename" className="block text-sm font-medium text-secondary mb-2">
-                Rinomina File
+                {adminModalCopy.mediaDialog.renameLabel}
               </label>
               <div className="flex gap-2">
                 <input
@@ -277,7 +291,7 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
                   }}
                   disabled={isPending}
                   className={cn(styles.input, "flex-1")}
-                  placeholder="Nome del file (senza estensione)"
+                  placeholder={adminModalCopy.mediaDialog.renamePlaceholder}
                 />
                 <button
                   onClick={handleRename}
@@ -285,11 +299,12 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
                   className={cn(styles.submitButton, "flex items-center gap-2")}
                 >
                   <Save className="w-4 h-4" />
-                  Salva
+                  {adminModalCopy.mediaDialog.save}
                 </button>
               </div>
               <p className="text-xs text-secondary/60 mt-1">
-                Estensione: <span className="font-mono">{file.name.split(".").pop()}</span>
+                {adminModalCopy.mediaDialog.extension}{" "}
+                <span className="font-mono">{file.name.split(".").pop()}</span>
               </p>
             </div>
           </div>
@@ -297,7 +312,7 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
           {/* Footer */}
           <div className="flex items-center justify-end gap-2 p-4 border-t border-secondary">
             <button onClick={handleClose} disabled={isPending} className={styles.cancelButton}>
-              Annulla
+              {adminModalCopy.common.cancel}
             </button>
             <button
               onClick={() => setShowDeleteConfirm(true)}
@@ -305,7 +320,7 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
               className={cn(styles.deleteButton, "flex items-center gap-2")}
             >
               <Trash2 className="w-4 h-4" />
-              Elimina
+              {adminModalCopy.common.delete}
             </button>
           </div>
         </div>
@@ -316,10 +331,10 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
         isOpen={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
         onConfirm={handleDelete}
-        title="Elimina File"
-        message={`Sei sicuro di voler eliminare il file "${file?.name}"? Questa azione non può essere annullata.`}
-        confirmText="Elimina"
-        cancelText="Annulla"
+        title={adminModalCopy.mediaDialog.deleteDialogTitle}
+        message={adminModalCopy.mediaDialog.deleteDialogMessage(file?.name || "")}
+        confirmText={adminModalCopy.common.delete}
+        cancelText={adminModalCopy.common.cancel}
         confirmButtonClassName={styles.deleteButton}
         isLoading={isPending}
       />

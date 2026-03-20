@@ -31,6 +31,7 @@ import type { Page } from "@/lib/github/types";
 import { useLocalizedPath } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils/classes";
 
+import { adminListCopy } from "../../components/adminListCopy";
 import baseStyles from "../../styles";
 import { deletePageAction, deletePagesAction } from "../actions";
 import styles from "../styles";
@@ -130,9 +131,9 @@ export default function PageListClient() {
       const result = await deletePageAction(slug);
 
       if (!result.success) {
-        toast.actionResult(result, { errorTitle: "Impossibile eliminare pagina" });
+        toast.actionResult(result, { errorTitle: adminListCopy.pages.deleteErrorTitle });
       } else {
-        toast.success(result.message || "Pagina eliminata con successo");
+        toast.success(result.message || adminListCopy.pages.deleteSuccess);
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/pages");
         mutate(`/api/pages/${slug}`);
@@ -156,9 +157,9 @@ export default function PageListClient() {
       const result = await deletePagesAction(selectedIds);
 
       if (!result.success) {
-        toast.actionResult(result, { errorTitle: "Eliminazione multipla non completata" });
+        toast.actionResult(result, { errorTitle: adminListCopy.pages.deleteManyErrorTitle });
       } else {
-        toast.success(result.message || "Pagine eliminate con successo");
+        toast.success(result.message || adminListCopy.pages.deleteManySuccess);
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/pages");
         // Invalida anche le singole pagine
@@ -198,8 +199,8 @@ export default function PageListClient() {
                 onClick={() => handleEdit(page)}
                 className={styles.iconButton}
                 disabled={isPending}
-                aria-label="Modifica"
-                title="Modifica"
+                aria-label={adminListCopy.common.edit}
+                title={adminListCopy.common.edit}
               >
                 <Pencil className="w-4 h-4" />
               </button>
@@ -207,8 +208,8 @@ export default function PageListClient() {
                 onClick={() => handleDeleteClick(page)}
                 className={cn(styles.iconButton, styles.iconButtonDanger)}
                 disabled={isPending}
-                aria-label="Elimina"
-                title="Elimina"
+                aria-label={adminListCopy.common.delete}
+                title={adminListCopy.common.delete}
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -224,7 +225,7 @@ export default function PageListClient() {
   if (isLoading && pages.length === 0) {
     return (
       <div className={baseStyles.container}>
-        <div className={baseStyles.loadingText}>Caricamento pagine...</div>
+        <div className={baseStyles.loadingText}>{adminListCopy.pages.loading}</div>
       </div>
     );
   }
@@ -235,7 +236,11 @@ export default function PageListClient() {
       <div className={baseStyles.searchContainer}>
         <div className={baseStyles.searchRow}>
           <div className={baseStyles.searchInputWrapper}>
-            <SearchInput value={search} onChange={setSearch} placeholder="Cerca per slug..." />
+            <SearchInput
+              value={search}
+              onChange={setSearch}
+              placeholder={adminListCopy.pages.searchPlaceholder}
+            />
           </div>
           <ColumnSelector
             columns={columnConfig}
@@ -245,7 +250,7 @@ export default function PageListClient() {
           <ItemsPerPageSelector value={itemsPerPage} onChange={setItemsPerPage} />
           <div
             className="flex items-center h-[34px] gap-1.5 px-2 py-1 border border-secondary"
-            title={`${totalItems} ${totalItems === 1 ? "pagina" : "pagine"}`}
+            title={`${totalItems} ${totalItems === 1 ? adminListCopy.pages.singular : adminListCopy.pages.plural}`}
           >
             <Hash className="h-4 w-4 text-secondary/60" />
             <span className="text-xs text-secondary/80">{totalItems}</span>
@@ -263,7 +268,7 @@ export default function PageListClient() {
                   checked={isAllSelected}
                   indeterminate={isIndeterminate}
                   onChange={toggleSelectAll}
-                  ariaLabel="Seleziona tutti"
+                  ariaLabel={adminListCopy.common.selectAll}
                 />
               </th>
               {visibleColumnConfigs.map((column) => {
@@ -294,7 +299,7 @@ export default function PageListClient() {
                   colSpan={visibleColumnConfigs.length + 1}
                   className={baseStyles.tableEmptyCell}
                 >
-                  Nessuna pagina trovata
+                  {adminListCopy.pages.empty}
                 </TableCell>
               </TableRow>
             ) : (
@@ -327,14 +332,17 @@ export default function PageListClient() {
       {selectedCount > 0 && (
         <div className="mt-4 flex items-center gap-2 p-3 bg-tertiary/10 border border-tertiary rounded">
           <span className="text-sm text-secondary">
-            {selectedCount} {selectedCount === 1 ? "pagina selezionata" : "pagine selezionate"}
+            {selectedCount}{" "}
+            {selectedCount === 1
+              ? adminListCopy.pages.selectedSingular
+              : adminListCopy.pages.selectedPlural}
           </span>
           <button
             onClick={handleDeleteMultipleClick}
             disabled={isPending}
             className={cn(styles.iconButton, styles.iconButtonDanger, "ml-auto")}
-            aria-label="Elimina selezionate"
-            title="Elimina selezionate"
+            aria-label={adminListCopy.common.deleteSelected}
+            title={adminListCopy.common.deleteSelected}
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -342,8 +350,8 @@ export default function PageListClient() {
             onClick={clearSelection}
             disabled={isPending}
             className={cn(styles.iconButton)}
-            aria-label="Deseleziona tutto"
-            title="Deseleziona tutto"
+            aria-label={adminListCopy.common.deselectAll}
+            title={adminListCopy.common.deselectAll}
           >
             <X className="w-4 h-4" />
           </button>
@@ -356,10 +364,12 @@ export default function PageListClient() {
           isOpen={deleteDialog.isOpen}
           onClose={() => setDeleteDialog({ isOpen: false, page: null })}
           onConfirm={handleDeleteConfirm}
-          title="Elimina Pagina"
-          message={`Sei sicuro di voler eliminare la pagina "${deleteDialog.page.title || deleteDialog.page.slug}"? Questa azione non può essere annullata.`}
-          confirmText="Elimina"
-          cancelText="Annulla"
+          title={adminListCopy.pages.deleteDialogTitle}
+          message={adminListCopy.pages.deleteDialogMessage(
+            deleteDialog.page.title || deleteDialog.page.slug,
+          )}
+          confirmText={adminListCopy.common.delete}
+          cancelText={adminListCopy.common.cancel}
           confirmButtonClassName={styles.deleteButton}
           isLoading={isPending}
         />
@@ -370,10 +380,10 @@ export default function PageListClient() {
         isOpen={deleteMultipleDialog.isOpen}
         onClose={() => setDeleteMultipleDialog({ isOpen: false, count: 0 })}
         onConfirm={handleDeleteMultipleConfirm}
-        title="Elimina Pagine"
-        message={`Sei sicuro di voler eliminare ${deleteMultipleDialog.count} pagin${deleteMultipleDialog.count === 1 ? "a" : "e"}? Questa azione non può essere annullata.`}
-        confirmText="Elimina"
-        cancelText="Annulla"
+        title={adminListCopy.pages.deleteManyDialogTitle}
+        message={adminListCopy.pages.deleteManyDialogMessage(deleteMultipleDialog.count)}
+        confirmText={adminListCopy.common.delete}
+        cancelText={adminListCopy.common.cancel}
         confirmButtonClassName={styles.deleteButton}
         isLoading={isPending}
       />

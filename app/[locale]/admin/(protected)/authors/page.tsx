@@ -9,12 +9,13 @@ import { Suspense } from "react";
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
 import { getUser } from "@/lib/auth/server";
 import { getAllAuthors } from "@/lib/github/authors";
+import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import { withLocale } from "@/lib/i18n/path";
+import { getDictionary } from "@/lib/i18n/utils";
 
 import AuthorListClient from "./components/AuthorListClient";
 import AuthorListSkeleton from "./components/AuthorListSkeleton";
 import styles from "./styles";
-
 
 /* **************************************************
  * Authors List Page (Server Component)
@@ -27,6 +28,7 @@ export default async function AuthorsPage({ params }: { params: Promise<{ locale
   }
 
   const authors = await getAllAuthors();
+  const adminDict = await getDictionary(locale, TRANSLATION_NAMESPACES.ADMIN);
 
   // Pre-popolazione cache SWR con dati SSR
   const swrFallback = {
@@ -37,21 +39,21 @@ export default async function AuthorsPage({ params }: { params: Promise<{ locale
     <SWRPageProvider fallback={swrFallback}>
       <main className={styles.main}>
         <div className={styles.header}>
-          <h1 className={styles.title}>Gestione Autori</h1>
+          <h1 className={styles.title}>{adminDict.resourcePages.authors.title}</h1>
           <div className="flex gap-2">
             <Link
               href={withLocale("/admin/authors/new", locale)}
               className={styles.iconButton}
-              aria-label="Nuovo Autore"
-              title="Nuovo Autore"
+              aria-label={adminDict.resourcePages.authors.new}
+              title={adminDict.resourcePages.authors.new}
             >
               <Plus className="w-4 h-4" />
             </Link>
             <Link
               href={withLocale("/admin", locale)}
               className={styles.iconButton}
-              aria-label="Indietro"
-              title="Indietro"
+              aria-label={adminDict.resourcePages.authors.back}
+              title={adminDict.resourcePages.authors.back}
             >
               <ArrowLeft className="w-4 h-4" />
             </Link>

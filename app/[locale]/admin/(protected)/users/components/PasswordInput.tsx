@@ -9,6 +9,7 @@ import { useState, useCallback } from "react";
 import { cn } from "@/lib/utils/classes";
 
 import styles from "./PasswordInputStyles";
+import { adminFormCopy } from "../../components/adminFormCopy";
 
 /* **************************************************
  * Types
@@ -111,13 +112,23 @@ function generateSecurePassword(): string {
   // Pool secondario: caratteri speciali (20% del totale)
   const specialChars = special;
 
+  function randomIndex(max: number): number {
+    const randomArray = new Uint32Array(1);
+    crypto.getRandomValues(randomArray);
+    return randomArray[0] % max;
+  }
+
+  function pick(source: string): string {
+    return source[randomIndex(source.length)];
+  }
+
   let password = "";
 
   // Assicurati che la password contenga almeno un carattere di ogni tipo
-  password += uppercase[Math.floor(Math.random() * uppercase.length)];
-  password += lowercase[Math.floor(Math.random() * lowercase.length)];
-  password += numbers[Math.floor(Math.random() * numbers.length)];
-  password += special[Math.floor(Math.random() * special.length)];
+  password += pick(uppercase);
+  password += pick(lowercase);
+  password += pick(numbers);
+  password += pick(special);
 
   // Riempi il resto: 80% lettere/numeri, 20% caratteri speciali
   const remainingLength = length - password.length;
@@ -125,18 +136,21 @@ function generateSecurePassword(): string {
   const mainCount = remainingLength - specialCount; // Resto lettere/numeri
 
   for (let i = 0; i < mainCount; i++) {
-    password += mainChars[Math.floor(Math.random() * mainChars.length)];
+    password += pick(mainChars);
   }
 
   for (let i = 0; i < specialCount; i++) {
-    password += specialChars[Math.floor(Math.random() * specialChars.length)];
+    password += pick(specialChars);
   }
 
-  // Mescola la password
-  return password
-    .split("")
-    .sort(() => Math.random() - 0.5)
-    .join("");
+  // Mescola la password (Fisher-Yates)
+  const chars = password.split("");
+  for (let i = chars.length - 1; i > 0; i--) {
+    const j = randomIndex(i + 1);
+    [chars[i], chars[j]] = [chars[j], chars[i]];
+  }
+
+  return chars.join("");
 }
 
 /* **************************************************
@@ -169,10 +183,10 @@ export default function PasswordInput({
   };
 
   const strengthLabels = {
-    weak: "Debole",
-    medium: "Media",
-    strong: "Forte",
-    "very-strong": "Molto Forte",
+    weak: adminFormCopy.userPassword.weak,
+    medium: adminFormCopy.userPassword.medium,
+    strong: adminFormCopy.userPassword.strong,
+    "very-strong": adminFormCopy.userPassword.veryStrong,
   };
 
   return (
@@ -197,8 +211,8 @@ export default function PasswordInput({
             type="button"
             onClick={handleGeneratePassword}
             className={styles.generateButton}
-            title="Genera password sicura"
-            aria-label="Genera password sicura"
+            title={adminFormCopy.userPassword.generateSecure}
+            aria-label={adminFormCopy.userPassword.generateSecure}
           >
             <RefreshCw className={styles.generateIcon} />
           </button>
@@ -206,8 +220,16 @@ export default function PasswordInput({
             type="button"
             onClick={() => setShowPassword(!showPassword)}
             className={styles.toggleButton}
-            title={showPassword ? "Nascondi password" : "Mostra password"}
-            aria-label={showPassword ? "Nascondi password" : "Mostra password"}
+            title={
+              showPassword
+                ? adminFormCopy.userPassword.hidePassword
+                : adminFormCopy.userPassword.showPassword
+            }
+            aria-label={
+              showPassword
+                ? adminFormCopy.userPassword.hidePassword
+                : adminFormCopy.userPassword.showPassword
+            }
           >
             {showPassword ? (
               <EyeOff className={styles.toggleIcon} />
@@ -239,7 +261,7 @@ export default function PasswordInput({
             </span>
             {!isStrongEnough && (
               <span className={styles.strengthWarning}>
-                La password deve essere almeno &quot;Forte&quot;
+                {adminFormCopy.userPassword.minStrongWarning}
               </span>
             )}
           </div>

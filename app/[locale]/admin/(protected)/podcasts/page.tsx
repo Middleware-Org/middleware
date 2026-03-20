@@ -9,12 +9,13 @@ import { Suspense } from "react";
 import SWRPageProvider from "@/components/providers/SWRPageProvider";
 import { getUser } from "@/lib/auth/server";
 import { getAllPodcasts } from "@/lib/github/podcasts";
+import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import { withLocale } from "@/lib/i18n/path";
+import { getDictionary } from "@/lib/i18n/utils";
 
 import PodcastListClient from "./components/PodcastListClient";
 import PodcastListSkeleton from "./components/PodcastListSkeleton";
 import styles from "./styles";
-
 
 /* **************************************************
  * Podcasts List Page (Server Component)
@@ -27,6 +28,7 @@ export default async function PodcastsPage({ params }: { params: Promise<{ local
   }
 
   const podcasts = await getAllPodcasts();
+  const adminDict = await getDictionary(locale, TRANSLATION_NAMESPACES.ADMIN);
 
   // Pre-popolazione cache SWR con dati SSR
   const swrFallback = {
@@ -37,21 +39,21 @@ export default async function PodcastsPage({ params }: { params: Promise<{ local
     <SWRPageProvider fallback={swrFallback}>
       <main className={styles.main}>
         <div className={styles.header}>
-          <h1 className={styles.title}>Gestione Podcasts</h1>
+          <h1 className={styles.title}>{adminDict.resourcePages.podcasts.title}</h1>
           <div className="flex gap-2">
             <Link
               href={withLocale("/admin/podcasts/new", locale)}
               className={styles.iconButton}
-              aria-label="Nuovo Podcast"
-              title="Nuovo Podcast"
+              aria-label={adminDict.resourcePages.podcasts.new}
+              title={adminDict.resourcePages.podcasts.new}
             >
               <Plus className="w-4 h-4" />
             </Link>
             <Link
               href={withLocale("/admin", locale)}
               className={styles.iconButton}
-              aria-label="Indietro"
-              title="Indietro"
+              aria-label={adminDict.resourcePages.podcasts.back}
+              title={adminDict.resourcePages.podcasts.back}
             >
               <ArrowLeft className="w-4 h-4" />
             </Link>

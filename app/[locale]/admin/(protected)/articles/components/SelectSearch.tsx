@@ -8,6 +8,8 @@ import { useState, useRef, useEffect, useMemo } from "react";
 
 import { cn } from "@/lib/utils/classes";
 
+import { adminModalCopy } from "../../components/adminModalCopy";
+import { useDialogFocusTrap } from "../../components/useDialogFocusTrap";
 import baseStyles from "../../styles";
 import styles from "../styles";
 
@@ -40,10 +42,10 @@ export default function SelectSearch({
   value,
   options,
   onChange,
-  placeholder = "Seleziona un'opzione",
+  placeholder = adminModalCopy.selectSearch.placeholder,
   required = false,
   disabled = false,
-  emptyMessage = "Nessuna opzione disponibile",
+  emptyMessage = adminModalCopy.selectSearch.emptyOptions,
 }: SelectSearchProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -76,9 +78,7 @@ export default function SelectSearch({
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
       // Focus search input when modal opens
-      setTimeout(() => {
-        searchInputRef.current?.focus();
-      }, 100);
+      searchInputRef.current?.focus();
     }
 
     return () => {
@@ -86,20 +86,10 @@ export default function SelectSearch({
     };
   }, [isOpen]);
 
-  // Close modal on Escape key
-  useEffect(() => {
-    function handleEscape(event: KeyboardEvent) {
-      if (event.key === "Escape" && isOpen) {
-        setIsOpen(false);
-        setSearchQuery("");
-      }
-    }
-
-    document.addEventListener("keydown", handleEscape);
-    return () => {
-      document.removeEventListener("keydown", handleEscape);
-    };
-  }, [isOpen]);
+  useDialogFocusTrap(isOpen, modalRef, () => {
+    setIsOpen(false);
+    setSearchQuery("");
+  });
 
   function handleSelect(optionValue: string) {
     onChange(optionValue);
@@ -120,6 +110,8 @@ export default function SelectSearch({
       }
     }
   }
+
+  const modalTitleId = `${id}-select-modal-title`;
 
   return (
     <div className={styles.field}>
@@ -154,7 +146,7 @@ export default function SelectSearch({
             type="button"
             onClick={handleClear}
             className="p-1 hover:bg-secondary/10 transition-colors shrink-0"
-            title="Rimuovi selezione"
+            title={adminModalCopy.selectSearch.removeSelection}
           >
             <X className="w-4 h-4 text-secondary" />
           </button>
@@ -167,10 +159,19 @@ export default function SelectSearch({
       {/* Modal */}
       {isOpen && (
         <div className={baseStyles.modalOverlay}>
-          <div ref={modalRef} className={cn(baseStyles.modalContainer, "max-w-md max-h-[70vh]")}>
+          <div
+            ref={modalRef}
+            tabIndex={-1}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={modalTitleId}
+            className={cn(baseStyles.modalContainer, "max-w-md max-h-[70vh]")}
+          >
             {/* Header */}
             <div className={baseStyles.modalHeader}>
-              <h3 className={baseStyles.modalTitle}>{label}</h3>
+              <h3 id={modalTitleId} className={baseStyles.modalTitle}>
+                {label}
+              </h3>
               <button
                 type="button"
                 onClick={() => {
@@ -178,7 +179,7 @@ export default function SelectSearch({
                   setSearchQuery("");
                 }}
                 className={baseStyles.modalCloseButton}
-                aria-label="Chiudi"
+                aria-label={adminModalCopy.common.close}
               >
                 ×
               </button>
@@ -193,7 +194,7 @@ export default function SelectSearch({
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Cerca..."
+                  placeholder={adminModalCopy.selectSearch.searchPlaceholder}
                   className={cn(styles.input, "pl-10")}
                 />
               </div>
@@ -206,7 +207,7 @@ export default function SelectSearch({
                   <p>{emptyMessage}</p>
                   {searchQuery && (
                     <p className={baseStyles.emptyStateText}>
-                      Nessun risultato per &quot;{searchQuery}&quot;
+                      {adminModalCopy.selectSearch.noResultFor(searchQuery)}
                     </p>
                   )}
                 </div>

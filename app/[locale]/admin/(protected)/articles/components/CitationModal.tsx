@@ -6,6 +6,8 @@
 import { Quote, X } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
+import { adminModalCopy } from "../../components/adminModalCopy";
+import { useDialogFocusTrap } from "../../components/useDialogFocusTrap";
 import baseStyles from "../../styles";
 
 /* **************************************************
@@ -33,15 +35,20 @@ export default function CitationModal({
 }: CitationModalProps) {
   const [text, setText] = useState(currentCitationText || "");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isOpen) {
-      setTimeout(() => {
+      const animationFrameId = requestAnimationFrame(() => {
         setText(currentCitationText || "");
         textareaRef.current?.focus();
-      }, 0);
+      });
+
+      return () => cancelAnimationFrame(animationFrameId);
     }
   }, [isOpen, currentCitationText]);
+
+  useDialogFocusTrap(isOpen, modalRef, onClose);
 
   function handleSubmit() {
     if (text.trim()) {
@@ -71,6 +78,8 @@ export default function CitationModal({
   return (
     <div className={baseStyles.modalOverlay} onClick={onClose}>
       <div
+        ref={modalRef}
+        tabIndex={-1}
         className={baseStyles.modalContainer}
         onClick={(e) => e.stopPropagation()}
         style={{ maxWidth: "600px" }}
@@ -82,14 +91,16 @@ export default function CitationModal({
           <div className="flex items-center gap-2">
             <Quote className="w-5 h-5 text-secondary" />
             <h2 id="citation-modal-title" className={baseStyles.modalTitle}>
-              {currentCitationId ? "Modifica Citazione" : "Inserisci Citazione"}
+              {currentCitationId
+                ? adminModalCopy.citationModal.titleEdit
+                : adminModalCopy.citationModal.titleCreate}
             </h2>
           </div>
           <button
             type="button"
             onClick={onClose}
             className={baseStyles.modalCloseButton}
-            aria-label="Chiudi finestra citazione"
+            aria-label={adminModalCopy.citationModal.closeAria}
           >
             <X className="w-5 h-5" />
           </button>
@@ -101,7 +112,7 @@ export default function CitationModal({
               htmlFor="citation-text"
               className="block mb-2 text-sm font-medium text-secondary"
             >
-              Testo della citazione
+              {adminModalCopy.citationModal.label}
             </label>
             <textarea
               ref={textareaRef}
@@ -112,19 +123,17 @@ export default function CitationModal({
                 handleKeyDown(e);
                 handleEnterKey(e);
               }}
-              placeholder="Inserisci il testo della citazione..."
+              placeholder={adminModalCopy.citationModal.placeholder}
               className={baseStyles.textarea}
               rows={5}
               autoFocus
             />
-            <p className="mt-2 text-xs text-secondary/60">
-              Premi Ctrl+Enter (o Cmd+Enter su Mac) per salvare
-            </p>
+            <p className="mt-2 text-xs text-secondary/60">{adminModalCopy.citationModal.hint}</p>
           </div>
 
           <div className="flex gap-2 justify-end">
             <button type="button" onClick={onClose} className={baseStyles.cancelButton}>
-              Annulla
+              {adminModalCopy.common.cancel}
             </button>
             <button
               type="button"
@@ -132,7 +141,9 @@ export default function CitationModal({
               disabled={!text.trim()}
               className={baseStyles.submitButton}
             >
-              {currentCitationId ? "Aggiorna" : "Inserisci"}
+              {currentCitationId
+                ? adminModalCopy.citationModal.update
+                : adminModalCopy.citationModal.insert}
             </button>
           </div>
         </div>

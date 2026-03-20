@@ -31,6 +31,7 @@ import type { Category } from "@/lib/github/types";
 import { useLocalizedPath } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils/classes";
 
+import { adminListCopy } from "../../components/adminListCopy";
 import baseStyles from "../../styles";
 import { deleteCategoryAction, deleteCategoriesAction } from "../actions";
 import styles from "../styles";
@@ -136,9 +137,9 @@ export default function CategoryListClient() {
       const result = await deleteCategoryAction(slug);
 
       if (!result.success) {
-        toast.actionResult(result, { errorTitle: "Impossibile eliminare categoria" });
+        toast.actionResult(result, { errorTitle: adminListCopy.categories.deleteErrorTitle });
       } else {
-        toast.success(result.message || "Categoria eliminata con successo");
+        toast.success(result.message || adminListCopy.categories.deleteSuccess);
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/categories");
         mutate("/api/github/merge/check");
@@ -161,9 +162,9 @@ export default function CategoryListClient() {
       const result = await deleteCategoriesAction(selectedIds);
 
       if (!result.success) {
-        toast.actionResult(result, { errorTitle: "Eliminazione multipla non completata" });
+        toast.actionResult(result, { errorTitle: adminListCopy.categories.deleteManyErrorTitle });
       } else {
-        toast.success(result.message || "Categorie eliminate con successo");
+        toast.success(result.message || adminListCopy.categories.deleteManySuccess);
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/categories");
         mutate("/api/github/merge/check");
@@ -194,8 +195,8 @@ export default function CategoryListClient() {
                 onClick={() => handleEdit(category)}
                 className={styles.iconButton}
                 disabled={isPending}
-                aria-label="Modifica"
-                title="Modifica"
+                aria-label={adminListCopy.common.edit}
+                title={adminListCopy.common.edit}
               >
                 <Pencil className="w-4 h-4" />
               </button>
@@ -203,8 +204,8 @@ export default function CategoryListClient() {
                 onClick={() => handleDeleteClick(category)}
                 className={cn(styles.iconButton, styles.iconButtonDanger)}
                 disabled={isPending}
-                aria-label="Elimina"
-                title="Elimina"
+                aria-label={adminListCopy.common.delete}
+                title={adminListCopy.common.delete}
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -220,7 +221,7 @@ export default function CategoryListClient() {
   if (isLoading && categories.length === 0) {
     return (
       <div className={baseStyles.container}>
-        <div className={baseStyles.loadingText}>Caricamento categorie...</div>
+        <div className={baseStyles.loadingText}>{adminListCopy.categories.loading}</div>
       </div>
     );
   }
@@ -234,7 +235,7 @@ export default function CategoryListClient() {
             <SearchInput
               value={search}
               onChange={setSearch}
-              placeholder="Cerca per nome, slug o descrizione..."
+              placeholder={adminListCopy.common.searchCategoryPlaceholder}
             />
           </div>
           <ColumnSelector
@@ -245,7 +246,7 @@ export default function CategoryListClient() {
           <ItemsPerPageSelector value={itemsPerPage} onChange={setItemsPerPage} />
           <div
             className="flex items-center h-[34px] gap-1.5 px-2 py-1 border border-secondary"
-            title={`${totalItems} ${totalItems === 1 ? "categoria" : "categorie"}`}
+            title={`${totalItems} ${totalItems === 1 ? adminListCopy.categories.singular : adminListCopy.categories.plural}`}
           >
             <Hash className="h-4 w-4 text-secondary/60" />
             <span className="text-xs text-secondary/80">{totalItems}</span>
@@ -263,7 +264,7 @@ export default function CategoryListClient() {
                   checked={isAllSelected}
                   indeterminate={isIndeterminate}
                   onChange={toggleSelectAll}
-                  ariaLabel="Seleziona tutti"
+                  ariaLabel={adminListCopy.common.selectAll}
                 />
               </th>
               {visibleColumnConfigs.map((column) => {
@@ -294,7 +295,7 @@ export default function CategoryListClient() {
                   colSpan={visibleColumnConfigs.length + 1}
                   className={baseStyles.tableEmptyCell}
                 >
-                  Nessuna categoria trovata
+                  {adminListCopy.categories.empty}
                 </TableCell>
               </TableRow>
             ) : (
@@ -328,14 +329,16 @@ export default function CategoryListClient() {
         <div className="mt-4 flex items-center gap-2 p-3 bg-tertiary/10 border border-tertiary rounded">
           <span className="text-sm text-secondary">
             {selectedCount}{" "}
-            {selectedCount === 1 ? "categoria selezionata" : "categorie selezionate"}
+            {selectedCount === 1
+              ? adminListCopy.categories.selectedSingular
+              : adminListCopy.categories.selectedPlural}
           </span>
           <button
             onClick={handleDeleteMultipleClick}
             disabled={isPending}
             className={cn(styles.iconButton, styles.iconButtonDanger, "ml-auto")}
-            aria-label="Elimina selezionate"
-            title="Elimina selezionate"
+            aria-label={adminListCopy.common.deleteSelected}
+            title={adminListCopy.common.deleteSelected}
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -343,8 +346,8 @@ export default function CategoryListClient() {
             onClick={clearSelection}
             disabled={isPending}
             className={cn(styles.iconButton)}
-            aria-label="Deseleziona tutto"
-            title="Deseleziona tutto"
+            aria-label={adminListCopy.common.deselectAll}
+            title={adminListCopy.common.deselectAll}
           >
             <X className="w-4 h-4" />
           </button>
@@ -357,10 +360,10 @@ export default function CategoryListClient() {
           isOpen={deleteDialog.isOpen}
           onClose={() => setDeleteDialog({ isOpen: false, category: null })}
           onConfirm={handleDeleteConfirm}
-          title="Elimina Categoria"
-          message={`Sei sicuro di voler eliminare la categoria "${deleteDialog.category.name}"? Questa azione non può essere annullata.`}
-          confirmText="Elimina"
-          cancelText="Annulla"
+          title={adminListCopy.categories.deleteDialogTitle}
+          message={adminListCopy.categories.deleteDialogMessage(deleteDialog.category.name)}
+          confirmText={adminListCopy.categories.deleteDialogConfirm}
+          cancelText={adminListCopy.common.cancel}
           confirmButtonClassName={styles.deleteButton}
           isLoading={isPending}
         />
@@ -371,10 +374,10 @@ export default function CategoryListClient() {
         isOpen={deleteMultipleDialog.isOpen}
         onClose={() => setDeleteMultipleDialog({ isOpen: false, count: 0 })}
         onConfirm={handleDeleteMultipleConfirm}
-        title="Elimina Categorie"
-        message={`Sei sicuro di voler eliminare ${deleteMultipleDialog.count} categor${deleteMultipleDialog.count === 1 ? "ia" : "ie"}? Questa azione non può essere annullata.`}
-        confirmText="Elimina"
-        cancelText="Annulla"
+        title={adminListCopy.categories.deleteManyDialogTitle}
+        message={adminListCopy.categories.deleteManyDialogMessage(deleteMultipleDialog.count)}
+        confirmText={adminListCopy.categories.deleteDialogConfirm}
+        cancelText={adminListCopy.common.cancel}
         confirmButtonClassName={styles.deleteButton}
         isLoading={isPending}
       />

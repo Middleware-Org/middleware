@@ -33,6 +33,7 @@ import type { Issue } from "@/lib/github/types";
 import { useLocalizedPath } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils/classes";
 
+import { adminListCopy } from "../../components/adminListCopy";
 import baseStyles from "../../styles";
 import { deleteIssueAction, deleteIssuesAction } from "../actions";
 import styles from "../styles";
@@ -141,9 +142,9 @@ export default function IssueListClient() {
       const result = await deleteIssueAction(slug);
 
       if (!result.success) {
-        toast.actionResult(result, { errorTitle: "Impossibile eliminare issue" });
+        toast.actionResult(result, { errorTitle: adminListCopy.issues.deleteErrorTitle });
       } else {
-        toast.success(result.message || "Issue eliminata con successo");
+        toast.success(result.message || adminListCopy.issues.deleteSuccess);
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/issues");
         mutate("/api/github/merge/check");
@@ -166,9 +167,9 @@ export default function IssueListClient() {
       const result = await deleteIssuesAction(selectedIds);
 
       if (!result.success) {
-        toast.actionResult(result, { errorTitle: "Eliminazione multipla non completata" });
+        toast.actionResult(result, { errorTitle: adminListCopy.issues.deleteManyErrorTitle });
       } else {
-        toast.success(result.message || "Issue eliminate con successo");
+        toast.success(result.message || adminListCopy.issues.deleteManySuccess);
         // Invalida la cache SWR per forzare il refetch
         mutate("/api/issues");
         mutate("/api/github/merge/check");
@@ -193,7 +194,7 @@ export default function IssueListClient() {
               />
             ) : (
               <div className="w-16 h-16 bg-secondary/20 border border-secondary flex items-center justify-center text-xs text-secondary/60">
-                No image
+                {adminListCopy.issues.noImage}
               </div>
             )}
           </TableCell>
@@ -234,8 +235,8 @@ export default function IssueListClient() {
                 onClick={() => handleEdit(issue)}
                 className={styles.iconButton}
                 disabled={isPending}
-                aria-label="Modifica"
-                title="Modifica"
+                aria-label={adminListCopy.common.edit}
+                title={adminListCopy.common.edit}
               >
                 <Pencil className="w-4 h-4" />
               </button>
@@ -243,8 +244,8 @@ export default function IssueListClient() {
                 onClick={() => handleDeleteClick(issue)}
                 className={cn(styles.iconButton, styles.iconButtonDanger)}
                 disabled={isPending}
-                aria-label="Elimina"
-                title="Elimina"
+                aria-label={adminListCopy.common.delete}
+                title={adminListCopy.common.delete}
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -260,7 +261,7 @@ export default function IssueListClient() {
   if (isLoading && issues.length === 0) {
     return (
       <div className={baseStyles.container}>
-        <div className={baseStyles.loadingText}>Caricamento issues...</div>
+        <div className={baseStyles.loadingText}>{adminListCopy.issues.loading}</div>
       </div>
     );
   }
@@ -274,7 +275,7 @@ export default function IssueListClient() {
             <SearchInput
               value={search}
               onChange={setSearch}
-              placeholder="Cerca per titolo, slug o descrizione..."
+              placeholder={adminListCopy.common.searchIssuePlaceholder}
             />
           </div>
           <ColumnSelector
@@ -285,7 +286,7 @@ export default function IssueListClient() {
           <ItemsPerPageSelector value={itemsPerPage} onChange={setItemsPerPage} />
           <div
             className="flex items-center h-[34px] gap-1.5 px-2 py-1 border border-secondary"
-            title={`${totalItems} ${totalItems === 1 ? "issue" : "issues"}`}
+            title={`${totalItems} ${totalItems === 1 ? adminListCopy.issues.singular : adminListCopy.issues.plural}`}
           >
             <Hash className="h-4 w-4 text-secondary/60" />
             <span className="text-xs text-secondary/80">{totalItems}</span>
@@ -303,7 +304,7 @@ export default function IssueListClient() {
                   checked={isAllSelected}
                   indeterminate={isIndeterminate}
                   onChange={toggleSelectAll}
-                  ariaLabel="Seleziona tutti"
+                  ariaLabel={adminListCopy.common.selectAll}
                 />
               </th>
               {visibleColumnConfigs.map((column) => {
@@ -334,7 +335,7 @@ export default function IssueListClient() {
                   colSpan={visibleColumnConfigs.length + 1}
                   className={baseStyles.tableEmptyCell}
                 >
-                  Nessuna issue trovata
+                  {adminListCopy.issues.empty}
                 </TableCell>
               </TableRow>
             ) : (
@@ -367,14 +368,17 @@ export default function IssueListClient() {
       {selectedCount > 0 && (
         <div className="mt-4 flex items-center gap-2 p-3 bg-tertiary/10 border border-tertiary rounded">
           <span className="text-sm text-secondary">
-            {selectedCount} {selectedCount === 1 ? "issue selezionata" : "issue selezionate"}
+            {selectedCount}{" "}
+            {selectedCount === 1
+              ? adminListCopy.issues.selectedSingular
+              : adminListCopy.issues.selectedPlural}
           </span>
           <button
             onClick={handleDeleteMultipleClick}
             disabled={isPending}
             className={cn(styles.iconButton, styles.iconButtonDanger, "ml-auto")}
-            aria-label="Elimina selezionate"
-            title="Elimina selezionate"
+            aria-label={adminListCopy.common.deleteSelected}
+            title={adminListCopy.common.deleteSelected}
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -382,8 +386,8 @@ export default function IssueListClient() {
             onClick={clearSelection}
             disabled={isPending}
             className={cn(styles.iconButton)}
-            aria-label="Deseleziona tutto"
-            title="Deseleziona tutto"
+            aria-label={adminListCopy.common.deselectAll}
+            title={adminListCopy.common.deselectAll}
           >
             <X className="w-4 h-4" />
           </button>
@@ -396,10 +400,10 @@ export default function IssueListClient() {
           isOpen={deleteDialog.isOpen}
           onClose={() => setDeleteDialog({ isOpen: false, issue: null })}
           onConfirm={handleDeleteConfirm}
-          title="Elimina Issue"
-          message={`Sei sicuro di voler eliminare l'issue "${deleteDialog.issue.title}"? Questa azione non può essere annullata.`}
-          confirmText="Elimina"
-          cancelText="Annulla"
+          title={adminListCopy.issues.deleteDialogTitle}
+          message={adminListCopy.issues.deleteDialogMessage(deleteDialog.issue.title)}
+          confirmText={adminListCopy.issues.deleteDialogConfirm}
+          cancelText={adminListCopy.common.cancel}
           confirmButtonClassName={styles.deleteButton}
           isLoading={isPending}
         />
@@ -410,10 +414,10 @@ export default function IssueListClient() {
         isOpen={deleteMultipleDialog.isOpen}
         onClose={() => setDeleteMultipleDialog({ isOpen: false, count: 0 })}
         onConfirm={handleDeleteMultipleConfirm}
-        title="Elimina Issue"
-        message={`Sei sicuro di voler eliminare ${deleteMultipleDialog.count} issue? Questa azione non può essere annullata.`}
-        confirmText="Elimina"
-        cancelText="Annulla"
+        title={adminListCopy.issues.deleteManyDialogTitle}
+        message={adminListCopy.issues.deleteManyDialogMessage(deleteMultipleDialog.count)}
+        confirmText={adminListCopy.issues.deleteDialogConfirm}
+        cancelText={adminListCopy.common.cancel}
         confirmButtonClassName={styles.deleteButton}
         isLoading={isPending}
       />
