@@ -27,15 +27,12 @@ export async function GET() {
 
     const authors = await getAllAuthors();
 
-    const response = NextResponse.json(authors);
+    const response = NextResponse.json(authors, { status: 200 });
     setPrivateCacheHeaders(response, CACHE_PROFILES.list);
 
     return response;
   } catch (error) {
     logger.error("Error fetching authors", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to fetch authors" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Failed to fetch authors" }, { status: 500 });
   }
 }

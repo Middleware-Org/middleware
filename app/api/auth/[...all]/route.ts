@@ -15,22 +15,26 @@ const authHandler = toNextJsHandler(auth);
 export const GET = authHandler.GET;
 
 export async function POST(request: Request) {
-  const pathname = new URL(request.url).pathname;
-  const ip = getClientIp(request);
+  try {
+    const pathname = new URL(request.url).pathname;
+    const ip = getClientIp(request);
 
-  const isSignIn = pathname.includes("/sign-in");
-  const limit = await checkRateLimit(`auth:${ip}:${isSignIn ? "sign-in" : "post"}`, {
-    windowMs: 60_000,
-    maxRequests: isSignIn ? 5 : 20,
-  });
+    const isSignIn = pathname.includes("/sign-in");
+    const limit = await checkRateLimit(`auth:${ip}:${isSignIn ? "sign-in" : "post"}`, {
+      windowMs: 60_000,
+      maxRequests: isSignIn ? 5 : 20,
+    });
 
-  if (!limit.allowed) {
-    return createRateLimitResponse(limit);
+    if (!limit.allowed) {
+      return createRateLimitResponse(limit);
+    }
+
+    if (pathname.includes("/sign-up")) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
+    return authHandler.POST(request);
+  } catch {
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
-
-  if (pathname.includes("/sign-up")) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
-  }
-
-  return authHandler.POST(request);
 }

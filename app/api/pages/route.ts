@@ -23,7 +23,7 @@ export const GET = withAuth(async (user) => {
       user: user.email,
     });
 
-    const response = NextResponse.json(pages);
+    const response = NextResponse.json(pages, { status: 200 });
     setPrivateCacheHeaders(response, CACHE_PROFILES.list);
 
     return response;

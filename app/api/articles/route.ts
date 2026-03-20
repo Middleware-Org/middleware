@@ -27,15 +27,12 @@ export async function GET() {
 
     const articles = await getAllArticles();
 
-    const response = NextResponse.json(articles);
+    const response = NextResponse.json(articles, { status: 200 });
     setPrivateCacheHeaders(response, CACHE_PROFILES.list);
 
     return response;
   } catch (error) {
     logger.error("Error fetching articles", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to fetch articles" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Failed to fetch articles" }, { status: 500 });
   }
 }

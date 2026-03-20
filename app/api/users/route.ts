@@ -27,15 +27,12 @@ export async function GET() {
 
     const users = await getAllUsers();
 
-    const response = NextResponse.json(users);
+    const response = NextResponse.json(users, { status: 200 });
     setPrivateCacheHeaders(response, CACHE_PROFILES.list);
 
     return response;
   } catch (error) {
     logger.error("Error fetching users", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to fetch users" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Failed to fetch users" }, { status: 500 });
   }
 }

@@ -27,15 +27,12 @@ export async function GET() {
 
     const mediaFiles = await getAllMediaFiles();
 
-    const response = NextResponse.json(mediaFiles);
+    const response = NextResponse.json(mediaFiles, { status: 200 });
     setPrivateCacheHeaders(response, CACHE_PROFILES.list);
 
     return response;
   } catch (error) {
     logger.error("Error fetching media files", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to fetch media files" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Failed to fetch media files" }, { status: 500 });
   }
 }

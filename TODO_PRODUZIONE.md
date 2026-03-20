@@ -8,9 +8,9 @@ senza introdurre nuovi ambienti e senza attività di deploy/rollback.
 - [x] Verificare che i nuovi file TypeScript non usino `any` evitabile. (enforced con hook pre-commit)
 - [x] Verificare uso corretto di `import type` dove serve. (enforced con hook pre-commit)
 - [x] Verificare ordine e coerenza import (terze parti -> alias `@/` -> relativi). (enforced con hook pre-commit)
-- [ ] Verificare che i moduli non mescolino responsabilità non correlate.
-- [ ] Verificare che le route API restituiscano `NextResponse.json(...)` con status espliciti.
-- [ ] Verificare che gli errori siano gestiti con `try/catch` e messaggi safe.
+- [x] Verificare che i moduli non mescolino responsabilità non correlate. (nessuna criticità alta riscontrata)
+- [x] Verificare che le route API restituiscano `NextResponse.json(...)` con status espliciti. (uniformato con status espliciti)
+- [x] Verificare che gli errori siano gestiti con `try/catch` e messaggi safe. (uniformato su route API)
 
 ## 2) Performance build/runtime (solo verifiche locali)
 

@@ -27,15 +27,12 @@ export async function GET() {
 
     const categories = await getAllCategories();
 
-    const response = NextResponse.json(categories);
+    const response = NextResponse.json(categories, { status: 200 });
     setPrivateCacheHeaders(response, CACHE_PROFILES.list);
 
     return response;
   } catch (error) {
     logger.error("Error fetching categories", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to fetch categories" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Failed to fetch categories" }, { status: 500 });
   }
 }

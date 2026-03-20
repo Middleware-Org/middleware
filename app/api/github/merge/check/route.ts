@@ -18,6 +18,7 @@ const token = process.env.GITHUB_TOKEN!;
 
 function noStoreJson(body: unknown, init?: ResponseInit) {
   return NextResponse.json(body, {
+    status: init?.status ?? 200,
     ...init,
     headers: {
       "Cache-Control": "no-store",

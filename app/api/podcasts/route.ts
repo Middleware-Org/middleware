@@ -22,15 +22,12 @@ export async function GET() {
 
     const podcasts = await getAllPodcasts();
 
-    const response = NextResponse.json(podcasts);
+    const response = NextResponse.json(podcasts, { status: 200 });
     setPrivateCacheHeaders(response, CACHE_PROFILES.list);
 
     return response;
   } catch (error) {
     logger.error("Error fetching podcasts", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to fetch podcasts" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Failed to fetch podcasts" }, { status: 500 });
   }
 }

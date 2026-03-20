@@ -34,15 +34,12 @@ export async function GET(_request: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "Podcast not found" }, { status: 404 });
     }
 
-    const response = NextResponse.json(podcast);
+    const response = NextResponse.json(podcast, { status: 200 });
     setPrivateCacheHeaders(response, CACHE_PROFILES.detail);
 
     return response;
   } catch (error) {
     logger.error("Error fetching podcast", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to fetch podcast" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Failed to fetch podcast" }, { status: 500 });
   }
 }

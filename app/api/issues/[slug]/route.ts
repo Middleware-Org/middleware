@@ -34,15 +34,12 @@ export async function GET(_request: Request, { params }: { params: Promise<{ slu
       return NextResponse.json({ error: "Issue not found" }, { status: 404 });
     }
 
-    const response = NextResponse.json(issue);
+    const response = NextResponse.json(issue, { status: 200 });
     setPrivateCacheHeaders(response, CACHE_PROFILES.detail);
 
     return response;
   } catch (error) {
     logger.error("Error fetching issue", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to fetch issue" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Failed to fetch issue" }, { status: 500 });
   }
 }

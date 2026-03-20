@@ -1,7 +1,7 @@
 /* **************************************************
  * Imports
  **************************************************/
-import type { NextRequest} from "next/server";
+import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 import { getUser } from "@/lib/auth/server";
@@ -97,11 +97,14 @@ export async function POST(request: NextRequest) {
 
     const filePath = await uploadMediaFile(fileBase64, filename?.trim() || undefined, fileType);
 
-    return NextResponse.json({
-      success: true,
-      data: filePath,
-      message: "File uploaded successfully",
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        data: filePath,
+        message: "File uploaded successfully",
+      },
+      { status: 200 },
+    );
   } catch {
     return NextResponse.json(
       {

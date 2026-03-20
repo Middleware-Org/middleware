@@ -29,7 +29,7 @@ export const GET = withAuth(
         return apiError("Page not found", 404);
       }
 
-      const response = NextResponse.json(page);
+      const response = NextResponse.json(page, { status: 200 });
       setPrivateCacheHeaders(response, CACHE_PROFILES.detail);
 
       return response;

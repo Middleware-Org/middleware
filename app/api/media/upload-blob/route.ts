@@ -2,7 +2,7 @@
  * Imports
  **************************************************/
 import { handleUpload } from "@vercel/blob/client";
-import type { NextRequest} from "next/server";
+import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 import { getUser } from "@/lib/auth/server";
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(response);
+    return NextResponse.json(response, { status: 200 });
   } catch (error) {
     logger.error("Error generating upload URL", error);
     return NextResponse.json(

@@ -92,20 +92,20 @@ export async function POST(request: Request) {
         );
       }
 
-      return NextResponse.json(
-        { error: errorData.message || "Failed to merge branches" },
-        { status: mergeRes.status },
-      );
+      return NextResponse.json({ error: "Failed to merge branches" }, { status: mergeRes.status });
     }
 
     const mergeData = await mergeRes.json();
 
-    return NextResponse.json({
-      success: true,
-      message: `Successfully merged ${devBranch} into ${mainBranch}`,
-      sha: mergeData.sha,
-      commit: mergeData.commit,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        message: `Successfully merged ${devBranch} into ${mainBranch}`,
+        sha: mergeData.sha,
+        commit: mergeData.commit,
+      },
+      { status: 200 },
+    );
   } catch (error) {
     logger.error("Error merging branches", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
