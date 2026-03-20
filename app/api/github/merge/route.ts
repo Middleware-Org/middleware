@@ -3,6 +3,7 @@
  **************************************************/
 import { NextResponse } from "next/server";
 
+import { setNoStoreHeaders } from "@/lib/api/cache";
 import { getAdminUser } from "@/lib/auth/server";
 import { createLogger } from "@/lib/logger";
 import { checkRateLimit, createRateLimitResponse, getClientIp } from "@/lib/security/rateLimit";
@@ -16,6 +17,10 @@ const mainBranch = process.env.GITHUB_BRANCH || "main";
 const devBranch = process.env.GITHUB_DEV_BRANCH || "develop";
 const token = process.env.GITHUB_TOKEN!;
 
+function noStoreJson(body: unknown, init?: ResponseInit): NextResponse {
+  return setNoStoreHeaders(NextResponse.json(body, init));
+}
+
 /* **************************************************
  * Merge develop into main
  **************************************************/
@@ -28,16 +33,16 @@ export async function POST(request: Request) {
     });
 
     if (!rateLimit.allowed) {
-      return createRateLimitResponse(rateLimit);
+      return setNoStoreHeaders(createRateLimitResponse(rateLimit));
     }
 
     const user = await getAdminUser();
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return noStoreJson({ error: "Unauthorized" }, { status: 401 });
     }
 
     if (!owner || !repo || !token) {
-      return NextResponse.json({ error: "GitHub configuration missing" }, { status: 500 });
+      return noStoreJson({ error: "GitHub configuration missing" }, { status: 500 });
     }
 
     // First check if there are changes to merge
@@ -51,17 +56,14 @@ export async function POST(request: Request) {
     });
 
     if (!checkRes.ok) {
-      return NextResponse.json({ error: "Failed to check branch status" }, { status: 500 });
+      return noStoreJson({ error: "Failed to check branch status" }, { status: 500 });
     }
 
     const compareData = await checkRes.json();
     const aheadBy = compareData.ahead_by || 0;
 
     if (aheadBy === 0) {
-      return NextResponse.json(
-        { error: "No changes to merge", alreadyMerged: true },
-        { status: 400 },
-      );
+      return noStoreJson({ error: "No changes to merge", alreadyMerged: true }, { status: 400 });
     }
 
     // Perform the merge using GitHub API
@@ -86,18 +88,18 @@ export async function POST(request: Request) {
 
       // Check if it's a merge conflict
       if (mergeRes.status === 409) {
-        return NextResponse.json(
+        return noStoreJson(
           { error: "Merge conflict detected. Please resolve conflicts manually.", conflict: true },
           { status: 409 },
         );
       }
 
-      return NextResponse.json({ error: "Failed to merge branches" }, { status: mergeRes.status });
+      return noStoreJson({ error: "Failed to merge branches" }, { status: mergeRes.status });
     }
 
     const mergeData = await mergeRes.json();
 
-    return NextResponse.json(
+    return noStoreJson(
       {
         success: true,
         message: `Successfully merged ${devBranch} into ${mainBranch}`,
@@ -108,6 +110,6 @@ export async function POST(request: Request) {
     );
   } catch (error) {
     logger.error("Error merging branches", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return noStoreJson({ error: "Internal server error" }, { status: 500 });
   }
 }

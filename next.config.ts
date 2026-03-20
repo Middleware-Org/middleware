@@ -1,5 +1,10 @@
 import type { NextConfig } from "next";
 
+const defaultBlobStorageHostname = "mdmdfxzts3o3uer1.public.blob.vercel-storage.com";
+const blobStorageHostname = (process.env.NEXT_PUBLIC_BLOB_HOSTNAME || defaultBlobStorageHostname)
+  .replace(/^https?:\/\//, "")
+  .replace(/\/.*/, "");
+
 const nextConfig: NextConfig = {
   images: {
     // Enable modern image formats (WebP and AVIF) for better compression
@@ -18,7 +23,7 @@ const nextConfig: NextConfig = {
       // Vercel Blob Storage
       {
         protocol: "https",
-        hostname: "mdmdfxzts3o3uer1.public.blob.vercel-storage.com",
+        hostname: blobStorageHostname,
         pathname: "/**",
       },
       // Local development only
@@ -82,7 +87,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: https: blob:",
               "font-src 'self' data:",
-              "connect-src 'self' va.vercel-scripts.com vitals.vercel-insights.com mdmdfxzts3o3uer1.public.blob.vercel-storage.com raw.githubusercontent.com",
+              `connect-src 'self' va.vercel-scripts.com vitals.vercel-insights.com ${blobStorageHostname} raw.githubusercontent.com`,
               "media-src 'self' https: blob:",
               "object-src 'none'",
               "base-uri 'self'",

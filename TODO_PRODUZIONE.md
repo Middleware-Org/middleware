@@ -14,11 +14,11 @@ senza introdurre nuovi ambienti e senza attività di deploy/rollback.
 
 ## 2) Performance build/runtime (solo verifiche locali)
 
-- [ ] Verificare presenza di caching coerente su API (`CACHE_PROFILES`, header cache).
-- [ ] Verificare che i componenti siano Server Components di default quando possibile.
-- [ ] Verificare uso mirato di `"use client"` solo dove necessaria interattività.
-- [ ] Verificare che `next/image` e `remotePatterns` siano coerenti con le sorgenti reali.
-- [ ] Verificare che `next.config.ts` mantenga `compress: true` e ottimizzazioni attive.
+- [x] Verificare presenza di caching coerente su API (`CACHE_PROFILES`, header cache). (GET con profili cache, mutation/auth con `no-store`)
+- [x] Verificare che i componenti siano Server Components di default quando possibile. (solo `app/error.tsx` e `app/global-error.tsx` client)
+- [x] Verificare uso mirato di `"use client"` solo dove necessaria interattività. (audit completato su componenti client)
+- [x] Verificare che `next/image` e `remotePatterns` siano coerenti con le sorgenti reali. (hostname Blob parametrizzato e allineato)
+- [x] Verificare che `next.config.ts` mantenga `compress: true` e ottimizzazioni attive. (confermato)
 
 ## 3) Integrazioni e contenuti
 

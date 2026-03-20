@@ -5,6 +5,7 @@ import { handleUpload } from "@vercel/blob/client";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
+import { setNoStoreHeaders } from "@/lib/api/cache";
 import { getUser } from "@/lib/auth/server";
 import { createLogger } from "@/lib/logger";
 import { checkRateLimit, createRateLimitResponse, getClientIp } from "@/lib/security/rateLimit";
@@ -13,6 +14,10 @@ const logger = createLogger("API /media/upload-blob");
 const ALLOWED_PATHNAME_REGEX = /^media\/[a-zA-Z0-9._-]{1,120}$/;
 const ALLOWED_EXTENSION_REGEX = /\.(jpe?g|png|gif|webp|mp3|wav|json)$/i;
 const MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024;
+
+function noStoreJson(body: unknown, init?: ResponseInit): NextResponse {
+  return setNoStoreHeaders(NextResponse.json(body, init));
+}
 
 /* **************************************************
  * Direct Blob Upload API Route
@@ -31,13 +36,13 @@ export async function POST(request: NextRequest) {
     });
 
     if (!rateLimit.allowed) {
-      return createRateLimitResponse(rateLimit);
+      return setNoStoreHeaders(createRateLimitResponse(rateLimit));
     }
 
     // Check authentication
     const user = await getUser();
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return noStoreJson({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
@@ -81,10 +86,10 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(response, { status: 200 });
+    return noStoreJson(response, { status: 200 });
   } catch (error) {
     logger.error("Error generating upload URL", error);
-    return NextResponse.json(
+    return noStoreJson(
       {
         error: "Failed to generate upload URL",
       },

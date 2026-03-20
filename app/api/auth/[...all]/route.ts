@@ -4,6 +4,7 @@
 import { toNextJsHandler } from "better-auth/next-js";
 import { NextResponse } from "next/server";
 
+import { setNoStoreHeaders } from "@/lib/api/cache";
 import { auth } from "@/lib/auth/server";
 import { checkRateLimit, createRateLimitResponse, getClientIp } from "@/lib/security/rateLimit";
 
@@ -26,15 +27,17 @@ export async function POST(request: Request) {
     });
 
     if (!limit.allowed) {
-      return createRateLimitResponse(limit);
+      return setNoStoreHeaders(createRateLimitResponse(limit));
     }
 
     if (pathname.includes("/sign-up")) {
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
+      return setNoStoreHeaders(NextResponse.json({ error: "Not found" }, { status: 404 }));
     }
 
-    return authHandler.POST(request);
+    return setNoStoreHeaders(await authHandler.POST(request));
   } catch {
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return setNoStoreHeaders(
+      NextResponse.json({ error: "Internal server error" }, { status: 500 }),
+    );
   }
 }

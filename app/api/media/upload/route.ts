@@ -4,6 +4,7 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
+import { setNoStoreHeaders } from "@/lib/api/cache";
 import { getUser } from "@/lib/auth/server";
 import { uploadMediaFile } from "@/lib/github/media";
 import { checkRateLimit, createRateLimitResponse, getClientIp } from "@/lib/security/rateLimit";
@@ -26,6 +27,10 @@ function estimateBase64SizeBytes(value: string): number {
   return Math.floor((base64Data.length * 3) / 4) - padding;
 }
 
+function noStoreJson(body: unknown, init?: ResponseInit): NextResponse {
+  return setNoStoreHeaders(NextResponse.json(body, init));
+}
+
 /* **************************************************
  * Media Upload API Route
  *
@@ -44,12 +49,12 @@ export async function POST(request: NextRequest) {
     });
 
     if (!rateLimit.allowed) {
-      return createRateLimitResponse(rateLimit);
+      return setNoStoreHeaders(createRateLimitResponse(rateLimit));
     }
 
     const user = await getUser();
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return noStoreJson({ error: "Unauthorized" }, { status: 401 });
     }
 
     const formData = await request.formData();
@@ -58,18 +63,18 @@ export async function POST(request: NextRequest) {
     const fileType = (formData.get("fileType") as "image" | "audio" | "json") || "image";
 
     if (!fileInput) {
-      return NextResponse.json({ error: "File is required" }, { status: 400 });
+      return noStoreJson({ error: "File is required" }, { status: 400 });
     }
 
     // Handle both File objects and base64 strings
     let fileBase64: string;
     if (fileInput instanceof File) {
       if (fileInput.size > MAX_FILE_SIZE_BYTES) {
-        return NextResponse.json({ error: "File too large" }, { status: 413 });
+        return noStoreJson({ error: "File too large" }, { status: 413 });
       }
 
       if (!ALLOWED_MIME_TYPES.has(fileInput.type)) {
-        return NextResponse.json({ error: "Unsupported file type" }, { status: 400 });
+        return noStoreJson({ error: "Unsupported file type" }, { status: 400 });
       }
 
       // Convert File to base64
@@ -80,16 +85,16 @@ export async function POST(request: NextRequest) {
     } else {
       // Already a base64 string
       if (typeof fileInput !== "string") {
-        return NextResponse.json({ error: "Invalid file payload" }, { status: 400 });
+        return noStoreJson({ error: "Invalid file payload" }, { status: 400 });
       }
 
       const mimeMatch = fileInput.match(/^data:([^;]+);base64,/);
       if (mimeMatch && !ALLOWED_MIME_TYPES.has(mimeMatch[1])) {
-        return NextResponse.json({ error: "Unsupported file type" }, { status: 400 });
+        return noStoreJson({ error: "Unsupported file type" }, { status: 400 });
       }
 
       if (estimateBase64SizeBytes(fileInput) > MAX_FILE_SIZE_BYTES) {
-        return NextResponse.json({ error: "File too large" }, { status: 413 });
+        return noStoreJson({ error: "File too large" }, { status: 413 });
       }
 
       fileBase64 = fileInput;
@@ -97,7 +102,7 @@ export async function POST(request: NextRequest) {
 
     const filePath = await uploadMediaFile(fileBase64, filename?.trim() || undefined, fileType);
 
-    return NextResponse.json(
+    return noStoreJson(
       {
         success: true,
         data: filePath,
@@ -106,7 +111,7 @@ export async function POST(request: NextRequest) {
       { status: 200 },
     );
   } catch {
-    return NextResponse.json(
+    return noStoreJson(
       {
         success: false,
         error: "Failed to upload file",

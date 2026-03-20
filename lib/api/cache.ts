@@ -27,3 +27,8 @@ export function setPrivateCacheHeaders(
   response.headers.set("Vary", "Authorization, Cookie");
   return response;
 }
+
+export function setNoStoreHeaders<T extends Response>(response: T): T {
+  response.headers.set("Cache-Control", "no-store");
+  return response;
+}
