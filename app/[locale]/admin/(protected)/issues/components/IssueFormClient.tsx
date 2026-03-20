@@ -216,16 +216,12 @@ export default function IssueFormClient({ issueSlug }: IssueFormClientProps) {
     router.push(toLocale("/admin/issues"));
   }, [state, router, editing, issueSlug, toLocale]);
 
-  useEffect(() => {
-    const coverInput = formRef.current?.querySelector('input[name="cover"]') as HTMLInputElement;
-    if (coverInput) {
-      coverInput.value = coverImage;
-    }
-  }, [coverImage]);
-
   function handleGenerateSlug() {
-    const titleInput = formRef.current?.querySelector('input[name="title"]') as HTMLInputElement;
-    const title = titleInput?.value?.trim();
+    const nativeFormData = formRef.current ? new FormData(formRef.current) : null;
+    const title =
+      typeof nativeFormData?.get("title") === "string"
+        ? (nativeFormData.get("title") as string).trim()
+        : "";
     if (title) {
       setSlugValue(generateSlug(title));
     }

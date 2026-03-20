@@ -8,7 +8,7 @@ senza introdurre nuovi ambienti e senza attività di deploy/rollback.
 
 ### P1 (priorità media)
 
-- [ ] [P1] Rimuovere `querySelector` dai form client admin e passare a stato typed + hidden inputs controllati/serializer `FormData` esplicito.
+- [x] [P1] Rimuovere `querySelector` dai form client admin e passare a stato typed + hidden inputs controllati/serializer `FormData` esplicito.
   - File chiave: `PageFormClient`, `PodcastFormClient`, `IssueFormClient`, `PageMetaPanel`, `PodcastMetaPanel`, `ArticleMetaPanel`.
 - [x] [P1] Uniformare tutte le conferme delete su `ConfirmDialog` (eliminare `window.confirm`).
   - File noti: `AuthorDeleteButton`, `CategoryDeleteButton`, `IssueDeleteButton`.
@@ -19,7 +19,7 @@ Stato avanzamento P1 (aggiornato):
 
 - [x] Conferme delete migrate a `ConfirmDialog` in area admin (`AuthorDeleteButton`, `CategoryDeleteButton`, `IssueDeleteButton`).
 - [x] Generazione password sicura migrata a API crittografica browser (`crypto.getRandomValues`) con shuffle Fisher-Yates.
-- [ ] Resta aperta la riduzione uso `querySelector` nei form client admin (task strutturale ancora da completare).
+- [x] Eliminato uso di `querySelector` in area admin protected (form/panel principali + form author/category).
 
 ### P2 (priorità bassa/media)
 

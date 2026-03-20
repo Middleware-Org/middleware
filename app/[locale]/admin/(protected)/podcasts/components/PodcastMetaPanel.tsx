@@ -5,7 +5,7 @@
 
 import { Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, useTransition, useEffect } from "react";
+import { useState, useTransition } from "react";
 import { mutate } from "swr";
 
 import ConfirmDialog from "@/components/molecules/confirmDialog";
@@ -60,13 +60,6 @@ export default function PodcastMetaPanel({
   const { issues = [] } = useIssues();
 
   const currentSlug = slugValue ?? podcast?.slug ?? "";
-
-  useEffect(() => {
-    const slugInput = formRef.current?.querySelector('input[name="newSlug"]') as HTMLInputElement;
-    if (slugInput) {
-      slugInput.value = currentSlug;
-    }
-  }, [currentSlug, formRef]);
 
   function handleGenerateSlug() {
     if (formData.title) {

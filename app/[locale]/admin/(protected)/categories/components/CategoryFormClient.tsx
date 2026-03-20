@@ -92,8 +92,11 @@ export default function CategoryFormClient({ categorySlug }: CategoryFormClientP
 
   // Handler per generare lo slug dal nome
   function handleGenerateSlug() {
-    const nameInput = formRef.current?.querySelector('input[name="name"]') as HTMLInputElement;
-    const name = nameInput?.value?.trim();
+    const nativeFormData = formRef.current ? new FormData(formRef.current) : null;
+    const name =
+      typeof nativeFormData?.get("name") === "string"
+        ? (nativeFormData.get("name") as string).trim()
+        : "";
 
     if (name) {
       const generatedSlug = generateSlug(name);

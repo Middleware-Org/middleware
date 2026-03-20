@@ -128,18 +128,16 @@ export default function PageFormClient({ pageSlug }: PageFormClientProps) {
 
     if (editing && pageSlug) {
       preparedFormData.set("slug", pageSlug);
-      // Aggiungi nuovo slug se presente nel form
-      const newSlugInput = formRef.current?.querySelector(
-        'input[name="newSlug"]',
-      ) as HTMLInputElement;
-      if (newSlugInput?.value) {
-        preparedFormData.set("newSlug", newSlugInput.value);
+      const nativeFormData = formRef.current ? new FormData(formRef.current) : null;
+      const newSlug = nativeFormData?.get("newSlug");
+      if (typeof newSlug === "string" && newSlug.trim()) {
+        preparedFormData.set("newSlug", newSlug);
       }
     } else {
-      // In fase di creazione, aggiungi slug se presente
-      const slugInput = formRef.current?.querySelector('input[name="slug"]') as HTMLInputElement;
-      if (slugInput?.value) {
-        preparedFormData.set("slug", slugInput.value);
+      const nativeFormData = formRef.current ? new FormData(formRef.current) : null;
+      const slug = nativeFormData?.get("slug");
+      if (typeof slug === "string" && slug.trim()) {
+        preparedFormData.set("slug", slug);
       }
     }
 

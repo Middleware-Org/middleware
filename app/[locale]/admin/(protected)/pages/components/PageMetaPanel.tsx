@@ -5,7 +5,7 @@
 
 import { Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, useTransition, useEffect } from "react";
+import { useState, useTransition } from "react";
 import { mutate } from "swr";
 
 import ConfirmDialog from "@/components/molecules/confirmDialog";
@@ -53,16 +53,6 @@ export default function PageMetaPanel({
 
   // Derive current slug: use modified value if exists, otherwise fall back to page slug
   const currentSlug = slugValue ?? page?.slug ?? "";
-
-  // Update hidden input when currentSlug changes
-  useEffect(() => {
-    const slugInput = formRef.current?.querySelector(
-      editing ? 'input[name="newSlug"]' : 'input[name="slug"]',
-    ) as HTMLInputElement;
-    if (slugInput) {
-      slugInput.value = currentSlug;
-    }
-  }, [currentSlug, formRef, editing]);
 
   // Handler per generare lo slug dal titolo
   function handleGenerateSlug() {
