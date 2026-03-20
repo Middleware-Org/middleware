@@ -79,3 +79,22 @@ export type Podcast = {
   published: boolean;
   createdBy: string;
 };
+
+export type ApiUser = {
+  id: string;
+  email: string;
+  name: string | null;
+  role: "ADMIN" | "EDITOR";
+  image: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ApiMediaFile = {
+  name: string;
+  path: string;
+  url: string;
+  size?: number;
+  type: "image" | "audio" | "json";
+  uploadedAt?: string;
+};

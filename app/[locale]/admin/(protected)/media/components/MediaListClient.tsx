@@ -13,7 +13,7 @@ import { TableCheckbox } from "@/components/table/TableCheckbox";
 import { useMedia } from "@/hooks/swr";
 import { toast } from "@/hooks/use-toast";
 import { useTableSelection } from "@/hooks/useTableSelection";
-import type { MediaFile } from "@/lib/github/media";
+import type { ApiMediaFile } from "@/lib/github/types";
 import { cn } from "@/lib/utils/classes";
 
 import { deleteMediaFilesAction } from "../actions";
@@ -27,7 +27,7 @@ import styles from "../styles";
 const ITEMS_PER_PAGE = 20;
 
 export default function MediaListClient() {
-  const [selectedFile, setSelectedFile] = useState<MediaFile | null>(null);
+  const [selectedFile, setSelectedFile] = useState<ApiMediaFile | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState<"all" | "image" | "audio" | "json">("all");
@@ -47,7 +47,7 @@ export default function MediaListClient() {
 
   // Filtra i file in base alla ricerca e al tipo
   const filteredFiles = useMemo(() => {
-    let filtered: MediaFile[] = mediaFiles;
+    let filtered: ApiMediaFile[] = mediaFiles;
 
     // Filtra per tipo
     if (filterType !== "all") {
@@ -122,7 +122,7 @@ export default function MediaListClient() {
     };
   }, [hasMore, filteredFiles.length]);
 
-  function handleFileClick(file: MediaFile, event?: React.MouseEvent) {
+  function handleFileClick(file: ApiMediaFile, event?: React.MouseEvent) {
     // If clicking on checkbox, don't open dialog
     if (event && (event.target as HTMLElement).closest('input[type="checkbox"]')) {
       return;

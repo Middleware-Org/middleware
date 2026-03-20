@@ -22,11 +22,18 @@ senza introdurre nuovi ambienti e senza attività di deploy/rollback.
 
 ## 3) Integrazioni e contenuti
 
-- [ ] Verificare che i moduli `lib/github/*` gestiscano errori e timeout in modo safe.
-- [ ] Verificare che i fallback lato API/UI siano presenti quando GitHub o Blob falliscono.
-- [ ] Verificare coerenza dei tipi condivisi (`lib/github/types`) tra fetcher, hook e route.
+- [x] Verificare che i moduli `lib/github/*` gestiscano errori e timeout in modo safe. (timeout centralizzato + errori safe in client GitHub)
+- [x] Verificare che i fallback lato API/UI siano presenti quando GitHub o Blob falliscono. (mantenuto approccio hard-fail con error boundary + fallback API safe)
+- [x] Verificare coerenza dei tipi condivisi (`lib/github/types`) tra fetcher, hook e route. (allineati DTO client per User/Media)
 
 ## 4) Criteri di uscita (go/no-go tecnico)
 
-- [ ] Nessun rischio alto aperto su sicurezza, performance o gestione errori.
-- [ ] Eventuali debiti tecnici residui sono tracciati con task chiari e priorità.
+- [x] Nessun rischio alto aperto su sicurezza, performance o gestione errori. (GO tecnico confermato su verifiche locali)
+- [x] Eventuali debiti tecnici residui sono tracciati con task chiari e priorità.
+
+Debiti residui (non bloccanti):
+
+- [ ] [P2] Uniformare timeout anche nelle route `app/api/github/*` con `fetch` diretto (`merge`, `merge/check`, `token-expiration`, `image`).
+- [ ] [P2] Ridurre il logging di payload errore raw da GitHub in `lib/github/client.ts` mantenendo status/code.
+- [ ] [P3] Ridurre complessità dei componenti admin più estesi (`MediaSelector`, `MediaListClient`, `UserListClient`).
+- [ ] [P3] Centralizzare i DTO API client/server in un modulo dedicato (`lib/api/types`) per prevenire drift.

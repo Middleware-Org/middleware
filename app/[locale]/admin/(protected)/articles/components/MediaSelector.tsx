@@ -11,7 +11,7 @@ import { mutate } from "swr";
 
 import { useMedia } from "@/hooks/swr";
 import { toast } from "@/hooks/use-toast";
-import type { MediaFile } from "@/lib/github/media";
+import type { ApiMediaFile } from "@/lib/github/types";
 import { cn } from "@/lib/utils/classes";
 
 import MediaDialog from "../../media/components/MediaDialog";
@@ -40,7 +40,7 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
   const [filename, setFilename] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
-  const [selectedFileForDialog, setSelectedFileForDialog] = useState<MediaFile | null>(null);
+  const [selectedFileForDialog, setSelectedFileForDialog] = useState<ApiMediaFile | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
@@ -113,7 +113,7 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
     onClose();
   }
 
-  function handleFileClick(file: MediaFile, event: React.MouseEvent) {
+  function handleFileClick(file: ApiMediaFile, event: React.MouseEvent) {
     event.stopPropagation();
     setSelectedFileForDialog(file);
     setIsDialogOpen(true);

@@ -7,6 +7,7 @@ import type { GitHubFile } from "./types";
  * Constants
  ************************************************** */
 const GITHUB_API_URL = "https://api.github.com";
+const GITHUB_TIMEOUT_MS = 10_000;
 
 const owner = process.env.GITHUB_OWNER!;
 const repo = process.env.GITHUB_REPO!;
@@ -23,10 +24,29 @@ if (!owner || !repo || !token) {
 /* **************************************************
  * GitHub API Helpers
  ************************************************** */
+async function fetchWithTimeout(url: string, init?: RequestInit): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), GITHUB_TIMEOUT_MS);
+
+  try {
+    return await fetch(url, {
+      ...init,
+      signal: controller.signal,
+    });
+  } catch (error) {
+    if (error instanceof Error && error.name === "AbortError") {
+      throw new Error("GitHub API timeout");
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
 export async function githubFetch(path: string) {
   const url = `${GITHUB_API_URL}/repos/${owner}/${repo}/${path}`;
 
-  const res = await fetch(url, {
+  const res = await fetchWithTimeout(url, {
     headers: {
       Authorization: `Bearer ${token}`,
       Accept: "application/vnd.github+json",
@@ -71,7 +91,7 @@ export async function listDirectoryFiles(dir: string): Promise<GitHubFile[]> {
 export async function githubPut(path: string, body: unknown) {
   const url = `${GITHUB_API_URL}/repos/${owner}/${repo}/${path}`;
 
-  const res = await fetch(url, {
+  const res = await fetchWithTimeout(url, {
     method: "PUT",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -84,7 +104,7 @@ export async function githubPut(path: string, body: unknown) {
   if (!res.ok) {
     const errorText = await res.text();
     console.error("GitHub PUT error", url, errorText);
-    throw new Error(`GitHub API error: ${res.status} - ${errorText}`);
+    throw new Error(`GitHub API error: ${res.status}`);
   }
 
   return res.json();
@@ -93,7 +113,7 @@ export async function githubPut(path: string, body: unknown) {
 export async function githubDelete(path: string, body: unknown) {
   const url = `${GITHUB_API_URL}/repos/${owner}/${repo}/${path}`;
 
-  const res = await fetch(url, {
+  const res = await fetchWithTimeout(url, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -106,7 +126,7 @@ export async function githubDelete(path: string, body: unknown) {
   if (!res.ok) {
     const errorText = await res.text();
     console.error("GitHub DELETE error", url, errorText);
-    throw new Error(`GitHub API error: ${res.status} - ${errorText}`);
+    throw new Error(`GitHub API error: ${res.status}`);
   }
 
   return res.json();

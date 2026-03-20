@@ -11,7 +11,7 @@ import { mutate } from "swr";
 
 import ConfirmDialog from "@/components/molecules/confirmDialog";
 import { toast } from "@/hooks/use-toast";
-import type { MediaFile } from "@/lib/github/media";
+import type { ApiMediaFile } from "@/lib/github/types";
 import { cn } from "@/lib/utils/classes";
 
 import { deleteMediaAction, renameMediaAction } from "../actions";
@@ -23,7 +23,7 @@ import styles from "../styles";
 interface MediaDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  file: MediaFile | null;
+  file: ApiMediaFile | null;
 }
 
 /* **************************************************

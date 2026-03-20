@@ -27,7 +27,7 @@ import { useUsers } from "@/hooks/swr";
 import { toast } from "@/hooks/use-toast";
 import { useTableSelection } from "@/hooks/useTableSelection";
 import { useTableState } from "@/hooks/useTableState";
-import type { User } from "@/lib/github/users";
+import type { ApiUser } from "@/lib/github/types";
 import { useLocalizedPath } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils/classes";
 
@@ -53,7 +53,7 @@ export default function UserListClient() {
   const router = useRouter();
   const toLocale = useLocalizedPath();
   const [isPending, startTransition] = useTransition();
-  const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; user: User | null }>({
+  const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; user: ApiUser | null }>({
     isOpen: false,
     user: null,
   });
@@ -67,7 +67,7 @@ export default function UserListClient() {
 
   // Usa SWR per ottenere gli utenti (cache pre-popolata dal server)
   const { users = [], isLoading } = useUsers();
-  const [localUsers, setLocalUsers] = useState<User[]>(users);
+  const [localUsers, setLocalUsers] = useState<ApiUser[]>(users);
 
   // Initialize visible columns from defaultVisible
   const [visibleColumns, setVisibleColumns] = useState<string[]>(() =>
@@ -86,7 +86,7 @@ export default function UserListClient() {
     setSort,
     setPage,
     setItemsPerPage,
-  } = useTableState<User>({
+  } = useTableState<ApiUser>({
     data: localUsers,
     searchKeys: ["email", "name"],
     itemsPerPage: 10,
@@ -119,11 +119,11 @@ export default function UserListClient() {
     clearSelection();
   }, [search, currentPage, clearSelection]);
 
-  function handleEdit(user: User) {
+  function handleEdit(user: ApiUser) {
     router.push(toLocale(`/admin/users/${user.id}/edit`));
   }
 
-  function handleDeleteClick(user: User) {
+  function handleDeleteClick(user: ApiUser) {
     setDeleteDialog({ isOpen: true, user });
   }
 
@@ -182,7 +182,7 @@ export default function UserListClient() {
     }).format(d);
   }
 
-  function renderCell(user: User, columnKey: string) {
+  function renderCell(user: ApiUser, columnKey: string) {
     switch (columnKey) {
       case "email":
         return <TableCell className="font-medium">{user.email}</TableCell>;

@@ -3,7 +3,7 @@
  **************************************************/
 import useSWR from "swr";
 
-import type { MediaFile } from "@/lib/github/media";
+import type { ApiMediaFile } from "@/lib/github/types";
 
 import { swrConfig } from "./config";
 import { createFetcher } from "./fetcher";
@@ -11,13 +11,13 @@ import { createFetcher } from "./fetcher";
 /* **************************************************
  * Fetcher
  **************************************************/
-const fetcher = createFetcher<MediaFile[]>("media");
+const fetcher = createFetcher<ApiMediaFile[]>("media");
 
 /* **************************************************
  * useMedia Hook
  **************************************************/
 export function useMedia() {
-  const { data, error, isLoading, mutate, isValidating } = useSWR<MediaFile[]>(
+  const { data, error, isLoading, mutate, isValidating } = useSWR<ApiMediaFile[]>(
     "/api/media",
     fetcher,
     swrConfig,
