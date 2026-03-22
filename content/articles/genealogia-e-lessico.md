@@ -3,7 +3,7 @@ id: f3047674-954e-4a6b-a01f-cf7ca9727523
 slug: genealogia-e-lessico
 title: Genealogia e lessico
 date: '2026-03-13'
-last_update: '2026-03-16T10:01:35.809Z'
+last_update: '2026-03-22T11:15:00.899Z'
 authorId: 9e421669-3a18-4bdb-94f9-e0bf8fef86dd
 categoryId: 6dfdddaf-c93c-4f34-8a6d-c3b4eebb0859
 in_evidence: false
