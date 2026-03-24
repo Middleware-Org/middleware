@@ -39,5 +39,5 @@ Stato avanzamento P2 (aggiornato):
 
 - [x] [P2] Uniformare timeout anche nelle route `app/api/github/*` con `fetch` diretto (`merge`, `merge/check`, `token-expiration`, `image`).
 - [x] [P2] Ridurre il logging di payload errore raw da GitHub in `lib/github/client.ts` mantenendo status/code.
-- [ ] [P3] Ridurre complessità dei componenti admin più estesi (`MediaSelector`, `MediaListClient`, `UserListClient`).
-- [ ] [P3] Centralizzare i DTO API client/server in un modulo dedicato (`lib/api/types`) per prevenire drift.
+- [x] [P3] Ridurre complessità dei componenti admin più estesi (`MediaSelector`, `MediaListClient`, `UserListClient`).
+- [x] [P3] Centralizzare i DTO API client/server in un modulo dedicato (`lib/api/types`) per prevenire drift.

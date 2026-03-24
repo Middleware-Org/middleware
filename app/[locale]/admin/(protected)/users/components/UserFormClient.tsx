@@ -13,7 +13,7 @@ import ConfirmDialog from "@/components/molecules/confirmDialog";
 import { useUser } from "@/hooks/swr";
 import { toast } from "@/hooks/use-toast";
 import type { ActionResult } from "@/lib/actions/types";
-import type { User } from "@/lib/github/users";
+import type { ApiUser } from "@/lib/github/types";
 import { useLocalizedPath } from "@/lib/i18n/client";
 
 import PasswordInput, { isPasswordStrongEnough } from "./PasswordInput";
@@ -53,11 +53,11 @@ export default function UserFormClient({ userId }: UserFormClientProps) {
   const { user } = useUser(userId || null);
 
   const formRef = useRef<HTMLFormElement>(null);
-  const [state, formAction] = useActionState<ActionResult<User> | null, FormData>(
+  const [state, formAction] = useActionState<ActionResult<ApiUser> | null, FormData>(
     editing ? updateUserAction : createUserAction,
     null,
   );
-  const handledStateRef = useRef<ActionResult<User> | null>(null);
+  const handledStateRef = useRef<ActionResult<ApiUser> | null>(null);
 
   const [isDeleting, startDeleteTransition] = useTransition();
   const [, startSubmitTransition] = useTransition();

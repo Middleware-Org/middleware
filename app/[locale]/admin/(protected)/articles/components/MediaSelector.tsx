@@ -18,6 +18,7 @@ import { adminModalCopy } from "../../components/adminModalCopy";
 import { useDialogFocusTrap } from "../../components/useDialogFocusTrap";
 import MediaDialog from "../../media/components/MediaDialog";
 import styles from "../../media/styles";
+import { useInfiniteScrollList } from "../../shared/useInfiniteScrollList";
 import baseStyles from "../../styles";
 
 /* **************************************************
@@ -32,8 +33,6 @@ interface MediaSelectorProps {
 /* **************************************************
  * Media Selector Component
  **************************************************/
-const ITEMS_PER_PAGE = 20;
-
 export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelectorProps) {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -41,10 +40,8 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [filename, setFilename] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
   const [selectedFileForDialog, setSelectedFileForDialog] = useState<ApiMediaFile | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const sentinelRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
 
   // Usa SWR per caricare i media files con cache, filtra solo immagini
@@ -53,8 +50,6 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
   // Filtra solo immagini e per ricerca
   const filteredFiles = useMemo(() => {
     let filtered = allMediaFiles.filter((file) => file.type === "image");
-
-    // Filtra per ricerca
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
@@ -62,46 +57,16 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
           file.name.toLowerCase().includes(query) || file.path.toLowerCase().includes(query),
       );
     }
-
     return filtered;
   }, [allMediaFiles, searchQuery]);
 
-  // Reset visible count when search changes
+  const { visibleItems: visibleFiles, hasMore, sentinelRef, reset: resetScroll } =
+    useInfiniteScrollList(filteredFiles, { isActive: isOpen });
+
+  // Reset scroll when search changes
   useEffect(() => {
-    setVisibleCount(ITEMS_PER_PAGE);
-  }, [searchQuery]);
-
-  // Get visible files
-  const visibleFiles = useMemo(() => {
-    return filteredFiles.slice(0, visibleCount);
-  }, [filteredFiles, visibleCount]);
-
-  const hasMore = visibleCount < filteredFiles.length;
-
-  // Intersection Observer for infinite scroll
-  useEffect(() => {
-    if (!hasMore || !sentinelRef.current || !isOpen) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const [entry] = entries;
-        if (entry.isIntersecting) {
-          setVisibleCount((prev) => Math.min(prev + ITEMS_PER_PAGE, filteredFiles.length));
-        }
-      },
-      {
-        root: null,
-        rootMargin: "100px",
-        threshold: 0.1,
-      },
-    );
-
-    observer.observe(sentinelRef.current);
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [hasMore, filteredFiles.length, isOpen]);
+    resetScroll();
+  }, [searchQuery, resetScroll]);
 
   useEffect(() => {
     if (isError) {

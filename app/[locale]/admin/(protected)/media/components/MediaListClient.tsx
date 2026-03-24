@@ -5,7 +5,7 @@
 
 import { Music, FileJson, Search, X, Trash2 } from "lucide-react";
 import Image from "next/image";
-import { useState, useMemo, useEffect, useRef, useTransition } from "react";
+import { useState, useMemo, useEffect, useTransition } from "react";
 import { mutate } from "swr";
 
 import ConfirmDialog from "@/components/molecules/confirmDialog";
@@ -16,25 +16,22 @@ import { useTableSelection } from "@/hooks/useTableSelection";
 import type { ApiMediaFile } from "@/lib/github/types";
 import { cn } from "@/lib/utils/classes";
 
+import MediaDialog from "./MediaDialog";
 import { adminListCopy } from "../../components/adminListCopy";
 import { useCrudDeleteDialogs } from "../../components/useCrudDeleteDialogs";
-import { deleteMediaFilesAction } from "../actions";
-import MediaDialog from "./MediaDialog";
+import { useInfiniteScrollList } from "../../shared/useInfiniteScrollList";
 import baseStyles from "../../styles";
+import { deleteMediaFilesAction } from "../actions";
 import styles from "../styles";
 
 /* **************************************************
  * Media List Client Component
  **************************************************/
-const ITEMS_PER_PAGE = 20;
-
 export default function MediaListClient() {
   const [selectedFile, setSelectedFile] = useState<ApiMediaFile | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState<"all" | "image" | "audio" | "json">("all");
-  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
-  const sentinelRef = useRef<HTMLDivElement>(null);
   const [isPending, startTransition] = useTransition();
   const { deleteMultipleDialog, openDeleteMultipleDialog, closeDeleteMultipleDialog } =
     useCrudDeleteDialogs<ApiMediaFile>();
@@ -45,13 +42,9 @@ export default function MediaListClient() {
   // Filtra i file in base alla ricerca e al tipo
   const filteredFiles = useMemo(() => {
     let filtered: ApiMediaFile[] = mediaFiles;
-
-    // Filtra per tipo
     if (filterType !== "all") {
       filtered = filtered.filter((file) => file.type === filterType);
     }
-
-    // Filtra per ricerca
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
@@ -59,18 +52,17 @@ export default function MediaListClient() {
           file.name.toLowerCase().includes(query) || file.path.toLowerCase().includes(query),
       );
     }
-
     return filtered;
   }, [mediaFiles, searchQuery, filterType]);
 
-  // Get visible files
-  const visibleFiles = useMemo(() => {
-    return filteredFiles.slice(0, visibleCount);
-  }, [filteredFiles, visibleCount]);
+  const {
+    visibleItems: visibleFiles,
+    hasMore,
+    sentinelRef,
+    reset: resetScroll,
+  } = useInfiniteScrollList(filteredFiles);
 
-  const hasMore = visibleCount < filteredFiles.length;
-
-  // Multi-selection
+  // Multi-selection (scoped to visible files)
   const {
     selectedIds,
     isAllSelected,
@@ -82,35 +74,11 @@ export default function MediaListClient() {
     selectedCount,
   } = useTableSelection(visibleFiles, (file) => file.name);
 
-  // Clear selection when filters change
+  // Clear selection and reset scroll when filters change
   useEffect(() => {
     clearSelection();
-  }, [searchQuery, filterType, clearSelection]);
-
-  // Intersection Observer for infinite scroll
-  useEffect(() => {
-    if (!hasMore || !sentinelRef.current) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const [entry] = entries;
-        if (entry.isIntersecting) {
-          setVisibleCount((prev) => Math.min(prev + ITEMS_PER_PAGE, filteredFiles.length));
-        }
-      },
-      {
-        root: null,
-        rootMargin: "100px", // Start loading 100px before reaching the sentinel
-        threshold: 0.1,
-      },
-    );
-
-    observer.observe(sentinelRef.current);
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [hasMore, filteredFiles.length]);
+    resetScroll();
+  }, [searchQuery, filterType, clearSelection, resetScroll]);
 
   function handleFileClick(file: ApiMediaFile, event?: React.MouseEvent) {
     // If clicking on checkbox, don't open dialog
@@ -170,20 +138,14 @@ export default function MediaListClient() {
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setVisibleCount(ITEMS_PER_PAGE);
-              }}
+              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={adminListCopy.media.searchPlaceholder}
               className={cn(styles.input, "pl-10 pr-10")}
             />
             {searchQuery && (
               <button
                 type="button"
-                onClick={() => {
-                  setSearchQuery("");
-                  setVisibleCount(ITEMS_PER_PAGE);
-                }}
+                onClick={() => setSearchQuery("")}
                 className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-secondary/10 transition-colors"
                 title={adminListCopy.media.clearSearch}
               >
@@ -214,10 +176,7 @@ export default function MediaListClient() {
               <button
                 key={type}
                 type="button"
-                onClick={() => {
-                  setFilterType(type);
-                  setVisibleCount(ITEMS_PER_PAGE);
-                }}
+                onClick={() => setFilterType(type)}
                 className={cn(
                   "px-3 py-1 text-sm border transition-all duration-150",
                   filterType === type
@@ -241,7 +200,6 @@ export default function MediaListClient() {
               onClick={() => {
                 setSearchQuery("");
                 setFilterType("all");
-                setVisibleCount(ITEMS_PER_PAGE);
               }}
               className="px-3 py-1 text-sm text-secondary/60 hover:text-secondary border border-secondary hover:border-tertiary transition-all duration-150"
             >
@@ -365,6 +323,9 @@ export default function MediaListClient() {
               );
             })}
           </div>
+
+          {/* Sentinel for infinite scroll */}
+          {hasMore && <div ref={sentinelRef} className="w-full h-10" aria-hidden="true" />}
         </>
       )}
 

@@ -6,8 +6,8 @@
 import type { ActionResult } from "@/lib/actions/types";
 import { getAdminUser } from "@/lib/auth/server";
 import { revalidateAdminPath } from "@/lib/cache/revalidate";
+import type { ApiUser } from "@/lib/github/types";
 import { createUser, updateUser, deleteUser } from "@/lib/github/users";
-import type { User } from "@/lib/github/users";
 
 function parseRole(value: FormDataEntryValue | null): "ADMIN" | "EDITOR" {
   return value === "ADMIN" ? "ADMIN" : "EDITOR";
@@ -17,9 +17,9 @@ function parseRole(value: FormDataEntryValue | null): "ADMIN" | "EDITOR" {
  * Server Actions
  **************************************************/
 export async function createUserAction(
-  _prevState: ActionResult<User> | null,
+  _prevState: ActionResult<ApiUser> | null,
   formData: FormData,
-): Promise<ActionResult<User>> {
+): Promise<ActionResult<ApiUser>> {
   try {
     const user = await getAdminUser();
     if (!user) {
@@ -55,7 +55,15 @@ export async function createUserAction(
     });
 
     revalidateAdminPath("/admin/users");
-    return { success: true, data: userData, message: "User created successfully" };
+    return {
+      success: true,
+      data: {
+        ...userData,
+        createdAt: userData.createdAt.toISOString(),
+        updatedAt: userData.updatedAt.toISOString(),
+      },
+      message: "User created successfully",
+    };
   } catch (error) {
     return {
       success: false,
@@ -66,9 +74,9 @@ export async function createUserAction(
 }
 
 export async function updateUserAction(
-  _prevState: ActionResult<User> | null,
+  _prevState: ActionResult<ApiUser> | null,
   formData: FormData,
-): Promise<ActionResult<User>> {
+): Promise<ActionResult<ApiUser>> {
   try {
     const user = await getAdminUser();
     if (!user) {
@@ -110,7 +118,15 @@ export async function updateUserAction(
     const userData = await updateUser(id, updateData);
 
     revalidateAdminPath("/admin/users");
-    return { success: true, data: userData, message: "User updated successfully" };
+    return {
+      success: true,
+      data: {
+        ...userData,
+        createdAt: userData.createdAt.toISOString(),
+        updatedAt: userData.updatedAt.toISOString(),
+      },
+      message: "User updated successfully",
+    };
   } catch (error) {
     return {
       success: false,
