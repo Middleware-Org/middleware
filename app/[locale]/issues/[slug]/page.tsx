@@ -120,6 +120,13 @@ export default async function IssuePage({ params }: IssuePageProps) {
     notFound();
   }
 
+  const orderByArticleId = issue.showOrder
+    ? (issue.articlesOrder || []).reduce<Record<string, number>>((acc, articleId, index) => {
+        acc[articleId] = index + 1;
+        return acc;
+      }, {})
+    : undefined;
+
   return (
     <div className={styles.container}>
       <div className={styles.issueContainer}>
@@ -138,6 +145,7 @@ export default async function IssuePage({ params }: IssuePageProps) {
               issue={issue}
               locale={locale as "it" | "en"}
               disableBadges={true}
+              orderNumber={orderByArticleId?.[articleInEvidence.id]}
             />
           </div>
           <div className={styles.articleInEvidenceContainer}>
@@ -146,6 +154,7 @@ export default async function IssuePage({ params }: IssuePageProps) {
               dict={dict}
               issue={issue}
               disableShowArticles={true}
+              orderByArticleId={orderByArticleId}
             />
           </div>
         </div>
