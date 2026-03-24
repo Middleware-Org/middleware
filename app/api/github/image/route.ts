@@ -1,10 +1,11 @@
 /* **************************************************
  * Imports
  **************************************************/
-import type { NextRequest} from "next/server";
+import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 import { getUser } from "@/lib/auth/server";
+import { fetchWithTimeout } from "@/lib/github/client";
 import { createLogger } from "@/lib/logger";
 
 const logger = createLogger("API /github/image");
@@ -91,7 +92,7 @@ export async function GET(request: NextRequest) {
     const encodedPath = encodeGitHubPath(path);
     const apiUrl = `${GITHUB_API_URL}/repos/${owner}/${repo}/contents/${encodedPath}?ref=${readBranch}`;
 
-    const res = await fetch(apiUrl, {
+    const res = await fetchWithTimeout(apiUrl, {
       headers: {
         Authorization: `Bearer ${token}`,
         Accept: "application/vnd.github.v3.raw",
@@ -101,10 +102,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (!res.ok) {
-      logger.error("GitHub API error", {
-        status: res.status,
-        body: await res.text(),
-      });
+      logger.error("GitHub API error", { status: res.status });
       return new NextResponse("Image not found", { status: 404 });
     }
 

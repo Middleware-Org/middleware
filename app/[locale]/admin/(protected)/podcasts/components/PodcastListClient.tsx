@@ -1,53 +1,35 @@
+"use client";
+
 /* **************************************************
  * Imports
  **************************************************/
-"use client";
-
-import { Pencil, Trash2, X, Hash } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, useTransition, useMemo, Fragment, useEffect } from "react";
 import { mutate } from "swr";
 
-import ConfirmDialog from "@/components/molecules/confirmDialog";
-import { Pagination } from "@/components/pagination";
-import { SearchInput } from "@/components/search";
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableCell,
-  SortableHeader,
-  ColumnSelector,
-  type ColumnConfig,
-} from "@/components/table";
-import { ItemsPerPageSelector } from "@/components/table/ItemsPerPageSelector";
-import { TableCheckbox } from "@/components/table/TableCheckbox";
+import { TableCell } from "@/components/table";
 import { usePodcasts } from "@/hooks/swr";
 import { toast } from "@/hooks/use-toast";
-import { useTableSelection } from "@/hooks/useTableSelection";
-import { useTableState } from "@/hooks/useTableState";
 import type { Podcast } from "@/lib/github/types";
 import { useLocalizedPath } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils/classes";
 
 import { adminListCopy } from "../../components/adminListCopy";
-import { useCrudDeleteDialogs } from "../../components/useCrudDeleteDialogs";
-import baseStyles from "../../styles";
+import CrudListShell from "../../shared/CrudListShell";
+import { entityCrudStyles } from "../../shared/entityCrudStyles";
+import { useCrudList } from "../../shared/useCrudList";
 import { deletePodcastAction, deletePodcastsAction } from "../actions";
-import styles from "../styles";
 
 /* **************************************************
  * Column Configuration
  **************************************************/
-const columnConfig: ColumnConfig[] = [
-  { key: "cover", label: "Cover", defaultVisible: true },
+const columnConfig = [
   { key: "title", label: "Titolo", defaultVisible: true },
   { key: "slug", label: "Slug", defaultVisible: true },
   { key: "date", label: "Data", defaultVisible: true },
   { key: "published", label: "Pubblicato", defaultVisible: false },
   { key: "actions", label: "Azioni", defaultVisible: true },
-];
+] as const;
 
 /* **************************************************
  * Podcast List Client Component
@@ -55,26 +37,20 @@ const columnConfig: ColumnConfig[] = [
 export default function PodcastListClient() {
   const router = useRouter();
   const toLocale = useLocalizedPath();
-  const [isPending, startTransition] = useTransition();
+  const { podcasts = [], isLoading } = usePodcasts();
+
   const {
+    isPending,
+    startTransition,
     deleteDialog,
     deleteMultipleDialog,
     openDeleteDialog,
     closeDeleteDialog,
     openDeleteMultipleDialog,
     closeDeleteMultipleDialog,
-  } = useCrudDeleteDialogs<Podcast>();
-
-  // Usa SWR per ottenere i podcasts (cache pre-popolata dal server)
-  const { podcasts = [], isLoading } = usePodcasts();
-
-  // Initialize visible columns from defaultVisible
-  const [visibleColumns, setVisibleColumns] = useState<string[]>(() =>
-    columnConfig.filter((col) => col.defaultVisible !== false).map((col) => col.key),
-  );
-
-  const {
-    data: tableData,
+    visibleColumns,
+    setVisibleColumns,
+    tableData,
     totalItems,
     totalPages,
     currentPage,
@@ -85,15 +61,6 @@ export default function PodcastListClient() {
     setSort,
     setPage,
     setItemsPerPage,
-  } = useTableState<Podcast>({
-    data: podcasts,
-    searchKeys: ["title", "slug", "description"],
-    itemsPerPage: 10,
-    initialSort: { key: "date", direction: "desc" },
-  });
-
-  // Multi-selection
-  const {
     selectedIds,
     isAllSelected,
     isIndeterminate,
@@ -102,39 +69,24 @@ export default function PodcastListClient() {
     clearSelection,
     isSelected,
     selectedCount,
-  } = useTableSelection(tableData, (podcast) => podcast.slug);
-
-  // Clear selection when search or page changes
-  useEffect(() => {
-    clearSelection();
-  }, [search, currentPage, clearSelection]);
-
-  // Get visible column configs
-  const visibleColumnConfigs = useMemo(() => {
-    return columnConfig.filter((col) => visibleColumns.includes(col.key));
-  }, [visibleColumns]);
-
-  function handleEdit(podcast: Podcast) {
-    router.push(toLocale(`/admin/podcasts/${podcast.slug}/edit`));
-  }
-
-  function handleDeleteClick(podcast: Podcast) {
-    openDeleteDialog(podcast);
-  }
+  } = useCrudList({
+    data: podcasts,
+    columnConfig: [...columnConfig],
+    searchKeys: ["title", "slug", "description"],
+    getItemId: (podcast) => podcast.slug,
+    tableStateOptions: { initialSort: { key: "date", direction: "desc" } },
+  });
 
   async function handleDeleteConfirm() {
     if (!deleteDialog.item) return;
-
     const { slug } = deleteDialog.item;
     closeDeleteDialog();
-
     startTransition(async () => {
       const result = await deletePodcastAction(slug);
-
       if (!result.success) {
-        toast.actionResult(result, { errorTitle: adminListCopy.podcasts.deleteErrorTitle });
+        toast.actionResult(result, { errorTitle: copy.deleteErrorTitle });
       } else {
-        toast.success(result.message || adminListCopy.podcasts.deleteSuccess);
+        toast.success(result.message || copy.deleteSuccess);
         mutate("/api/podcasts");
         mutate("/api/github/merge/check");
         clearSelection();
@@ -142,22 +94,15 @@ export default function PodcastListClient() {
     });
   }
 
-  function handleDeleteMultipleClick() {
-    openDeleteMultipleDialog(selectedCount);
-  }
-
   async function handleDeleteMultipleConfirm() {
     if (selectedIds.length === 0) return;
-
     closeDeleteMultipleDialog();
-
     startTransition(async () => {
       const result = await deletePodcastsAction(selectedIds);
-
       if (!result.success) {
-        toast.actionResult(result, { errorTitle: adminListCopy.podcasts.deleteManyErrorTitle });
+        toast.actionResult(result, { errorTitle: copy.deleteManyErrorTitle });
       } else {
-        toast.success(result.message || adminListCopy.podcasts.deleteManySuccess);
+        toast.success(result.message || copy.deleteManySuccess);
         mutate("/api/podcasts");
         mutate("/api/github/merge/check");
         clearSelection();
@@ -183,23 +128,19 @@ export default function PodcastListClient() {
         return (
           <TableCell>
             {podcast.published ? (
-              <span className="px-2 py-1 text-xs bg-green-100 text-green-700">
-                {adminListCopy.podcasts.yes}
-              </span>
+              <span className="px-2 py-1 text-xs bg-green-100 text-green-700">{copy.yes}</span>
             ) : (
-              <span className="px-2 py-1 text-xs bg-secondary/10 text-secondary/60">
-                {adminListCopy.podcasts.no}
-              </span>
+              <span className="px-2 py-1 text-xs bg-secondary/10 text-secondary/60">{copy.no}</span>
             )}
           </TableCell>
         );
       case "actions":
         return (
           <TableCell>
-            <div className={baseStyles.buttonGroup}>
+            <div className="flex items-center gap-2">
               <button
-                onClick={() => handleEdit(podcast)}
-                className={styles.iconButton}
+                onClick={() => router.push(toLocale(`/admin/podcasts/${podcast.slug}/edit`))}
+                className={entityCrudStyles.iconButton}
                 disabled={isPending}
                 aria-label={adminListCopy.common.edit}
                 title={adminListCopy.common.edit}
@@ -207,8 +148,8 @@ export default function PodcastListClient() {
                 <Pencil className="w-4 h-4" />
               </button>
               <button
-                onClick={() => handleDeleteClick(podcast)}
-                className={cn(styles.iconButton, styles.iconButtonDanger)}
+                onClick={() => openDeleteDialog(podcast)}
+                className={cn(entityCrudStyles.iconButton, entityCrudStyles.iconButtonDanger)}
                 disabled={isPending}
                 aria-label={adminListCopy.common.delete}
                 title={adminListCopy.common.delete}
@@ -223,170 +164,59 @@ export default function PodcastListClient() {
     }
   }
 
-  // Mostra loading solo se non ci sono dati (prima richiesta)
-  if (isLoading && podcasts.length === 0) {
-    return (
-      <div className={baseStyles.container}>
-        <div className={baseStyles.loadingText}>{adminListCopy.podcasts.loading}</div>
-      </div>
-    );
-  }
+  const copy = adminListCopy.podcasts;
 
   return (
-    <div className={baseStyles.container}>
-      {/* Search and Filters */}
-      <div className={baseStyles.searchContainer}>
-        <div className={baseStyles.searchRow}>
-          <div className={baseStyles.searchInputWrapper}>
-            <SearchInput
-              value={search}
-              onChange={setSearch}
-              placeholder={adminListCopy.common.searchPodcastPlaceholder}
-            />
-          </div>
-          <ColumnSelector
-            columns={columnConfig}
-            visibleColumns={visibleColumns}
-            onColumnsChange={setVisibleColumns}
-          />
-          <ItemsPerPageSelector value={itemsPerPage} onChange={setItemsPerPage} />
-          <div
-            className="flex items-center h-[34px] gap-1.5 px-2 py-1 border border-secondary"
-            title={`${totalItems} ${totalItems === 1 ? adminListCopy.podcasts.singular : adminListCopy.podcasts.plural}`}
-          >
-            <Hash className="h-4 w-4 text-secondary/60" />
-            <span className="text-xs text-secondary/80">{totalItems}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Table */}
-      <div className={baseStyles.tableContainer}>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <th className={baseStyles.tableHeaderCell} style={{ width: "40px" }}>
-                <TableCheckbox
-                  checked={isAllSelected}
-                  indeterminate={isIndeterminate}
-                  onChange={toggleSelectAll}
-                  ariaLabel={adminListCopy.common.selectAll}
-                />
-              </th>
-              {visibleColumnConfigs.map((column) => {
-                if (column.key === "actions") {
-                  return (
-                    <th key={column.key} className={baseStyles.tableHeaderCell}>
-                      {column.label}
-                    </th>
-                  );
-                }
-                return (
-                  <SortableHeader
-                    key={column.key}
-                    sortKey={column.key}
-                    currentSort={sort || undefined}
-                    onSort={setSort}
-                  >
-                    {column.label}
-                  </SortableHeader>
-                );
-              })}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {tableData.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={visibleColumnConfigs.length + 1}
-                  className={baseStyles.tableEmptyCell}
-                >
-                  {adminListCopy.podcasts.empty}
-                </TableCell>
-              </TableRow>
-            ) : (
-              tableData.map((podcast) => (
-                <TableRow key={podcast.slug}>
-                  <TableCell>
-                    <TableCheckbox
-                      checked={isSelected(podcast.slug)}
-                      onChange={() => toggleSelection(podcast.slug)}
-                      disabled={isPending}
-                      ariaLabel={`Seleziona ${podcast.title}`}
-                    />
-                  </TableCell>
-                  {visibleColumnConfigs.map((column) => (
-                    <Fragment key={column.key}>{renderCell(podcast, column.key)}</Fragment>
-                  ))}
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setPage} />
-        )}
-      </div>
-
-      {/* Bulk Actions */}
-      {selectedCount > 0 && (
-        <div className="mt-4 flex items-center gap-2 p-3 bg-tertiary/10 border border-tertiary rounded">
-          <span className="text-sm text-secondary">
-            {selectedCount}{" "}
-            {selectedCount === 1
-              ? adminListCopy.podcasts.selectedSingular
-              : adminListCopy.podcasts.selectedPlural}
-          </span>
-          <button
-            onClick={handleDeleteMultipleClick}
-            disabled={isPending}
-            className={cn(styles.iconButton, styles.iconButtonDanger, "ml-auto")}
-            aria-label={adminListCopy.common.deleteSelected}
-            title={adminListCopy.common.deleteSelected}
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
-          <button
-            onClick={clearSelection}
-            disabled={isPending}
-            className={cn(styles.iconButton)}
-            aria-label={adminListCopy.common.deselectAll}
-            title={adminListCopy.common.deselectAll}
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-      )}
-
-      {/* Delete Confirmation Dialog */}
-      {deleteDialog.item && (
-        <ConfirmDialog
-          isOpen={deleteDialog.isOpen}
-          onClose={closeDeleteDialog}
-          onConfirm={handleDeleteConfirm}
-          title={adminListCopy.podcasts.deleteDialogTitle}
-          message={adminListCopy.podcasts.deleteDialogMessage(deleteDialog.item?.title ?? "")}
-          confirmText={adminListCopy.podcasts.deleteDialogConfirm}
-          cancelText={adminListCopy.common.cancel}
-          confirmButtonClassName={styles.deleteButton}
-          isLoading={isPending}
-        />
-      )}
-
-      {/* Delete Multiple Confirmation Dialog */}
-      <ConfirmDialog
-        isOpen={deleteMultipleDialog.isOpen}
-        onClose={closeDeleteMultipleDialog}
-        onConfirm={handleDeleteMultipleConfirm}
-        title={adminListCopy.podcasts.deleteManyDialogTitle}
-        message={adminListCopy.podcasts.deleteManyDialogMessage(deleteMultipleDialog.count)}
-        confirmText={adminListCopy.podcasts.deleteDialogConfirm}
-        cancelText={adminListCopy.common.cancel}
-        confirmButtonClassName={styles.deleteButton}
-        isLoading={isPending}
-      />
-    </div>
+    <CrudListShell<Podcast>
+      isLoading={isLoading}
+      loadingText={copy.loading}
+      isPending={isPending}
+      data={tableData}
+      emptyText={copy.empty}
+      getItemKey={(p) => p.slug}
+      getItemLabel={(p) => p.title}
+      renderCell={renderCell}
+      columnConfig={[...columnConfig]}
+      visibleColumns={visibleColumns}
+      onColumnsChange={setVisibleColumns}
+      sort={sort}
+      onSort={setSort}
+      itemsPerPage={itemsPerPage}
+      onItemsPerPageChange={setItemsPerPage}
+      totalPages={totalPages}
+      currentPage={currentPage}
+      onPageChange={setPage}
+      search={search}
+      onSearchChange={setSearch}
+      searchPlaceholder={adminListCopy.common.searchPodcastPlaceholder}
+      totalItems={totalItems}
+      countTitle={`${totalItems} ${totalItems === 1 ? copy.singular : copy.plural}`}
+      isAllSelected={isAllSelected}
+      isIndeterminate={isIndeterminate}
+      onToggleSelectAll={toggleSelectAll}
+      isSelected={isSelected}
+      onToggleSelection={toggleSelection}
+      selectedCount={selectedCount}
+      selectedLabel={selectedCount === 1 ? copy.selectedSingular : copy.selectedPlural}
+      onDeleteMultiple={() => openDeleteMultipleDialog(selectedCount)}
+      onClearSelection={clearSelection}
+      deleteDialog={{
+        isOpen: deleteDialog.isOpen,
+        title: copy.deleteDialogTitle,
+        message: copy.deleteDialogMessage(deleteDialog.item?.title ?? ""),
+        confirmText: copy.deleteDialogConfirm,
+        onConfirm: handleDeleteConfirm,
+        onClose: closeDeleteDialog,
+      }}
+      deleteMultipleDialog={{
+        isOpen: deleteMultipleDialog.isOpen,
+        title: copy.deleteManyDialogTitle,
+        message: copy.deleteManyDialogMessage(deleteMultipleDialog.count),
+        confirmText: copy.deleteDialogConfirm,
+        onConfirm: handleDeleteMultipleConfirm,
+        onClose: closeDeleteMultipleDialog,
+      }}
+      cancelText={adminListCopy.common.cancel}
+    />
   );
 }

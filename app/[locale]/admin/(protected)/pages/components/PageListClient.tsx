@@ -1,50 +1,33 @@
+"use client";
+
 /* **************************************************
  * Imports
  **************************************************/
-"use client";
-
-import { Hash, Pencil, Trash2, X } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, useTransition, useMemo, useEffect, Fragment } from "react";
 import { mutate } from "swr";
 
-import ConfirmDialog from "@/components/molecules/confirmDialog";
-import { Pagination } from "@/components/pagination";
-import { SearchInput } from "@/components/search";
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableCell,
-  SortableHeader,
-  ColumnSelector,
-  ItemsPerPageSelector,
-  type ColumnConfig,
-} from "@/components/table";
-import { TableCheckbox } from "@/components/table/TableCheckbox";
+import { TableCell } from "@/components/table";
 import { usePages } from "@/hooks/swr";
 import { toast } from "@/hooks/use-toast";
-import { useTableSelection } from "@/hooks/useTableSelection";
-import { useTableState } from "@/hooks/useTableState";
 import type { Page } from "@/lib/github/types";
 import { useLocalizedPath } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils/classes";
 
 import { adminListCopy } from "../../components/adminListCopy";
-import { useCrudDeleteDialogs } from "../../components/useCrudDeleteDialogs";
-import baseStyles from "../../styles";
+import CrudListShell from "../../shared/CrudListShell";
+import { entityCrudStyles } from "../../shared/entityCrudStyles";
+import { useCrudList } from "../../shared/useCrudList";
 import { deletePageAction, deletePagesAction } from "../actions";
-import styles from "../styles";
 
 /* **************************************************
  * Column Configuration
  **************************************************/
-const columnConfig: ColumnConfig[] = [
+const columnConfig = [
   { key: "slug", label: "Slug", defaultVisible: true },
   { key: "preview", label: "Anteprima", defaultVisible: true },
   { key: "actions", label: "Azioni", defaultVisible: true },
-];
+] as const;
 
 /* **************************************************
  * Page List Client Component
@@ -52,26 +35,20 @@ const columnConfig: ColumnConfig[] = [
 export default function PageListClient() {
   const router = useRouter();
   const toLocale = useLocalizedPath();
-  const [isPending, startTransition] = useTransition();
+  const { pages = [], isLoading } = usePages();
+
   const {
+    isPending,
+    startTransition,
     deleteDialog,
     deleteMultipleDialog,
     openDeleteDialog,
     closeDeleteDialog,
     openDeleteMultipleDialog,
     closeDeleteMultipleDialog,
-  } = useCrudDeleteDialogs<Page>();
-
-  // Usa SWR per ottenere le pagine (cache pre-popolata dal server)
-  const { pages = [], isLoading } = usePages();
-
-  // Initialize visible columns from defaultVisible
-  const [visibleColumns, setVisibleColumns] = useState<string[]>(() =>
-    columnConfig.filter((col) => col.defaultVisible !== false).map((col) => col.key),
-  );
-
-  const {
-    data: tableData,
+    visibleColumns,
+    setVisibleColumns,
+    tableData,
     totalItems,
     totalPages,
     currentPage,
@@ -82,15 +59,6 @@ export default function PageListClient() {
     setSort,
     setPage,
     setItemsPerPage,
-  } = useTableState<Page>({
-    data: pages,
-    searchKeys: ["slug"],
-    itemsPerPage: 10,
-    initialSort: { key: "slug", direction: "asc" },
-  });
-
-  // Multi-selection
-  const {
     selectedIds,
     isAllSelected,
     isIndeterminate,
@@ -99,40 +67,24 @@ export default function PageListClient() {
     clearSelection,
     isSelected,
     selectedCount,
-  } = useTableSelection(tableData, (page) => page.slug);
-
-  // Get visible column configs
-  const visibleColumnConfigs = useMemo(() => {
-    return columnConfig.filter((col) => visibleColumns.includes(col.key));
-  }, [visibleColumns]);
-
-  // Clear selection when search or page changes
-  useEffect(() => {
-    clearSelection();
-  }, [search, currentPage, clearSelection]);
-
-  function handleEdit(page: Page) {
-    router.push(toLocale(`/admin/pages/${page.slug}/edit`));
-  }
-
-  function handleDeleteClick(page: Page) {
-    openDeleteDialog(page);
-  }
+  } = useCrudList({
+    data: pages,
+    columnConfig: [...columnConfig],
+    searchKeys: ["slug"],
+    getItemId: (page) => page.slug,
+    tableStateOptions: { initialSort: { key: "slug", direction: "asc" } },
+  });
 
   async function handleDeleteConfirm() {
     if (!deleteDialog.item) return;
-
     const { slug } = deleteDialog.item;
     closeDeleteDialog();
-
     startTransition(async () => {
       const result = await deletePageAction(slug);
-
       if (!result.success) {
-        toast.actionResult(result, { errorTitle: adminListCopy.pages.deleteErrorTitle });
+        toast.actionResult(result, { errorTitle: copy.deleteErrorTitle });
       } else {
-        toast.success(result.message || adminListCopy.pages.deleteSuccess);
-        // Invalida la cache SWR per forzare il refetch
+        toast.success(result.message || copy.deleteSuccess);
         mutate("/api/pages");
         mutate(`/api/pages/${slug}`);
         mutate("/api/github/merge/check");
@@ -141,28 +93,17 @@ export default function PageListClient() {
     });
   }
 
-  function handleDeleteMultipleClick() {
-    openDeleteMultipleDialog(selectedCount);
-  }
-
   async function handleDeleteMultipleConfirm() {
     if (selectedIds.length === 0) return;
-
     closeDeleteMultipleDialog();
-
     startTransition(async () => {
       const result = await deletePagesAction(selectedIds);
-
       if (!result.success) {
-        toast.actionResult(result, { errorTitle: adminListCopy.pages.deleteManyErrorTitle });
+        toast.actionResult(result, { errorTitle: copy.deleteManyErrorTitle });
       } else {
-        toast.success(result.message || adminListCopy.pages.deleteManySuccess);
-        // Invalida la cache SWR per forzare il refetch
+        toast.success(result.message || copy.deleteManySuccess);
         mutate("/api/pages");
-        // Invalida anche le singole pagine
-        selectedIds.forEach((slug) => {
-          mutate(`/api/pages/${slug}`);
-        });
+        selectedIds.forEach((slug) => mutate(`/api/pages/${slug}`));
         mutate("/api/github/merge/check");
         clearSelection();
       }
@@ -191,10 +132,10 @@ export default function PageListClient() {
       case "actions":
         return (
           <TableCell>
-            <div className={baseStyles.buttonGroup}>
+            <div className="flex items-center gap-2">
               <button
-                onClick={() => handleEdit(page)}
-                className={styles.iconButton}
+                onClick={() => router.push(toLocale(`/admin/pages/${page.slug}/edit`))}
+                className={entityCrudStyles.iconButton}
                 disabled={isPending}
                 aria-label={adminListCopy.common.edit}
                 title={adminListCopy.common.edit}
@@ -202,8 +143,8 @@ export default function PageListClient() {
                 <Pencil className="w-4 h-4" />
               </button>
               <button
-                onClick={() => handleDeleteClick(page)}
-                className={cn(styles.iconButton, styles.iconButtonDanger)}
+                onClick={() => openDeleteDialog(page)}
+                className={cn(entityCrudStyles.iconButton, entityCrudStyles.iconButtonDanger)}
                 disabled={isPending}
                 aria-label={adminListCopy.common.delete}
                 title={adminListCopy.common.delete}
@@ -218,172 +159,61 @@ export default function PageListClient() {
     }
   }
 
-  // Mostra loading solo se non ci sono dati (prima richiesta)
-  if (isLoading && pages.length === 0) {
-    return (
-      <div className={baseStyles.container}>
-        <div className={baseStyles.loadingText}>{adminListCopy.pages.loading}</div>
-      </div>
-    );
-  }
+  const copy = adminListCopy.pages;
 
   return (
-    <div className={baseStyles.container}>
-      {/* Search and Filters */}
-      <div className={baseStyles.searchContainer}>
-        <div className={baseStyles.searchRow}>
-          <div className={baseStyles.searchInputWrapper}>
-            <SearchInput
-              value={search}
-              onChange={setSearch}
-              placeholder={adminListCopy.pages.searchPlaceholder}
-            />
-          </div>
-          <ColumnSelector
-            columns={columnConfig}
-            visibleColumns={visibleColumns}
-            onColumnsChange={setVisibleColumns}
-          />
-          <ItemsPerPageSelector value={itemsPerPage} onChange={setItemsPerPage} />
-          <div
-            className="flex items-center h-[34px] gap-1.5 px-2 py-1 border border-secondary"
-            title={`${totalItems} ${totalItems === 1 ? adminListCopy.pages.singular : adminListCopy.pages.plural}`}
-          >
-            <Hash className="h-4 w-4 text-secondary/60" />
-            <span className="text-xs text-secondary/80">{totalItems}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Table */}
-      <div className={baseStyles.tableContainer}>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <th className={baseStyles.tableHeaderCell} style={{ width: "40px" }}>
-                <TableCheckbox
-                  checked={isAllSelected}
-                  indeterminate={isIndeterminate}
-                  onChange={toggleSelectAll}
-                  ariaLabel={adminListCopy.common.selectAll}
-                />
-              </th>
-              {visibleColumnConfigs.map((column) => {
-                if (column.key === "actions") {
-                  return (
-                    <th key={column.key} className={baseStyles.tableHeaderCell}>
-                      {column.label}
-                    </th>
-                  );
-                }
-                return (
-                  <SortableHeader
-                    key={column.key}
-                    sortKey={column.key}
-                    currentSort={sort || undefined}
-                    onSort={setSort}
-                  >
-                    {column.label}
-                  </SortableHeader>
-                );
-              })}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {tableData.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={visibleColumnConfigs.length + 1}
-                  className={baseStyles.tableEmptyCell}
-                >
-                  {adminListCopy.pages.empty}
-                </TableCell>
-              </TableRow>
-            ) : (
-              tableData.map((page) => (
-                <TableRow key={page.slug}>
-                  <TableCell>
-                    <TableCheckbox
-                      checked={isSelected(page.slug)}
-                      onChange={() => toggleSelection(page.slug)}
-                      disabled={isPending}
-                      ariaLabel={`Seleziona ${page.title || page.slug}`}
-                    />
-                  </TableCell>
-                  {visibleColumnConfigs.map((column) => (
-                    <Fragment key={column.key}>{renderCell(page, column.key)}</Fragment>
-                  ))}
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setPage} />
-        )}
-      </div>
-
-      {/* Bulk Actions */}
-      {selectedCount > 0 && (
-        <div className="mt-4 flex items-center gap-2 p-3 bg-tertiary/10 border border-tertiary rounded">
-          <span className="text-sm text-secondary">
-            {selectedCount}{" "}
-            {selectedCount === 1
-              ? adminListCopy.pages.selectedSingular
-              : adminListCopy.pages.selectedPlural}
-          </span>
-          <button
-            onClick={handleDeleteMultipleClick}
-            disabled={isPending}
-            className={cn(styles.iconButton, styles.iconButtonDanger, "ml-auto")}
-            aria-label={adminListCopy.common.deleteSelected}
-            title={adminListCopy.common.deleteSelected}
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
-          <button
-            onClick={clearSelection}
-            disabled={isPending}
-            className={cn(styles.iconButton)}
-            aria-label={adminListCopy.common.deselectAll}
-            title={adminListCopy.common.deselectAll}
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-      )}
-
-      {/* Delete Confirmation Dialog */}
-      {deleteDialog.item && (
-        <ConfirmDialog
-          isOpen={deleteDialog.isOpen}
-          onClose={closeDeleteDialog}
-          onConfirm={handleDeleteConfirm}
-          title={adminListCopy.pages.deleteDialogTitle}
-          message={adminListCopy.pages.deleteDialogMessage(
-            deleteDialog.item?.title || deleteDialog.item?.slug || "",
-          )}
-          confirmText={adminListCopy.common.delete}
-          cancelText={adminListCopy.common.cancel}
-          confirmButtonClassName={styles.deleteButton}
-          isLoading={isPending}
-        />
-      )}
-
-      {/* Delete Multiple Confirmation Dialog */}
-      <ConfirmDialog
-        isOpen={deleteMultipleDialog.isOpen}
-        onClose={closeDeleteMultipleDialog}
-        onConfirm={handleDeleteMultipleConfirm}
-        title={adminListCopy.pages.deleteManyDialogTitle}
-        message={adminListCopy.pages.deleteManyDialogMessage(deleteMultipleDialog.count)}
-        confirmText={adminListCopy.common.delete}
-        cancelText={adminListCopy.common.cancel}
-        confirmButtonClassName={styles.deleteButton}
-        isLoading={isPending}
-      />
-    </div>
+    <CrudListShell<Page>
+      isLoading={isLoading}
+      loadingText={copy.loading}
+      isPending={isPending}
+      data={tableData}
+      emptyText={copy.empty}
+      getItemKey={(p) => p.slug}
+      getItemLabel={(p) => p.title || p.slug}
+      renderCell={renderCell}
+      columnConfig={[...columnConfig]}
+      visibleColumns={visibleColumns}
+      onColumnsChange={setVisibleColumns}
+      sort={sort}
+      onSort={setSort}
+      itemsPerPage={itemsPerPage}
+      onItemsPerPageChange={setItemsPerPage}
+      totalPages={totalPages}
+      currentPage={currentPage}
+      onPageChange={setPage}
+      search={search}
+      onSearchChange={setSearch}
+      searchPlaceholder={copy.searchPlaceholder}
+      totalItems={totalItems}
+      countTitle={`${totalItems} ${totalItems === 1 ? copy.singular : copy.plural}`}
+      isAllSelected={isAllSelected}
+      isIndeterminate={isIndeterminate}
+      onToggleSelectAll={toggleSelectAll}
+      isSelected={isSelected}
+      onToggleSelection={toggleSelection}
+      selectedCount={selectedCount}
+      selectedLabel={selectedCount === 1 ? copy.selectedSingular : copy.selectedPlural}
+      onDeleteMultiple={() => openDeleteMultipleDialog(selectedCount)}
+      onClearSelection={clearSelection}
+      deleteDialog={{
+        isOpen: deleteDialog.isOpen,
+        title: copy.deleteDialogTitle,
+        message: copy.deleteDialogMessage(
+          deleteDialog.item?.title || deleteDialog.item?.slug || "",
+        ),
+        confirmText: adminListCopy.common.delete,
+        onConfirm: handleDeleteConfirm,
+        onClose: closeDeleteDialog,
+      }}
+      deleteMultipleDialog={{
+        isOpen: deleteMultipleDialog.isOpen,
+        title: copy.deleteManyDialogTitle,
+        message: copy.deleteManyDialogMessage(deleteMultipleDialog.count),
+        confirmText: adminListCopy.common.delete,
+        onConfirm: handleDeleteMultipleConfirm,
+        onClose: closeDeleteMultipleDialog,
+      }}
+      cancelText={adminListCopy.common.cancel}
+    />
   );
 }

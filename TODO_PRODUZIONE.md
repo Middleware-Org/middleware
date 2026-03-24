@@ -24,8 +24,8 @@ Stato avanzamento P1 (aggiornato):
 
 ### P2 (priorità bassa/media)
 
-- [ ] [P2] Ridurre duplicazione dei `*ListClient` CRUD con estrazione base condivisa (hook/componente headless per search/sort/selection/pagination/bulk actions).
-  - Progresso: estratto hook condiviso `useCrudDeleteDialogs` e adottato in `AuthorListClient`, `CategoryListClient`, `UserListClient`, `IssueListClient`, `PodcastListClient`, `PageListClient`, `ArticleListClient`, `MediaListClient`.
+- [x] [P2] Ridurre duplicazione dei `*ListClient` CRUD con estrazione base condivisa (hook/componente headless per search/sort/selection/pagination/bulk actions).
+  - Estratti `CrudListShell<T>` (componente generico tabella+paginazione+dialogs) e `useCrudList<T>` (hook generico state CRUD) in `(protected)/shared/`. Applicati a `AuthorListClient`, `CategoryListClient`, `UserListClient`, `IssueListClient`, `PodcastListClient`, `PageListClient`, `ArticleListClient`.
 - [x] [P2] Ridurre duplicazione degli style object admin (`authors/categories/users/issues`) e consolidare stili sidebar in un unico modulo.
 - [x] [P2] Estrarre error boundary admin riusabile per ridurre copy/paste tra `*/error.tsx`.
 
@@ -33,11 +33,11 @@ Stato avanzamento P2 (aggiornato):
 
 - [x] Error boundary admin consolidata in componente riusabile (`(protected)/components/AdminErrorView.tsx`) e applicata a `articles/authors/categories/issues/media/podcasts/users`.
 - [x] Stili CRUD entity consolidati in modulo condiviso (`(protected)/shared/entityCrudStyles.ts`) con override minimi locali; sidebar allineata a un solo modulo stile (`(protected)/components/Sidebar/styles.ts`).
-- [ ] Resta aperta la riduzione duplicazione `*ListClient` CRUD.
+- [x] Riduzione duplicazione `*ListClient` CRUD completata (`CrudListShell` + `useCrudList`).
 
 ## Debiti residui (non bloccanti)
 
-- [ ] [P2] Uniformare timeout anche nelle route `app/api/github/*` con `fetch` diretto (`merge`, `merge/check`, `token-expiration`, `image`).
-- [ ] [P2] Ridurre il logging di payload errore raw da GitHub in `lib/github/client.ts` mantenendo status/code.
+- [x] [P2] Uniformare timeout anche nelle route `app/api/github/*` con `fetch` diretto (`merge`, `merge/check`, `token-expiration`, `image`).
+- [x] [P2] Ridurre il logging di payload errore raw da GitHub in `lib/github/client.ts` mantenendo status/code.
 - [ ] [P3] Ridurre complessità dei componenti admin più estesi (`MediaSelector`, `MediaListClient`, `UserListClient`).
 - [ ] [P3] Centralizzare i DTO API client/server in un modulo dedicato (`lib/api/types`) per prevenire drift.

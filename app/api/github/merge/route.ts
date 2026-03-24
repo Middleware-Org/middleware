@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 
 import { setNoStoreHeaders } from "@/lib/api/cache";
 import { getAdminUser } from "@/lib/auth/server";
+import { fetchWithTimeout } from "@/lib/github/client";
 import { createLogger } from "@/lib/logger";
 import { checkRateLimit, createRateLimitResponse, getClientIp } from "@/lib/security/rateLimit";
 
@@ -47,7 +48,7 @@ export async function POST(request: Request) {
 
     // First check if there are changes to merge
     const checkUrl = `${GITHUB_API_URL}/repos/${owner}/${repo}/compare/${mainBranch}...${devBranch}`;
-    const checkRes = await fetch(checkUrl, {
+    const checkRes = await fetchWithTimeout(checkUrl, {
       headers: {
         Authorization: `Bearer ${token}`,
         Accept: "application/vnd.github+json",
@@ -68,7 +69,7 @@ export async function POST(request: Request) {
 
     // Perform the merge using GitHub API
     const mergeUrl = `${GITHUB_API_URL}/repos/${owner}/${repo}/merges`;
-    const mergeRes = await fetch(mergeUrl, {
+    const mergeRes = await fetchWithTimeout(mergeUrl, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -84,7 +85,7 @@ export async function POST(request: Request) {
 
     if (!mergeRes.ok) {
       const errorData = await mergeRes.json();
-      logger.error("Merge error", errorData);
+      logger.error("Merge error", { status: mergeRes.status, message: errorData?.message });
 
       // Check if it's a merge conflict
       if (mergeRes.status === 409) {

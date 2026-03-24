@@ -4,6 +4,7 @@
 import { NextResponse } from "next/server";
 
 import { getAdminUser } from "@/lib/auth/server";
+import { fetchWithTimeout } from "@/lib/github/client";
 import { createLogger } from "@/lib/logger";
 import { checkRateLimit, createRateLimitResponse, getClientIp } from "@/lib/security/rateLimit";
 
@@ -53,14 +54,14 @@ export async function GET(request: Request) {
 
     // Get the latest commit SHA for both branches
     const [mainBranchData, devBranchData] = await Promise.all([
-      fetch(`${GITHUB_API_URL}/repos/${owner}/${repo}/branches/${mainBranch}`, {
+      fetchWithTimeout(`${GITHUB_API_URL}/repos/${owner}/${repo}/branches/${mainBranch}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: "application/vnd.github+json",
         },
         cache: "no-store",
       }),
-      fetch(`${GITHUB_API_URL}/repos/${owner}/${repo}/branches/${devBranch}`, {
+      fetchWithTimeout(`${GITHUB_API_URL}/repos/${owner}/${repo}/branches/${devBranch}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: "application/vnd.github+json",
@@ -82,7 +83,7 @@ export async function GET(request: Request) {
     // Check if develop is ahead of main
     // Compare the two branches
     const compareUrl = `${GITHUB_API_URL}/repos/${owner}/${repo}/compare/${mainBranch}...${devBranch}`;
-    const compareRes = await fetch(compareUrl, {
+    const compareRes = await fetchWithTimeout(compareUrl, {
       headers: {
         Authorization: `Bearer ${token}`,
         Accept: "application/vnd.github+json",

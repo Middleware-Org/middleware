@@ -24,7 +24,7 @@ if (!owner || !repo || !token) {
 /* **************************************************
  * GitHub API Helpers
  ************************************************** */
-async function fetchWithTimeout(url: string, init?: RequestInit): Promise<Response> {
+export async function fetchWithTimeout(url: string, init?: RequestInit): Promise<Response> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), GITHUB_TIMEOUT_MS);
 
@@ -55,7 +55,7 @@ export async function githubFetch(path: string) {
   });
 
   if (!res.ok) {
-    console.error("GitHub error", url, await res.text());
+    console.error("GitHub API error", { url, status: res.status });
     throw new Error(`GitHub API error: ${res.status}`);
   }
 
@@ -102,8 +102,7 @@ export async function githubPut(path: string, body: unknown) {
   });
 
   if (!res.ok) {
-    const errorText = await res.text();
-    console.error("GitHub PUT error", url, errorText);
+    console.error("GitHub PUT error", { url, status: res.status });
     throw new Error(`GitHub API error: ${res.status}`);
   }
 
@@ -124,8 +123,7 @@ export async function githubDelete(path: string, body: unknown) {
   });
 
   if (!res.ok) {
-    const errorText = await res.text();
-    console.error("GitHub DELETE error", url, errorText);
+    console.error("GitHub DELETE error", { url, status: res.status });
     throw new Error(`GitHub API error: ${res.status}`);
   }
 

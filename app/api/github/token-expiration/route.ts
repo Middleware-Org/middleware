@@ -4,6 +4,7 @@
 import { NextResponse } from "next/server";
 
 import { getAdminUser } from "@/lib/auth/server";
+import { fetchWithTimeout } from "@/lib/github/client";
 import { createLogger } from "@/lib/logger";
 import { checkRateLimit, createRateLimitResponse, getClientIp } from "@/lib/security/rateLimit";
 
@@ -51,7 +52,7 @@ export async function GET(request: Request) {
       return noStoreJson({ error: "GitHub token not configured" }, { status: 500 });
     }
 
-    const res = await fetch(`${GITHUB_API_URL}/user`, {
+    const res = await fetchWithTimeout(`${GITHUB_API_URL}/user`, {
       headers: {
         Authorization: `Bearer ${token}`,
         Accept: "application/vnd.github+json",
@@ -60,10 +61,7 @@ export async function GET(request: Request) {
     });
 
     if (!res.ok) {
-      logger.error("GitHub API error", {
-        status: res.status,
-        body: await res.text(),
-      });
+      logger.error("GitHub API error", { status: res.status });
       return noStoreJson({ error: "Failed to check token expiration" }, { status: res.status });
     }
 

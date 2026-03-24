@@ -1,52 +1,35 @@
+"use client";
+
 /* **************************************************
  * Imports
  **************************************************/
-"use client";
-
-import { Hash, Pencil, Trash2, X } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, useTransition, useMemo, useEffect, Fragment } from "react";
 import { mutate } from "swr";
 
-import ConfirmDialog from "@/components/molecules/confirmDialog";
-import { Pagination } from "@/components/pagination";
-import { SearchInput } from "@/components/search";
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableCell,
-  SortableHeader,
-  ColumnSelector,
-  type ColumnConfig,
-} from "@/components/table";
-import { ItemsPerPageSelector } from "@/components/table/ItemsPerPageSelector";
-import { TableCheckbox } from "@/components/table/TableCheckbox";
+import { TableCell } from "@/components/table";
 import { useUsers } from "@/hooks/swr";
 import { toast } from "@/hooks/use-toast";
-import { useTableSelection } from "@/hooks/useTableSelection";
-import { useTableState } from "@/hooks/useTableState";
 import type { ApiUser } from "@/lib/github/types";
 import { useLocalizedPath } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils/classes";
 
 import { adminListCopy } from "../../components/adminListCopy";
-import { useCrudDeleteDialogs } from "../../components/useCrudDeleteDialogs";
-import baseStyles from "../../styles";
+import CrudListShell from "../../shared/CrudListShell";
+import { entityCrudStyles } from "../../shared/entityCrudStyles";
+import { useCrudList } from "../../shared/useCrudList";
 import { deleteUserAction, deleteUsersAction } from "../actions";
-import styles from "../styles";
 
 /* **************************************************
  * Column Configuration
  **************************************************/
-const columnConfig: ColumnConfig[] = [
+const columnConfig = [
   { key: "email", label: "Email", defaultVisible: true },
   { key: "name", label: "Nome", defaultVisible: true },
   { key: "role", label: "Ruolo", defaultVisible: true },
   { key: "createdAt", label: "Data Creazione", defaultVisible: true },
   { key: "actions", label: "Azioni", defaultVisible: true },
-];
+] as const;
 
 /* **************************************************
  * User List Client Component
@@ -54,27 +37,20 @@ const columnConfig: ColumnConfig[] = [
 export default function UserListClient() {
   const router = useRouter();
   const toLocale = useLocalizedPath();
-  const [isPending, startTransition] = useTransition();
+  const { users = [], isLoading } = useUsers();
+
   const {
+    isPending,
+    startTransition,
     deleteDialog,
     deleteMultipleDialog,
     openDeleteDialog,
     closeDeleteDialog,
     openDeleteMultipleDialog,
     closeDeleteMultipleDialog,
-  } = useCrudDeleteDialogs<ApiUser>();
-
-  // Usa SWR per ottenere gli utenti (cache pre-popolata dal server)
-  const { users = [], isLoading } = useUsers();
-  const [localUsers, setLocalUsers] = useState<ApiUser[]>(users);
-
-  // Initialize visible columns from defaultVisible
-  const [visibleColumns, setVisibleColumns] = useState<string[]>(() =>
-    columnConfig.filter((col) => col.defaultVisible !== false).map((col) => col.key),
-  );
-
-  const {
-    data: tableData,
+    visibleColumns,
+    setVisibleColumns,
+    tableData,
     totalItems,
     totalPages,
     currentPage,
@@ -85,14 +61,6 @@ export default function UserListClient() {
     setSort,
     setPage,
     setItemsPerPage,
-  } = useTableState<ApiUser>({
-    data: localUsers,
-    searchKeys: ["email", "name"],
-    itemsPerPage: 10,
-  });
-
-  // Multi-selection
-  const {
     selectedIds,
     isAllSelected,
     isIndeterminate,
@@ -101,68 +69,38 @@ export default function UserListClient() {
     clearSelection,
     isSelected,
     selectedCount,
-  } = useTableSelection(tableData);
-
-  // Get visible column configs
-  const visibleColumnConfigs = useMemo(() => {
-    return columnConfig.filter((col) => visibleColumns.includes(col.key));
-  }, [visibleColumns]);
-
-  // Sync local users with SWR data when they change
-  useEffect(() => {
-    setLocalUsers(users);
-  }, [users]);
-
-  // Clear selection when search or page changes
-  useEffect(() => {
-    clearSelection();
-  }, [search, currentPage, clearSelection]);
-
-  function handleEdit(user: ApiUser) {
-    router.push(toLocale(`/admin/users/${user.id}/edit`));
-  }
-
-  function handleDeleteClick(user: ApiUser) {
-    openDeleteDialog(user);
-  }
+  } = useCrudList({
+    data: users,
+    columnConfig: [...columnConfig],
+    searchKeys: ["email", "name"],
+    getItemId: (user) => user.id,
+  });
 
   async function handleDeleteConfirm() {
     if (!deleteDialog.item) return;
-
     const { id } = deleteDialog.item;
     closeDeleteDialog();
-
     startTransition(async () => {
       const result = await deleteUserAction(id);
-
       if (!result.success) {
-        toast.actionResult(result, { errorTitle: adminListCopy.users.deleteErrorTitle });
+        toast.actionResult(result, { errorTitle: copy.deleteErrorTitle });
       } else {
-        toast.success(result.message || adminListCopy.users.deleteSuccess);
-        // Invalida la cache SWR per forzare il refetch
+        toast.success(result.message || copy.deleteSuccess);
         mutate("/api/users");
         clearSelection();
       }
     });
   }
 
-  function handleDeleteMultipleClick() {
-    openDeleteMultipleDialog(selectedCount);
-  }
-
   async function handleDeleteMultipleConfirm() {
     if (selectedIds.length === 0) return;
-
     closeDeleteMultipleDialog();
-
     startTransition(async () => {
       const result = await deleteUsersAction(selectedIds);
-
       if (!result.success) {
-        toast.actionResult(result, { errorTitle: adminListCopy.users.deleteManyErrorTitle });
+        toast.actionResult(result, { errorTitle: copy.deleteManyErrorTitle });
       } else {
-        toast.success(result.message || adminListCopy.users.deleteManySuccess);
-        // Invalida la cache SWR per forzare il refetch
+        toast.success(result.message || copy.deleteManySuccess);
         mutate("/api/users");
         clearSelection();
       }
@@ -193,10 +131,10 @@ export default function UserListClient() {
       case "actions":
         return (
           <TableCell>
-            <div className={baseStyles.buttonGroup}>
+            <div className="flex items-center gap-2">
               <button
-                onClick={() => handleEdit(user)}
-                className={styles.iconButton}
+                onClick={() => router.push(toLocale(`/admin/users/${user.id}/edit`))}
+                className={entityCrudStyles.iconButton}
                 disabled={isPending}
                 aria-label={adminListCopy.common.edit}
                 title={adminListCopy.common.edit}
@@ -204,8 +142,8 @@ export default function UserListClient() {
                 <Pencil className="w-4 h-4" />
               </button>
               <button
-                onClick={() => handleDeleteClick(user)}
-                className={cn(styles.iconButton, styles.iconButtonDanger)}
+                onClick={() => openDeleteDialog(user)}
+                className={cn(entityCrudStyles.iconButton, entityCrudStyles.iconButtonDanger)}
                 disabled={isPending}
                 aria-label={adminListCopy.common.delete}
                 title={adminListCopy.common.delete}
@@ -220,170 +158,59 @@ export default function UserListClient() {
     }
   }
 
-  // Mostra loading solo se non ci sono dati (prima richiesta)
-  if (isLoading && users.length === 0) {
-    return (
-      <div className={baseStyles.container}>
-        <div className={baseStyles.loadingText}>{adminListCopy.users.loading}</div>
-      </div>
-    );
-  }
+  const copy = adminListCopy.users;
 
   return (
-    <div className={baseStyles.container}>
-      {/* Search and Filters */}
-      <div className={baseStyles.searchContainer}>
-        <div className={baseStyles.searchRow}>
-          <div className={baseStyles.searchInputWrapper}>
-            <SearchInput
-              value={search}
-              onChange={setSearch}
-              placeholder={adminListCopy.common.searchUserPlaceholder}
-            />
-          </div>
-          <ColumnSelector
-            columns={columnConfig}
-            visibleColumns={visibleColumns}
-            onColumnsChange={setVisibleColumns}
-          />
-          <ItemsPerPageSelector value={itemsPerPage} onChange={setItemsPerPage} />
-          <div
-            className="flex items-center h-[34px] gap-1.5 px-2 py-1 border border-secondary"
-            title={`${totalItems} ${totalItems === 1 ? adminListCopy.users.singular : adminListCopy.users.plural}`}
-          >
-            <Hash className="h-4 w-4 text-secondary/60" />
-            <span className="text-xs text-secondary/80">{totalItems}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Table */}
-      <div className={baseStyles.tableContainer}>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <th className={baseStyles.tableHeaderCell} style={{ width: "40px" }}>
-                <TableCheckbox
-                  checked={isAllSelected}
-                  indeterminate={isIndeterminate}
-                  onChange={toggleSelectAll}
-                  ariaLabel={adminListCopy.common.selectAll}
-                />
-              </th>
-              {visibleColumnConfigs.map((column) => {
-                if (column.key === "actions") {
-                  return (
-                    <th key={column.key} className={baseStyles.tableHeaderCell}>
-                      {column.label}
-                    </th>
-                  );
-                }
-                return (
-                  <SortableHeader
-                    key={column.key}
-                    sortKey={column.key}
-                    currentSort={sort || undefined}
-                    onSort={setSort}
-                  >
-                    {column.label}
-                  </SortableHeader>
-                );
-              })}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {tableData.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={visibleColumnConfigs.length + 1}
-                  className={baseStyles.tableEmptyCell}
-                >
-                  {adminListCopy.users.empty}
-                </TableCell>
-              </TableRow>
-            ) : (
-              tableData.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell>
-                    <TableCheckbox
-                      checked={isSelected(user.id)}
-                      onChange={() => toggleSelection(user.id)}
-                      disabled={isPending}
-                      ariaLabel={`Seleziona ${user.email}`}
-                    />
-                  </TableCell>
-                  {visibleColumnConfigs.map((column) => (
-                    <Fragment key={column.key}>{renderCell(user, column.key)}</Fragment>
-                  ))}
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setPage} />
-        )}
-      </div>
-
-      {/* Bulk Actions */}
-      {selectedCount > 0 && (
-        <div className="mt-4 flex items-center gap-2 p-3 bg-tertiary/10 border border-tertiary rounded">
-          <span className="text-sm text-secondary">
-            {selectedCount}{" "}
-            {selectedCount === 1
-              ? adminListCopy.users.selectedSingular
-              : adminListCopy.users.selectedPlural}
-          </span>
-          <button
-            onClick={handleDeleteMultipleClick}
-            disabled={isPending}
-            className={cn(styles.iconButton, styles.iconButtonDanger, "ml-auto")}
-            aria-label={adminListCopy.common.deleteSelected}
-            title={adminListCopy.common.deleteSelected}
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
-          <button
-            onClick={clearSelection}
-            disabled={isPending}
-            className={cn(styles.iconButton)}
-            aria-label={adminListCopy.common.deselectAll}
-            title={adminListCopy.common.deselectAll}
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-      )}
-
-      {/* Delete Confirmation Dialog */}
-      {deleteDialog.item && (
-        <ConfirmDialog
-          isOpen={deleteDialog.isOpen}
-          onClose={closeDeleteDialog}
-          onConfirm={handleDeleteConfirm}
-          title={adminListCopy.users.deleteDialogTitle}
-          message={adminListCopy.users.deleteDialogMessage(deleteDialog.item?.email ?? "")}
-          confirmText={adminListCopy.users.deleteDialogConfirm}
-          cancelText={adminListCopy.common.cancel}
-          confirmButtonClassName={styles.deleteButton}
-          isLoading={isPending}
-        />
-      )}
-
-      {/* Delete Multiple Confirmation Dialog */}
-      <ConfirmDialog
-        isOpen={deleteMultipleDialog.isOpen}
-        onClose={closeDeleteMultipleDialog}
-        onConfirm={handleDeleteMultipleConfirm}
-        title={adminListCopy.users.deleteManyDialogTitle}
-        message={adminListCopy.users.deleteManyDialogMessage(deleteMultipleDialog.count)}
-        confirmText={adminListCopy.users.deleteDialogConfirm}
-        cancelText={adminListCopy.common.cancel}
-        confirmButtonClassName={styles.deleteButton}
-        isLoading={isPending}
-      />
-    </div>
+    <CrudListShell<ApiUser>
+      isLoading={isLoading}
+      loadingText={copy.loading}
+      isPending={isPending}
+      data={tableData}
+      emptyText={copy.empty}
+      getItemKey={(u) => u.id}
+      getItemLabel={(u) => u.email}
+      renderCell={renderCell}
+      columnConfig={[...columnConfig]}
+      visibleColumns={visibleColumns}
+      onColumnsChange={setVisibleColumns}
+      sort={sort}
+      onSort={setSort}
+      itemsPerPage={itemsPerPage}
+      onItemsPerPageChange={setItemsPerPage}
+      totalPages={totalPages}
+      currentPage={currentPage}
+      onPageChange={setPage}
+      search={search}
+      onSearchChange={setSearch}
+      searchPlaceholder={adminListCopy.common.searchUserPlaceholder}
+      totalItems={totalItems}
+      countTitle={`${totalItems} ${totalItems === 1 ? copy.singular : copy.plural}`}
+      isAllSelected={isAllSelected}
+      isIndeterminate={isIndeterminate}
+      onToggleSelectAll={toggleSelectAll}
+      isSelected={isSelected}
+      onToggleSelection={toggleSelection}
+      selectedCount={selectedCount}
+      selectedLabel={selectedCount === 1 ? copy.selectedSingular : copy.selectedPlural}
+      onDeleteMultiple={() => openDeleteMultipleDialog(selectedCount)}
+      onClearSelection={clearSelection}
+      deleteDialog={{
+        isOpen: deleteDialog.isOpen,
+        title: copy.deleteDialogTitle,
+        message: copy.deleteDialogMessage(deleteDialog.item?.email ?? ""),
+        confirmText: copy.deleteDialogConfirm,
+        onConfirm: handleDeleteConfirm,
+        onClose: closeDeleteDialog,
+      }}
+      deleteMultipleDialog={{
+        isOpen: deleteMultipleDialog.isOpen,
+        title: copy.deleteManyDialogTitle,
+        message: copy.deleteManyDialogMessage(deleteMultipleDialog.count),
+        confirmText: copy.deleteDialogConfirm,
+        onConfirm: handleDeleteMultipleConfirm,
+        onClose: closeDeleteMultipleDialog,
+      }}
+      cancelText={adminListCopy.common.cancel}
+    />
   );
 }
