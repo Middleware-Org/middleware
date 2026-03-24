@@ -38,7 +38,6 @@ export default function Articles({
   orderByArticleId,
 }: ArticlesProps) {
   const [showArticles, setShowArticles] = useState(false);
-  const { color } = getTextColor(issue.color);
 
   /* **************************************************
    * Handlers
@@ -96,9 +95,11 @@ export default function Articles({
             variants="unstyled"
             onClick={handleToggle}
             className={styles.button}
-            style={{ borderColor: color }}
+            style={{
+              borderColor: getTextColor(issue.color).borderColor,
+            }}
           >
-            <MonoTextLight style={{ color: `${color}!important` }}>
+            <MonoTextLight style={{ color: `${getTextColor(issue.color).color}!important` }}>
               {showArticles
                 ? dict.lists.hideArticles
                 : `${dict.lists.showArticles} ${articles.length} ${dict.lists.articlesSuffix}`}
