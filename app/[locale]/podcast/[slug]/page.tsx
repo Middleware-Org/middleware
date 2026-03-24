@@ -171,7 +171,7 @@ export default async function PodcastPage({ params }: PodcastPageProps) {
           <div className="max-w-[1472px] mx-auto lg:px-10 md:px-4 px-4">
             <Separator />
           </div>
-          <section className="max-w-[1472px] mx-auto lg:px-10 md:px-4 px-4 pb-10 pt-5">
+          <section className="max-w-[1472px] mx-auto lg:px-10 md:px-4 px-4 pb-0 pt-5">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {relatedPodcasts.map((relatedPodcast) => (
                 <PodcastCard key={relatedPodcast.slug} podcast={relatedPodcast} dict={commonDict} />
