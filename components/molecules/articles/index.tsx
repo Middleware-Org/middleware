@@ -95,9 +95,7 @@ export default function Articles({
             variants="unstyled"
             onClick={handleToggle}
             className={styles.button}
-            style={{
-              borderColor: getTextColor(issue.color).borderColor,
-            }}
+            style={{ borderColor: `${getTextColor(issue.color).color}!important` }}
           >
             <MonoTextLight style={{ color: `${getTextColor(issue.color).color}!important` }}>
               {showArticles
