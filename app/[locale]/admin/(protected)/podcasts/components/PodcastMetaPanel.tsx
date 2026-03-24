@@ -34,7 +34,7 @@ interface PodcastMetaPanelProps {
     date: string;
     audio: string;
     audio_chunks: string;
-    issue?: string;
+    issueId?: string;
     published: boolean;
   };
   onFormDataChange: (field: string, value: string | boolean) => void;
@@ -240,17 +240,17 @@ export default function PodcastMetaPanel({
         </div>
 
         <SelectSearch
-          id="issue"
+          id="issueId"
           label={adminFormCopy.podcast.numberOptional}
-          value={formData.issue || ""}
+          value={formData.issueId || ""}
           options={[
             { value: "", label: adminFormCopy.podcast.noNumber },
             ...issues.map((issue) => ({
-              value: issue.slug,
+              value: issue.id,
               label: issue.title,
             })),
           ]}
-          onChange={(value) => onFormDataChange("issue", value || "")}
+          onChange={(value) => onFormDataChange("issueId", value || "")}
           placeholder={adminFormCopy.podcast.numberPlaceholder}
         />
       </div>
