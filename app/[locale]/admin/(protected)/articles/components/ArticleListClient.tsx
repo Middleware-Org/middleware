@@ -31,10 +31,11 @@ import type { Article } from "@/lib/github/types";
 import { useLocalizedPath } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils/classes";
 
-import { adminListCopy } from "../../components/adminListCopy";
-import { deleteArticleAction, deleteArticlesAction } from "../actions";
 import SelectSearch, { type SelectSearchOption } from "./SelectSearch";
+import { adminListCopy } from "../../components/adminListCopy";
+import { useCrudDeleteDialogs } from "../../components/useCrudDeleteDialogs";
 import baseStyles from "../../styles";
+import { deleteArticleAction, deleteArticlesAction } from "../actions";
 import styles from "../styles";
 
 /* **************************************************
@@ -58,17 +59,14 @@ export default function ArticleListClient() {
   const router = useRouter();
   const toLocale = useLocalizedPath();
   const [isPending, startTransition] = useTransition();
-  const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; article: Article | null }>({
-    isOpen: false,
-    article: null,
-  });
-  const [deleteMultipleDialog, setDeleteMultipleDialog] = useState<{
-    isOpen: boolean;
-    count: number;
-  }>({
-    isOpen: false,
-    count: 0,
-  });
+  const {
+    deleteDialog,
+    deleteMultipleDialog,
+    openDeleteDialog,
+    closeDeleteDialog,
+    openDeleteMultipleDialog,
+    closeDeleteMultipleDialog,
+  } = useCrudDeleteDialogs<Article>();
 
   // Usa SWR per ottenere gli articoli (cache pre-popolata dal server)
   const { articles = [], isLoading } = useArticles();
@@ -215,14 +213,14 @@ export default function ArticleListClient() {
   }
 
   function handleDeleteClick(article: Article) {
-    setDeleteDialog({ isOpen: true, article });
+    openDeleteDialog(article);
   }
 
   async function handleDeleteConfirm() {
-    if (!deleteDialog.article) return;
+    if (!deleteDialog.item) return;
 
-    const { slug } = deleteDialog.article;
-    setDeleteDialog({ isOpen: false, article: null });
+    const { slug } = deleteDialog.item;
+    closeDeleteDialog();
 
     startTransition(async () => {
       const result = await deleteArticleAction(slug);
@@ -240,14 +238,13 @@ export default function ArticleListClient() {
   }
 
   function handleDeleteMultipleClick() {
-    if (selectedCount === 0) return;
-    setDeleteMultipleDialog({ isOpen: true, count: selectedCount });
+    openDeleteMultipleDialog(selectedCount);
   }
 
   async function handleDeleteMultipleConfirm() {
     if (selectedIds.length === 0) return;
 
-    setDeleteMultipleDialog({ isOpen: false, count: 0 });
+    closeDeleteMultipleDialog();
 
     startTransition(async () => {
       const result = await deleteArticlesAction(selectedIds);
@@ -574,13 +571,13 @@ export default function ArticleListClient() {
       )}
 
       {/* Delete Confirmation Dialog */}
-      {deleteDialog.article && (
+      {deleteDialog.item && (
         <ConfirmDialog
           isOpen={deleteDialog.isOpen}
-          onClose={() => setDeleteDialog({ isOpen: false, article: null })}
+          onClose={closeDeleteDialog}
           onConfirm={handleDeleteConfirm}
           title={adminListCopy.articles.deleteDialogTitle}
-          message={adminListCopy.articles.deleteDialogMessage(deleteDialog.article.title)}
+          message={adminListCopy.articles.deleteDialogMessage(deleteDialog.item?.title ?? "")}
           confirmText={adminListCopy.common.delete}
           cancelText={adminListCopy.common.cancel}
           confirmButtonClassName={styles.deleteButton}
@@ -591,7 +588,7 @@ export default function ArticleListClient() {
       {/* Delete Multiple Confirmation Dialog */}
       <ConfirmDialog
         isOpen={deleteMultipleDialog.isOpen}
-        onClose={() => setDeleteMultipleDialog({ isOpen: false, count: 0 })}
+        onClose={closeDeleteMultipleDialog}
         onConfirm={handleDeleteMultipleConfirm}
         title={adminListCopy.articles.deleteManyDialogTitle}
         message={adminListCopy.articles.deleteManyDialogMessage(deleteMultipleDialog.count)}

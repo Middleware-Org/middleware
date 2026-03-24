@@ -32,6 +32,7 @@ import { useLocalizedPath } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils/classes";
 
 import { adminListCopy } from "../../components/adminListCopy";
+import { useCrudDeleteDialogs } from "../../components/useCrudDeleteDialogs";
 import baseStyles from "../../styles";
 import { deletePageAction, deletePagesAction } from "../actions";
 import styles from "../styles";
@@ -52,17 +53,14 @@ export default function PageListClient() {
   const router = useRouter();
   const toLocale = useLocalizedPath();
   const [isPending, startTransition] = useTransition();
-  const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; page: Page | null }>({
-    isOpen: false,
-    page: null,
-  });
-  const [deleteMultipleDialog, setDeleteMultipleDialog] = useState<{
-    isOpen: boolean;
-    count: number;
-  }>({
-    isOpen: false,
-    count: 0,
-  });
+  const {
+    deleteDialog,
+    deleteMultipleDialog,
+    openDeleteDialog,
+    closeDeleteDialog,
+    openDeleteMultipleDialog,
+    closeDeleteMultipleDialog,
+  } = useCrudDeleteDialogs<Page>();
 
   // Usa SWR per ottenere le pagine (cache pre-popolata dal server)
   const { pages = [], isLoading } = usePages();
@@ -118,14 +116,14 @@ export default function PageListClient() {
   }
 
   function handleDeleteClick(page: Page) {
-    setDeleteDialog({ isOpen: true, page });
+    openDeleteDialog(page);
   }
 
   async function handleDeleteConfirm() {
-    if (!deleteDialog.page) return;
+    if (!deleteDialog.item) return;
 
-    const { slug } = deleteDialog.page;
-    setDeleteDialog({ isOpen: false, page: null });
+    const { slug } = deleteDialog.item;
+    closeDeleteDialog();
 
     startTransition(async () => {
       const result = await deletePageAction(slug);
@@ -144,14 +142,13 @@ export default function PageListClient() {
   }
 
   function handleDeleteMultipleClick() {
-    if (selectedCount === 0) return;
-    setDeleteMultipleDialog({ isOpen: true, count: selectedCount });
+    openDeleteMultipleDialog(selectedCount);
   }
 
   async function handleDeleteMultipleConfirm() {
     if (selectedIds.length === 0) return;
 
-    setDeleteMultipleDialog({ isOpen: false, count: 0 });
+    closeDeleteMultipleDialog();
 
     startTransition(async () => {
       const result = await deletePagesAction(selectedIds);
@@ -359,14 +356,14 @@ export default function PageListClient() {
       )}
 
       {/* Delete Confirmation Dialog */}
-      {deleteDialog.page && (
+      {deleteDialog.item && (
         <ConfirmDialog
           isOpen={deleteDialog.isOpen}
-          onClose={() => setDeleteDialog({ isOpen: false, page: null })}
+          onClose={closeDeleteDialog}
           onConfirm={handleDeleteConfirm}
           title={adminListCopy.pages.deleteDialogTitle}
           message={adminListCopy.pages.deleteDialogMessage(
-            deleteDialog.page.title || deleteDialog.page.slug,
+            deleteDialog.item?.title || deleteDialog.item?.slug || "",
           )}
           confirmText={adminListCopy.common.delete}
           cancelText={adminListCopy.common.cancel}
@@ -378,7 +375,7 @@ export default function PageListClient() {
       {/* Delete Multiple Confirmation Dialog */}
       <ConfirmDialog
         isOpen={deleteMultipleDialog.isOpen}
-        onClose={() => setDeleteMultipleDialog({ isOpen: false, count: 0 })}
+        onClose={closeDeleteMultipleDialog}
         onConfirm={handleDeleteMultipleConfirm}
         title={adminListCopy.pages.deleteManyDialogTitle}
         message={adminListCopy.pages.deleteManyDialogMessage(deleteMultipleDialog.count)}

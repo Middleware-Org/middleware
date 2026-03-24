@@ -17,6 +17,7 @@ import type { ApiMediaFile } from "@/lib/github/types";
 import { cn } from "@/lib/utils/classes";
 
 import { adminListCopy } from "../../components/adminListCopy";
+import { useCrudDeleteDialogs } from "../../components/useCrudDeleteDialogs";
 import { deleteMediaFilesAction } from "../actions";
 import MediaDialog from "./MediaDialog";
 import baseStyles from "../../styles";
@@ -35,13 +36,8 @@ export default function MediaListClient() {
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const [isPending, startTransition] = useTransition();
-  const [deleteMultipleDialog, setDeleteMultipleDialog] = useState<{
-    isOpen: boolean;
-    count: number;
-  }>({
-    isOpen: false,
-    count: 0,
-  });
+  const { deleteMultipleDialog, openDeleteMultipleDialog, closeDeleteMultipleDialog } =
+    useCrudDeleteDialogs<ApiMediaFile>();
 
   // Usa SWR per ottenere i file media (cache pre-popolata dal server)
   const { mediaFiles = [], isLoading } = useMedia();
@@ -131,14 +127,13 @@ export default function MediaListClient() {
   }
 
   function handleDeleteMultipleClick() {
-    if (selectedCount === 0) return;
-    setDeleteMultipleDialog({ isOpen: true, count: selectedCount });
+    openDeleteMultipleDialog(selectedCount);
   }
 
   async function handleDeleteMultipleConfirm() {
     if (selectedIds.length === 0) return;
 
-    setDeleteMultipleDialog({ isOpen: false, count: 0 });
+    closeDeleteMultipleDialog();
 
     startTransition(async () => {
       const result = await deleteMediaFilesAction(selectedIds);
@@ -379,7 +374,7 @@ export default function MediaListClient() {
       {/* Delete Multiple Confirmation Dialog */}
       <ConfirmDialog
         isOpen={deleteMultipleDialog.isOpen}
-        onClose={() => setDeleteMultipleDialog({ isOpen: false, count: 0 })}
+        onClose={closeDeleteMultipleDialog}
         onConfirm={handleDeleteMultipleConfirm}
         title={adminListCopy.media.deleteDialogTitle}
         message={adminListCopy.media.deleteDialogMessage(deleteMultipleDialog.count)}

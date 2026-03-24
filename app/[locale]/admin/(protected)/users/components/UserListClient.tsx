@@ -32,6 +32,7 @@ import { useLocalizedPath } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils/classes";
 
 import { adminListCopy } from "../../components/adminListCopy";
+import { useCrudDeleteDialogs } from "../../components/useCrudDeleteDialogs";
 import baseStyles from "../../styles";
 import { deleteUserAction, deleteUsersAction } from "../actions";
 import styles from "../styles";
@@ -54,17 +55,14 @@ export default function UserListClient() {
   const router = useRouter();
   const toLocale = useLocalizedPath();
   const [isPending, startTransition] = useTransition();
-  const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; user: ApiUser | null }>({
-    isOpen: false,
-    user: null,
-  });
-  const [deleteMultipleDialog, setDeleteMultipleDialog] = useState<{
-    isOpen: boolean;
-    count: number;
-  }>({
-    isOpen: false,
-    count: 0,
-  });
+  const {
+    deleteDialog,
+    deleteMultipleDialog,
+    openDeleteDialog,
+    closeDeleteDialog,
+    openDeleteMultipleDialog,
+    closeDeleteMultipleDialog,
+  } = useCrudDeleteDialogs<ApiUser>();
 
   // Usa SWR per ottenere gli utenti (cache pre-popolata dal server)
   const { users = [], isLoading } = useUsers();
@@ -125,14 +123,14 @@ export default function UserListClient() {
   }
 
   function handleDeleteClick(user: ApiUser) {
-    setDeleteDialog({ isOpen: true, user });
+    openDeleteDialog(user);
   }
 
   async function handleDeleteConfirm() {
-    if (!deleteDialog.user) return;
+    if (!deleteDialog.item) return;
 
-    const { id } = deleteDialog.user;
-    setDeleteDialog({ isOpen: false, user: null });
+    const { id } = deleteDialog.item;
+    closeDeleteDialog();
 
     startTransition(async () => {
       const result = await deleteUserAction(id);
@@ -149,14 +147,13 @@ export default function UserListClient() {
   }
 
   function handleDeleteMultipleClick() {
-    if (selectedCount === 0) return;
-    setDeleteMultipleDialog({ isOpen: true, count: selectedCount });
+    openDeleteMultipleDialog(selectedCount);
   }
 
   async function handleDeleteMultipleConfirm() {
     if (selectedIds.length === 0) return;
 
-    setDeleteMultipleDialog({ isOpen: false, count: 0 });
+    closeDeleteMultipleDialog();
 
     startTransition(async () => {
       const result = await deleteUsersAction(selectedIds);
@@ -361,13 +358,13 @@ export default function UserListClient() {
       )}
 
       {/* Delete Confirmation Dialog */}
-      {deleteDialog.user && (
+      {deleteDialog.item && (
         <ConfirmDialog
           isOpen={deleteDialog.isOpen}
-          onClose={() => setDeleteDialog({ isOpen: false, user: null })}
+          onClose={closeDeleteDialog}
           onConfirm={handleDeleteConfirm}
           title={adminListCopy.users.deleteDialogTitle}
-          message={adminListCopy.users.deleteDialogMessage(deleteDialog.user.email)}
+          message={adminListCopy.users.deleteDialogMessage(deleteDialog.item?.email ?? "")}
           confirmText={adminListCopy.users.deleteDialogConfirm}
           cancelText={adminListCopy.common.cancel}
           confirmButtonClassName={styles.deleteButton}
@@ -378,7 +375,7 @@ export default function UserListClient() {
       {/* Delete Multiple Confirmation Dialog */}
       <ConfirmDialog
         isOpen={deleteMultipleDialog.isOpen}
-        onClose={() => setDeleteMultipleDialog({ isOpen: false, count: 0 })}
+        onClose={closeDeleteMultipleDialog}
         onConfirm={handleDeleteMultipleConfirm}
         title={adminListCopy.users.deleteManyDialogTitle}
         message={adminListCopy.users.deleteManyDialogMessage(deleteMultipleDialog.count)}

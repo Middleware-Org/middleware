@@ -26,7 +26,7 @@ import type { AdminDictionary, CommonDictionary } from "@/lib/i18n/types";
 import { cn } from "@/lib/utils/classes";
 
 import MergeButton from "./MergeButton";
-import styles from "./styles";
+import styles from "./Sidebar/styles";
 
 /* **************************************************
  * Types

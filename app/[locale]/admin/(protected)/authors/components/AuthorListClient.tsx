@@ -32,6 +32,7 @@ import { useLocalizedPath } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils/classes";
 
 import { adminListCopy } from "../../components/adminListCopy";
+import { useCrudDeleteDialogs } from "../../components/useCrudDeleteDialogs";
 import baseStyles from "../../styles";
 import { deleteAuthorAction, deleteAuthorsAction } from "../actions";
 import styles from "../styles";
@@ -53,17 +54,14 @@ export default function AuthorListClient() {
   const router = useRouter();
   const toLocale = useLocalizedPath();
   const [isPending, startTransition] = useTransition();
-  const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; author: Author | null }>({
-    isOpen: false,
-    author: null,
-  });
-  const [deleteMultipleDialog, setDeleteMultipleDialog] = useState<{
-    isOpen: boolean;
-    count: number;
-  }>({
-    isOpen: false,
-    count: 0,
-  });
+  const {
+    deleteDialog,
+    deleteMultipleDialog,
+    openDeleteDialog,
+    closeDeleteDialog,
+    openDeleteMultipleDialog,
+    closeDeleteMultipleDialog,
+  } = useCrudDeleteDialogs<Author>();
 
   // Usa SWR per ottenere gli autori (cache pre-popolata dal server)
   const { authors = [], isLoading } = useAuthors();
@@ -124,14 +122,14 @@ export default function AuthorListClient() {
   }
 
   function handleDeleteClick(author: Author) {
-    setDeleteDialog({ isOpen: true, author });
+    openDeleteDialog(author);
   }
 
   async function handleDeleteConfirm() {
-    if (!deleteDialog.author) return;
+    if (!deleteDialog.item) return;
 
-    const { slug } = deleteDialog.author;
-    setDeleteDialog({ isOpen: false, author: null });
+    const { slug } = deleteDialog.item;
+    closeDeleteDialog();
 
     startTransition(async () => {
       const result = await deleteAuthorAction(slug);
@@ -149,14 +147,13 @@ export default function AuthorListClient() {
   }
 
   function handleDeleteMultipleClick() {
-    if (selectedCount === 0) return;
-    setDeleteMultipleDialog({ isOpen: true, count: selectedCount });
+    openDeleteMultipleDialog(selectedCount);
   }
 
   async function handleDeleteMultipleConfirm() {
     if (selectedIds.length === 0) return;
 
-    setDeleteMultipleDialog({ isOpen: false, count: 0 });
+    closeDeleteMultipleDialog();
 
     startTransition(async () => {
       const result = await deleteAuthorsAction(selectedIds);
@@ -355,13 +352,13 @@ export default function AuthorListClient() {
       )}
 
       {/* Delete Confirmation Dialog */}
-      {deleteDialog.author && (
+      {deleteDialog.item && (
         <ConfirmDialog
           isOpen={deleteDialog.isOpen}
-          onClose={() => setDeleteDialog({ isOpen: false, author: null })}
+          onClose={closeDeleteDialog}
           onConfirm={handleDeleteConfirm}
           title={adminListCopy.authors.deleteDialogTitle}
-          message={adminListCopy.authors.deleteDialogMessage(deleteDialog.author.name)}
+          message={adminListCopy.authors.deleteDialogMessage(deleteDialog.item?.name ?? "")}
           confirmText={adminListCopy.authors.deleteDialogConfirm}
           cancelText={adminListCopy.common.cancel}
           confirmButtonClassName={styles.deleteButton}
@@ -372,7 +369,7 @@ export default function AuthorListClient() {
       {/* Delete Multiple Confirmation Dialog */}
       <ConfirmDialog
         isOpen={deleteMultipleDialog.isOpen}
-        onClose={() => setDeleteMultipleDialog({ isOpen: false, count: 0 })}
+        onClose={closeDeleteMultipleDialog}
         onConfirm={handleDeleteMultipleConfirm}
         title={adminListCopy.authors.deleteManyDialogTitle}
         message={adminListCopy.authors.deleteManyDialogMessage(deleteMultipleDialog.count)}

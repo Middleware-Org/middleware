@@ -32,6 +32,7 @@ import { useLocalizedPath } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils/classes";
 
 import { adminListCopy } from "../../components/adminListCopy";
+import { useCrudDeleteDialogs } from "../../components/useCrudDeleteDialogs";
 import baseStyles from "../../styles";
 import { deleteCategoryAction, deleteCategoriesAction } from "../actions";
 import styles from "../styles";
@@ -53,17 +54,14 @@ export default function CategoryListClient() {
   const router = useRouter();
   const toLocale = useLocalizedPath();
   const [isPending, startTransition] = useTransition();
-  const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; category: Category | null }>({
-    isOpen: false,
-    category: null,
-  });
-  const [deleteMultipleDialog, setDeleteMultipleDialog] = useState<{
-    isOpen: boolean;
-    count: number;
-  }>({
-    isOpen: false,
-    count: 0,
-  });
+  const {
+    deleteDialog,
+    deleteMultipleDialog,
+    openDeleteDialog,
+    closeDeleteDialog,
+    openDeleteMultipleDialog,
+    closeDeleteMultipleDialog,
+  } = useCrudDeleteDialogs<Category>();
 
   // Usa SWR per ottenere le categorie (cache pre-popolata dal server)
   const { categories = [], isLoading } = useCategories();
@@ -124,14 +122,14 @@ export default function CategoryListClient() {
   }
 
   function handleDeleteClick(category: Category) {
-    setDeleteDialog({ isOpen: true, category });
+    openDeleteDialog(category);
   }
 
   async function handleDeleteConfirm() {
-    if (!deleteDialog.category) return;
+    if (!deleteDialog.item) return;
 
-    const { slug } = deleteDialog.category;
-    setDeleteDialog({ isOpen: false, category: null });
+    const { slug } = deleteDialog.item;
+    closeDeleteDialog();
 
     startTransition(async () => {
       const result = await deleteCategoryAction(slug);
@@ -149,14 +147,13 @@ export default function CategoryListClient() {
   }
 
   function handleDeleteMultipleClick() {
-    if (selectedCount === 0) return;
-    setDeleteMultipleDialog({ isOpen: true, count: selectedCount });
+    openDeleteMultipleDialog(selectedCount);
   }
 
   async function handleDeleteMultipleConfirm() {
     if (selectedIds.length === 0) return;
 
-    setDeleteMultipleDialog({ isOpen: false, count: 0 });
+    closeDeleteMultipleDialog();
 
     startTransition(async () => {
       const result = await deleteCategoriesAction(selectedIds);
@@ -355,13 +352,13 @@ export default function CategoryListClient() {
       )}
 
       {/* Delete Confirmation Dialog */}
-      {deleteDialog.category && (
+      {deleteDialog.item && (
         <ConfirmDialog
           isOpen={deleteDialog.isOpen}
-          onClose={() => setDeleteDialog({ isOpen: false, category: null })}
+          onClose={closeDeleteDialog}
           onConfirm={handleDeleteConfirm}
           title={adminListCopy.categories.deleteDialogTitle}
-          message={adminListCopy.categories.deleteDialogMessage(deleteDialog.category.name)}
+          message={adminListCopy.categories.deleteDialogMessage(deleteDialog.item?.name ?? "")}
           confirmText={adminListCopy.categories.deleteDialogConfirm}
           cancelText={adminListCopy.common.cancel}
           confirmButtonClassName={styles.deleteButton}
@@ -372,7 +369,7 @@ export default function CategoryListClient() {
       {/* Delete Multiple Confirmation Dialog */}
       <ConfirmDialog
         isOpen={deleteMultipleDialog.isOpen}
-        onClose={() => setDeleteMultipleDialog({ isOpen: false, count: 0 })}
+        onClose={closeDeleteMultipleDialog}
         onConfirm={handleDeleteMultipleConfirm}
         title={adminListCopy.categories.deleteManyDialogTitle}
         message={adminListCopy.categories.deleteManyDialogMessage(deleteMultipleDialog.count)}

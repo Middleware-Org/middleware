@@ -32,6 +32,7 @@ import { useLocalizedPath } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils/classes";
 
 import { adminListCopy } from "../../components/adminListCopy";
+import { useCrudDeleteDialogs } from "../../components/useCrudDeleteDialogs";
 import baseStyles from "../../styles";
 import { deletePodcastAction, deletePodcastsAction } from "../actions";
 import styles from "../styles";
@@ -55,17 +56,14 @@ export default function PodcastListClient() {
   const router = useRouter();
   const toLocale = useLocalizedPath();
   const [isPending, startTransition] = useTransition();
-  const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; podcast: Podcast | null }>({
-    isOpen: false,
-    podcast: null,
-  });
-  const [deleteMultipleDialog, setDeleteMultipleDialog] = useState<{
-    isOpen: boolean;
-    count: number;
-  }>({
-    isOpen: false,
-    count: 0,
-  });
+  const {
+    deleteDialog,
+    deleteMultipleDialog,
+    openDeleteDialog,
+    closeDeleteDialog,
+    openDeleteMultipleDialog,
+    closeDeleteMultipleDialog,
+  } = useCrudDeleteDialogs<Podcast>();
 
   // Usa SWR per ottenere i podcasts (cache pre-popolata dal server)
   const { podcasts = [], isLoading } = usePodcasts();
@@ -121,14 +119,14 @@ export default function PodcastListClient() {
   }
 
   function handleDeleteClick(podcast: Podcast) {
-    setDeleteDialog({ isOpen: true, podcast });
+    openDeleteDialog(podcast);
   }
 
   async function handleDeleteConfirm() {
-    if (!deleteDialog.podcast) return;
+    if (!deleteDialog.item) return;
 
-    const { slug } = deleteDialog.podcast;
-    setDeleteDialog({ isOpen: false, podcast: null });
+    const { slug } = deleteDialog.item;
+    closeDeleteDialog();
 
     startTransition(async () => {
       const result = await deletePodcastAction(slug);
@@ -145,14 +143,13 @@ export default function PodcastListClient() {
   }
 
   function handleDeleteMultipleClick() {
-    if (selectedCount === 0) return;
-    setDeleteMultipleDialog({ isOpen: true, count: selectedCount });
+    openDeleteMultipleDialog(selectedCount);
   }
 
   async function handleDeleteMultipleConfirm() {
     if (selectedIds.length === 0) return;
 
-    setDeleteMultipleDialog({ isOpen: false, count: 0 });
+    closeDeleteMultipleDialog();
 
     startTransition(async () => {
       const result = await deletePodcastsAction(selectedIds);
@@ -364,13 +361,13 @@ export default function PodcastListClient() {
       )}
 
       {/* Delete Confirmation Dialog */}
-      {deleteDialog.podcast && (
+      {deleteDialog.item && (
         <ConfirmDialog
           isOpen={deleteDialog.isOpen}
-          onClose={() => setDeleteDialog({ isOpen: false, podcast: null })}
+          onClose={closeDeleteDialog}
           onConfirm={handleDeleteConfirm}
           title={adminListCopy.podcasts.deleteDialogTitle}
-          message={adminListCopy.podcasts.deleteDialogMessage(deleteDialog.podcast.title)}
+          message={adminListCopy.podcasts.deleteDialogMessage(deleteDialog.item?.title ?? "")}
           confirmText={adminListCopy.podcasts.deleteDialogConfirm}
           cancelText={adminListCopy.common.cancel}
           confirmButtonClassName={styles.deleteButton}
@@ -381,7 +378,7 @@ export default function PodcastListClient() {
       {/* Delete Multiple Confirmation Dialog */}
       <ConfirmDialog
         isOpen={deleteMultipleDialog.isOpen}
-        onClose={() => setDeleteMultipleDialog({ isOpen: false, count: 0 })}
+        onClose={closeDeleteMultipleDialog}
         onConfirm={handleDeleteMultipleConfirm}
         title={adminListCopy.podcasts.deleteManyDialogTitle}
         message={adminListCopy.podcasts.deleteManyDialogMessage(deleteMultipleDialog.count)}

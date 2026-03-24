@@ -34,6 +34,7 @@ import { useLocalizedPath } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils/classes";
 
 import { adminListCopy } from "../../components/adminListCopy";
+import { useCrudDeleteDialogs } from "../../components/useCrudDeleteDialogs";
 import baseStyles from "../../styles";
 import { deleteIssueAction, deleteIssuesAction } from "../actions";
 import styles from "../styles";
@@ -58,17 +59,14 @@ export default function IssueListClient() {
   const router = useRouter();
   const toLocale = useLocalizedPath();
   const [isPending, startTransition] = useTransition();
-  const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; issue: Issue | null }>({
-    isOpen: false,
-    issue: null,
-  });
-  const [deleteMultipleDialog, setDeleteMultipleDialog] = useState<{
-    isOpen: boolean;
-    count: number;
-  }>({
-    isOpen: false,
-    count: 0,
-  });
+  const {
+    deleteDialog,
+    deleteMultipleDialog,
+    openDeleteDialog,
+    closeDeleteDialog,
+    openDeleteMultipleDialog,
+    closeDeleteMultipleDialog,
+  } = useCrudDeleteDialogs<Issue>();
 
   // Usa SWR per ottenere le issues (cache pre-popolata dal server)
   const { issues = [], isLoading } = useIssues();
@@ -129,14 +127,14 @@ export default function IssueListClient() {
   }
 
   function handleDeleteClick(issue: Issue) {
-    setDeleteDialog({ isOpen: true, issue });
+    openDeleteDialog(issue);
   }
 
   async function handleDeleteConfirm() {
-    if (!deleteDialog.issue) return;
+    if (!deleteDialog.item) return;
 
-    const { slug } = deleteDialog.issue;
-    setDeleteDialog({ isOpen: false, issue: null });
+    const { slug } = deleteDialog.item;
+    closeDeleteDialog();
 
     startTransition(async () => {
       const result = await deleteIssueAction(slug);
@@ -154,14 +152,13 @@ export default function IssueListClient() {
   }
 
   function handleDeleteMultipleClick() {
-    if (selectedCount === 0) return;
-    setDeleteMultipleDialog({ isOpen: true, count: selectedCount });
+    openDeleteMultipleDialog(selectedCount);
   }
 
   async function handleDeleteMultipleConfirm() {
     if (selectedIds.length === 0) return;
 
-    setDeleteMultipleDialog({ isOpen: false, count: 0 });
+    closeDeleteMultipleDialog();
 
     startTransition(async () => {
       const result = await deleteIssuesAction(selectedIds);
@@ -395,13 +392,13 @@ export default function IssueListClient() {
       )}
 
       {/* Delete Confirmation Dialog */}
-      {deleteDialog.issue && (
+      {deleteDialog.item && (
         <ConfirmDialog
           isOpen={deleteDialog.isOpen}
-          onClose={() => setDeleteDialog({ isOpen: false, issue: null })}
+          onClose={closeDeleteDialog}
           onConfirm={handleDeleteConfirm}
           title={adminListCopy.issues.deleteDialogTitle}
-          message={adminListCopy.issues.deleteDialogMessage(deleteDialog.issue.title)}
+          message={adminListCopy.issues.deleteDialogMessage(deleteDialog.item?.title ?? "")}
           confirmText={adminListCopy.issues.deleteDialogConfirm}
           cancelText={adminListCopy.common.cancel}
           confirmButtonClassName={styles.deleteButton}
@@ -412,7 +409,7 @@ export default function IssueListClient() {
       {/* Delete Multiple Confirmation Dialog */}
       <ConfirmDialog
         isOpen={deleteMultipleDialog.isOpen}
-        onClose={() => setDeleteMultipleDialog({ isOpen: false, count: 0 })}
+        onClose={closeDeleteMultipleDialog}
         onConfirm={handleDeleteMultipleConfirm}
         title={adminListCopy.issues.deleteManyDialogTitle}
         message={adminListCopy.issues.deleteManyDialogMessage(deleteMultipleDialog.count)}

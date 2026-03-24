@@ -4,15 +4,18 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import Separator from "@/components/atoms/separetor";
+import PodcastCard from "@/components/molecules/podcastCard";
 import StructuredData from "@/components/StructuredData";
 import { getAllPodcasts, getPodcastBySlug, getIssueById } from "@/lib/content";
+import { getPodcastsByIssue } from "@/lib/content/podcasts";
 import { getGitHubImageUrl } from "@/lib/github/images";
+import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import { i18nSettings } from "@/lib/i18n/settings";
+import { getDictionary } from "@/lib/i18n/utils";
 import { getBaseUrl, createOpenGraphMetadata, createTwitterMetadata } from "@/lib/utils/metadata";
 
 import PodcastPlayer from "./components/PodcastPlayer";
-
-
 
 /* **************************************************
  * Types
@@ -149,10 +152,34 @@ export default async function PodcastPage({ params }: PodcastPageProps) {
   // Get associated issue for cover image
   const issue = podcast.issueId ? getIssueById(podcast.issueId) : undefined;
 
+  // Get related podcasts from the same issue
+  const relatedPodcasts = (() => {
+    if (!podcast.issueId) return [];
+    const issueData = issue;
+    if (!issueData) return [];
+    return getPodcastsByIssue(issueData.slug).filter((p) => p.slug !== podcast.slug);
+  })();
+
+  const commonDict = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
+
   return (
     <>
       <StructuredData id={`podcast-ld-${slug}`} data={getPodcastStructuredData(locale, slug)} />
       <PodcastPlayer podcast={podcast} issue={issue} />
+      {relatedPodcasts.length > 0 && (
+        <>
+          <div className="max-w-[1472px] mx-auto lg:px-10 md:px-4 px-4">
+            <Separator />
+          </div>
+          <section className="max-w-[1472px] mx-auto lg:px-10 md:px-4 px-4 pb-10 pt-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {relatedPodcasts.map((relatedPodcast) => (
+                <PodcastCard key={relatedPodcast.slug} podcast={relatedPodcast} dict={commonDict} />
+              ))}
+            </div>
+          </section>
+        </>
+      )}
     </>
   );
 }

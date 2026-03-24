@@ -9,6 +9,8 @@ import { cn } from "@/lib/utils/classes";
 const styles = {
   sidebar: cn("w-64 bg-primary border-l border-secondary h-screen flex flex-col overflow-hidden"),
   header: cn("p-6 border-b border-secondary shrink-0"),
+  logoContainer: cn("flex items-center gap-2"),
+  logoText: cn("text-xl"),
   title: cn("text-xl font-bold text-secondary"),
   nav: cn("flex-1 p-4 overflow-y-auto"),
   navList: cn("space-y-2"),
@@ -16,6 +18,8 @@ const styles = {
     "flex items-center gap-3 px-4 py-3 transition-all duration-150",
     "hover:bg-tertiary hover:text-white",
   ),
+  navItemText: cn("hover:text-white"),
+  navItemActiveText: cn("text-white"),
   navItemActive: cn("bg-tertiary text-white hover:bg-tertiary hover:text-white"),
   navItemInactive: cn("text-secondary hover:text-white"),
   navIcon: cn("w-5 h-5"),
