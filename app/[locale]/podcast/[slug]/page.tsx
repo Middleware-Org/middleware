@@ -15,6 +15,7 @@ import {
   getAllPodcasts,
   getArticleByPodcastId,
   getAuthorById,
+  getCategoryById,
   getPodcastBySlug,
   getIssueById,
 } from "@/lib/content";
@@ -25,6 +26,7 @@ import { withLocale } from "@/lib/i18n/path";
 import { i18nSettings } from "@/lib/i18n/settings";
 import { getDictionary } from "@/lib/i18n/utils";
 import { getBaseUrl, createOpenGraphMetadata, createTwitterMetadata } from "@/lib/utils/metadata";
+import { getMinText } from "@/lib/utils/text";
 
 import PodcastPlayer from "./components/PodcastPlayer";
 
@@ -173,11 +175,16 @@ export default async function PodcastPage({ params }: PodcastPageProps) {
 
   const relatedArticle = getArticleByPodcastId(podcast.id);
   const relatedAuthor = relatedArticle ? getAuthorById(relatedArticle.authorId) : undefined;
+  const relatedCategory = relatedArticle ? getCategoryById(relatedArticle.categoryId) : undefined;
+  const listeningTime = relatedArticle ? getMinText(relatedArticle.content) : null;
   const articleHref = relatedArticle
     ? withLocale(`/articles/${relatedArticle.slug}`, locale)
     : null;
   const authorHref = relatedAuthor
     ? withLocale(`/authors?author=${relatedAuthor.slug}`, locale)
+    : null;
+  const categoryHref = relatedCategory
+    ? withLocale(`/categories?category=${relatedCategory.slug}`, locale)
     : null;
 
   const [commonDict, podcastDict] = await Promise.all([
@@ -220,6 +227,24 @@ export default async function PodcastPage({ params }: PodcastPageProps) {
                 {podcastDict.page.readArticle}
               </MonoTextLight>
             </Link>
+          )}
+        </div>
+        <Separator className="lg:mt-2.5 lg:mb-2.5 mt-2.5 mb-2.5" />
+        <div className="flex justify-between items-center">
+          {relatedCategory ? (
+            <Link href={categoryHref || "#"}>
+              <MonoTextLight className="hover:underline">{relatedCategory.name}</MonoTextLight>
+            </Link>
+          ) : (
+            <div />
+          )}
+          {listeningTime && (
+            <div className="lg:text-[16px] text-[12px] flex items-center gap-2 text-secondary">
+              <Book className="w-5 h-5" />
+              <MonoTextLight className="lg:text-[16px] text-[12px]">
+                {listeningTime} {podcastDict.page.listeningTime}
+              </MonoTextLight>
+            </div>
           )}
         </div>
         <Separator className="lg:mt-2.5 lg:mb-2.5 mt-2.5 mb-2.5" />
