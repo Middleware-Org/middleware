@@ -16,6 +16,10 @@ export const getArticleBySlug = (slug: string) => {
   return article && article.published ? article : undefined;
 };
 
+export const getArticleByPodcastId = (podcastId: string) => {
+  return getAllArticles().find((article) => article.podcastId === podcastId);
+};
+
 export const getArticlesByIssue = (issueSlug: string) => {
   const issue = issues.find((i) => i.slug === issueSlug && i.published);
   if (!issue) return [];

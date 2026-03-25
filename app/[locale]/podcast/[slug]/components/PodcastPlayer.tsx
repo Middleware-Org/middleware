@@ -8,13 +8,12 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { toast } from "@/hooks/use-toast";
 import { getGitHubMediaUrl } from "@/lib/github/images";
 
-import type { Podcast, Issue } from "@/.velite";
+import type { Podcast } from "@/.velite";
 
 import { useAudioPlayer } from "./hooks/useAudioPlayer";
 import { usePodcastBookmarks } from "./hooks/usePodcastBookmarks";
 import { useTranscriptScroll } from "./hooks/useTranscriptScroll";
 import PlayerControls from "./PlayerControls";
-import PodcastHeader from "./PodcastHeader";
 import styles from "./PodcastPlayerStyles";
 import ProgressBar from "./ProgressBar";
 import Transcript from "./Transcript";
@@ -25,13 +24,12 @@ import type { Segment } from "./types";
  **************************************************/
 type PodcastPlayerProps = {
   podcast: Podcast;
-  issue?: Issue;
 };
 
 /* **************************************************
  * PodcastPlayer
  **************************************************/
-export default function PodcastPlayer({ podcast, issue }: PodcastPlayerProps) {
+export default function PodcastPlayer({ podcast }: PodcastPlayerProps) {
   const transcriptContainerRef = useRef<HTMLDivElement | null>(null);
   const transcriptContentInnerRef = useRef<HTMLDivElement | null>(null);
   const activeSegmentRef = useRef<HTMLDivElement | null>(null);
@@ -151,10 +149,8 @@ export default function PodcastPlayer({ podcast, issue }: PodcastPlayerProps) {
     <div className={styles.container}>
       <audio ref={audioRef} src={audioUrl} preload="metadata" />
 
-      {/* Top Grid: Header + Player */}
+      {/* Top Grid: Player */}
       <div className={styles.topGrid}>
-        <PodcastHeader podcast={podcast} issue={issue} />
-
         <ProgressBar
           currentTime={currentTime}
           totalTime={totalTime}

@@ -1,16 +1,27 @@
 /* **************************************************
  * Imports
  **************************************************/
+import { Book } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import FormattedDate from "@/components/atoms/date";
 import Separator from "@/components/atoms/separetor";
+import { H1, H2, MonoTextBold, MonoTextLight } from "@/components/atoms/typography";
 import PodcastCard from "@/components/molecules/podcastCard";
 import StructuredData from "@/components/StructuredData";
-import { getAllPodcasts, getPodcastBySlug, getIssueById } from "@/lib/content";
+import {
+  getAllPodcasts,
+  getArticleByPodcastId,
+  getAuthorById,
+  getPodcastBySlug,
+  getIssueById,
+} from "@/lib/content";
 import { getPodcastsByIssue } from "@/lib/content/podcasts";
 import { getGitHubImageUrl } from "@/lib/github/images";
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
+import { withLocale } from "@/lib/i18n/path";
 import { i18nSettings } from "@/lib/i18n/settings";
 import { getDictionary } from "@/lib/i18n/utils";
 import { getBaseUrl, createOpenGraphMetadata, createTwitterMetadata } from "@/lib/utils/metadata";
@@ -160,12 +171,65 @@ export default async function PodcastPage({ params }: PodcastPageProps) {
     return getPodcastsByIssue(issueData.slug).filter((p) => p.slug !== podcast.slug);
   })();
 
-  const commonDict = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
+  const relatedArticle = getArticleByPodcastId(podcast.id);
+  const relatedAuthor = relatedArticle ? getAuthorById(relatedArticle.authorId) : undefined;
+  const articleHref = relatedArticle
+    ? withLocale(`/articles/${relatedArticle.slug}`, locale)
+    : null;
+  const authorHref = relatedAuthor
+    ? withLocale(`/authors?author=${relatedAuthor.slug}`, locale)
+    : null;
+
+  const [commonDict, podcastDict] = await Promise.all([
+    getDictionary(locale, TRANSLATION_NAMESPACES.COMMON),
+    getDictionary(locale, TRANSLATION_NAMESPACES.PODCAST),
+  ]);
 
   return (
     <>
       <StructuredData id={`podcast-ld-${slug}`} data={getPodcastStructuredData(locale, slug)} />
-      <PodcastPlayer podcast={podcast} issue={issue} />
+      <header className="lg:px-10 md:px-4 px-4 lg:pt-10 py-[25px] w-full max-w-[1472px] mx-auto">
+        <div className="w-full flex flex-col">
+          <div className="flex gap-2.5 items-baseline">
+            <MonoTextLight className="border-b border-secondary lg:pb-2.5 lg:text-lg text-base mb-5">
+              {podcastDict.page.wordsBy}
+            </MonoTextLight>
+            {relatedAuthor ? (
+              <Link href={authorHref || "#"}>
+                <MonoTextBold className="lg:pb-2.5 lg:text-lg text-base mb-5">
+                  {relatedAuthor.name}
+                </MonoTextBold>
+              </Link>
+            ) : (
+              <MonoTextBold className="lg:pb-2.5 lg:text-lg text-base mb-5">
+                Middleware
+              </MonoTextBold>
+            )}
+          </div>
+          <H1>{podcast.title}</H1>
+        </div>
+        <Separator className="lg:mt-[30px] lg:mb-2.5 mt-2.5 mb-2.5" />
+        <div className="flex flex-row justify-between">
+          <span className="lg:text-[16px] text-[14px] flex items-center gap-2.5">
+            <FormattedDate date={podcast.date} lang="it" />
+          </span>
+          {relatedArticle && (
+            <Link href={articleHref || "#"} className="flex items-center gap-2 hover:underline">
+              <Book className="w-4 h-4" />
+              <MonoTextLight className="lg:text-[16px] text-[14px]">
+                {podcastDict.page.readArticle}
+              </MonoTextLight>
+            </Link>
+          )}
+        </div>
+        <Separator className="lg:mt-2.5 lg:mb-2.5 mt-2.5 mb-2.5" />
+      </header>
+      <section className="w-full flex flex-col max-w-[1472px] mx-auto lg:px-10 md:px-4 px-4 gap-5 pb-10">
+        <div className="w-full lg:max-w-[75%] max-w-full">
+          <H2 className="mb-[15px]">{podcast.description}</H2>
+        </div>
+      </section>
+      <PodcastPlayer podcast={podcast} />
       {relatedPodcasts.length > 0 && (
         <>
           <div className="max-w-[1472px] mx-auto lg:px-10 md:px-4 px-4">

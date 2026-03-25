@@ -13,7 +13,7 @@ const styles = {
     "px-0 md:px-8 lg:px-10 py-0 md:py-6 lg:py-8 gap-0 md:gap-6 lg:gap-6",
     "overflow-hidden",
   ),
-  topGrid: cn("grid grid-rows-[auto_auto_auto]", "gap-0 md:gap-0 lg:gap-6", "w-full", "relative"),
+  topGrid: cn("grid grid-rows-[auto_auto]", "gap-0 md:gap-0 lg:gap-6", "w-full", "relative"),
   transcriptToggleContainer: cn("flex items-center shrink-0", "md:hidden"),
   transcriptToggleButton: cn(
     "p-2! w-10! h-10! flex items-center justify-center",

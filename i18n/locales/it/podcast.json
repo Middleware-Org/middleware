@@ -5,6 +5,8 @@
   },
   "page": {
     "title": "Podcast",
-    "description": "Podcast"
+    "description": "Podcast",
+    "wordsBy": "Scritto da",
+    "readArticle": "Leggi articolo"
   }
 }
