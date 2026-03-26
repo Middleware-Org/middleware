@@ -6,15 +6,13 @@
 import { useEffect, useState, useCallback } from "react";
 
 import { toast } from "@/hooks/use-toast";
-import type {
-  PodcastBookmark} from "@/lib/storage/podcastBookmarks";
+import type { PodcastBookmark } from "@/lib/storage/podcastBookmarks";
 import {
   PODCAST_BOOKMARKS_UPDATED_EVENT,
   podcastBookmarksStorage,
 } from "@/lib/storage/podcastBookmarks";
 
 import type { Segment } from "../types";
-
 
 /* **************************************************
  * Types
@@ -29,6 +27,7 @@ type UsePodcastBookmarksReturn = {
   isLoading: boolean;
   addBookmark: (time: number) => Promise<boolean>; // Restituisce true se aggiunto, false se già esiste
   removeBookmark: (id: string) => Promise<void>;
+  getBookmarkInChunk: (time: number) => PodcastBookmark | null;
   hasBookmarkInChunk: (time: number) => boolean;
   refreshBookmarks: () => Promise<void>;
 };
@@ -93,20 +92,29 @@ export function usePodcastBookmarks({
     };
   }, [podcastSlug, refreshBookmarks]);
 
-  // Verifica se esiste un bookmark nello stesso chunk
-  const hasBookmarkInChunk = useCallback(
-    (time: number): boolean => {
-      // Trova il segmento/chunk corrispondente al tempo
+  // Restituisce il bookmark presente nello stesso chunk del tempo specificato
+  const getBookmarkInChunk = useCallback(
+    (time: number): PodcastBookmark | null => {
       const currentSegment = segments.find((s) => time >= s.start && time <= s.end);
 
       if (!currentSegment) {
-        return false;
+        return null;
       }
 
-      // Controlla se esiste già un bookmark nello stesso chunk
-      return bookmarks.some((b) => b.time >= currentSegment.start && b.time <= currentSegment.end);
+      return (
+        bookmarks.find((b) => b.time >= currentSegment.start && b.time <= currentSegment.end) ??
+        null
+      );
     },
     [bookmarks, segments],
+  );
+
+  // Verifica se esiste un bookmark nello stesso chunk
+  const hasBookmarkInChunk = useCallback(
+    (time: number): boolean => {
+      return getBookmarkInChunk(time) !== null;
+    },
+    [getBookmarkInChunk],
   );
 
   // Aggiunge un bookmark (solo se non esiste già nello stesso chunk)
@@ -171,6 +179,7 @@ export function usePodcastBookmarks({
     isLoading,
     addBookmark,
     removeBookmark,
+    getBookmarkInChunk,
     hasBookmarkInChunk,
     refreshBookmarks,
   };

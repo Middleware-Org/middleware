@@ -104,15 +104,23 @@ export default function PodcastPlayer({ podcast }: PodcastPlayerProps) {
   }, [podcast.audio_chunks]);
 
   // Usa il custom hook per gestire i bookmarks
-  const { bookmarks, addBookmark, removeBookmark, hasBookmarkInChunk } = usePodcastBookmarks({
-    podcastSlug: podcastId,
-    segments,
-  });
+  const { bookmarks, addBookmark, removeBookmark, getBookmarkInChunk, hasBookmarkInChunk } =
+    usePodcastBookmarks({
+      podcastSlug: podcastId,
+      segments,
+    });
 
   // Funzione per aggiungere segnaposto al tempo corrente
   const handleToggleBookmark = useCallback(async () => {
+    const existingBookmark = getBookmarkInChunk(currentTime);
+
+    if (existingBookmark) {
+      await removeBookmark(existingBookmark.id);
+      return;
+    }
+
     await addBookmark(currentTime);
-  }, [currentTime, addBookmark]);
+  }, [currentTime, getBookmarkInChunk, removeBookmark, addBookmark]);
 
   // Verifica se c'è un segnaposto nel chunk corrente (usando logica unificata)
   const hasBookmarkAtCurrentTime = hasBookmarkInChunk(currentTime);
