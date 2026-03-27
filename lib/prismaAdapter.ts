@@ -7,10 +7,5 @@ export function createPrismaAdapter() {
     throw new Error("MIDDLEWARE_PRISMA_DATABASE_URL is required");
   }
 
-  const protocol = new URL(connectionString).protocol;
-  if (protocol !== "postgres:" && protocol !== "postgresql:") {
-    throw new Error("MIDDLEWARE_PRISMA_DATABASE_URL must use postgres:// or postgresql://");
-  }
-
   return new PrismaPg({ connectionString });
 }
