@@ -105,7 +105,9 @@ export default function Article({
       </header>
       <section className="w-full flex flex-col max-w-[1472px] mx-auto lg:px-10 md:px-4 px-4 gap-5 pb-10">
         <div className={cn("w-full lg:max-w-[75%] max-w-full")}>
-          <H2 className="text-[20px] mb-[15px]">{article.excerpt}</H2>
+          <H2 className="lg:text-[32px]! md:text-[28px]! text-[20px]! mb-[15px]">
+            {article.excerpt}
+          </H2>
         </div>
         <div className="lg:hidden md:flex flex w-full mb-4">
           <Separator />
