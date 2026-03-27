@@ -55,6 +55,7 @@ export default function Cover({
             alt={`Copertina del numero ${issue.title} di Middleware${issue.description ? ` - ${issue.description}` : ""}`}
             width={IMAGE_WIDTH}
             height={IMAGE_HEIGHT}
+            sizes="(max-width: 768px) 100vw, 50vw"
             className={styles.image}
             priority={imagePriority}
           />

@@ -132,8 +132,7 @@ function getPodcastStructuredData(locale: string, slug: string) {
   return [podcastSchema, breadcrumbSchema];
 }
 
-// Enable Incremental Static Regeneration (ISR) - revalidate every hour
-export const revalidate = 3600;
+export const dynamicParams = false;
 
 /* **************************************************
  * Generate Static Params
@@ -218,7 +217,7 @@ export default async function PodcastPage({ params }: PodcastPageProps) {
         <Separator className="lg:mt-[30px] lg:mb-2.5 mt-2.5 mb-2.5" />
         <div className="flex flex-row justify-between">
           <span className="lg:text-[16px] text-[14px] flex items-center gap-2.5">
-            <FormattedDate date={podcast.date} lang="it" />
+            <FormattedDate date={podcast.date} lang={locale} />
           </span>
           {relatedArticle && (
             <Link href={articleHref || "#"} className="flex items-center gap-2 hover:underline">
@@ -251,7 +250,7 @@ export default async function PodcastPage({ params }: PodcastPageProps) {
       </header>
       <section className="w-full flex flex-col max-w-[1472px] mx-auto lg:px-10 md:px-4 px-4 gap-5 pb-10">
         <div className="w-full lg:max-w-[75%] max-w-full">
-          <H2 className="text-[20px]! mb-[15px]">{podcast.description}</H2>
+          <H2 className="text-[20px] mb-[15px]">{podcast.description}</H2>
         </div>
       </section>
       <PodcastPlayer podcast={podcast} />
