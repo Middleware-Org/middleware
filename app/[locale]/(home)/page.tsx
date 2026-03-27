@@ -41,7 +41,7 @@ export default async function RootPage({ params }: RootPageProps) {
 
   return (
     <div className={styles.container}>
-      {issues.map((issue) => {
+      {issues.map((issue, index) => {
         const articles = getArticlesByIssue(issue.slug);
 
         if (articles.length === 0) return null;
@@ -79,6 +79,7 @@ export default async function RootPage({ params }: RootPageProps) {
                 dict={dict}
                 locale={locale}
                 articleInEvidenceOrderNumber={orderByArticleId?.[articleInEvidence.id]}
+                imagePriority={index === 0}
               />
             </div>
             <div className={styles.issueArticlesContainer}>

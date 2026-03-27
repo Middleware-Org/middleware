@@ -24,6 +24,7 @@ type CoverProps = {
   dict: Pick<CommonDictionary, "articleCard">;
   locale: string;
   articleInEvidenceOrderNumber?: number;
+  imagePriority?: boolean;
 };
 
 /* **************************************************
@@ -41,6 +42,7 @@ export default function Cover({
   dict,
   locale,
   articleInEvidenceOrderNumber,
+  imagePriority = false,
 }: CoverProps) {
   const issueHref = withLocale(`/issues/${issue.slug}`, locale);
 
@@ -54,7 +56,7 @@ export default function Cover({
             width={IMAGE_WIDTH}
             height={IMAGE_HEIGHT}
             className={styles.image}
-            priority
+            priority={imagePriority}
           />
           <div className={styles.badgesWrapper}>
             <div className={styles.badgeDate}>

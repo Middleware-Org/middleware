@@ -28,7 +28,7 @@ export default function Pictogram({ className, size = 48 }: PictogramProps) {
   return (
     <Link href={toLocale("/")}>
       <span className={cn(styles.pictogram, className ?? "")}>
-        <Image src="/logo.svg" alt="Middleware" width={size} height={size} priority />
+        <Image src="/logo.svg" alt="Middleware" width={size} height={size} />
       </span>
     </Link>
   );

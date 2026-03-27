@@ -35,19 +35,7 @@ export default function IssuesDropdown({ issues, className }: IssuesDropdownProp
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const activeIssue = useActiveIssue(issues);
-  const [selectedIssue, setSelectedIssue] = useState<Issue | null>(() => {
-    return activeIssue || (issues.length > 0 ? issues[0] : null);
-  });
-
-  useEffect(() => {
-    if (activeIssue && activeIssue.slug !== selectedIssue?.slug) {
-      setTimeout(() => {
-        setSelectedIssue(activeIssue);
-      }, 100);
-    }
-  }, [activeIssue, selectedIssue]);
-
-  const displayIssue = selectedIssue || activeIssue;
+  const displayIssue = activeIssue || issues[0] || null;
 
   /* **************************************************
    * Effects

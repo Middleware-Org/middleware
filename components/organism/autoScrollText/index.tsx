@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useAnimation } from "framer-motion";
-import type { ReactNode} from "react";
+import type { ReactNode } from "react";
 import React, { useEffect, useRef } from "react";
 
 type AutoScrollTextProps = {
@@ -24,9 +24,21 @@ const AutoScrollText: React.FC<AutoScrollTextProps> = ({
   const controls = useAnimation();
 
   useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
     const container = containerRef.current;
     const content = textRef.current;
     if (!container || !content) return;
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const isMobileViewport = window.matchMedia("(max-width: 767px)").matches;
+
+    if (prefersReducedMotion || isMobileViewport) {
+      controls.set({ x: 0 });
+      return;
+    }
 
     const distance = content.scrollWidth - container.clientWidth;
 
@@ -41,6 +53,11 @@ const AutoScrollText: React.FC<AutoScrollTextProps> = ({
 
     const runLoop = async () => {
       while (!isCancelled) {
+        if (document.hidden) {
+          await delay(250);
+          continue;
+        }
+
         await controls.start({ x: 0, transition: { duration: 0 } });
         await delay(pause * 1000);
         if (isCancelled) break;
