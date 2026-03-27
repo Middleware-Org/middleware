@@ -3,7 +3,7 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import Button from "@/components/atoms/button";
 import { MonoTextLight } from "@/components/atoms/typography";
@@ -22,10 +22,13 @@ import styles from "./styles";
 type ArticlesProps = {
   articles: Article[];
   issue: Issue;
+  locale: string;
   disableShowArticles?: boolean;
   dict: Pick<CommonDictionary, "articleCard" | "lists">;
   orderByArticleId?: Record<string, number>;
 };
+
+const MOBILE_MEDIA_QUERY = "(max-width: 767px)";
 
 /* **************************************************
  * Articles
@@ -34,10 +37,27 @@ export default function Articles({
   articles,
   dict,
   issue,
+  locale,
   disableShowArticles,
   orderByArticleId,
 }: ArticlesProps) {
   const [showArticles, setShowArticles] = useState(false);
+  const [isMobileViewport, setIsMobileViewport] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(MOBILE_MEDIA_QUERY);
+
+    const updateViewport = () => {
+      setIsMobileViewport(mediaQuery.matches);
+    };
+
+    updateViewport();
+
+    mediaQuery.addEventListener("change", updateViewport);
+    return () => {
+      mediaQuery.removeEventListener("change", updateViewport);
+    };
+  }, []);
 
   /* **************************************************
    * Handlers
@@ -46,25 +66,31 @@ export default function Articles({
     setShowArticles(!showArticles);
   };
 
+  const shouldRenderDesktopList = isMobileViewport !== true;
+  const shouldRenderMobileList = isMobileViewport === true && (showArticles || disableShowArticles);
+
   /* **************************************************
    * Render
    **************************************************/
   return (
     <>
-      <div className={styles.desktop}>
-        <div className={styles.grid}>
-          {articles.map((article) => (
-            <ArticleCard
-              key={article.slug}
-              article={article}
-              dict={dict}
-              orderNumber={orderByArticleId?.[article.id]}
-            />
-          ))}
+      {shouldRenderDesktopList && (
+        <div className={styles.desktop}>
+          <div className={styles.grid}>
+            {articles.map((article) => (
+              <ArticleCard
+                key={article.slug}
+                article={article}
+                dict={dict}
+                locale={locale}
+                orderNumber={orderByArticleId?.[article.id]}
+              />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
-      {(showArticles || disableShowArticles) && (
+      {shouldRenderMobileList && (
         <div
           className={cn(
             styles.mobile,
@@ -77,6 +103,7 @@ export default function Articles({
                 key={article.slug}
                 article={article}
                 dict={dict}
+                locale={locale}
                 orderNumber={orderByArticleId?.[article.id]}
               />
             ))}
@@ -84,7 +111,7 @@ export default function Articles({
         </div>
       )}
 
-      {!disableShowArticles && (
+      {!disableShowArticles && isMobileViewport === true && (
         <div
           className={showArticles ? styles.buttonContainerOpen : styles.buttonContainer}
           style={{

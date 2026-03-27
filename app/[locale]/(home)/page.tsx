@@ -86,6 +86,7 @@ export default async function RootPage({ params }: RootPageProps) {
                 articles={otherArticles}
                 dict={dict}
                 issue={issue}
+                locale={locale}
                 disableShowArticles={false}
                 orderByArticleId={orderByArticleId}
               />

@@ -66,6 +66,7 @@ export default async function AuthorsPage({ params }: AuthorsPageProps) {
               dictCommon={dictCommon}
               dictAuthors={dictAuthors}
               isLastAuthor={index === authors.length - 1}
+              locale={locale}
             />
           ))}
         </div>

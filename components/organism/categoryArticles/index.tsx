@@ -27,6 +27,7 @@ type CategoryArticlesProps = {
   dictCommon: Pick<CommonDictionary, "articleCard">;
   dictCategories: Pick<CategoriesDictionary, "page">;
   category: Category;
+  locale: string;
 };
 
 /* **************************************************
@@ -37,6 +38,7 @@ export default function CategoryArticles({
   dictCommon,
   dictCategories,
   category,
+  locale,
 }: CategoryArticlesProps) {
   const [showAllArticles, setShowAllArticles] = useState(false);
 
@@ -52,7 +54,7 @@ export default function CategoryArticles({
       {/* Articles grid */}
       <div className={styles.grid}>
         {visibleArticles.map((article) => (
-          <ArticleCard key={article.slug} article={article} dict={dictCommon} />
+          <ArticleCard key={article.slug} article={article} dict={dictCommon} locale={locale} />
         ))}
       </div>
 

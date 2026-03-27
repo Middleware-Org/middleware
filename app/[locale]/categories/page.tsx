@@ -62,6 +62,7 @@ export default async function CategoriesPage({ params }: CategoriesPageProps) {
               dictCommon={dictCommon}
               dictCategories={dictCategories}
               isLastCategory={index === categories.length - 1}
+              locale={locale}
             />
           ))}
         </div>

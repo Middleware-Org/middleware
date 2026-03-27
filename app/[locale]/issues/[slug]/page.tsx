@@ -153,6 +153,7 @@ export default async function IssuePage({ params }: IssuePageProps) {
               articles={otherArticles}
               dict={dict}
               issue={issue}
+              locale={locale}
               disableShowArticles={true}
               orderByArticleId={orderByArticleId}
             />

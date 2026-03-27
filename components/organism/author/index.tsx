@@ -9,7 +9,6 @@ import type { AuthorsDictionary, CommonDictionary } from "@/lib/i18n/types";
 
 import type { Author } from "@/.velite";
 
-
 import AuthorArticles from "../authorArticles";
 import styles from "./styles";
 
@@ -21,6 +20,7 @@ type AuthorProps = {
   dictCommon: Pick<CommonDictionary, "articleCard">;
   dictAuthors: Pick<AuthorsDictionary, "page">;
   isLastAuthor: boolean;
+  locale: string;
 };
 
 /* **************************************************
@@ -31,6 +31,7 @@ export default async function Author({
   dictCommon,
   dictAuthors,
   isLastAuthor,
+  locale,
 }: AuthorProps) {
   const articles = getArticlesByAuthorSlug(author.slug);
 
@@ -55,6 +56,7 @@ export default async function Author({
         dictCommon={dictCommon}
         dictAuthors={dictAuthors}
         author={author}
+        locale={locale}
       />
 
       {/* Bottom separator */}

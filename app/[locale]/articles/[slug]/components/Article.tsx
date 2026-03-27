@@ -230,7 +230,12 @@ export default function Article({ article, dict, commonDict, locale }: ArticlePr
           <section className="max-w-[1472px] mx-auto lg:px-10 md:px-4 px-4 pb-0 pt-5">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {relatedArticles.map((relatedArticle) => (
-                <ArticleCard key={relatedArticle.slug} article={relatedArticle} dict={commonDict} />
+                <ArticleCard
+                  key={relatedArticle.slug}
+                  article={relatedArticle}
+                  dict={commonDict}
+                  locale={locale}
+                />
               ))}
             </div>
           </section>

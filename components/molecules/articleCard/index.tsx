@@ -4,7 +4,6 @@
  * Imports
  **************************************************/
 import Link from "next/link";
-import { useParams } from "next/navigation";
 
 import Separator from "@/components/atoms/separetor";
 import { H3, MonoTextBold, MonoTextLight, SerifText } from "@/components/atoms/typography";
@@ -16,14 +15,13 @@ import type { Article } from "@/.velite";
 
 import styles from "./styles";
 
-
-
 /* **************************************************
  * Types
  **************************************************/
 type ArticleCardProps = {
   article: Article;
   dict: Pick<CommonDictionary, "articleCard">;
+  locale: string;
   isPodcast?: boolean;
   orderNumber?: number;
 };
@@ -34,11 +32,10 @@ type ArticleCardProps = {
 export default function ArticleCard({
   article,
   dict,
+  locale,
   isPodcast = false,
   orderNumber,
 }: ArticleCardProps) {
-  const { locale = "it" } = useParams() as { locale: "it" };
-
   const author = getAuthorById(article.authorId);
   const category = getCategoryById(article.categoryId);
 

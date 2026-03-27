@@ -9,7 +9,6 @@ import type { CategoriesDictionary, CommonDictionary } from "@/lib/i18n/types";
 
 import type { Category } from "@/.velite";
 
-
 import CategoryArticles from "../categoryArticles";
 import styles from "./styles";
 
@@ -21,6 +20,7 @@ type CategoryProps = {
   dictCommon: Pick<CommonDictionary, "articleCard">;
   dictCategories: Pick<CategoriesDictionary, "page">;
   isLastCategory: boolean;
+  locale: string;
 };
 
 /* **************************************************
@@ -31,6 +31,7 @@ export default async function Category({
   dictCommon,
   dictCategories,
   isLastCategory,
+  locale,
 }: CategoryProps) {
   const articles = getArticlesByCategorySlug(category.slug);
 
@@ -55,6 +56,7 @@ export default async function Category({
         dictCommon={dictCommon}
         dictCategories={dictCategories}
         category={category}
+        locale={locale}
       />
 
       {/* Bottom separator */}

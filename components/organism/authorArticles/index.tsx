@@ -27,6 +27,7 @@ type AuthorArticlesProps = {
   dictCommon: Pick<CommonDictionary, "articleCard">;
   dictAuthors: Pick<AuthorsDictionary, "page">;
   author: Author;
+  locale: string;
 };
 
 /* **************************************************
@@ -37,6 +38,7 @@ export default function AuthorArticles({
   dictCommon,
   dictAuthors,
   author,
+  locale,
 }: AuthorArticlesProps) {
   const [showAllArticles, setShowAllArticles] = useState(false);
 
@@ -52,7 +54,7 @@ export default function AuthorArticles({
       {/* Articles grid */}
       <div className={styles.grid}>
         {visibleArticles.map((article) => (
-          <ArticleCard key={article.slug} article={article} dict={dictCommon} />
+          <ArticleCard key={article.slug} article={article} dict={dictCommon} locale={locale} />
         ))}
       </div>
 
