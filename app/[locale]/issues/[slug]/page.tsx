@@ -7,18 +7,14 @@ import { notFound } from "next/navigation";
 import ArticleInEvidenceCard from "@/components/molecules/articleInEvidenceCard";
 import Articles from "@/components/molecules/articles";
 import { getArticlesByIssue, getIssueBySlug, getAllIssues } from "@/lib/content";
+import { splitArticlesByEvidence } from "@/lib/content/articles";
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import { i18nSettings } from "@/lib/i18n/settings";
 import { getDictionary } from "@/lib/i18n/utils";
 import { cn } from "@/lib/utils/classes";
 import { getBaseUrl } from "@/lib/utils/metadata";
 
-import type { Article } from "@/.velite";
-
 import IssueCover from "./components/IssueCover";
-
-// Enable Incremental Static Regeneration (ISR) - revalidate every hour
-export const revalidate = 3600;
 
 /* **************************************************
  * Types
@@ -104,17 +100,7 @@ export default async function IssuePage({ params }: IssuePageProps) {
 
   const issue = getIssueBySlug(slug);
   const articles = getArticlesByIssue(slug);
-  const { articleInEvidence, otherArticles } = articles.reduce(
-    (acc, article) => {
-      if (article.in_evidence && !acc.articleInEvidence) {
-        acc.articleInEvidence = article;
-      } else {
-        acc.otherArticles.push(article);
-      }
-      return acc;
-    },
-    { articleInEvidence: undefined as Article | undefined, otherArticles: [] as Article[] },
-  );
+  const { articleInEvidence, otherArticles } = splitArticlesByEvidence(articles);
 
   if (!articleInEvidence || !issue) {
     notFound();
@@ -143,7 +129,7 @@ export default async function IssuePage({ params }: IssuePageProps) {
               article={articleInEvidence}
               dict={dict}
               issue={issue}
-              locale={locale as "it" | "en"}
+              locale={locale}
               disableBadges={true}
               orderNumber={orderByArticleId?.[articleInEvidence.id]}
             />

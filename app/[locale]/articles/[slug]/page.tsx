@@ -139,14 +139,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
     title: article.title,
     description: optimizedDescription,
     authors: author ? [{ name: author.name }] : [{ name: "Middleware" }],
-    keywords: [
-      "tecnologia",
-      "innovazione",
-      "digitale",
-      ...(category ? [category.name] : []),
-      ...(author ? [author.name] : []),
-      ...article.title.split(" ").slice(0, 3),
-    ].join(", "),
+    keywords: [category?.name, author?.name].filter(Boolean).join(", "),
     openGraph: {
       title: article.title,
       description: optimizedDescription,
@@ -182,6 +175,8 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
     },
   };
 }
+
+export const dynamicParams = false;
 
 // Generate static params for all articles at build time
 export async function generateStaticParams() {

@@ -5,11 +5,10 @@
 import Articles from "@/components/molecules/articles";
 import Cover from "@/components/organism/cover";
 import { getAllIssues, getArticlesByIssue } from "@/lib/content";
+import { splitArticlesByEvidence } from "@/lib/content/articles";
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import { getDictionary } from "@/lib/i18n/utils";
 import { cn } from "@/lib/utils/classes";
-
-import type { Article } from "@/.velite";
 
 /* **************************************************
  * Types
@@ -46,22 +45,7 @@ export default async function RootPage({ params }: RootPageProps) {
 
         if (articles.length === 0) return null;
 
-        let { articleInEvidence, otherArticles } = articles.reduce(
-          (acc, article) => {
-            if (article.in_evidence && !acc.articleInEvidence) {
-              acc.articleInEvidence = article;
-            } else {
-              acc.otherArticles.push(article);
-            }
-            return acc;
-          },
-          { articleInEvidence: undefined as Article | undefined, otherArticles: [] as Article[] },
-        );
-
-        if (!articleInEvidence) {
-          articleInEvidence = otherArticles[0];
-          otherArticles = otherArticles.slice(1);
-        }
+        const { articleInEvidence, otherArticles } = splitArticlesByEvidence(articles);
 
         const orderByArticleId = issue.showOrder
           ? (issue.articlesOrder || []).reduce<Record<string, number>>((acc, articleId, index) => {

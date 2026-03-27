@@ -36,6 +36,17 @@ export const getArticlesByIssue = (issueSlug: string) => {
   return [...ordered, ...unordered];
 };
 
+export function splitArticlesByEvidence(articleList: typeof articles) {
+  const evidenceIndex = articleList.findIndex((a) => a.in_evidence);
+  if (evidenceIndex === -1) {
+    return { articleInEvidence: articleList[0], otherArticles: articleList.slice(1) };
+  }
+  return {
+    articleInEvidence: articleList[evidenceIndex],
+    otherArticles: articleList.filter((_, i) => i !== evidenceIndex),
+  };
+}
+
 export const getArticlesByCategorySlug = (categorySlug: string) => {
   const category = categories.find((c) => c.slug === categorySlug);
   if (!category) return [];

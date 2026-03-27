@@ -16,7 +16,8 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
 
     // Extract parameters from URL
-    const title = searchParams.get("title") || "Middleware";
+    const rawTitle = searchParams.get("title") || "Middleware";
+    const title = rawTitle.length > 80 ? rawTitle.slice(0, 79) + "…" : rawTitle;
     const author = searchParams.get("author");
     const category = searchParams.get("category");
     const issueColor = searchParams.get("color") || "#c2081c";

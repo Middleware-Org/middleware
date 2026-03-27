@@ -57,7 +57,7 @@ export default async function PodcastsLayout({ children, params }: PodcastsLayou
         </AutoScrollText>
       </Header>
       <Menu dict={dict} />
-      <main id="main-content" className="w-full" tabIndex={-1}>
+      <main id="main-content" className="w-full">
         {children}
       </main>
       <Footer dict={dict} />

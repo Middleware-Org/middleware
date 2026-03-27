@@ -2,6 +2,7 @@
  * Imports
  **************************************************/
 import { getAllIssues, getArticlesByIssue } from "@/lib/content";
+import { HEADER_HEIGHT } from "@/lib/constants/layout";
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import { getDictionary } from "@/lib/i18n/utils";
 import { cn } from "@/lib/utils/classes";
@@ -33,7 +34,7 @@ export default async function ArchivePage({ params }: ArchivePageProps) {
 
   return (
     <div className={styles.wrapper}>
-      <ArchiveScrollWrapper stickyOffset={155}>
+      <ArchiveScrollWrapper stickyOffset={HEADER_HEIGHT.desktop}>
         {issues.map((issue, index) => {
           const articles = getArticlesByIssue(issue.slug);
 

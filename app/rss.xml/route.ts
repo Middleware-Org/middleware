@@ -5,9 +5,11 @@
 import { getAllArticles, getAllPodcasts } from "@/lib/content";
 import { getAuthorById } from "@/lib/content/authors";
 import { getCategoryById } from "@/lib/content/categories";
+import { i18nSettings } from "@/lib/i18n/settings";
 
 export async function GET() {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://middleware.media";
+  const locale = i18nSettings.defaultLocale;
   const articles = getAllArticles();
   const podcasts = getAllPodcasts();
 
@@ -17,7 +19,7 @@ export async function GET() {
       type: "article" as const,
       title: article.title,
       description: article.excerpt,
-      url: `${baseUrl}/it/articles/${article.slug}`,
+      url: `${baseUrl}/${locale}/articles/${article.slug}`,
       date: new Date(article.date),
       author: getAuthorById(article.authorId)?.name || "Middleware",
       category: getCategoryById(article.categoryId)?.name || "Tecnologia",
@@ -26,7 +28,7 @@ export async function GET() {
       type: "podcast" as const,
       title: podcast.title,
       description: podcast.description,
-      url: `${baseUrl}/it/podcast/${podcast.slug}`,
+      url: `${baseUrl}/${locale}/podcast/${podcast.slug}`,
       date: new Date(podcast.date),
       author: "Middleware",
       category: "Podcast",

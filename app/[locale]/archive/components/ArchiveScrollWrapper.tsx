@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import HorizontalScroll from "@/components/molecules/HorizontalScroll";
+import { HEADER_HEIGHT } from "@/lib/constants/layout";
 import { cn } from "@/lib/utils/classes";
 
 type ArchiveScrollWrapperProps = {
@@ -14,21 +15,23 @@ type ArchiveScrollWrapperProps = {
 
 export default function ArchiveScrollWrapper({
   children,
-  stickyOffset = 155,
+  stickyOffset = HEADER_HEIGHT.desktop,
   className,
   innerClassName,
 }: ArchiveScrollWrapperProps) {
-  const [isDesktop, setIsDesktop] = useState(true);
+  const [isDesktop, setIsDesktop] = useState(() => {
+    if (typeof window === "undefined") return true;
+    return window.innerWidth >= 1024;
+  });
+
+  const checkScreenSize = useCallback(() => {
+    setIsDesktop(window.innerWidth >= 1024); // lg breakpoint
+  }, []);
 
   useEffect(() => {
-    function checkScreenSize() {
-      setIsDesktop(window.innerWidth >= 1024); // lg breakpoint
-    }
-
-    checkScreenSize();
     window.addEventListener("resize", checkScreenSize);
     return () => window.removeEventListener("resize", checkScreenSize);
-  }, []);
+  }, [checkScreenSize]);
 
   return (
     <HorizontalScroll

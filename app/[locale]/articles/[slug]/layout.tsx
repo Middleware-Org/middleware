@@ -55,7 +55,7 @@ export default async function ArticleLayout({ children, params }: ArticleLayoutP
         </AutoScrollText>
       </Header>
       <Menu dict={dict} />
-      <main id="main-content" className="w-full" tabIndex={-1}>
+      <main id="main-content" className="w-full">
         {children}
       </main>
       <Footer dict={dict} />
