@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils/classes";
  **************************************************/
 interface FormattedDateProps {
   date: string;
-  lang?: "it" | "en";
+  lang?: string;
   className?: string;
 }
 

@@ -62,7 +62,7 @@ export default function Cover({
             <div className={styles.badgeDate}>
               <FormattedDate
                 date={issue.date}
-                lang={locale as "it"}
+                lang={locale}
                 className={styles.badgeTextDate}
               />
             </div>
@@ -79,7 +79,7 @@ export default function Cover({
               article={articleInEvidence}
               dict={dict}
               issue={issue}
-              locale={locale as "it" | "en"}
+              locale={locale}
               orderNumber={articleInEvidenceOrderNumber}
             />
           )}

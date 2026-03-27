@@ -25,7 +25,7 @@ type ArticleInEvidenceCardProps = {
   article: Article;
   issue: Issue;
   dict: Pick<CommonDictionary, "articleCard">;
-  locale: "it" | "en";
+  locale: string;
   disableBadges?: boolean;
   orderNumber?: number;
 };

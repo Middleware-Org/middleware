@@ -5,11 +5,9 @@ import Footer from "@/components/organism/footer";
 import Header from "@/components/organism/header";
 import IssuesDropdown from "@/components/organism/issuesDropDown";
 import Menu from "@/components/organism/menu";
-import "@/globals.css";
 import { getAllIssues } from "@/lib/content";
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import { getDictionary } from "@/lib/i18n/utils";
-import { getBaseUrl, createOpenGraphMetadata, createTwitterMetadata } from "@/lib/utils/metadata";
 
 /* **************************************************
  * Types
@@ -17,39 +15,6 @@ import { getBaseUrl, createOpenGraphMetadata, createTwitterMetadata } from "@/li
 interface HomeLayoutProps {
   params: Promise<{ locale: string }>;
   children: React.ReactNode;
-}
-
-/* **************************************************
- * Metadata
- **************************************************/
-export async function generateMetadata({ params }: HomeLayoutProps) {
-  const { locale } = await params;
-
-  const dict = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
-  const meta = dict.meta;
-
-  const url = `${getBaseUrl()}/${locale}`;
-
-  return {
-    title: meta.title,
-    description: meta.description,
-    alternates: {
-      canonical: url,
-      languages: {
-        [locale]: `/${locale}`,
-      },
-    },
-    openGraph: createOpenGraphMetadata({
-      title: meta.title,
-      description: meta.description,
-      url,
-      type: "website",
-    }),
-    twitter: createTwitterMetadata({
-      title: meta.title,
-      description: meta.description,
-    }),
-  };
 }
 
 /* **************************************************

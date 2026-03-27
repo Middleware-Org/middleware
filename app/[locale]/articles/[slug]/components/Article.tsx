@@ -1,7 +1,5 @@
 import { Book, Play } from "lucide-react";
-import { marked } from "marked";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 
 import FormattedDate from "@/components/atoms/date";
 import Separator from "@/components/atoms/separetor";
@@ -9,135 +7,46 @@ import { H1, H2, MonoTextBold, MonoTextLight } from "@/components/atoms/typograp
 import ArticleCard from "@/components/molecules/articleCard";
 import SeparatorWithLogo from "@/components/molecules/SeparatorWithLogo";
 import { getArticlesByIssue } from "@/lib/content/articles";
-import { getAuthorById } from "@/lib/content/authors";
-import { getCategoryById } from "@/lib/content/categories";
-import { getIssueById } from "@/lib/content/issues";
 import { getPodcastById } from "@/lib/content/podcasts";
 import { withLocale } from "@/lib/i18n/path";
 import type { ArticleDictionary, CommonDictionary } from "@/lib/i18n/types";
-import { sanitizeInlineHtml, sanitizeRichHtml } from "@/lib/security/sanitizeHtml";
 import { cn } from "@/lib/utils/classes";
+import { processCitations } from "@/lib/utils/citations";
 import { getMinText } from "@/lib/utils/text";
 
-import type { Article } from "@/.velite";
+import type { Article, Author, Category, Issue } from "@/.velite";
 
 import BookmarkManagerLazy from "./BookmarkManagerLazy";
 import CitationsSection from "./CitationsSection";
 
+/* **************************************************
+ * Types
+ **************************************************/
 type ArticleProps = {
   article: Article;
+  author: Author;
+  category: Category;
+  issue: Issue | undefined;
   dict: Pick<ArticleDictionary, "page">;
   commonDict: Pick<CommonDictionary, "articleCard">;
   locale: string;
 };
 
-export default function Article({ article, dict, commonDict, locale }: ArticleProps) {
-  const author = getAuthorById(article.authorId);
-  const category = getCategoryById(article.categoryId);
-
+/* **************************************************
+ * Article
+ **************************************************/
+export default function Article({ article, author, category, issue, dict, commonDict, locale }: ArticleProps) {
   const readingTime = getMinText(article.content);
-
-  if (!author || !category) {
-    notFound();
-  }
-
-  // Estrai e processa le citazioni dal contenuto (può essere markdown o HTML già processato)
-  const processCitations = (content: string) => {
-    const citations: Array<{ id: string; text: string; index: number }> = [];
-    const citationOrder: string[] = [];
-    const citationData = new Map<string, string>();
-
-    // Prima passata: estrai tutte le citazioni nell'ordine in cui appaiono
-    // Formato: [citation:ID:text] o [citation-ID] (formato vecchio)
-    const citationRegex = /\[citation:([^:]+):([^\]]+)\]/g;
-    let match;
-
-    while ((match = citationRegex.exec(content)) !== null) {
-      const citationId = match[1];
-      // Decodifica il testo (gestisce i due punti escapati)
-      const citationText = match[2].replace(/\\:/g, ":");
-
-      if (citationId && citationText && !citationOrder.includes(citationId)) {
-        citationOrder.push(citationId);
-        citationData.set(citationId, citationText);
-      }
-    }
-
-    // Supporta anche il formato vecchio [citation-ID]
-    const oldCitationRegex = /\[citation-([^\]]+)\]/g;
-    while ((match = oldCitationRegex.exec(content)) !== null) {
-      const citationId = match[1];
-      if (citationId && !citationOrder.includes(citationId)) {
-        citationOrder.push(citationId);
-        citationData.set(citationId, ""); // Formato vecchio senza testo
-      }
-    }
-
-    // Crea l'array delle citazioni con gli indici corretti
-    citationOrder.forEach((citationId, index) => {
-      const text = citationData.get(citationId) || "";
-      if (text || citationId) {
-        citations.push({
-          id: citationId,
-          text: sanitizeInlineHtml(text),
-          index: index + 1,
-        });
-      }
-    });
-
-    // Sostituisci le citazioni con link cliccabili
-    let processedContent = content;
-    let currentIndex = 0;
-    const indexMap = new Map<string, number>();
-
-    // Sostituisci formato nuovo [citation:ID:text]
-    processedContent = processedContent.replace(
-      /\[citation:([^:]+):([^\]]+)\]/g,
-      (match, citationId) => {
-        if (!indexMap.has(citationId)) {
-          currentIndex++;
-          indexMap.set(citationId, currentIndex);
-        }
-        const index = indexMap.get(citationId) || 1;
-        return `<a id="cit-${index}" href="#citation-${index}" class="citation-link inline text-tertiary hover:text-tertiary/80 transition-colors cursor-pointer" style="font-size: 0.7em; vertical-align: super; text-decoration: none;">${index}</a>`;
-      },
-    );
-
-    // Sostituisci formato vecchio [citation-ID]
-    processedContent = processedContent.replace(/\[citation-([^\]]+)\]/g, (match, citationId) => {
-      if (!indexMap.has(citationId)) {
-        currentIndex++;
-        indexMap.set(citationId, currentIndex);
-      }
-      const index = indexMap.get(citationId) || 1;
-      return `<a href="#citation-${index}" class="citation-link inline text-tertiary hover:text-tertiary/80 transition-colors cursor-pointer" style="font-size: 0.7em; vertical-align: super; text-decoration: none;">${index}</a>`;
-    });
-
-    // Se il contenuto non sembra essere HTML già processato, convertilo da markdown
-    let processedHtml = processedContent;
-    if (!processedContent.includes("<p>") && !processedContent.includes("<h")) {
-      // Sembra essere ancora markdown, convertilo
-      processedHtml = marked.parse(processedContent, { breaks: true }) as string;
-    }
-
-    return {
-      processedHtml: sanitizeRichHtml(processedHtml),
-      citations,
-    };
-  };
 
   const { processedHtml, citations } = processCitations(article.content);
 
-  // Check if there's a related podcast
   const relatedPodcast = article.podcastId ? getPodcastById(article.podcastId) : null;
 
-  // Get other articles from the same issue
   const relatedArticles = (() => {
-    if (!article.issueId) return [];
-    const issue = getIssueById(article.issueId);
     if (!issue) return [];
     return getArticlesByIssue(issue.slug).filter((a) => a.slug !== article.slug);
   })();
+
   const authorHref = withLocale(`/authors?author=${author.slug}`, locale);
   const categoryHref = withLocale(`/categories?category=${category.slug}`, locale);
   const podcastHref = relatedPodcast ? withLocale(`/podcast/${relatedPodcast.slug}`, locale) : null;
@@ -161,7 +70,7 @@ export default function Article({ article, dict, commonDict, locale }: ArticlePr
         <Separator className="lg:mt-[30px] lg:mb-2.5 mt-2.5 mb-2.5" />
         <div className="flex flex-row justify-between">
           <span className="lg:text-[16px] text-[14px] flex items-center gap-2.5">
-            <FormattedDate date={article.date} lang="it" />
+            <FormattedDate date={article.date} lang={locale} />
           </span>
           {relatedPodcast && (
             <Link href={podcastHref || "#"} className="flex items-center gap-2 hover:underline">

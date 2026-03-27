@@ -11,101 +11,38 @@ import { i18nSettings } from "@/lib/i18n/settings";
 import { getDictionary } from "@/lib/i18n/utils";
 import { getBaseUrl } from "@/lib/utils/metadata";
 
+import type { Article as ArticleType, Author, Category, Issue } from "@/.velite";
+
 import Article from "./components/Article";
-
-
 
 interface ArticlePageProps {
   params: Promise<{ locale: string; slug: string }>;
 }
 
-// Generate metadata for SEO
-export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
-  const { locale, slug } = await params;
+type ResolvedArticleData = {
+  article: ArticleType;
+  author: Author | undefined;
+  category: Category | undefined;
+  issue: Issue | undefined;
+};
+
+function resolveArticleData(slug: string): ResolvedArticleData | null {
   const article = getArticleBySlug(slug);
-
-  if (!article) {
-    return {
-      title: "Articolo non trovato",
-      description: "L'articolo richiesto non esiste",
-    };
-  }
-
-  const author = getAuthorById(article.authorId);
-  const category = getCategoryById(article.categoryId);
-  const issue = article.issueId ? getIssueById(article.issueId) : undefined;
-  const baseUrl = getBaseUrl();
-  const articleUrl = `${baseUrl}/${locale}/articles/${slug}`;
-
-  // Optimize meta description length (max 160 characters)
-  const optimizedDescription =
-    article.excerpt.length > 160 ? article.excerpt.substring(0, 157) + "..." : article.excerpt;
-
-  // Generate dynamic OG image URL with article metadata
-  const ogImageUrl = `${baseUrl}/api/og?${new URLSearchParams({
-    title: article.title,
-    ...(author && { author: author.name }),
-    ...(category && { category: category.name }),
-    ...(issue?.color && { color: issue.color }),
-  }).toString()}`;
-
+  if (!article) return null;
   return {
-    title: article.title,
-    description: optimizedDescription,
-    authors: author ? [{ name: author.name }] : [{ name: "Middleware" }],
-    keywords: [
-      "tecnologia",
-      "innovazione",
-      "digitale",
-      ...(category ? [category.name] : []),
-      ...(author ? [author.name] : []),
-      ...article.title.split(" ").slice(0, 3),
-    ].join(", "),
-    openGraph: {
-      title: article.title,
-      description: optimizedDescription,
-      url: articleUrl,
-      locale: locale,
-      type: "article",
-      publishedTime: article.date,
-      modifiedTime: article.last_update || article.date,
-      authors: author ? [author.name] : ["Middleware"],
-      tags: [...(category ? [category.name] : []), ...(author ? [author.name] : [])],
-      images: [
-        {
-          url: ogImageUrl,
-          width: 1200,
-          height: 630,
-          alt: article.title,
-        },
-      ],
-    },
-    twitter: {
-      title: article.title,
-      description: optimizedDescription,
-      images: [ogImageUrl],
-    },
-    alternates: {
-      canonical: articleUrl,
-    },
-    other: {
-      "article:published_time": article.date,
-      "article:modified_time": article.last_update || article.date,
-      "article:author": author?.name || "Middleware",
-      "article:section": category?.name || "Tecnologia",
-    },
+    article,
+    author: getAuthorById(article.authorId),
+    category: getCategoryById(article.categoryId),
+    issue: article.issueId ? getIssueById(article.issueId) : undefined,
   };
 }
 
-function getArticleStructuredData(locale: string, slug: string) {
-  const article = getArticleBySlug(slug);
-  if (!article) {
-    return [] as Array<Record<string, unknown>>;
-  }
-
-  const author = getAuthorById(article.authorId);
-  const category = getCategoryById(article.categoryId);
-  const issue = article.issueId ? getIssueById(article.issueId) : undefined;
+function buildStructuredData(
+  locale: string,
+  slug: string,
+  data: ResolvedArticleData,
+): Array<Record<string, unknown>> {
+  const { article, author, category, issue } = data;
   const baseUrl = getBaseUrl();
   const articleUrl = `${baseUrl}/${locale}/articles/${slug}`;
   const ogImageUrl = `${baseUrl}/api/og?${new URLSearchParams({
@@ -172,8 +109,79 @@ function getArticleStructuredData(locale: string, slug: string) {
   return [articleSchema, breadcrumbSchema];
 }
 
-// Enable Incremental Static Regeneration (ISR) - revalidate every hour
-export const revalidate = 3600;
+// Generate metadata for SEO
+export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
+  const { locale, slug } = await params;
+  const data = resolveArticleData(slug);
+
+  if (!data) {
+    return {
+      title: "Articolo non trovato",
+      description: "L'articolo richiesto non esiste",
+    };
+  }
+
+  const { article, author, category, issue } = data;
+  const baseUrl = getBaseUrl();
+  const articleUrl = `${baseUrl}/${locale}/articles/${slug}`;
+
+  const optimizedDescription =
+    article.excerpt.length > 160 ? article.excerpt.substring(0, 157) + "..." : article.excerpt;
+
+  const ogImageUrl = `${baseUrl}/api/og?${new URLSearchParams({
+    title: article.title,
+    ...(author && { author: author.name }),
+    ...(category && { category: category.name }),
+    ...(issue?.color && { color: issue.color }),
+  }).toString()}`;
+
+  return {
+    title: article.title,
+    description: optimizedDescription,
+    authors: author ? [{ name: author.name }] : [{ name: "Middleware" }],
+    keywords: [
+      "tecnologia",
+      "innovazione",
+      "digitale",
+      ...(category ? [category.name] : []),
+      ...(author ? [author.name] : []),
+      ...article.title.split(" ").slice(0, 3),
+    ].join(", "),
+    openGraph: {
+      title: article.title,
+      description: optimizedDescription,
+      url: articleUrl,
+      locale: locale,
+      type: "article",
+      publishedTime: article.date,
+      modifiedTime: article.last_update || article.date,
+      authors: author ? [author.name] : ["Middleware"],
+      tags: [...(category ? [category.name] : []), ...(author ? [author.name] : [])],
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: article.title,
+        },
+      ],
+    },
+    twitter: {
+      title: article.title,
+      description: optimizedDescription,
+      images: [ogImageUrl],
+    },
+    alternates: {
+      canonical: articleUrl,
+    },
+    other: {
+      "article:published_time": article.date,
+      "article:modified_time": article.last_update || article.date,
+      "article:author": author?.name || "Middleware",
+      "article:section": category?.name || "Tecnologia",
+    },
+  };
+}
 
 // Generate static params for all articles at build time
 export async function generateStaticParams() {
@@ -191,21 +199,35 @@ export async function generateStaticParams() {
 export default async function ArticlePage({ params }: ArticlePageProps) {
   const { locale, slug } = await params;
 
+  const data = resolveArticleData(slug);
+
+  if (!data) {
+    notFound();
+  }
+
+  const { article, author, category, issue } = data;
+
+  if (!author || !category) {
+    notFound();
+  }
+
   const [dict, commonDict] = await Promise.all([
     getDictionary(locale, TRANSLATION_NAMESPACES.ARTICLE),
     getDictionary(locale, TRANSLATION_NAMESPACES.COMMON),
   ]);
 
-  const article = getArticleBySlug(slug);
-
-  if (!article) {
-    notFound();
-  }
-
   return (
     <div>
-      <StructuredData id={`article-ld-${slug}`} data={getArticleStructuredData(locale, slug)} />
-      <Article article={article} dict={dict} commonDict={commonDict} locale={locale} />
+      <StructuredData id={`article-ld-${slug}`} data={buildStructuredData(locale, slug, data)} />
+      <Article
+        article={article}
+        author={author}
+        category={category}
+        issue={issue}
+        dict={dict}
+        commonDict={commonDict}
+        locale={locale}
+      />
     </div>
   );
 }
