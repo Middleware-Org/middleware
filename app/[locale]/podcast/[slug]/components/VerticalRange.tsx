@@ -52,8 +52,8 @@ export default function VerticalRange({
     [onChange],
   );
 
-  const handleInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = parseFloat(e.target.value);
+  const handleInput = useCallback((e: React.FormEvent<HTMLInputElement>) => {
+    const newValue = parseFloat(e.currentTarget.value);
     setInputValue(newValue);
   }, []);
 

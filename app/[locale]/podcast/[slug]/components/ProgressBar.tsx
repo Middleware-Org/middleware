@@ -35,8 +35,8 @@ export default function ProgressBar({
   onSeekStart,
   onSeekEnd,
 }: ProgressBarProps) {
-  const handleRangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newPosition = parseFloat(e.target.value);
+  const handleRangeInput = (e: React.FormEvent<HTMLInputElement>) => {
+    const newPosition = parseFloat(e.currentTarget.value);
     onSeek(newPosition);
   };
 
