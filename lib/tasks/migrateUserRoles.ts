@@ -1,6 +1,16 @@
 import { PrismaClient } from "@/lib/generated/prisma/client";
+import { createPrismaAdapter } from "@/lib/prismaAdapter";
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  adapter: createPrismaAdapter(),
+});
+
+type RoleMigrationUser = {
+  id: string;
+  email: string;
+  role: "ADMIN" | "EDITOR";
+  createdAt: Date;
+};
 
 function parseAdminEmails() {
   const raw = process.env.ADMIN_EMAILS || "";
@@ -11,7 +21,7 @@ function parseAdminEmails() {
 }
 
 async function main() {
-  const users = await prisma.user.findMany({
+  const users: RoleMigrationUser[] = await prisma.user.findMany({
     select: {
       id: true,
       email: true,
