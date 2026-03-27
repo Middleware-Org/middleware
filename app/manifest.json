@@ -1,7 +1,7 @@
 {
-  "name": "Middleware - Rivista di cultura digitale e innovazione",
+  "name": "Middleware — Laboratorio di contro-formazione",
   "short_name": "Middleware",
-  "description": "Rivista italiana di tecnologia, cultura e innovazione. Articoli, podcast e analisi sul mondo digitale.",
+  "description": "Middleware si inserisce tra input e output per leggere, interpretare e deviare i processi, traducendo teoria e pratica in modo circolare.",
   "start_url": "/it",
   "scope": "/",
   "display": "standalone",

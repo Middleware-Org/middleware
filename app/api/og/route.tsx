@@ -120,7 +120,7 @@ export async function GET(req: NextRequest) {
               opacity: 0.6,
             }}
           >
-            Rivista di cultura digitale
+            Laboratorio di contro-formazione
           </div>
         </div>
 

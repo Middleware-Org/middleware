@@ -13,7 +13,6 @@ import { getDictionary } from "@/lib/i18n/utils";
 import { cn } from "@/lib/utils/classes";
 import { getBaseUrl } from "@/lib/utils/metadata";
 
-
 /* **************************************************
  * Types
  **************************************************/
@@ -26,7 +25,7 @@ export async function generateMetadata({ params }: PodcastsPageProps): Promise<M
   const baseUrl = getBaseUrl();
   const pageUrl = `${baseUrl}/${locale}/podcasts`;
   const description =
-    "Archivio podcast di Middleware su tecnologia, cultura digitale e innovazione.";
+    "Archivio podcast di Middleware dedicato a contro-formazione, metodo operaista e traduzione circolare tra teoria e pratica.";
 
   return {
     title: "Podcast",

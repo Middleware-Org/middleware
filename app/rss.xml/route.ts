@@ -42,9 +42,9 @@ export async function GET() {
      xmlns:content="http://purl.org/rss/1.0/modules/content/"
      xmlns:dc="http://purl.org/dc/elements/1.1/">
   <channel>
-    <title>Middleware - Rivista di cultura digitale e innovazione</title>
+    <title>Middleware — Laboratorio di contro-formazione</title>
     <link>${baseUrl}</link>
-    <description>Middleware è la rivista italiana che esplora l'intersezione tra tecnologia, cultura e società. Articoli, podcast e analisi approfondite sul mondo digitale.</description>
+    <description>Middleware si inserisce tra input e output per leggere, interpretare e deviare i processi, traducendo teoria e pratica in modo circolare.</description>
     <language>it</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
     <atom:link href="${baseUrl}/rss.xml" rel="self" type="application/rss+xml"/>

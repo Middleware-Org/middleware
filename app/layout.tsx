@@ -22,19 +22,20 @@ export async function generateMetadata() {
   return {
     metadataBase: new URL(getBaseUrl()),
     title: {
-      default: "Middleware - Rivista di cultura digitale e innovazione",
+      default: "Middleware — Laboratorio di contro-formazione",
       template: "%s | Middleware",
     },
     description:
-      "Middleware è la rivista italiana che esplora l'intersezione tra tecnologia, cultura e società. Articoli, podcast e analisi approfondite sul mondo digitale.",
+      "Middleware si inserisce tra input e output per leggere, interpretare e deviare i processi, traducendo teoria e pratica in modo circolare.",
     keywords: [
-      "tecnologia",
-      "innovazione",
-      "cultura digitale",
+      "contro-formazione",
+      "operaismo",
+      "militanza intermedista",
+      "classe",
+      "conricerca",
       "podcast",
-      "articoli tech",
-      "società digitale",
-      "media digitali",
+      "analisi politica",
+      "teoria e pratica",
     ],
     authors: [{ name: "Team Middleware" }],
     creator: "Middleware",
@@ -49,16 +50,16 @@ export async function generateMetadata() {
       },
     },
     openGraph: createOpenGraphMetadata({
-      title: "Middleware - Rivista di cultura digitale e innovazione",
+      title: "Middleware — Laboratorio di contro-formazione",
       description:
-        "Middleware è la rivista italiana che esplora l'intersezione tra tecnologia, cultura e società.",
+        "Middleware si inserisce tra input e output per leggere, interpretare e deviare i processi, traducendo teoria e pratica in modo circolare.",
       url,
       type: "website",
     }),
     twitter: createTwitterMetadata({
-      title: "Middleware - Rivista di cultura digitale e innovazione",
+      title: "Middleware — Laboratorio di contro-formazione",
       description:
-        "Middleware è la rivista italiana che esplora l'intersezione tra tecnologia, cultura e società.",
+        "Middleware si inserisce tra input e output per leggere, interpretare e deviare i processi, traducendo teoria e pratica in modo circolare.",
     }),
     robots: {
       index: true,

@@ -77,8 +77,8 @@ function buildStructuredData(
       "@type": "WebPage",
       "@id": articleUrl,
     },
-    articleSection: category?.name || "Tecnologia",
-    keywords: "tecnologia, innovazione, digitale",
+    articleSection: category?.name || "Contro-formazione",
+    keywords: "contro-formazione, operaismo, teoria e pratica",
   };
 
   const breadcrumbSchema = {
@@ -171,7 +171,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
       "article:published_time": article.date,
       "article:modified_time": article.last_update || article.date,
       "article:author": author?.name || "Middleware",
-      "article:section": category?.name || "Tecnologia",
+      "article:section": category?.name || "Contro-formazione",
     },
   };
 }
