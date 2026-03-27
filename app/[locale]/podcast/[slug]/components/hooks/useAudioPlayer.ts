@@ -29,6 +29,12 @@ export function useAudioPlayer({
   const audioRef = useRef<HTMLAudioElement>(null);
   const progressRestoredRef = useRef<boolean>(false);
   const lastSaveTimeRef = useRef<number>(0);
+  const lastUiUpdateRef = useRef<number>(0);
+  const onTimeUpdateRef = useRef<typeof onTimeUpdate>(onTimeUpdate);
+  const isPlayingRef = useRef<boolean>(false);
+  const currentTimeRef = useRef<number>(0);
+  const currentPositionRef = useRef<number>(0);
+  const uiUpdateThrottleMs = 200;
   const saveThrottleMs = 3000;
 
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -38,6 +44,33 @@ export function useAudioPlayer({
   const [wasPlayingBeforeSeek, setWasPlayingBeforeSeek] = useState<boolean>(false);
   const [volume, setVolume] = useState<number>(100);
   const [playbackRate, setPlaybackRate] = useState<number>(1.0);
+
+  useEffect(() => {
+    onTimeUpdateRef.current = onTimeUpdate;
+  }, [onTimeUpdate]);
+
+  const updatePlaybackState = useCallback(
+    (newTime: number, duration: number, options?: { force?: boolean }) => {
+      const force = options?.force ?? false;
+      const normalizedTime = Number.isFinite(newTime) ? newTime : 0;
+      const normalizedDuration = duration > 0 ? duration : 0;
+      const normalizedPosition =
+        normalizedDuration > 0
+          ? Math.floor((normalizedTime / normalizedDuration) * totalPositions)
+          : 0;
+
+      if (force || normalizedTime !== currentTimeRef.current) {
+        currentTimeRef.current = normalizedTime;
+        setCurrentTime(normalizedTime);
+      }
+
+      if (force || normalizedPosition !== currentPositionRef.current) {
+        currentPositionRef.current = normalizedPosition;
+        setCurrentPosition(normalizedPosition);
+      }
+    },
+    [totalPositions],
+  );
 
   // Initialize storage and restore progress
   useEffect(() => {
@@ -64,11 +97,8 @@ export function useAudioPlayer({
                 isDurationMatch
               ) {
                 audio.currentTime = savedProgress.currentTime;
-                setCurrentTime(savedProgress.currentTime);
                 setTotalTime(audio.duration);
-                setCurrentPosition(
-                  Math.floor((savedProgress.currentTime / audio.duration) * totalPositions),
-                );
+                updatePlaybackState(savedProgress.currentTime, audio.duration, { force: true });
               }
             }
           } catch (error) {
@@ -87,7 +117,7 @@ export function useAudioPlayer({
     };
 
     initStorageAndRestore();
-  }, [podcastId, totalPositions]);
+  }, [podcastId, totalPositions, updatePlaybackState]);
 
   // Start auto-save when audio is ready and playing
   useEffect(() => {
@@ -118,24 +148,34 @@ export function useAudioPlayer({
 
     const handleTimeUpdate = () => {
       const newTime = audio.currentTime;
-      setCurrentTime(newTime);
+      const duration = audio.duration;
+      const now = Date.now();
 
-      if (audio.duration > 0) {
-        const newPosition = Math.floor((newTime / audio.duration) * totalPositions);
-        setCurrentPosition(newPosition);
+      if (duration > 0) {
+        const newPosition = Math.floor((newTime / duration) * totalPositions);
+        const shouldUpdateUi =
+          now - lastUiUpdateRef.current >= uiUpdateThrottleMs ||
+          Math.abs(newTime - currentTimeRef.current) >= 0.25 ||
+          Math.abs(newPosition - currentPositionRef.current) >= 3;
+
+        if (shouldUpdateUi) {
+          lastUiUpdateRef.current = now;
+          updatePlaybackState(newTime, duration);
+        }
 
         // Salva periodicamente sugli eventi timeupdate
-        const now = Date.now();
-        if (now - lastSaveTimeRef.current >= saveThrottleMs && isPlaying) {
+        if (now - lastSaveTimeRef.current >= saveThrottleMs && isPlayingRef.current) {
           lastSaveTimeRef.current = now;
-          const progressPercentage = (newTime / audio.duration) * 100;
+          const progressPercentage = (newTime / duration) * 100;
           podcastProgressStorage
-            .saveProgress(podcastId, newTime, audio.duration, progressPercentage, false)
+            .saveProgress(podcastId, newTime, duration, progressPercentage, false)
             .catch(() => {});
         }
+      } else {
+        updatePlaybackState(newTime, duration);
       }
 
-      onTimeUpdate?.(newTime);
+      onTimeUpdateRef.current?.(newTime);
     };
 
     const handleLoadedMetadata = () => {
@@ -166,10 +206,7 @@ export function useAudioPlayer({
                 isDurationMatch
               ) {
                 audio.currentTime = savedProgress.currentTime;
-                setCurrentTime(savedProgress.currentTime);
-                setCurrentPosition(
-                  Math.floor((savedProgress.currentTime / audio.duration) * totalPositions),
-                );
+                updatePlaybackState(savedProgress.currentTime, audio.duration, { force: true });
               }
             }
           } catch (error) {
@@ -183,10 +220,12 @@ export function useAudioPlayer({
     };
 
     const handlePlay = () => {
+      isPlayingRef.current = true;
       setIsPlaying(true);
     };
 
     const handlePause = async () => {
+      isPlayingRef.current = false;
       setIsPlaying(false);
       const audio = audioRef.current;
       if (audio && audio.duration > 0) {
@@ -209,9 +248,9 @@ export function useAudioPlayer({
     };
 
     const handleEnded = async () => {
+      isPlayingRef.current = false;
       setIsPlaying(false);
-      setCurrentTime(0);
-      setCurrentPosition(0);
+      updatePlaybackState(0, totalTime, { force: true });
 
       podcastProgressStorage.stopAutoSave();
 
@@ -235,7 +274,14 @@ export function useAudioPlayer({
       audio.removeEventListener("pause", handlePause);
       audio.removeEventListener("ended", handleEnded);
     };
-  }, [totalTime, totalPositions, podcastId, isPlaying, onTimeUpdate, saveThrottleMs]);
+  }, [
+    totalTime,
+    totalPositions,
+    podcastId,
+    saveThrottleMs,
+    uiUpdateThrottleMs,
+    updatePlaybackState,
+  ]);
 
   // Load audio source
   useEffect(() => {
@@ -302,8 +348,7 @@ export function useAudioPlayer({
     if (audio) {
       const newTime = Math.min(audio.currentTime + 10, audio.duration);
       audio.currentTime = newTime;
-      setCurrentTime(newTime);
-      setCurrentPosition(Math.floor((newTime / audio.duration) * totalPositions));
+      updatePlaybackState(newTime, audio.duration, { force: true });
 
       if (audio.duration > 0) {
         const progressPercentage = (newTime / audio.duration) * 100;
@@ -323,15 +368,14 @@ export function useAudioPlayer({
         }
       }
     }
-  }, [totalPositions, podcastId]);
+  }, [podcastId, updatePlaybackState]);
 
   const backward = useCallback(async () => {
     const audio = audioRef.current;
     if (audio) {
       const newTime = Math.max(audio.currentTime - 10, 0);
       audio.currentTime = newTime;
-      setCurrentTime(newTime);
-      setCurrentPosition(Math.floor((newTime / audio.duration) * totalPositions));
+      updatePlaybackState(newTime, audio.duration, { force: true });
 
       if (audio.duration > 0) {
         const progressPercentage = (newTime / audio.duration) * 100;
@@ -351,18 +395,18 @@ export function useAudioPlayer({
         }
       }
     }
-  }, [totalPositions, podcastId]);
+  }, [podcastId, updatePlaybackState]);
 
   const seek = useCallback(
-    async (newPosition: number) => {
+    async (newPosition: number, options?: { persist?: boolean }) => {
       const audio = audioRef.current;
       if (audio) {
+        const shouldPersist = options?.persist ?? true;
         const newTime = (newPosition / totalPositions) * audio.duration;
         audio.currentTime = newTime;
-        setCurrentTime(newTime);
-        setCurrentPosition(newPosition);
+        updatePlaybackState(newTime, audio.duration, { force: true });
 
-        if (audio.duration > 0) {
+        if (shouldPersist && audio.duration > 0) {
           const progressPercentage = (newTime / audio.duration) * 100;
           lastSaveTimeRef.current = Date.now();
           try {
@@ -381,7 +425,7 @@ export function useAudioPlayer({
         }
       }
     },
-    [totalPositions, podcastId],
+    [podcastId, totalPositions, updatePlaybackState],
   );
 
   return {

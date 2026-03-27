@@ -19,6 +19,30 @@ import ProgressBar from "./ProgressBar";
 import Transcript from "./Transcript";
 import type { Segment } from "./types";
 
+function findSegmentIndexAtTime(segments: Segment[], currentTime: number) {
+  let left = 0;
+  let right = segments.length - 1;
+
+  while (left <= right) {
+    const middle = Math.floor((left + right) / 2);
+    const segment = segments[middle];
+
+    if (currentTime < segment.start) {
+      right = middle - 1;
+      continue;
+    }
+
+    if (currentTime > segment.end) {
+      left = middle + 1;
+      continue;
+    }
+
+    return middle;
+  }
+
+  return -1;
+}
+
 /* **************************************************
  * Types
  **************************************************/
@@ -35,7 +59,6 @@ export default function PodcastPlayer({ podcast }: PodcastPlayerProps) {
   const activeSegmentRef = useRef<HTMLDivElement | null>(null);
 
   const [segments, setSegments] = useState<Segment[]>([]);
-  const [currentSegmentIndex, setCurrentSegmentIndex] = useState<number>(-1);
   const [showVolumeControl, setShowVolumeControl] = useState<boolean>(false);
 
   const podcastId = podcast.slug;
@@ -64,16 +87,9 @@ export default function PodcastPlayer({ podcast }: PodcastPlayerProps) {
     audioSrc: podcast.audio ? getGitHubMediaUrl(podcast.audio) : "",
     podcastId,
     totalPositions,
-    onTimeUpdate: (newTime) => {
-      // Find current segment
-      if (segments.length > 0) {
-        const segmentIndex = segments.findIndex((s) => newTime >= s.start && newTime <= s.end);
-        if (segmentIndex !== -1 && segmentIndex !== currentSegmentIndex) {
-          setCurrentSegmentIndex(segmentIndex);
-        }
-      }
-    },
   });
+
+  const currentSegmentIndex = findSegmentIndexAtTime(segments, currentTime);
 
   // Transcript scroll hook
   useTranscriptScroll({

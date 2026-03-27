@@ -17,7 +17,7 @@ type ProgressBarProps = {
   currentPosition: number;
   totalPositions: number;
   bookmarks?: Array<{ time: number }>; // Array di segnaposto con i loro tempi
-  onSeek: (position: number) => void;
+  onSeek: (position: number, options?: { persist?: boolean }) => void;
   onSeekStart: () => void;
   onSeekEnd: () => void;
 };
@@ -37,7 +37,12 @@ export default function ProgressBar({
 }: ProgressBarProps) {
   const handleRangeInput = (e: React.FormEvent<HTMLInputElement>) => {
     const newPosition = parseFloat(e.currentTarget.value);
-    onSeek(newPosition);
+    onSeek(newPosition, { persist: false });
+  };
+
+  const handleRangeChange = (e: React.FormEvent<HTMLInputElement>) => {
+    const newPosition = parseFloat(e.currentTarget.value);
+    onSeek(newPosition, { persist: true });
   };
 
   // Calcola le posizioni delle tacchette dei segnaposto
@@ -62,7 +67,7 @@ export default function ProgressBar({
           max={Math.max(totalPositions - 1, 0)}
           step={1}
           value={currentPosition}
-          onChange={handleRangeInput}
+          onChange={handleRangeChange}
           onInput={handleRangeInput}
           onMouseDown={onSeekStart}
           onMouseUp={onSeekEnd}
