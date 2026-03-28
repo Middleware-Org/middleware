@@ -66,17 +66,14 @@ export function processCitations(content: string): ProcessedCitations {
   const indexMap = new Map<string, number>();
 
   // Sostituisci formato nuovo [citation:ID:text]
-  processedContent = processedContent.replace(
-    /\[citation:([^:]+):([^\]]+)\]/g,
-    (_, citationId) => {
-      if (!indexMap.has(citationId)) {
-        currentIndex++;
-        indexMap.set(citationId, currentIndex);
-      }
-      const index = indexMap.get(citationId) || 1;
-      return `<a id="cit-${index}" href="#citation-${index}" class="citation-link inline text-tertiary hover:text-tertiary/80 transition-colors cursor-pointer" style="font-size: 0.7em; vertical-align: super; text-decoration: none;">${index}</a>`;
-    },
-  );
+  processedContent = processedContent.replace(/\[citation:([^:]+):([^\]]+)\]/g, (_, citationId) => {
+    if (!indexMap.has(citationId)) {
+      currentIndex++;
+      indexMap.set(citationId, currentIndex);
+    }
+    const index = indexMap.get(citationId) || 1;
+    return `<a id="cit-${index}" href="#citation-${index}" class="citation-link inline text-tertiary hover:text-tertiary/80 transition-colors cursor-pointer" style="font-size: 0.7em; vertical-align: super; text-decoration: none;">${index}</a>`;
+  });
 
   // Sostituisci formato vecchio [citation-ID]
   processedContent = processedContent.replace(/\[citation-([^\]]+)\]/g, (_, citationId) => {
@@ -85,7 +82,7 @@ export function processCitations(content: string): ProcessedCitations {
       indexMap.set(citationId, currentIndex);
     }
     const index = indexMap.get(citationId) || 1;
-    return `<a href="#citation-${index}" class="citation-link inline text-tertiary hover:text-tertiary/80 transition-colors cursor-pointer" style="font-size: 0.7em; vertical-align: super; text-decoration: none;">${index}</a>`;
+    return `<a id="cit-${index}" href="#citation-${index}" class="citation-link inline text-tertiary hover:text-tertiary/80 transition-colors cursor-pointer" style="font-size: 0.7em; vertical-align: super; text-decoration: none;">${index}</a>`;
   });
 
   // Se il contenuto non sembra essere HTML già processato, convertilo da markdown

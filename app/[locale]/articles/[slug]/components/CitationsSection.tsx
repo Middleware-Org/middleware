@@ -1,9 +1,8 @@
 /* **************************************************
  * Imports
  **************************************************/
-import type { ReactNode } from "react";
-
 import { MonoTextLight } from "@/components/atoms/typography";
+import { sanitizeInlineHtml } from "@/lib/security/sanitizeHtml";
 
 /* **************************************************
  * Types
@@ -33,48 +32,21 @@ function splitUrlAndTrailingPunctuation(url: string) {
   };
 }
 
-function renderCitationText(text: string): ReactNode[] {
-  const content: ReactNode[] = [];
-  let lastIndex = 0;
+function linkifyPlainText(text: string): string {
+  return text.replace(URL_REGEX, (url) => {
+    const { href, trailing } = splitUrlAndTrailingPunctuation(url);
+    return `<a href="${href}" target="_blank" rel="noopener noreferrer" class="underline break-all">${href}</a>${trailing}`;
+  });
+}
 
-  for (const match of text.matchAll(URL_REGEX)) {
-    const matchText = match[0];
-    const index = match.index ?? -1;
+function renderCitationHtml(text: string): string {
+  const hasHtmlTags = /<[^>]+>/.test(text);
 
-    if (index < 0) {
-      continue;
-    }
-
-    if (index > lastIndex) {
-      content.push(text.slice(lastIndex, index));
-    }
-
-    const { href, trailing } = splitUrlAndTrailingPunctuation(matchText);
-
-    content.push(
-      <a
-        key={`${href}-${index}`}
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="underline break-all"
-      >
-        {href}
-      </a>,
-    );
-
-    if (trailing) {
-      content.push(trailing);
-    }
-
-    lastIndex = index + matchText.length;
+  if (hasHtmlTags) {
+    return sanitizeInlineHtml(text);
   }
 
-  if (lastIndex < text.length) {
-    content.push(text.slice(lastIndex));
-  }
-
-  return content;
+  return sanitizeInlineHtml(linkifyPlainText(text));
 }
 
 /* **************************************************
@@ -98,7 +70,7 @@ export default function CitationsSection({ citations }: CitationsSectionProps) {
               <li
                 key={citation.id}
                 id={`citation-${citation.index}`}
-                className="flex gap-4 py-3 transition-colors duration-200 border-t border-secondary"
+                className="citation-target flex gap-4 py-3 transition-colors duration-200 border-t border-secondary"
               >
                 <a
                   href={`#cit-${citation.index}`}
@@ -107,9 +79,10 @@ export default function CitationsSection({ citations }: CitationsSectionProps) {
                 >
                   {citation.index}.
                 </a>
-                <MonoTextLight className="text-base leading-relaxed flex-1 min-w-0 wrap-anywhere">
-                  {renderCitationText(citation.text)}
-                </MonoTextLight>
+                <MonoTextLight
+                  className="text-base leading-relaxed flex-1 min-w-0 wrap-anywhere [&_a]:underline [&_a]:break-all"
+                  dangerouslySetInnerHTML={{ __html: renderCitationHtml(citation.text) }}
+                />
               </li>
             ))}
           </ol>
