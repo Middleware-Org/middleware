@@ -111,7 +111,7 @@ export default function ArchiveIssueCard({
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className={styles.image}
-                priority={index === 0}
+                priority={false}
                 style={{ objectFit: "cover" }}
               />
             </Link>

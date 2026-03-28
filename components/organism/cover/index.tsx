@@ -58,14 +58,12 @@ export default function Cover({
             sizes="(max-width: 768px) 100vw, 50vw"
             className={styles.image}
             priority={imagePriority}
+            fetchPriority={imagePriority ? "high" : "auto"}
+            loading={imagePriority ? "eager" : "lazy"}
           />
           <div className={styles.badgesWrapper}>
             <div className={styles.badgeDate}>
-              <FormattedDate
-                date={issue.date}
-                lang={locale}
-                className={styles.badgeTextDate}
-              />
+              <FormattedDate date={issue.date} lang={locale} className={styles.badgeTextDate} />
             </div>
             <div className={styles.badgeTitle}>
               <Link href={issueHref} aria-label={`Leggi il numero ${issue.title}`}>

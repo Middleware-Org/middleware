@@ -43,15 +43,13 @@ export default function Footer({ dict }: FooterProps) {
         </div>
         <div>
           <MonoTextLight className="text-sm">{dict.footer.subscribe}</MonoTextLight>
-          <div className="flex lg:flex-row md:flex-row flex-col lg:gap-2 md:gap-2 gap-0 flex-wrap">
+          <div className="flex lg:flex-row md:flex-row flex-col lg:gap-2 md:gap-2 gap-1 flex-wrap">
             {footerLinks.map((link, index) => (
               <Link
                 key={link.href}
                 href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`${dict.footer[link.label as keyof typeof dict.footer]} (si apre in una nuova finestra)`}
-                className="flex items-center lg:text-left md:text-center text-center lg:text-[14px] md:text-[12px] text-[12px] lg:gap-2 md:gap-2 gap-0 hover:opacity-80 transition-opacity"
+                aria-label={dict.footer[link.label as keyof typeof dict.footer]}
+                className="inline-flex items-center min-h-11 px-1 -mx-1 lg:text-left md:text-center text-center lg:text-[14px] md:text-[12px] text-[12px] lg:gap-2 md:gap-2 gap-0 hover:opacity-80 transition-opacity"
               >
                 <MonoTextBold className="text-sm font-bold">
                   {dict.footer[link.label as keyof typeof dict.footer]}
