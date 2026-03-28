@@ -40,6 +40,10 @@ export default function Menu({ dict }: MenuProps) {
 
   const pathnameWithoutLang = getPathnameWithoutLang(pathname);
 
+  const handleMenuLinkSelect = () => {
+    closeMenu();
+  };
+
   /* **************************************************
    * Effects
    **************************************************/
@@ -112,11 +116,8 @@ export default function Menu({ dict }: MenuProps) {
             {menuItems.map((item) => {
               const isActive = pathnameWithoutLang === item.href;
               return (
-                <Link key={item.href} href={toLocale(item.href)}>
-                  <MonoTextLight
-                    onClick={closeMenu}
-                    className={cn(styles.linkMain, isActive ? styles.linkActive : "")}
-                  >
+                <Link key={item.href} href={toLocale(item.href)} onClick={handleMenuLinkSelect}>
+                  <MonoTextLight className={cn(styles.linkMain, isActive ? styles.linkActive : "")}>
                     {dict.aria.menu[item.label as keyof typeof dict.aria.menu]}
                   </MonoTextLight>
                 </Link>
@@ -131,11 +132,8 @@ export default function Menu({ dict }: MenuProps) {
             {headerLinks.map((item) => {
               const isActive = pathnameWithoutLang === item.href;
               return (
-                <Link key={item.href} href={toLocale(item.href)}>
-                  <MonoTextLight
-                    onClick={() => closeMenu()}
-                    className={cn("text-lg", isActive ? "text-tertiary" : "")}
-                  >
+                <Link key={item.href} href={toLocale(item.href)} onClick={handleMenuLinkSelect}>
+                  <MonoTextLight className={cn("text-lg", isActive ? "text-tertiary" : "")}>
                     {dict.aria.header[item.label as keyof typeof dict.aria.header]}
                   </MonoTextLight>
                 </Link>

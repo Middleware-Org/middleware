@@ -77,7 +77,7 @@ export default function ArticleCard({
         </div>
       </section>
       <footer className={styles.footer}>
-        <Link href={categoryLink}>
+        <Link href={categoryLink} className="group">
           <div className={styles.category}>
             <MonoTextLight className={styles.categoryText}>{category.name}</MonoTextLight>
           </div>
