@@ -8,7 +8,7 @@ import Button from "@/components/atoms/button";
 import { SerifText, MonoTextLight } from "@/components/atoms/typography";
 import Footer from "@/components/organism/footer";
 import Header from "@/components/organism/header";
-import Menu from "@/components/organism/menu/LazyMenu";
+import Menu from "@/components/organism/menu";
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import { i18nSettings } from "@/lib/i18n/settings";
 import { getDictionary } from "@/lib/i18n/utils";

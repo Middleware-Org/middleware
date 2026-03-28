@@ -4,7 +4,7 @@
 import Footer from "@/components/organism/footer";
 import Header from "@/components/organism/header";
 import IssuesDropdown from "@/components/organism/issuesDropDown";
-import Menu from "@/components/organism/menu/LazyMenu";
+import Menu from "@/components/organism/menu";
 import { getAllIssues } from "@/lib/content";
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import { getDictionary } from "@/lib/i18n/utils";

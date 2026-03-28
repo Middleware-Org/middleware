@@ -8,7 +8,7 @@ import ReadingProgress from "@/components/molecules/ReadingProgress";
 import AutoScrollText from "@/components/organism/autoScrollText";
 import Footer from "@/components/organism/footer";
 import Header from "@/components/organism/header";
-import Menu from "@/components/organism/menu/LazyMenu";
+import Menu from "@/components/organism/menu";
 import { getArticleBySlug } from "@/lib/content";
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import { getDictionary } from "@/lib/i18n/utils";

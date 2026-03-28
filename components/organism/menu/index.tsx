@@ -4,9 +4,9 @@
  * Imports
  **************************************************/
 import Link from "next/link";
-import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
+import FocusLock from "react-focus-lock";
 
 import Separator from "@/components/atoms/separetor";
 import { MonoTextBold, MonoTextLight } from "@/components/atoms/typography";
@@ -18,10 +18,6 @@ import { cn } from "@/lib/utils/classes";
 
 import Pictogram from "../pictogram";
 import styles from "./styles";
-
-const FocusLock = dynamic(() => import("react-focus-lock"), {
-  ssr: false,
-});
 
 /* **************************************************
  * Types
