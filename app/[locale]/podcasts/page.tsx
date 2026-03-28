@@ -90,6 +90,7 @@ export default async function PodcastsPage({ params }: PodcastsPageProps) {
                 issue={issue}
                 dictCommon={dictCommon}
                 isLastIssue={index === issues.length - 1}
+                locale={locale}
               />
             );
           })}

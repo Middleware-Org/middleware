@@ -26,12 +26,13 @@ type IssuePodcastsProps = {
   podcasts: Podcast[];
   dictCommon: Pick<CommonDictionary, "articleCard" | "lists">;
   issue: Issue;
+  locale: string;
 };
 
 /* **************************************************
  * IssuePodcasts Component
  **************************************************/
-export default function IssuePodcasts({ podcasts, dictCommon, issue }: IssuePodcastsProps) {
+export default function IssuePodcasts({ podcasts, dictCommon, issue, locale }: IssuePodcastsProps) {
   const [showAllPodcasts, setShowAllPodcasts] = useState(false);
 
   const visiblePodcasts = showAllPodcasts ? podcasts : podcasts.slice(0, INITIAL_PODCASTS_COUNT);
@@ -44,7 +45,7 @@ export default function IssuePodcasts({ podcasts, dictCommon, issue }: IssuePodc
       {/* Podcasts grid */}
       <div className={styles.grid}>
         {visiblePodcasts.map((podcast) => (
-          <PodcastCard key={podcast.slug} podcast={podcast} dict={dictCommon} />
+          <PodcastCard key={podcast.slug} podcast={podcast} dict={dictCommon} locale={locale} />
         ))}
       </div>
 

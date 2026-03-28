@@ -35,8 +35,9 @@ export default function PodcastHeader({ podcast, issue }: PodcastHeaderProps) {
             src={getGitHubImageUrl(coverImage)}
             alt={podcast.title}
             fill
+            sizes="(max-width: 768px) 100vw, 320px"
             className={styles.coverImage}
-            priority
+            priority={false}
             style={{ objectFit: "cover" }}
           />
         </div>

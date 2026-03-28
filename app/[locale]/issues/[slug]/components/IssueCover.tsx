@@ -18,6 +18,7 @@ import type { Issue } from "@/.velite";
 type IssueCoverProps = {
   issue: Issue;
   locale: string;
+  imagePriority?: boolean;
 };
 
 /* **************************************************
@@ -36,7 +37,7 @@ const styles = {
 /* **************************************************
  * IssueCover
  **************************************************/
-export default function IssueCover({ issue, locale }: IssueCoverProps) {
+export default function IssueCover({ issue, locale, imagePriority = true }: IssueCoverProps) {
   const lightColor = lightenColor(issue.color);
   const issueHref = withLocale(`/issues/${issue.slug}`, locale);
 
@@ -70,8 +71,9 @@ export default function IssueCover({ issue, locale }: IssueCoverProps) {
           src={getGitHubImageUrl(issue.cover)}
           alt={issue.title}
           fill
+          sizes="(max-width: 768px) 100vw, 75vw"
           className={styles.image}
-          priority
+          priority={imagePriority}
           style={{ objectFit: "cover" }}
         />
       </div>

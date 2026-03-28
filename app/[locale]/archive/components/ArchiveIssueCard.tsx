@@ -1,5 +1,3 @@
-"use client";
-
 /* **************************************************
  * Imports
  **************************************************/
@@ -10,7 +8,7 @@ import Separator from "@/components/atoms/separetor";
 import { MonoTextBold, MonoTextLight, SerifText } from "@/components/atoms/typography";
 import { getAuthorById, getCategoryById } from "@/lib/content";
 import { getGitHubImageUrl } from "@/lib/github/images";
-import { useLocalizedPath } from "@/lib/i18n/client";
+import { withLocale } from "@/lib/i18n/path";
 import type { CommonDictionary } from "@/lib/i18n/types";
 import { cn } from "@/lib/utils/classes";
 import { lightenColor, getTextColor } from "@/lib/utils/color";
@@ -25,6 +23,7 @@ type ArchiveIssueCardProps = {
   articles: Article[];
   dict: Pick<CommonDictionary, "articleCard">;
   index: number;
+  locale: string;
 };
 
 /* **************************************************
@@ -64,8 +63,13 @@ const styles = {
 /* **************************************************
  * ArchiveIssueCard
  **************************************************/
-export default function ArchiveIssueCard({ issue, articles, dict, index }: ArchiveIssueCardProps) {
-  const toLocale = useLocalizedPath();
+export default function ArchiveIssueCard({
+  issue,
+  articles,
+  dict,
+  index,
+  locale,
+}: ArchiveIssueCardProps) {
   const lightColor = lightenColor(issue.color);
   const { textColor, backgroundColor } = getTextColor(issue.color);
 
@@ -79,7 +83,7 @@ export default function ArchiveIssueCard({ issue, articles, dict, index }: Archi
         <div className={styles.coverContainer}>
           <div className={styles.issueLabelContainer} style={{ backgroundColor: lightColor }}>
             <Link
-              href={toLocale(`/issues/${issue.slug}`)}
+              href={withLocale(`/issues/${issue.slug}`, locale)}
               className={styles.issueLabelLink}
               style={{
                 borderLeft: `1px solid ${issue.color}`,
@@ -100,11 +104,12 @@ export default function ArchiveIssueCard({ issue, articles, dict, index }: Archi
             </Link>
           </div>
           <div className={styles.imageWrapper} style={{ backgroundColor: issue.color }}>
-            <Link href={toLocale(`/issues/${issue.slug}`)} className={styles.imageLink}>
+            <Link href={withLocale(`/issues/${issue.slug}`, locale)} className={styles.imageLink}>
               <Image
                 src={getGitHubImageUrl(issue.cover)}
                 alt={issue.title}
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className={styles.image}
                 priority={index === 0}
                 style={{ objectFit: "cover" }}
@@ -143,7 +148,7 @@ export default function ArchiveIssueCard({ issue, articles, dict, index }: Archi
 
                   return (
                     <div key={article.slug} className={styles.articleItem}>
-                      <Link href={toLocale(`/articles/${article.slug}`)}>
+                      <Link href={withLocale(`/articles/${article.slug}`, locale)}>
                         <MonoTextBold className={cn(styles.articleTitle, textColor)}>
                           {article.title}
                         </MonoTextBold>
@@ -151,11 +156,11 @@ export default function ArchiveIssueCard({ issue, articles, dict, index }: Archi
                       <div className={styles.articleMeta}>
                         <MonoTextLight className={cn(styles.articleAuthor, textColor)}>
                           {dict.articleCard.wordsBy}{" "}
-                          <Link href={toLocale(`/authors?author=${author.slug}`)}>
+                          <Link href={withLocale(`/authors?author=${author.slug}`, locale)}>
                             <span className={styles.articleAuthorLink}>{author.name}</span>
                           </Link>
                         </MonoTextLight>
-                        <Link href={toLocale(`/categories?category=${category.slug}`)}>
+                        <Link href={withLocale(`/categories?category=${category.slug}`, locale)}>
                           <MonoTextLight className={cn(styles.articleCategory, textColor)}>
                             {category.name}
                           </MonoTextLight>

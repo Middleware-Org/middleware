@@ -119,7 +119,7 @@ export default async function IssuePage({ params }: IssuePageProps) {
         <div className={styles.issueCoverContainer}>
           <div key={issue.slug} id={`issue-${issue.slug}`} className={styles.issueCoverContainer}>
             <div className={styles.link}>
-              <IssueCover issue={issue} locale={locale} />
+              <IssueCover issue={issue} locale={locale} imagePriority={true} />
             </div>
           </div>
         </div>

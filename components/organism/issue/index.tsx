@@ -9,7 +9,6 @@ import type { CommonDictionary } from "@/lib/i18n/types";
 
 import type { Issue } from "@/.velite";
 
-
 import IssuePodcasts from "../issuePodcasts";
 import styles from "./styles";
 
@@ -20,12 +19,13 @@ type IssueProps = {
   issue: Issue;
   dictCommon: Pick<CommonDictionary, "articleCard" | "lists">;
   isLastIssue: boolean;
+  locale: string;
 };
 
 /* **************************************************
  * Issue Component
  **************************************************/
-export default async function Issue({ issue, dictCommon, isLastIssue }: IssueProps) {
+export default async function Issue({ issue, dictCommon, isLastIssue, locale }: IssueProps) {
   const podcasts = getPodcastsByIssue(issue.slug);
 
   if (!podcasts || podcasts.length === 0) return null;
@@ -44,7 +44,7 @@ export default async function Issue({ issue, dictCommon, isLastIssue }: IssuePro
       )}
 
       {/* Podcasts list */}
-      <IssuePodcasts podcasts={podcasts} dictCommon={dictCommon} issue={issue} />
+      <IssuePodcasts podcasts={podcasts} dictCommon={dictCommon} issue={issue} locale={locale} />
 
       {/* Bottom separator */}
       {!isLastIssue && <Separator className={styles.separatorBottom} />}
