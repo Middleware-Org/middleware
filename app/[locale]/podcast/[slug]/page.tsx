@@ -10,6 +10,7 @@ import FormattedDate from "@/components/atoms/date";
 import Separator from "@/components/atoms/separetor";
 import { H1, H2, MonoTextBold, MonoTextLight } from "@/components/atoms/typography";
 import PodcastCard from "@/components/molecules/podcastCard";
+import SeparatorWithLogo from "@/components/molecules/SeparatorWithLogo";
 import StructuredData from "@/components/StructuredData";
 import {
   getAllPodcasts,
@@ -262,6 +263,20 @@ export default async function PodcastPage({ params }: PodcastPageProps) {
           audio_chunks: podcast.audio_chunks,
         }}
       />
+      {relatedAuthor?.description && (
+        <footer className="flex flex-col max-w-[1472px] mx-auto lg:px-10 md:px-4 px-4 gap-5 pb-10">
+          <div className="flex lg:flex-row md:flex-row flex-col justify-between gap-10">
+            <div className="lg:w-1/4 lg:flex hidden"></div>
+            <div className="lg:w-2/4 md:w-full w-full">
+              <SeparatorWithLogo />
+              <div className="py-[25px]">
+                <MonoTextLight>{relatedAuthor.description}</MonoTextLight>
+              </div>
+            </div>
+            <div className="lg:w-1/4 lg:flex hidden"></div>
+          </div>
+        </footer>
+      )}
       {relatedPodcasts.length > 0 && (
         <>
           <div className="max-w-[1472px] mx-auto lg:px-10 md:px-4 px-4">
