@@ -4,6 +4,7 @@
  * Imports
  **************************************************/
 import { useEffect, useRef, useState, useCallback } from "react";
+import dynamic from "next/dynamic";
 
 import { toast } from "@/hooks/use-toast";
 import { getGitHubMediaUrl } from "@/lib/github/images";
@@ -16,8 +17,9 @@ import { useTranscriptScroll } from "./hooks/useTranscriptScroll";
 import PlayerControls from "./PlayerControls";
 import styles from "./PodcastPlayerStyles";
 import ProgressBar from "./ProgressBar";
-import Transcript from "./Transcript";
 import type { Segment } from "./types";
+
+const Transcript = dynamic(() => import("./Transcript"));
 
 function findSegmentIndexAtTime(segments: Segment[], currentTime: number) {
   let left = 0;

@@ -32,6 +32,7 @@ export default function PodcastBookmarkManager({
   const [isInitialized, setIsInitialized] = useState(false);
   const contentContainerRef = useRef<HTMLElement | null>(null);
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
+  const frameRequestRef = useRef<number | null>(null);
 
   // Inizializza il contenitore
   useEffect(() => {
@@ -41,17 +42,6 @@ export default function PodcastBookmarkManager({
       requestAnimationFrame(() => {
         setContainerRect(container.getBoundingClientRect());
         setIsInitialized(true);
-      });
-    }
-  }, [contentContainerSelector]);
-
-  // Trova il contenitore della trascrizione e aggiorna il containerRect
-  useEffect(() => {
-    const container = document.querySelector(contentContainerSelector) as HTMLElement;
-    if (container) {
-      contentContainerRef.current = container;
-      requestAnimationFrame(() => {
-        setContainerRect(container.getBoundingClientRect());
       });
     }
   }, [contentContainerSelector]);
@@ -119,41 +109,38 @@ export default function PodcastBookmarkManager({
     return () => clearTimeout(timeout);
   }, [isInitialized, bookmarksProp, segments, updateBookmarkPositions]);
 
-  // Aggiorna le posizioni quando la finestra viene ridimensionata o scrollata
+  // Aggiorna le posizioni quando il layout cambia
   useEffect(() => {
     if (!isInitialized) return;
 
     const updatePositions = () => {
-      if (contentContainerRef.current) {
-        setContainerRect(contentContainerRef.current.getBoundingClientRect());
+      if (frameRequestRef.current !== null) {
+        cancelAnimationFrame(frameRequestRef.current);
       }
-      updateBookmarkPositions();
+
+      frameRequestRef.current = requestAnimationFrame(() => {
+        if (contentContainerRef.current) {
+          setContainerRect(contentContainerRef.current.getBoundingClientRect());
+        }
+        updateBookmarkPositions();
+      });
     };
 
     const container = contentContainerRef.current;
     if (!container) return;
 
-    // Ascolta lo scroll del contenitore invece che della finestra
-    const scrollContainer = container.parentElement;
-    if (scrollContainer) {
-      scrollContainer.addEventListener("scroll", updatePositions);
-    }
     window.addEventListener("resize", updatePositions);
 
-    if (contentContainerRef.current) {
-      resizeObserverRef.current = new ResizeObserver(updatePositions);
-      resizeObserverRef.current.observe(contentContainerRef.current);
-    }
+    resizeObserverRef.current = new ResizeObserver(updatePositions);
+    resizeObserverRef.current.observe(container);
 
     return () => {
-      const container = contentContainerRef.current;
-      if (container) {
-        const scrollContainer = container.parentElement;
-        if (scrollContainer) {
-          scrollContainer.removeEventListener("scroll", updatePositions);
-        }
+      if (frameRequestRef.current !== null) {
+        cancelAnimationFrame(frameRequestRef.current);
       }
+
       window.removeEventListener("resize", updatePositions);
+
       if (resizeObserverRef.current) {
         resizeObserverRef.current.disconnect();
       }

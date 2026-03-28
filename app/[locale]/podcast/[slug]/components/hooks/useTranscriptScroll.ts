@@ -1,7 +1,7 @@
 /* **************************************************
  * Imports
  **************************************************/
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 /* **************************************************
  * Types
@@ -34,56 +34,92 @@ export function useTranscriptScroll({
   transcriptContainerRef,
   transcriptContentInnerRef,
 }: UseTranscriptScrollProps) {
+  const layoutMetricsRef = useRef<{
+    elementOffsetTop: number;
+    elementHeight: number;
+    containerHeight: number;
+    segmentStart: number;
+    segmentEnd: number;
+  } | null>(null);
+  const lastTranslateYRef = useRef<number | null>(null);
+  const frameRequestRef = useRef<number | null>(null);
+
   useEffect(() => {
     if (
-      activeSegmentRef.current &&
-      transcriptContainerRef.current &&
-      transcriptContentInnerRef.current &&
-      currentSegmentIndex >= 0 &&
-      segments.length > 0
+      !activeSegmentRef.current ||
+      !transcriptContainerRef.current ||
+      currentSegmentIndex < 0 ||
+      segments.length === 0
     ) {
-      const container = transcriptContainerRef.current;
-      const innerContent = transcriptContentInnerRef.current;
-      const activeElement = activeSegmentRef.current;
-
-      // Get dimensions
-      const elementOffsetTop = activeElement.offsetTop;
-      const elementHeight = activeElement.offsetHeight;
-      const containerHeight = container.clientHeight;
-      const targetOffset = 80; // Preferred offset from top
-      const availableHeight = containerHeight - targetOffset - 20; // 20px padding at bottom
-
-      // Get current segment
-      const currentSegment = segments[currentSegmentIndex];
-      const segmentDuration = currentSegment.end - currentSegment.start;
-      const timeInSegment = currentTime - currentSegment.start;
-      let segmentProgress = Math.max(0, Math.min(1, timeInSegment / segmentDuration));
-
-      // Accelerate scroll by 30% to keep text ahead of audio
-      segmentProgress = Math.min(1, segmentProgress * 1.3);
-
-      let translateY: number;
-
-      if (elementHeight <= availableHeight) {
-        // Segment fits: position it at targetOffset from top
-        translateY = targetOffset - elementOffsetTop;
-      } else {
-        // Segment is too long: scroll progressively based on audio progress
-        const totalScrollableHeight = elementHeight - availableHeight;
-        const scrollOffset = segmentProgress * totalScrollableHeight;
-        const baseTranslateY = targetOffset - elementOffsetTop;
-        translateY = baseTranslateY - scrollOffset;
-      }
-
-      // Apply transform to move the content
-      innerContent.style.transform = `translateY(${translateY}px)`;
+      layoutMetricsRef.current = null;
+      return;
     }
-  }, [
-    currentSegmentIndex,
-    currentTime,
-    segments,
-    activeSegmentRef,
-    transcriptContainerRef,
-    transcriptContentInnerRef,
-  ]);
+
+    const activeElement = activeSegmentRef.current;
+    const container = transcriptContainerRef.current;
+    const currentSegment = segments[currentSegmentIndex];
+
+    layoutMetricsRef.current = {
+      elementOffsetTop: activeElement.offsetTop,
+      elementHeight: activeElement.offsetHeight,
+      containerHeight: container.clientHeight,
+      segmentStart: currentSegment.start,
+      segmentEnd: currentSegment.end,
+    };
+
+    lastTranslateYRef.current = null;
+  }, [currentSegmentIndex, segments, activeSegmentRef, transcriptContainerRef]);
+
+  useEffect(() => {
+    if (!transcriptContentInnerRef.current || currentSegmentIndex < 0) {
+      return;
+    }
+
+    const metrics = layoutMetricsRef.current;
+    if (!metrics) {
+      return;
+    }
+
+    const targetOffset = 80;
+    const availableHeight = metrics.containerHeight - targetOffset - 20;
+    const segmentDuration = metrics.segmentEnd - metrics.segmentStart;
+    const safeDuration = segmentDuration > 0 ? segmentDuration : 1;
+    const timeInSegment = currentTime - metrics.segmentStart;
+    let segmentProgress = Math.max(0, Math.min(1, timeInSegment / safeDuration));
+
+    segmentProgress = Math.min(1, segmentProgress * 1.3);
+
+    let translateY: number;
+
+    if (metrics.elementHeight <= availableHeight) {
+      translateY = targetOffset - metrics.elementOffsetTop;
+    } else {
+      const totalScrollableHeight = metrics.elementHeight - availableHeight;
+      const scrollOffset = segmentProgress * totalScrollableHeight;
+      const baseTranslateY = targetOffset - metrics.elementOffsetTop;
+      translateY = baseTranslateY - scrollOffset;
+    }
+
+    const lastTranslateY = lastTranslateYRef.current;
+    if (lastTranslateY !== null && Math.abs(lastTranslateY - translateY) < 0.75) {
+      return;
+    }
+
+    if (frameRequestRef.current !== null) {
+      cancelAnimationFrame(frameRequestRef.current);
+    }
+
+    frameRequestRef.current = requestAnimationFrame(() => {
+      lastTranslateYRef.current = translateY;
+      if (transcriptContentInnerRef.current) {
+        transcriptContentInnerRef.current.style.transform = `translateY(${translateY}px)`;
+      }
+    });
+
+    return () => {
+      if (frameRequestRef.current !== null) {
+        cancelAnimationFrame(frameRequestRef.current);
+      }
+    };
+  }, [currentSegmentIndex, currentTime, transcriptContentInnerRef]);
 }

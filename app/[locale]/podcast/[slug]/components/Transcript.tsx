@@ -4,12 +4,16 @@
  * Imports
  **************************************************/
 import { memo, useMemo } from "react";
+import dynamic from "next/dynamic";
 
 import { SerifText } from "@/components/atoms/typography";
 
-import PodcastBookmarkManager from "./PodcastBookmarkManager";
 import styles from "./PodcastPlayerStyles";
 import type { Segment } from "./types";
+
+const PodcastBookmarkManager = dynamic(() => import("./PodcastBookmarkManager"), {
+  ssr: false,
+});
 
 /* **************************************************
  * Types
@@ -23,6 +27,9 @@ type TranscriptProps = {
   bookmarks: Array<{ id: string; time: number }>;
   onRemoveBookmark: (id: string) => Promise<void>;
 };
+
+const VIRTUAL_WINDOW_SIZE = 180;
+const VIRTUAL_OVERSCAN = 60;
 
 type TranscriptSegmentRowProps = {
   segment: Segment;
@@ -81,6 +88,31 @@ export default function Transcript({
   bookmarks,
   onRemoveBookmark,
 }: TranscriptProps) {
+  const virtualRange = useMemo(() => {
+    const totalSegments = segments.length;
+    if (totalSegments === 0) {
+      return { start: 0, end: 0 };
+    }
+
+    if (currentSegmentIndex < 0) {
+      return {
+        start: 0,
+        end: Math.min(totalSegments, VIRTUAL_WINDOW_SIZE),
+      };
+    }
+
+    const baseWindowStart = Math.max(0, currentSegmentIndex - Math.floor(VIRTUAL_WINDOW_SIZE / 2));
+    const baseWindowEnd = Math.min(totalSegments, baseWindowStart + VIRTUAL_WINDOW_SIZE);
+    const start = Math.max(0, baseWindowStart - VIRTUAL_OVERSCAN);
+    const end = Math.min(totalSegments, baseWindowEnd + VIRTUAL_OVERSCAN);
+
+    return { start, end };
+  }, [currentSegmentIndex, segments.length]);
+
+  const visibleSegments = useMemo(() => {
+    return segments.slice(virtualRange.start, virtualRange.end);
+  }, [segments, virtualRange.end, virtualRange.start]);
+
   const bookmarkSegments = useMemo(
     () => segments.map((segment) => ({ start: segment.start, end: segment.end })),
     [segments],
@@ -99,11 +131,12 @@ export default function Transcript({
           className={styles.transcriptContentInner}
           style={{ position: "relative" }}
         >
-          {segments.map((segment, index) => {
+          {visibleSegments.map((segment, index) => {
+            const actualIndex = virtualRange.start + index;
             const visualState =
-              index === currentSegmentIndex
+              actualIndex === currentSegmentIndex
                 ? "active"
-                : index === currentSegmentIndex - 1 || index === currentSegmentIndex + 1
+                : actualIndex === currentSegmentIndex - 1 || actualIndex === currentSegmentIndex + 1
                   ? "nearby"
                   : "default";
 
@@ -112,17 +145,19 @@ export default function Transcript({
                 key={segment.id}
                 segment={segment}
                 visualState={visualState}
-                index={index}
+                index={actualIndex}
                 activeSegmentRef={activeSegmentRef}
               />
             );
           })}
-          <PodcastBookmarkManager
-            contentContainerSelector="#podcast-transcript-content"
-            segments={bookmarkSegments}
-            bookmarks={bookmarks}
-            onRemoveBookmark={onRemoveBookmark}
-          />
+          {bookmarks.length > 0 && (
+            <PodcastBookmarkManager
+              contentContainerSelector="#podcast-transcript-content"
+              segments={bookmarkSegments}
+              bookmarks={bookmarks}
+              onRemoveBookmark={onRemoveBookmark}
+            />
+          )}
         </div>
       </div>
       <div className={styles.transcriptFadeBottom} />

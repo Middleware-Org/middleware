@@ -41,23 +41,28 @@ export default function IssuesDropdown({ issues, className }: IssuesDropdownProp
    * Effects
    **************************************************/
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+    if (!isOpen) {
+      return;
+    }
+
+    const handleClickOutside = (event: PointerEvent) => {
+      const target = event.target;
+      if (dropdownRef.current && target instanceof Node && !dropdownRef.current.contains(target)) {
         setIsOpen(false);
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("pointerdown", handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("pointerdown", handleClickOutside);
     };
-  }, []);
+  }, [isOpen]);
 
   /* **************************************************
    * Handlers
    **************************************************/
   const handleToggle = () => {
-    setIsOpen(!isOpen);
+    setIsOpen((previous) => !previous);
   };
 
   const handleIssueSelect = (issue: Issue) => {

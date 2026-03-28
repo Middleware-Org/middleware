@@ -4,6 +4,7 @@
  * Imports
  **************************************************/
 import { useEffect, useState, useCallback } from "react";
+import { useMemo } from "react";
 
 import { toast } from "@/hooks/use-toast";
 import type { PodcastBookmark } from "@/lib/storage/podcastBookmarks";
@@ -32,6 +33,30 @@ type UsePodcastBookmarksReturn = {
   refreshBookmarks: () => Promise<void>;
 };
 
+function findSegmentIndexAtTime(segments: Segment[], time: number): number {
+  let left = 0;
+  let right = segments.length - 1;
+
+  while (left <= right) {
+    const middle = Math.floor((left + right) / 2);
+    const segment = segments[middle];
+
+    if (time < segment.start) {
+      right = middle - 1;
+      continue;
+    }
+
+    if (time > segment.end) {
+      left = middle + 1;
+      continue;
+    }
+
+    return middle;
+  }
+
+  return -1;
+}
+
 /* **************************************************
  * usePodcastBookmarks Hook
  * Gestisce lo stato e le operazioni sui bookmarks dei podcast
@@ -42,6 +67,24 @@ export function usePodcastBookmarks({
 }: UsePodcastBookmarksProps): UsePodcastBookmarksReturn {
   const [bookmarks, setBookmarks] = useState<PodcastBookmark[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const bookmarkBySegmentIndex = useMemo(() => {
+    const map = new Map<number, PodcastBookmark>();
+
+    for (const bookmark of bookmarks) {
+      const segmentIndex = findSegmentIndexAtTime(segments, bookmark.time);
+      if (segmentIndex === -1) {
+        continue;
+      }
+
+      const existingBookmark = map.get(segmentIndex);
+      if (!existingBookmark || bookmark.time < existingBookmark.time) {
+        map.set(segmentIndex, bookmark);
+      }
+    }
+
+    return map;
+  }, [bookmarks, segments]);
 
   // Carica i bookmarks iniziali
   useEffect(() => {
@@ -95,18 +138,14 @@ export function usePodcastBookmarks({
   // Restituisce il bookmark presente nello stesso chunk del tempo specificato
   const getBookmarkInChunk = useCallback(
     (time: number): PodcastBookmark | null => {
-      const currentSegment = segments.find((s) => time >= s.start && time <= s.end);
-
-      if (!currentSegment) {
+      const segmentIndex = findSegmentIndexAtTime(segments, time);
+      if (segmentIndex === -1) {
         return null;
       }
 
-      return (
-        bookmarks.find((b) => b.time >= currentSegment.start && b.time <= currentSegment.end) ??
-        null
-      );
+      return bookmarkBySegmentIndex.get(segmentIndex) ?? null;
     },
-    [bookmarks, segments],
+    [bookmarkBySegmentIndex, segments],
   );
 
   // Verifica se esiste un bookmark nello stesso chunk
@@ -121,20 +160,13 @@ export function usePodcastBookmarks({
   const addBookmark = useCallback(
     async (time: number): Promise<boolean> => {
       try {
-        // Trova il segmento/chunk corrispondente al tempo
-        const currentSegment = segments.find((s) => time >= s.start && time <= s.end);
-
-        if (!currentSegment) {
+        const segmentIndex = findSegmentIndexAtTime(segments, time);
+        if (segmentIndex === -1) {
           // Se non c'è un segmento corrispondente, non aggiungere il bookmark
           return false;
         }
 
-        // Controlla se esiste già un bookmark nello stesso chunk
-        const existingBookmark = bookmarks.find(
-          (b) => b.time >= currentSegment.start && b.time <= currentSegment.end,
-        );
-
-        if (existingBookmark) {
+        if (bookmarkBySegmentIndex.has(segmentIndex)) {
           // Non aggiungere se esiste già un bookmark nello stesso chunk
           return false;
         }
@@ -156,7 +188,7 @@ export function usePodcastBookmarks({
         return false;
       }
     },
-    [podcastSlug, segments, bookmarks],
+    [bookmarkBySegmentIndex, podcastSlug, segments],
   );
 
   // Rimuove un bookmark

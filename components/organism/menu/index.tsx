@@ -34,6 +34,8 @@ export default function Menu({ dict }: MenuProps) {
   const pathname = usePathname();
   const toLocale = useLocalizedPath();
 
+  const pathnameWithoutLang = getPathnameWithoutLang(pathname);
+
   /* **************************************************
    * Effects
    **************************************************/
@@ -51,14 +53,20 @@ export default function Menu({ dict }: MenuProps) {
 
   // Close menu on ESC key press
   useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
     const handleEscKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && isOpen) {
+      if (event.key === "Escape") {
         closeMenu();
       }
     };
 
     document.addEventListener("keydown", handleEscKey);
-    return () => document.removeEventListener("keydown", handleEscKey);
+    return () => {
+      document.removeEventListener("keydown", handleEscKey);
+    };
   }, [isOpen, closeMenu]);
 
   /* **************************************************
@@ -73,6 +81,10 @@ export default function Menu({ dict }: MenuProps) {
       return "/";
     }
     return `/${pathnameWithoutLang}`;
+  }
+
+  if (!isOpen) {
+    return null;
   }
 
   return (
@@ -94,7 +106,6 @@ export default function Menu({ dict }: MenuProps) {
         >
           <nav className={styles.navMain} role="navigation">
             {menuItems.map((item) => {
-              const pathnameWithoutLang = getPathnameWithoutLang(pathname);
               const isActive = pathnameWithoutLang === item.href;
               return (
                 <Link key={item.href} href={toLocale(item.href)}>
@@ -114,7 +125,6 @@ export default function Menu({ dict }: MenuProps) {
             role="navigation"
           >
             {headerLinks.map((item) => {
-              const pathnameWithoutLang = getPathnameWithoutLang(pathname);
               const isActive = pathnameWithoutLang === item.href;
               return (
                 <Link key={item.href} href={toLocale(item.href)}>
