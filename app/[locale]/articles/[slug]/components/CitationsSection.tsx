@@ -1,6 +1,8 @@
 /* **************************************************
  * Imports
  **************************************************/
+import type { ReactNode } from "react";
+
 import { MonoTextLight } from "@/components/atoms/typography";
 
 /* **************************************************
@@ -14,6 +16,65 @@ type Citation = {
 
 interface CitationsSectionProps {
   citations: Citation[];
+}
+
+const URL_REGEX = /https?:\/\/[^\s<>"]+/gi;
+
+function splitUrlAndTrailingPunctuation(url: string) {
+  const trimmed = url.match(/^(.*?)([),.;!?]+)$/);
+
+  if (!trimmed) {
+    return { href: url, trailing: "" };
+  }
+
+  return {
+    href: trimmed[1],
+    trailing: trimmed[2],
+  };
+}
+
+function renderCitationText(text: string): ReactNode[] {
+  const content: ReactNode[] = [];
+  let lastIndex = 0;
+
+  for (const match of text.matchAll(URL_REGEX)) {
+    const matchText = match[0];
+    const index = match.index ?? -1;
+
+    if (index < 0) {
+      continue;
+    }
+
+    if (index > lastIndex) {
+      content.push(text.slice(lastIndex, index));
+    }
+
+    const { href, trailing } = splitUrlAndTrailingPunctuation(matchText);
+
+    content.push(
+      <a
+        key={`${href}-${index}`}
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="underline break-all"
+      >
+        {href}
+      </a>,
+    );
+
+    if (trailing) {
+      content.push(trailing);
+    }
+
+    lastIndex = index + matchText.length;
+  }
+
+  if (lastIndex < text.length) {
+    content.push(text.slice(lastIndex));
+  }
+
+  return content;
 }
 
 /* **************************************************
@@ -46,10 +107,9 @@ export default function CitationsSection({ citations }: CitationsSectionProps) {
                 >
                   {citation.index}.
                 </a>
-                <MonoTextLight
-                  className="text-base leading-relaxed flex-1"
-                  dangerouslySetInnerHTML={{ __html: citation.text }}
-                />
+                <MonoTextLight className="text-base leading-relaxed flex-1 min-w-0 wrap-anywhere">
+                  {renderCitationText(citation.text)}
+                </MonoTextLight>
               </li>
             ))}
           </ol>
