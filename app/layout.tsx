@@ -2,7 +2,7 @@
  * Imports
  **************************************************/
 import "@/globals.css";
-import Toaster from "@/components/ui/sonner";
+import Toaster from "@/components/ui/LazyToaster";
 import { editorFont, gtAmericaMono } from "@/lib/fonts";
 import { getBaseUrl, createOpenGraphMetadata, createTwitterMetadata } from "@/lib/utils/metadata";
 

@@ -4,7 +4,7 @@
 import { MonoTextLight } from "@/components/atoms/typography";
 import Footer from "@/components/organism/footer";
 import Header from "@/components/organism/header";
-import Menu from "@/components/organism/menu";
+import Menu from "@/components/organism/menu/LazyMenu";
 import { TRANSLATION_NAMESPACES } from "@/lib/i18n/consts";
 import { getDictionary } from "@/lib/i18n/utils";
 import { getBaseUrl, createOpenGraphMetadata, createTwitterMetadata } from "@/lib/utils/metadata";
