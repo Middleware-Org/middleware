@@ -12,7 +12,7 @@ export default function StaticPageBody({ page }: Props) {
   const safeContent = sanitizeRichHtml(page.content);
 
   return (
-    <section className="w-full flex flex-col max-w-[1472px] mx-auto lg:px-10 md:px-4 px-4 gap-5 pb-10">
+    <section className="w-full flex flex-col max-w-[1472px] mx-auto lg:px-10 md:px-4 px-4 gap-5">
       <div className="w-full lg:max-w-[75%] max-w-full">
         <H2 className="mb-[15px] lg:text-[32px]! md:text-[28px]! text-[20px]!">{page.excerpt}</H2>
       </div>

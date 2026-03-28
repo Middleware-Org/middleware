@@ -103,7 +103,7 @@ export default function Article({
         </div>
         <Separator className="lg:mt-2.5 lg:mb-2.5 mt-2.5 mb-2.5" />
       </header>
-      <section className="w-full flex flex-col max-w-[1472px] mx-auto lg:px-10 md:px-4 px-4 gap-5 pb-10">
+      <section className="w-full flex flex-col max-w-[1472px] mx-auto lg:px-10 md:px-4 px-4 gap-5">
         <div className={cn("w-full lg:max-w-[75%] max-w-full")}>
           <H2 className="lg:text-[32px]! md:text-[28px]! text-[20px]! mb-[15px]">
             {article.excerpt}
@@ -129,13 +129,13 @@ export default function Article({
         </div>
       </section>
       {citations.length > 0 && <CitationsSection citations={citations} />}
-      <footer className="flex flex-col max-w-[1472px] mx-auto lg:px-10 md:px-4 px-4 gap-5 pb-10">
+      <footer className="flex flex-col max-w-[1472px] mx-auto lg:px-10 md:px-4 px-4 gap-5">
         <div className="flex lg:flex-row md:flex-row flex-col justify-between gap-10">
           <div className="lg:w-1/4 lg:flex hidden"></div>
           <div className="lg:w-2/4 md:w-full w-full">
             <SeparatorWithLogo />
-            <div className="py-[25px]">
-              <MonoTextLight>{author.description}</MonoTextLight>
+            <div className="py-[25px] text-center">
+              <MonoTextLight>Middleware — Laboratorio di contro-formazione</MonoTextLight>
             </div>
           </div>
           <div className="lg:w-1/4 lg:flex hidden"></div>
