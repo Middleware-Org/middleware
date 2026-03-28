@@ -9,9 +9,9 @@ createdBy: 00000000-0000-0000-0000-000000000001
 **Ultimo aggiornamento:** 4 agosto 2025
 
 Il presente documento descrive la politica di riservatezza del sito **Middleware**  
-([https://www.middleware.blog](https://www.middleware.blog)), gestito da Middleware, con sede in:  
+([https://www.middleware.media](https://www.middleware.media)), gestito da Middleware, con sede in:  
 Via Dante Alighieri 20, Modena 41013, Italia  
-Email: [**info@middleware.blog**](mailto:info@middleware.blog) – Tel: +39 370 3211722.
+Email: [**info@middleware.media**](mailto:info@middleware.media) – Tel: +39 370 3211722.
 
 ---
 
@@ -52,7 +52,7 @@ I **soli cookie utilizzati sono tecnici**, necessari al corretto funzionamento d
 - Non sono presenti script pubblicitari o di tracciamento social.
 - Gli strumenti di analisi e performance di Vercel **non impiegano cookie** e forniscono solamente misurazioni aggregate e anonime.
 
-Per maggiori dettagli consulta la nostra [Cookie Policy](https://www.middleware.blog/cookie-policy).
+Per maggiori dettagli consulta la nostra [Cookie Policy](https://www.middleware.media/cookie-policy).
 
 ---
 
@@ -72,4 +72,4 @@ Ci riserviamo il diritto di aggiornare la presente Privacy Policy. In tal caso, 
 **5\. Contatti**
 
 Per qualsiasi informazione o chiarimento:  
-Email: [**info@middleware.blog**](mailto:info@middleware.blog)
+Email: [**info@middleware.media**](mailto:info@middleware.media)

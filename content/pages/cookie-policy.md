@@ -8,7 +8,7 @@ createdBy: 00000000-0000-0000-0000-000000000001
 
 **Ultimo aggiornamento:** 4 agosto 2025
 
-Questo sito web ([https://www.middleware.blog](https://www.middleware.blog)) utilizza esclusivamente cookie tecnici e strumenti di analisi senza cookie (cookieless), nel pieno rispetto della normativa vigente.
+Questo sito web ([https://www.middleware.media](https://www.middleware.media)) utilizza esclusivamente cookie tecnici e strumenti di analisi senza cookie (cookieless), nel pieno rispetto della normativa vigente.
 
 **Cosa sono i cookie?**
 
@@ -78,4 +78,4 @@ Se lo desideri, puoi comunque gestire o eliminare i cookie tramite le impostazio
 Contatti
 
 Per ulteriori informazioni sulla presente Cookie Policy, puoi contattarci via email:  
-[**info@middleware.blog**](mailto:info@middleware.blog)
+[**info@middleware.media**](mailto:info@middleware.media)

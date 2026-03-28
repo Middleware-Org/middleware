@@ -12,7 +12,7 @@ type FooterProps = {
   dict: Pick<CommonDictionary, "footer">;
 };
 
-const EMAIL = "info@middleware.blog";
+const EMAIL = "info@middleware.media";
 
 export default function Footer({ dict }: FooterProps) {
   return (
@@ -49,7 +49,7 @@ export default function Footer({ dict }: FooterProps) {
                 key={link.href}
                 href={link.href}
                 aria-label={dict.footer[link.label as keyof typeof dict.footer]}
-                className="inline-flex items-center min-h-11 px-1 -mx-1 lg:text-left md:text-center text-center lg:text-[14px] md:text-[12px] text-[12px] lg:gap-2 md:gap-2 gap-0 hover:opacity-80 transition-opacity"
+                className="inline-flex items-center px-1 -mx-1 lg:text-left md:text-center text-center lg:text-[14px] md:text-[12px] text-[12px] lg:gap-2 md:gap-2 gap-0 hover:opacity-80 transition-opacity"
               >
                 <MonoTextBold className="text-sm font-bold">
                   {dict.footer[link.label as keyof typeof dict.footer]}
