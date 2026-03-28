@@ -49,7 +49,7 @@ export default function ArticleCard({
   return (
     <article className={styles.article}>
       <header className={styles.header}>
-        <Link href={articleLink}>
+        <Link href={articleLink} className={styles.titleLink}>
           <H3 className={styles.title}>
             {orderNumber !== undefined && `#${orderNumber} `}
             {article.title}
@@ -58,8 +58,8 @@ export default function ArticleCard({
 
         <div className={styles.authorInfo}>
           <MonoTextLight className={styles.authorLabel}>{dict.articleCard.wordsBy}</MonoTextLight>
-          <Link href={authorLink}>
-            <MonoTextBold className={styles.authorLink}>{author.name}</MonoTextBold>
+          <Link href={authorLink} className={styles.authorLink}>
+            <MonoTextBold className={styles.authorLinkText}>{author.name}</MonoTextBold>
           </Link>
         </div>
       </header>

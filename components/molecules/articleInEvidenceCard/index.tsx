@@ -16,8 +16,6 @@ import type { Article, Issue } from "@/.velite";
 
 import styles from "./styles";
 
-
-
 /* **************************************************
  * Types
  **************************************************/
@@ -68,7 +66,7 @@ export default function ArticleInEvidenceCard({
             </div>
           </div>
         )}
-        <Link href={articleHref}>
+        <Link href={articleHref} className={styles.titleLink}>
           <H3 className={cn(styles.title, textColor)}>
             {orderNumber !== undefined && `#${orderNumber} `}
             {article.title}
@@ -79,8 +77,10 @@ export default function ArticleInEvidenceCard({
           <MonoTextLight className={cn(styles.authorLabel, textColor)}>
             {dict.articleCard.wordsBy}
           </MonoTextLight>
-          <Link href={authorHref}>
-            <MonoTextBold className={cn(styles.authorLink, textColor)}>{author.name}</MonoTextBold>
+          <Link href={authorHref} className={styles.authorLink}>
+            <MonoTextBold className={cn(styles.authorLinkText, textColor)}>
+              {author.name}
+            </MonoTextBold>
           </Link>
         </div>
       </header>
