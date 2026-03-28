@@ -49,7 +49,7 @@ function findSegmentIndexAtTime(segments: Segment[], currentTime: number) {
  * Types
  **************************************************/
 type PodcastPlayerProps = {
-  podcast: Podcast;
+  podcast: Pick<Podcast, "slug" | "audio" | "audio_chunks">;
 };
 
 /* **************************************************

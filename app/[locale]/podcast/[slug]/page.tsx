@@ -255,7 +255,13 @@ export default async function PodcastPage({ params }: PodcastPageProps) {
           </H2>
         </div>
       </section>
-      <PodcastPlayer podcast={podcast} />
+      <PodcastPlayer
+        podcast={{
+          slug: podcast.slug,
+          audio: podcast.audio,
+          audio_chunks: podcast.audio_chunks,
+        }}
+      />
       {relatedPodcasts.length > 0 && (
         <>
           <div className="max-w-[1472px] mx-auto lg:px-10 md:px-4 px-4">
