@@ -36,15 +36,16 @@ export default async function RootPage({ params }: RootPageProps) {
 
   const dict = await getDictionary(locale, TRANSLATION_NAMESPACES.COMMON);
 
-  const issues = getAllIssues();
+  const issuesWithArticles = getAllIssues()
+    .map((issue) => ({
+      issue,
+      articles: getArticlesByIssue(issue.slug),
+    }))
+    .filter(({ articles }) => articles.length > 0);
 
   return (
     <div className={styles.container}>
-      {issues.map((issue, index) => {
-        const articles = getArticlesByIssue(issue.slug);
-
-        if (articles.length === 0) return null;
-
+      {issuesWithArticles.map(({ issue, articles }, renderedIndex) => {
         const { articleInEvidence, otherArticles } = splitArticlesByEvidence(articles);
 
         const orderByArticleId = issue.showOrder
@@ -63,7 +64,7 @@ export default async function RootPage({ params }: RootPageProps) {
                 dict={dict}
                 locale={locale}
                 articleInEvidenceOrderNumber={orderByArticleId?.[articleInEvidence.id]}
-                imagePriority={index === 0}
+                imagePriority={renderedIndex === 0}
               />
             </div>
             <div className={styles.issueArticlesContainer}>
