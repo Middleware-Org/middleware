@@ -22,7 +22,7 @@ export async function GET() {
       url: `${baseUrl}/${locale}/articles/${article.slug}`,
       date: new Date(article.date),
       author: getAuthorById(article.authorId)?.name || "Middleware",
-      category: getCategoryById(article.categoryId)?.name || "Tecnologia",
+      category: getCategoryById(article.categoryId)?.name || "Controformazione",
     })),
     ...podcasts.map((podcast) => ({
       type: "podcast" as const,

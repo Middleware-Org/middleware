@@ -11,6 +11,12 @@ export function useDialogFocusTrap(
   onEscape?: () => void,
 ) {
   const previousActiveElementRef = useRef<HTMLElement | null>(null);
+  const onEscapeRef = useRef(onEscape);
+
+  // Keep the ref up to date without re-triggering the effect
+  useEffect(() => {
+    onEscapeRef.current = onEscape;
+  }, [onEscape]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -31,7 +37,7 @@ export function useDialogFocusTrap(
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
         event.preventDefault();
-        onEscape?.();
+        onEscapeRef.current?.();
         return;
       }
 
@@ -67,5 +73,5 @@ export function useDialogFocusTrap(
       document.removeEventListener("keydown", handleKeyDown);
       previousActiveElementRef.current?.focus();
     };
-  }, [dialogRef, isOpen, onEscape]);
+  }, [dialogRef, isOpen]);
 }

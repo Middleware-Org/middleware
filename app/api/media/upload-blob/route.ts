@@ -81,8 +81,10 @@ export async function POST(request: NextRequest) {
                 : ["application/json"],
           maximumSizeInBytes: MAX_FILE_SIZE_BYTES,
           addRandomSuffix: false,
-          pathname: pathname, // Use the pathname provided by the client
         };
+      },
+      onUploadCompleted: async ({ blob }) => {
+        logger.debug("Upload completed", { url: blob.url, pathname: blob.pathname });
       },
     });
 
