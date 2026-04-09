@@ -87,7 +87,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: https: blob:",
               "font-src 'self' data:",
-              `connect-src 'self' va.vercel-scripts.com vitals.vercel-insights.com ${blobStorageHostname} raw.githubusercontent.com`,
+              `connect-src 'self' va.vercel-scripts.com vitals.vercel-insights.com https://vercel.com ${blobStorageHostname} raw.githubusercontent.com`,
               "media-src 'self' https: blob:",
               "object-src 'none'",
               "base-uri 'self'",

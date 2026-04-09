@@ -137,7 +137,7 @@ export default function Menu({ dict }: MenuProps) {
             })}
           </nav>
           <div className={styles.footer}>
-            <Pictogram />
+            <Pictogram onClick={handleMenuLinkSelect} />
             <MonoTextBold className={styles.title}>{dict.title}</MonoTextBold>
             <MonoTextLight className={styles.quote}>
               &ldquo;{dict.aria.menu.quote}&rdquo;
