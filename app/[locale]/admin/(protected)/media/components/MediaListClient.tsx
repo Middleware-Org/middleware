@@ -110,9 +110,8 @@ export default function MediaListClient() {
         toast.actionResult(result, { errorTitle: adminListCopy.media.deleteManyErrorTitle });
       } else {
         toast.success(result.message || adminListCopy.media.deleteManySuccess);
-        // Invalida la cache SWR per forzare il refetch
-        mutate("/api/media");
-        mutate("/api/github/merge/check");
+        // Invalida la cache SWR e attende il refetch
+        await Promise.all([mutate("/api/media"), mutate("/api/github/merge/check")]);
         clearSelection();
       }
     });

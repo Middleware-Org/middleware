@@ -6,7 +6,7 @@
 import { upload } from "@vercel/blob/client";
 import { Search, X, Music, FileJson } from "lucide-react";
 import Image from "next/image";
-import { useState, useRef, useMemo, useEffect } from "react";
+import { useState, useRef, useMemo, useEffect, useCallback } from "react";
 import { mutate } from "swr";
 
 import { useMedia } from "@/hooks/swr";
@@ -113,11 +113,23 @@ export default function AudioJsonMediaSelector({
     }
   }, [isError]);
 
-  useDialogFocusTrap(isOpen, modalRef, onClose);
+  const handleClose = useCallback(() => {
+    setSearchQuery("");
+    setPreview(null);
+    setSelectedFile(null);
+    setFilename("");
+    setVisibleCount(ITEMS_PER_PAGE);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+    onClose();
+  }, [onClose]);
+
+  useDialogFocusTrap(isOpen, modalRef, handleClose);
 
   function handleSelect(fileUrl: string) {
     onSelect(fileUrl);
-    onClose();
+    handleClose();
   }
 
   function handleFileSelect(event: React.ChangeEvent<HTMLInputElement>) {
@@ -235,8 +247,8 @@ export default function AudioJsonMediaSelector({
       });
 
       toast.success(adminModalCopy.audioJsonSelector.uploadSuccess);
-      // Invalida la cache SWR per forzare il refetch
-      mutate("/api/media");
+      // Invalida la cache SWR e attende il refetch
+      await mutate("/api/media");
       // Seleziona automaticamente il file appena caricato
       handleSelect(blob.url);
       // Reset form
@@ -285,7 +297,7 @@ export default function AudioJsonMediaSelector({
           </h2>
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
             className={baseStyles.modalCloseButton}
             aria-label={adminModalCopy.audioJsonSelector.closeAria}
           >
@@ -499,7 +511,7 @@ export default function AudioJsonMediaSelector({
 
         {/* Footer */}
         <div className={baseStyles.modalFooter}>
-          <button type="button" onClick={onClose} className={baseStyles.cancelButton}>
+          <button type="button" onClick={handleClose} className={baseStyles.cancelButton}>
             {adminModalCopy.common.cancel}
           </button>
         </div>

@@ -41,6 +41,8 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
   const handleClose = useCallback(() => {
     if (!isPending) {
       setNewFilename("");
+      setShowDeleteConfirm(false);
+      setJsonContent(null);
       onClose();
     }
   }, [isPending, onClose]);
@@ -111,7 +113,7 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
 
     if (finalFilename === file.name) {
       // No change, just close
-      onClose();
+      handleClose();
       return;
     }
 
@@ -122,10 +124,9 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
         toast.actionResult(result, { errorTitle: adminModalCopy.mediaDialog.renameErrorTitle });
       } else {
         toast.success(result.message || adminModalCopy.mediaDialog.renameSuccess);
-        // Invalida la cache SWR per forzare il refetch
-        mutate("/api/media");
-        mutate("/api/github/merge/check");
-        onClose();
+        // Invalida la cache SWR e attende il refetch
+        await Promise.all([mutate("/api/media"), mutate("/api/github/merge/check")]);
+        handleClose();
       }
     });
   }
@@ -142,10 +143,9 @@ export default function MediaDialog({ isOpen, onClose, file }: MediaDialogProps)
         toast.actionResult(result, { errorTitle: adminModalCopy.mediaDialog.deleteErrorTitle });
       } else {
         toast.success(result.message || adminModalCopy.mediaDialog.deleteSuccess);
-        // Invalida la cache SWR per forzare il refetch
-        mutate("/api/media");
-        mutate("/api/github/merge/check");
-        onClose();
+        // Invalida la cache SWR e attende il refetch
+        await Promise.all([mutate("/api/media"), mutate("/api/github/merge/check")]);
+        handleClose();
       }
     });
   }

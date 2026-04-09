@@ -6,7 +6,7 @@
 import { upload } from "@vercel/blob/client";
 import { Search, X } from "lucide-react";
 import Image from "next/image";
-import { useState, useRef, useMemo, useEffect } from "react";
+import { useState, useRef, useMemo, useEffect, useCallback } from "react";
 import { mutate } from "swr";
 
 import { useMedia } from "@/hooks/swr";
@@ -60,8 +60,12 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
     return filtered;
   }, [allMediaFiles, searchQuery]);
 
-  const { visibleItems: visibleFiles, hasMore, sentinelRef, reset: resetScroll } =
-    useInfiniteScrollList(filteredFiles, { isActive: isOpen });
+  const {
+    visibleItems: visibleFiles,
+    hasMore,
+    sentinelRef,
+    reset: resetScroll,
+  } = useInfiniteScrollList(filteredFiles, { isActive: isOpen });
 
   // Reset scroll when search changes
   useEffect(() => {
@@ -74,11 +78,24 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
     }
   }, [isError]);
 
-  useDialogFocusTrap(isOpen, modalRef, onClose);
+  const handleClose = useCallback(() => {
+    setSearchQuery("");
+    setPreview(null);
+    setSelectedFile(null);
+    setFilename("");
+    setSelectedFileForDialog(null);
+    setIsDialogOpen(false);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+    onClose();
+  }, [onClose]);
+
+  useDialogFocusTrap(isOpen, modalRef, handleClose);
 
   function handleSelect(imageUrl: string) {
     onSelect(imageUrl);
-    onClose();
+    handleClose();
   }
 
   function handleFileClick(file: ApiMediaFile, event: React.MouseEvent) {
@@ -168,9 +185,8 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
       });
 
       toast.success(adminModalCopy.mediaSelector.uploadSuccess);
-      // Invalida la cache SWR per forzare il refetch
-      mutate("/api/media");
-      mutate("/api/github/merge/check");
+      // Invalida la cache SWR e attende il refetch
+      await Promise.all([mutate("/api/media"), mutate("/api/github/merge/check")]);
       // Seleziona automaticamente il file appena caricato
       handleSelect(blob.url);
       // Reset form
@@ -211,7 +227,7 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
           </h2>
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
             className={baseStyles.modalCloseButton}
             aria-label={adminModalCopy.mediaSelector.closeAria}
           >
@@ -420,7 +436,7 @@ export default function MediaSelector({ isOpen, onClose, onSelect }: MediaSelect
 
         {/* Footer */}
         <div className={baseStyles.modalFooter}>
-          <button type="button" onClick={onClose} className={baseStyles.cancelButton}>
+          <button type="button" onClick={handleClose} className={baseStyles.cancelButton}>
             {adminModalCopy.common.cancel}
           </button>
         </div>

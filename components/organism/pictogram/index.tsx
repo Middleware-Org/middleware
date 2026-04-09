@@ -17,17 +17,17 @@ import styles from "./styles";
 interface PictogramProps {
   className?: string;
   size?: number;
-  onClick?: () => void;
+  handleClick?: () => void;
 }
 
 /* **************************************************
  * Pictogram
  **************************************************/
-export default function Pictogram({ className, size = 48, onClick }: PictogramProps) {
+export default function Pictogram({ className, size = 48, handleClick }: PictogramProps) {
   const toLocale = useLocalizedPath();
 
   return (
-    <Link href={toLocale("/")} onClick={() => (onClick ? onClick : null)}>
+    <Link href={toLocale("/")} onClick={handleClick}>
       <span className={cn(styles.pictogram, className ?? "")}>
         <Image src="/logo.svg" alt="Middleware" width={size} height={size} />
       </span>

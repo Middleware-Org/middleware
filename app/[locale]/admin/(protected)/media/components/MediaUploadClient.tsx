@@ -148,8 +148,7 @@ export default function MediaUploadClient() {
       toast.success(adminFormCopy.mediaUpload.uploadSuccess);
       // Invalida la cache SWR per forzare il refetch
       const { mutate } = await import("swr");
-      mutate("/api/media");
-      mutate("/api/github/merge/check");
+      await Promise.all([mutate("/api/media"), mutate("/api/github/merge/check")]);
       handleRemove();
       formRef.current?.reset();
     } catch (error) {
