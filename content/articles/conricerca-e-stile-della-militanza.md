@@ -3,7 +3,7 @@ id: 5f6bad46-85c4-4298-bd14-7593eb1c03f0
 slug: conricerca-e-stile-della-militanza
 title: Conricerca e stile della militanza
 date: '2026-04-07'
-last_update: '2026-04-13T17:11:50.038Z'
+last_update: '2026-04-13T17:13:21.713Z'
 authorId: 9e421669-3a18-4bdb-94f9-e0bf8fef86dd
 categoryId: 6dfdddaf-c93c-4f34-8a6d-c3b4eebb0859
 in_evidence: false
@@ -15,10 +15,6 @@ createdBy: 57b37768-d15b-42f2-9d78-383e92d8c828
 issueId: 3ae30972-293d-440e-ab7c-9ee1c28954a8
 podcastId: 5556dd94-13c8-46ea-a9df-75c979c524fc
 ---
-Ecco il testo con tutte le modifiche applicate, mantenendo la struttura Markdown.
-
-* * *
-
 Questo testo raccoglie i contenuti del terzo di quattro incontri di contro-formazione dedicati all'operaismo politico italiano. Il ciclo è strutturato in quattro parti: [contesto e origini](https://middleware.media/it/articles/contesto-e-origini), [genealogia e lessico](https://middleware.media/it/articles/genealogia-e-lessico), conricerca e stile della militanza, e infine tracce e ipotesi.
 
 Nel primo incontro abbiamo ricostruito il contesto: l'Italia del miracolo economico, la crisi del movimento operaio tradizionale, l'emergere di una figura nuova, l'operaio-massa. E abbiamo visto come un piccolo gruppo di militanti abbia potuto esercitare un impatto sproporzionato rispetto ai propri numeri: perché hanno anticipato, scommettendo su una composizione di classe che nessuno ancora vedeva.
