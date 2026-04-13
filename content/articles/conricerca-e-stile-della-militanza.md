@@ -3,7 +3,7 @@ id: 5f6bad46-85c4-4298-bd14-7593eb1c03f0
 slug: conricerca-e-stile-della-militanza
 title: Conricerca e stile della militanza
 date: '2026-04-07'
-last_update: '2026-04-07T11:01:23.461Z'
+last_update: '2026-04-13T13:54:52.324Z'
 authorId: 9e421669-3a18-4bdb-94f9-e0bf8fef86dd
 categoryId: 6dfdddaf-c93c-4f34-8a6d-c3b4eebb0859
 in_evidence: false
@@ -27,7 +27,8 @@ Questo terzo incontro parte da dove il secondo si era fermato. Avevamo detto che
 
 ## Un cane in chiesa
 
-Un cane in chiesa disturba, è fuori posto e non può fare a meno di esserlo. Romano Alquati era così: dava fastidio non solo all'università e al mondo intellettuale, ma anche a molti compagni. Il suo modo di lavorare metteva a disagio le certezze di chiunque, rimetteva continuamente in discussione quello che sembrava acquisito. E per questo il suo pensiero è stato spesso ignorato. Ma, come scrivono i curatori del volume che raccoglie i suoi scritti:
+Un cane in chiesa disturba, è fuori posto e non può fare a meno di esserlo. Romano Alquati era così: dava fastidio non solo all'università e al mondo intellettuale, ma anche a molti compagni. Il suo modo di lavorare metteva a disagio le certezze di chiunque, rimetteva continuamente in discussione quello che sembrava acquisito. E per questo il suo pensiero è stato spesso ignorato. Ma, come scrivono i curatori del volume che raccoglie i suoi scritti[citation:citation-1776088485071-rwdi25qwq:Per un’introduzione alla figura di Romano Alquati, si veda Francesco Bedani e Francesca Ioannilli, Un cane in chiesa. Militanza, categorie e conricerca di Romano Alquati, DeriveApprodi, disponibile all’indirizzo\: https\://deriveapprodi.com/libro/un-cane-in-chiesa/
+.]:
 
 > «dare fastidio è forse la più significativa qualità di una soggettività rivoluzionaria».
 
