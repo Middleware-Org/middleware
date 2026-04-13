@@ -3,7 +3,7 @@ id: 5f6bad46-85c4-4298-bd14-7593eb1c03f0
 slug: conricerca-e-stile-della-militanza
 title: Conricerca e stile della militanza
 date: '2026-04-07'
-last_update: '2026-04-13T17:13:21.713Z'
+last_update: '2026-04-13T17:17:18.242Z'
 authorId: 9e421669-3a18-4bdb-94f9-e0bf8fef86dd
 categoryId: 6dfdddaf-c93c-4f34-8a6d-c3b4eebb0859
 in_evidence: false
@@ -67,7 +67,7 @@ Stare dentro, però, non basta. La conricerca significa stare dentro e contro.
 
 Stare contro vuol dire partire dalla consapevolezza della propria condizione e dal desiderio di rifiutarla perché insostenibile. La conricerca nasce quando si trova questo mondo invivibile e si vuole cambiarlo. Non è un'operazione neutrale: è politicamente orientata, punta a cambiare lo stato delle cose non aspettando il cambiamento, ma creando le condizioni perché avvenga.
 
-Se non esiste un fuori dal capitalismo, non esistono nemmeno strumenti neutri da cui partire. Occorre quindi impossessarsi degli strumenti del capitale e controutilizzarli, non rigettarli come estranei. Le macchine, la scienza, le tecnologie di comunicazione, le forme organizzative: non esistono strumenti neutri, tutti sono attraversati da un rapporto di forza, tutti portano impresso il segno del comando. Ma proprio perché nati come strumenti di comando, possono essere curvati e trasformati in strumenti di liberazione. Le contro-risorse si costruiscono curvando ciò che c'è già.
+Se non esiste un fuori dal capitalismo, non esistono nemmeno strumenti neutri da cui partire. Occorre quindi impossessarsi degli strumenti del capitale e controutilizzarli, non rigettarli come estranei. Le macchine, la scienza, le tecnologie di comunicazione, le forme organizzative: non esistono strumenti privi di storia, tutti sono attraversati da un rapporto di forza, tutti portano impresso il segno del comando. Ma proprio perché nati come strumenti di comando, possono essere curvati e trasformati in strumenti di liberazione. Le contro-risorse si costruiscono curvando ciò che c'è già.
 
 ### L'ambivalenza
 
@@ -113,7 +113,7 @@ A caldo, quando la lotta è già esplosa, si è arrivati tardi: la situazione si
 
 La conricerca è un metodo, ma Alquati preferisce una definizione più precisa: è lo stile della militanza. Non si fa conricerca come si applica una tecnica; si fa conricerca come si vive la propria militanza.
 
-La si fa quando si trova questo mondo invivibile e si vuole cambiarlo. Se si sta bene nel capitalismo, la conricerca non interessa: richiede fatica, richiede di mettersi in discussione, richiede la volontà autentica di sovvertire, non di migliorare. È indispensabile dunque contro-formare una capacità di pensare e agire dentro processi continuamente aperti e modificabili. Lo scopo immediato della conricerca è acquisire nuova conoscenza più potente, cioè più efficiente per conseguire lo scopo di trasformazione della realtà.
+La si fa quando la propria condizione diventa intollerabile e si vuole trasformarla. Se si sta bene nel capitalismo, la conricerca non interessa: richiede fatica, richiede di mettersi in discussione, richiede la volontà autentica di sovvertire, non di migliorare. È indispensabile dunque contro-formare una capacità di pensare e agire dentro processi continuamente aperti e modificabili. Lo scopo immediato della conricerca è acquisire nuova conoscenza più potente, cioè più efficiente per conseguire lo scopo di trasformazione della realtà.
 
 ## Il modellone
 
