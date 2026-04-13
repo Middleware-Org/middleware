@@ -3,7 +3,7 @@ id: 5f6bad46-85c4-4298-bd14-7593eb1c03f0
 slug: conricerca-e-stile-della-militanza
 title: Conricerca e stile della militanza
 date: '2026-04-07'
-last_update: '2026-04-13T18:40:25.664Z'
+last_update: '2026-04-13T18:47:56.532Z'
 authorId: 9e421669-3a18-4bdb-94f9-e0bf8fef86dd
 categoryId: 6dfdddaf-c93c-4f34-8a6d-c3b4eebb0859
 in_evidence: false
@@ -27,9 +27,7 @@ Questo terzo incontro parte da dove il secondo si era fermato. Avevamo detto che
 
 ## Un cane in chiesa
 
-Un cane in chiesa disturba, è fuori posto e non può fare a meno di esserlo. Romano Alquati era così: dava fastidio all'università, al mondo intellettuale, ma anche a molti compagni. Il suo modo di lavorare metteva a disagio le certezze di chiunque, rimetteva in discussione quello che sembrava acquisito. E per questo il suo pensiero è stato spesso ignorato. Ma, come scrivono i curatori del volume che raccoglie i suoi scritti\[citation-1776088485071-rwdi25qwq\]:
-
-> «dare fastidio è forse la più significativa qualità di una soggettività rivoluzionaria».
+Un cane in chiesa disturba, è fuori posto e non può fare a meno di esserlo. Romano Alquati era così: dava fastidio all'università, al mondo intellettuale, ma anche a molti compagni. Il suo modo di lavorare metteva a disagio le certezze di chiunque, rimetteva in discussione quello che sembrava acquisito. E per questo il suo pensiero è stato spesso ignorato. Ma dare fastidio è forse la più significativa qualità di una soggettività rivoluzionaria.
 
 Alquati viene da Cremona e arriva nella Torino industriale degli anni Cinquanta. Si forma in rottura con il PSI e con il sindacato: il mito della classe operaia non gli basta. Non gli basta sapere cosa gli operai dovrebbero fare secondo una teoria già confezionata. Bisogna andare a vedere, capire cosa fanno e come pensano, scommettere sulla soggettività operaia reale. Quando arriva a Torino trova qualcosa che le organizzazioni comuniste non sanno leggere: una classe operaia che non si comporta come dovrebbe. Giovani operai che non si riconoscono nel sindacato, che non parlano il linguaggio del partito. Per il movimento ufficiale erano un problema. Per Alquati erano il punto di partenza.
 
