@@ -3,7 +3,7 @@ id: 5f6bad46-85c4-4298-bd14-7593eb1c03f0
 slug: conricerca-e-stile-della-militanza
 title: Conricerca e stile della militanza
 date: '2026-04-07'
-last_update: '2026-04-13T18:47:56.532Z'
+last_update: '2026-04-13T18:55:11.124Z'
 authorId: 9e421669-3a18-4bdb-94f9-e0bf8fef86dd
 categoryId: 6dfdddaf-c93c-4f34-8a6d-c3b4eebb0859
 in_evidence: false
